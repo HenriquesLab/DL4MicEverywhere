@@ -8,14 +8,19 @@ RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/
 
 WORKDIR /home 
 
-ARG CACHEBUST=1 
-ARG NOTEBOOK_NAME="notebookname.ipynb"
-ARG PATH_TO_NOTEBOOK="https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/${NOTEBOOK_NAME}"
-ARG PATH_TO_REQUIREMENTS="https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/master/requirements_files/${NOTEBOOK_NAME}"
+ARG CACHEBUST=1
+ARG NOTEBOOK_NAME="notebook_name"
+ARG PATH_TO_NOTEBOOK="path_to_the_notebook"
+ARG PATH_TO_REQUIREMENTS="path_to_the_requirements"
+ARG SECTIONS_TO_REMOVE=""
 
 # Download the selected notebook from ZeroCostDL4Mic and the requirements.txt
-RUN wget "${PATH_TO_NOTEBOOK}?raw=true" -O ${NOTEBOOK_NAME} \
-    && wget "${PATH_TO_REQUIREMENTS}?raw=true" -O requirements.txt
+# RUN wget "${PATH_TO_NOTEBOOK}?raw=true" -O ${NOTEBOOK_NAME} \
+#     && wget "${PATH_TO_REQUIREMENTS}?raw=true" -O requirements.txt
+# Until the requirements are tested and published in a public repository, they will be stored here
+RUN wget "${PATH_TO_NOTEBOOK}?raw=true" -O ${NOTEBOOK_NAME}
+
+COPY requirements.txt .
 
 RUN pip install -r requirements.txt \
     && rm requirements.txt
@@ -23,8 +28,8 @@ RUN pip install -r requirements.txt \
 RUN wget https://github.com/IvanHCenalmor/colab_to_docker/archive/refs/heads/main.zip -O colab_to_docker.zip \
     && unzip colab_to_docker.zip \
     && rm colab_to_docker.zip \
-    && pip install nbformat \
-    && python colab_to_docker-main/src/transform.py -p . -n ${NOTEBOOK_NAME} \
+    && pip install nbformat
+RUN python colab_to_docker-main/src/transform.py -p . -n ${NOTEBOOK_NAME} -s ${SECTIONS_TO_REMOVE}\
     && mv colabless_${NOTEBOOK_NAME} ${NOTEBOOK_NAME} \
     && rm -r colab_to_docker-main
 

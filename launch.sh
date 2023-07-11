@@ -1,24 +1,21 @@
 #!/bin/bash
 
-echo $BASH_VERSION
-
 declare -A notebook_dict
-notebook_dict[care2d]="CARE_2D_DL4Mic"
-notebook_dict[care3d]="CARE_3D_DL4Mic"
-notebook_dict[cyclegan]=CycleGAN_DL4Mic
-notebook_dict[deepstorm2d]=Deep-STORM_2D_DL4Mic
-notebook_dict[noise2void2d]=Noise2Void_2D_DL4Mic
-notebook_dict[noise2void3d]=Noise2Void_3D_DL4Mic
-notebook_dict[stardist2d]=StarDist_2D_DL4Mic
-notebook_dict[stardist3d]=StarDist_3D_DL4Mic
-notebook_dict[unet2d]="U-Net_2D_DL4Mic"
-notebook_dict[unet3d]="U-Net_3D_DL4Mic"
-notebook_dict[unet2dmultilabel]=U-Net_2D_Multilabel_DL4Mic
-notebook_dict[yolov2]=YOLOv2_DL4Mic
-notebook_dict[fnet2d]=fnet_2D_DL4Mic
-notebook_dict[fnet3d]=fnet_3D_DL4Mic
-notebook_dict[pix2pix]=pix2pix_DL4Mic
-
+notebook_dict[care2d]="CARE_2D"
+notebook_dict[care3d]="CARE_3D"
+notebook_dict[cyclegan]="CycleGAN"
+notebook_dict[deepstorm2d]="Deep-STORM_2D"
+notebook_dict[noise2void2d]="Noise2Void_2D"
+notebook_dict[noise2void3d]="Noise2Void_3D"
+notebook_dict[stardist2d]="StarDist_2D"
+notebook_dict[stardist3d]="StarDist_3D"
+notebook_dict[unet2d]="U-Net_2D"
+notebook_dict[unet3d]="U-Net_3D"
+notebook_dict[unet2dmultilabel]="U-Net_2D_Multilabel"
+notebook_dict[yolov2]="YOLOv2"
+notebook_dict[fnet2d]="fnet_2D"
+notebook_dict[fnet3d]="fnet_3D"
+notebook_dict[pix2pix]=pix2pix
 
 usage() {
   cat << EOF # remove the space between << and EOF, this is due to web plugin issue
@@ -68,31 +65,36 @@ while getopts :hv:n:d: flag;do
    esac
 done
 
-if [ -z "$version" ]; then 
-   echo "No version has been specified, please make sure to use -v --version argument and give a value to it."
-   exit
-else
-   echo "version $version"
-fi 
-
 if [ -z "$name" ]; then 
    echo "No notebook name has been specified, please make sure to use -n --name argument and give a value to it."
    exit
 else
-   echo "name $name"
+   echo "Notebook name: $name"
    if [ -v "${notebook_dict[$name]}" ]; then
       echo "No such name for the notebook" 
       exit
    else
-      echo "notebook ${notebook_dict[$name]}" 
+      echo "Actual notebook: ${notebook_dict[$name]}" 
    fi
+fi 
+
+if [ -z "$version" ]; then 
+   echo "No version has been specified, please make sure to use -v --version argument and give a value to it."
+   exit
+else
+   echo "Version: $version"
 fi 
 
 if [ -z "$data_path" ]; then 
    echo "No data path has been specified, please make sure to use -d --data_path argument and give a value to it."
    exit
 else
-   echo "data_path $data_path"
+   echo "Path to the data: $data_path"
 fi 
 
-bash "/notebooks/${notebook_dict[$name]}/docker.sh" -v $version -d $data_path
+echo ""
+
+parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+cd "$parent_path/notebooks/${notebook_dict[$name]}_DL4Mic"
+
+bash docker.sh ${notebook_dict[$name]} $version $data_path 
