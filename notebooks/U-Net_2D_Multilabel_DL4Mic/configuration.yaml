@@ -1,0 +1,4 @@
+notebook_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/U-Net_2D_Multilabel_ZeroCostDL4Mic.ipynb
+requirements_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/master/requirements_files/2D_UNet_multilabel_requirements_simple.txt
+base_img: tensorflow/tensorflow:2.8.0-gpu
+sections_to_remove: 1.1. 1.2. 2. 6.2.

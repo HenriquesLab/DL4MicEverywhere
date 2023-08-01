@@ -1,21 +1,22 @@
 #!/bin/bash
 
-declare -A notebook_dict
-notebook_dict[care2d]="CARE_2D"
-notebook_dict[care3d]="CARE_3D"
-notebook_dict[cyclegan]="CycleGAN"
-notebook_dict[deepstorm2d]="Deep-STORM_2D"
-notebook_dict[noise2void2d]="Noise2Void_2D"
-notebook_dict[noise2void3d]="Noise2Void_3D"
-notebook_dict[stardist2d]="StarDist_2D"
-notebook_dict[stardist3d]="StarDist_3D"
-notebook_dict[unet2d]="U-Net_2D"
-notebook_dict[unet3d]="U-Net_3D"
-notebook_dict[unet2dmultilabel]="U-Net_2D_Multilabel"
-notebook_dict[yolov2]="YOLOv2"
-notebook_dict[fnet2d]="fnet_2D"
-notebook_dict[fnet3d]="fnet_3D"
-notebook_dict[pix2pix]=pix2pix
+# As there are not key-value lists on bash versions lower to 4 and mac computers cannot have that version, 
+# this is a way to create this key-value list
+notebook_care2d="CARE_2D"
+notebook_care3d="CARE_3D"
+notebook_cyclegan="CycleGAN"
+notebook_deepstorm2d="Deep-STORM_2D"
+notebook_noise2void2d="Noise2Void_2D"
+notebook_noise2void3d="Noise2Void_3D"
+notebook_stardist2d="StarDist_2D"
+notebook_stardist3d="StarDist_3D"
+notebook_unet2d="U-Net_2D"
+notebook_unet3d="U-Net_3D"
+notebook_unet2dmultilabel="U-Net_2D_Multilabel"
+notebook_yolov2="YOLOv2"
+notebook_fnet2d="fnet_2D"
+notebook_fnet3d="fnet_3D"
+notebook_pix2pix="pix2pix"
 
 usage() {
   cat << EOF # remove the space between << and EOF, this is due to web plugin issue
@@ -48,6 +49,29 @@ EOF
   exit
 }
 
+parse_yaml() {
+  
+  local prefix=$2
+  local s='[[:space:]]*'
+  local w='[a-zA-Z0-9_]*'
+  local fs=$(echo @|tr @ '\034')
+  
+  sed "h;s/^[^:]*//;x;s/:.*$//;y/-/_/;G;s/\n//" $1 |
+  sed -ne "s|^\($s\)\($w\)$s:$s\"\(.*\)\"$s\$|\1$fs\2$fs\3|p" \
+      -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" |
+  awk -F$fs '{
+    indent = length($1)/2;
+    vname[indent] = $2;
+
+    for (i in vname) {if (i > indent) {delete vname[i]}}
+    if (length($3) > 0) {
+        vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+        printf("%s%s%s : \"%s\"\n", "'$prefix'",vn, $2, $3);
+    }
+  }'
+}
+
+
 while getopts :hv:n:d: flag;do
    case $flag in 
       h)
@@ -70,11 +94,13 @@ if [ -z "$name" ]; then
    exit
 else
    echo "Notebook name: $name"
-   if [ -v "${notebook_dict[$name]}" ]; then
+   notebook_name=notebook_$name
+   echo ${!notebook_name}
+   if [ -z "${!notebook_name}" ]; then
       echo "No such name for the notebook" 
       exit
    else
-      echo "Actual notebook: ${notebook_dict[$name]}" 
+      echo "Actual notebook: ${!notebook_name}" 
    fi
 fi 
 
@@ -94,7 +120,17 @@ fi
 
 echo ""
 
-parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-cd "$parent_path/notebooks/${notebook_dict[$name]}_DL4Mic"
+echo "Configuration in the yaml file:"
+eval parse_yaml notebooks/${!notebook_name}_DL4Mic/configuration.yaml
+echo ""
 
-bash docker.sh ${notebook_dict[$name]} $version $data_path 
+docker build \
+       --build-arg="BASE_IMAGE=${base_img}" \
+       --build-arg CACHEBUST=$(date +%s) \
+       --build-arg="NOTEBOOK_NAME=${!notebook_name}_DL4Mic.ipynb" \
+       --build-arg="PATH_TO_NOTEBOOK=${notebook_url}" \
+       --build-arg="PATH_TO_REQUIREMENTS=${requirements_url}" \
+       --build-arg="SECTIONS_TO_REMOVE=${sections_to_remove}" \
+       -t $${!notebook_name}_dl4mic .
+
+docker run -it --gpus all -p 8888:8888 -v $data_path:/home/dataset ${!notebook_name}_dl4mic
