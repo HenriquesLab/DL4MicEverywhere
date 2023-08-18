@@ -1,4 +1,5 @@
 notebook_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/CARE_2D_ZeroCostDL4Mic.ipynb
 requirements_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/master/requirements_files/CARE_2D_requirements_simple.txt
-base_img: tensorflow/tensorflow:2.8.0-gpu
+base_img: nvidia/cuda:11.8.0-base-ubuntu22.04
+python_version: 10
 sections_to_remove: 1.1. 1.2. 2. 6.3.

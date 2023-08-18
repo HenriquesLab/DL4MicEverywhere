@@ -49,26 +49,21 @@ EOF
   exit
 }
 
-parse_yaml() {
-  
-  local prefix=$2
-  local s='[[:space:]]*'
-  local w='[a-zA-Z0-9_]*'
-  local fs=$(echo @|tr @ '\034')
-  
-  sed "h;s/^[^:]*//;x;s/:.*$//;y/-/_/;G;s/\n//" $1 |
-  sed -ne "s|^\($s\)\($w\)$s:$s\"\(.*\)\"$s\$|\1$fs\2$fs\3|p" \
-      -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" |
-  awk -F$fs '{
-    indent = length($1)/2;
-    vname[indent] = $2;
-
-    for (i in vname) {if (i > indent) {delete vname[i]}}
-    if (length($3) > 0) {
-        vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
-        printf("%s%s%s : \"%s\"\n", "'$prefix'",vn, $2, $3);
-    }
-  }'
+function parse_yaml {
+   local prefix=$2
+   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
+   sed -ne "s|^\($s\):|\1|" \
+        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
+        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
+   awk -F$fs '{
+      indent = length($1)/2;
+      vname[indent] = $2;
+      for (i in vname) {if (i > indent) {delete vname[i]}}
+      if (length($3) > 0) {
+         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+         printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
+      }
+   }'
 }
 
 
@@ -117,20 +112,18 @@ if [ -z "$data_path" ]; then
 else
    echo "Path to the data: $data_path"
 fi 
-
 echo ""
 
-echo "Configuration in the yaml file:"
-eval parse_yaml notebooks/${!notebook_name}_DL4Mic/configuration.yaml
-echo ""
+# Read the variables fro mthe yaml file
+eval $(parse_yaml ./notebooks/${!notebook_name}_DL4Mic/configuration.yaml)
 
-docker build \
-       --build-arg="BASE_IMAGE=${base_img}" \
-       --build-arg CACHEBUST=$(date +%s) \
-       --build-arg="NOTEBOOK_NAME=${!notebook_name}_DL4Mic.ipynb" \
-       --build-arg="PATH_TO_NOTEBOOK=${notebook_url}" \
-       --build-arg="PATH_TO_REQUIREMENTS=${requirements_url}" \
-       --build-arg="SECTIONS_TO_REMOVE=${sections_to_remove}" \
-       -t $${!notebook_name}_dl4mic .
+# Build and launch the docker
+docker build . --no-cache -t "${name}_dl4mic" \
+       --build-arg BASE_IMAGE="${base_img}" \
+       --build-arg PYTHON_VERSIOM="${python_version}" \
+       --build-arg NOTEBOOK_NAME="${!notebook_name}_DL4Mic.ipynb" \
+       --build-arg PATH_TO_NOTEBOOK="${notebook_url}" \
+       --build-arg PATH_TO_REQUIREMENTS="${requirements_url}" \
+       --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
 
-docker run -it --gpus all -p 8888:8888 -v $data_path:/home/dataset ${!notebook_name}_dl4mic
+docker run -it --gpus all -p 8888:8888 -v $data_path:/home/dataset ${name}_dl4mic
