@@ -21,16 +21,16 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ARG PYTHON_VERSIOM="9"
 RUN add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && apt-get install -y \
-    python3.${PYTHON_VERSIOM} python3.${PYTHON_VERSIOM}-dev python3-pip python3.${PYTHON_VERSIOM}-venv && \
+    python${PYTHON_VERSIOM} python${PYTHON_VERSIOM}-dev python3-pip python${PYTHON_VERSIOM}-venv && \
     rm -rf /var/lib/apt/lists/* && \
-    python3.${PYTHON_VERSIOM} -m pip install pip --upgrade && \
-    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.${PYTHON_VERSIOM} 0 && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.${PYTHON_VERSIOM} 0
+    python${PYTHON_VERSIOM} -m pip install pip --upgrade && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${PYTHON_VERSIOM} 0 && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_VERSIOM} 0
 
 # Run nvidia-cudnn-cu11 for Python
 RUN pip install nvidia-cudnn-cu11==8.6.0.163
 # And export the environment variable LD_LIBRARY_PATH
-ENV LD_LIBRARY_PATH lib/:/usr/local/lib/python3.${PYTHON_VERSIOM}/dist-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH lib/:/usr/local/lib/python${PYTHON_VERSIOM}/dist-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
 
 WORKDIR /home 
 

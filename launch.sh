@@ -44,7 +44,7 @@ Available options:
                                        - fnet3d
                                        - pix2pix
 -d --data_path  Path to the data directory
-
+-g --gpu        Flag to specify if GPU should be used
 EOF
   exit
 }
@@ -66,8 +66,7 @@ function parse_yaml {
    }'
 }
 
-
-while getopts :hn:d: flag;do
+while getopts :hn:d:g: flag;do
    case $flag in 
       h)
         usage ;;
@@ -75,6 +74,8 @@ while getopts :hn:d: flag;do
         name="$OPTARG" ;;
       d)
         data_path="$OPTARG" ;;
+      g)
+        gpu_flag="$OPTARG" ;;
       \?)
         echo "Invalid option: -$OPTARG"
         echo "Try bash ./test.sh -h for more information."
@@ -104,8 +105,25 @@ else
    echo "Path to the data: $data_path"
 fi 
 
+if [ -z "$gpu_flag" ]; then 
+   echo "No GPU flag has been specified, therefore GPU will not be used."
+   gpu_flag=0
+else
+   if [ $gpu_flag -eq 1 ]; then
+      echo 'GPU will be allowed.'
+   else
+      echo 'GPU is not allowed.'
+   fi
+fi
+
 # Read the variables fro mthe yaml file
 eval $(parse_yaml $BASEDIR/notebooks/${!notebook_name}_DL4Mic/configuration.yaml)
+
+if [ $gpu_flag -eq 1 ]; then
+   base_img="nvidia/cuda:${cuda_version}-base-ubuntu${ubuntu_version}"
+else
+   base_img="ubuntu:${ubuntu_version}"
+fi
 
 # Build and launch the docker
 docker build $BASEDIR --no-cache -t "${name}_dl4mic" \
@@ -116,4 +134,8 @@ docker build $BASEDIR --no-cache -t "${name}_dl4mic" \
        --build-arg PATH_TO_REQUIREMENTS="${requirements_url}" \
        --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
 
-docker run -it --gpus all -p 8888:8888 -v $data_path:/home/dataset ${name}_dl4mic
+if [ $gpu_flag -eq 1 ]; then
+   docker run -it --gpus all -p 8888:8888 -v $data_path:/home/dataset ${name}_dl4mic
+else
+   docker run -it -p 8888:8888 -v $data_path:/home/dataset ${name}_dl4mic
+fi

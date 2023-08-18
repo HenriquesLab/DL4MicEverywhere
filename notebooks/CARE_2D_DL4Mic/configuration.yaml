@@ -1,5 +1,6 @@
 notebook_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/0d2bcef99cfd76294b9b91243d68ba6c6727c4fe/Colab_notebooks/CARE_2D_ZeroCostDL4Mic.ipynb
 requirements_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/0d2bcef99cfd76294b9b91243d68ba6c6727c4fe/requirements_files/CARE_2D_requirements_simple.txt
-base_img: nvidia/cuda:11.8.0-base-ubuntu22.04
-python_version: 10
+cuda_version: 11.8.0
+ubuntu_version: 22.04
+python_version: 3.10
 sections_to_remove: 1.1. 1.2. 2. 6.3.
