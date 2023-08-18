@@ -35,14 +35,18 @@ ENV LD_LIBRARY_PATH lib/:/usr/local/lib/python${PYTHON_VERSIOM}/dist-packages/nv
 WORKDIR /home 
 
 # Read all the arguments to load the nteobook and requirements
-ARG NOTEBOOK_NAME="notebook_name"
-ARG PATH_TO_NOTEBOOK="path_to_the_notebook"
-ARG PATH_TO_REQUIREMENTS="path_to_the_requirements"
+ARG URL_TO_NOTEBOOK=""
+ARG URL_TO_REQUIREMENTS=""
+ARG PATH_TO_NOTEBOOK=""
+ARG PATH_TO_REQUIREMENTS=""
 ARG SECTIONS_TO_REMOVE=""
 
-# Download the notebook and requirements
-RUN wget "${PATH_TO_NOTEBOOK}?raw=true" -O notebook.ipynb && \
-    wget "${PATH_TO_REQUIREMENTS}?raw=true" -O requirements.txt
+# Download the notebook and requirements if they are not provided
+RUN if [ ! "$PATH_TO_NOTEBOOK" ]; then wget "${URL_TO_NOTEBOOK}?raw=true" -O notebook.ipynb ; fi
+RUN if [ ! "$PATH_TO_REQUIREMENTS"]; then wget "${URL_TO_REQUIREMENTS}?raw=true" -O requirements.txt ; fi
+
+# COPY Dockerfile $PATH_TO_NOTEBOOK* ./
+# COPY Dockerfile $PATH_TO_REQUIREMENTS* ./
 
 # Install the requirements 
 RUN pip install --upgrade pip && \

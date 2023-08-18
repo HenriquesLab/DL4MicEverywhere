@@ -13,6 +13,8 @@ Available options:
 -c, --config_path       Path to the configuration file 'configuration.yaml'     
 -d, --data_path         Path to the data directory
 -g, --gpu               Flag to specify if GPU should be used
+-n, --notebook_path     Path to the notebook
+-r, --requirements_path Path to the requirements file
 EOF
   exit
 }
@@ -34,7 +36,7 @@ function parse_yaml {
    }'
 }
 
-while getopts :hc:d:g: flag;do
+while getopts :hc:d:g:n:r: flag;do
    case $flag in 
       h)
         usage ;;
@@ -44,6 +46,10 @@ while getopts :hc:d:g: flag;do
         data_path="$OPTARG" ;;
       g)
         gpu_flag="$OPTARG" ;;
+      n)
+        notebook_path="$OPTARG" ;;
+      g)
+        requirements_path="$OPTARG" ;;
       \?)
         echo "Invalid option: -$OPTARG"
         echo "Try bash ./test.sh -h for more information."
@@ -93,12 +99,30 @@ else
    base_img="ubuntu:${ubuntu_version}"
 fi
 
+
+if [ -z $notebook_path ]; then
+   echo "Path to the notebook that will be used: $notebook_path"
+else
+   notebook_path=""
+   echo "No notebook has been specified, therefore the notebook url specified on 'configuration.yaml' will be used."
+fi
+
+if [ -z $requirements_path ]; then
+   echo "Path to the notebook that will be used: $requirements_path"
+else
+   requirements_path=""
+   echo "No requirements file has been specified, therefore the requirements url specified on 'configuration.yaml' will be used."
+fi
+
+
 # Build and launch the docker
 docker build $BASEDIR --no-cache -t "notebook_dl4mic" \
        --build-arg BASE_IMAGE="${base_img}" \
        --build-arg PYTHON_VERSIOM="${python_version}" \
-       --build-arg PATH_TO_NOTEBOOK="${notebook_url}" \
-       --build-arg PATH_TO_REQUIREMENTS="${requirements_url}" \
+       --build-arg URL_TO_NOTEBOOK="${notebook_url}" \
+       --build-arg URL_TO_REQUIREMENTS="${requirements_url}" \
+       --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
+       --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
        --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
 
 if [ $gpu_flag -eq 1 ]; then
