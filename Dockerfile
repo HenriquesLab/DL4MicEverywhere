@@ -1,4 +1,4 @@
-ARG BASE_IMAGE="nvidia/cuda:11.8.0-base-ubuntu22.04"
+ARG BASE_IMAGE=""
 FROM ${BASE_IMAGE}
 
 # Install common packages and nvidia-cuda-toolkit
@@ -41,7 +41,7 @@ ARG PATH_TO_REQUIREMENTS="path_to_the_requirements"
 ARG SECTIONS_TO_REMOVE=""
 
 # Download the notebook and requirements
-RUN wget "${PATH_TO_NOTEBOOK}?raw=true" -O ${NOTEBOOK_NAME} && \
+RUN wget "${PATH_TO_NOTEBOOK}?raw=true" -O notebook.ipynb && \
     wget "${PATH_TO_REQUIREMENTS}?raw=true" -O requirements.txt
 
 # Install the requirements 
@@ -55,12 +55,12 @@ RUN wget https://github.com/IvanHCenalmor/colab_to_docker/archive/refs/heads/mai
     && rm colab_to_docker.zip \
     && pip install nbformat
 
-RUN python colab_to_docker-main/src/transform.py -p . -n ${NOTEBOOK_NAME} -s ${SECTIONS_TO_REMOVE}\
-    && mv colabless_${NOTEBOOK_NAME} ${NOTEBOOK_NAME} \
+RUN python colab_to_docker-main/src/transform.py -p . -n notebook.ipynb -s ${SECTIONS_TO_REMOVE}\
+    && mv colabless_notebook.ipynb notebook.ipynb \
     && rm -r colab_to_docker-main
 
 # Install jupyterlab and ipywidgets
 RUN pip install jupyterlab ipywidgets
 
 # Run the notebook
-CMD jupyter-lab ${NOTEBOOK_NAME} --ip='0.0.0.0' --port=8888 --no-browser --allow-root
+CMD jupyter-lab notebook.ipynb --ip='0.0.0.0' --port=8888 --no-browser --allow-root

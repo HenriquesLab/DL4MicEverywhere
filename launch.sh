@@ -1,24 +1,6 @@
 #!/bin/bash
 BASEDIR=$(dirname "$0")
 
-# As there are not key-value lists on bash versions lower to 4 and mac computers cannot have that version, 
-# this is a way to create this key-value list
-notebook_care2d="CARE_2D"
-notebook_care3d="CARE_3D"
-notebook_cyclegan="CycleGAN"
-notebook_deepstorm2d="Deep-STORM_2D"
-notebook_noise2void2d="Noise2Void_2D"
-notebook_noise2void3d="Noise2Void_3D"
-notebook_stardist2d="StarDist_2D"
-notebook_stardist3d="StarDist_3D"
-notebook_unet2d="U-Net_2D"
-notebook_unet3d="U-Net_3D"
-notebook_unet2dmultilabel="U-Net_2D_Multilabel"
-notebook_yolov2="YOLOv2"
-notebook_fnet2d="fnet_2D"
-notebook_fnet3d="fnet_3D"
-notebook_pix2pix="pix2pix"
-
 usage() {
   cat << EOF # remove the space between << and EOF, this is due to web plugin issue
 Usage: $(basename "${BASH_SOURCE[0]}") [-h] -n notebook_name -d dataset_path
@@ -27,24 +9,10 @@ Script description here.
 
 Available options:
 
--h, --help      Print this help and exit
--n, --name      Name of the notebook:  - care2d
-                                       - care3d
-                                       - cyclegan
-                                       - deepstorm2d
-                                       - noise2void2d
-                                       - noise2void3d
-                                       - stardist2d
-                                       - stardist3d
-                                       - unet2d
-                                       - unet3d
-                                       - unet2dmultilabel
-                                       - yolov2
-                                       - fnet2d
-                                       - fnet3d
-                                       - pix2pix
--d --data_path  Path to the data directory
--g --gpu        Flag to specify if GPU should be used
+-h, --help              Print this help and exit
+-c, --config_path       Path to the configuration file 'configuration.yaml'     
+-d, --data_path         Path to the data directory
+-g, --gpu               Flag to specify if GPU should be used
 EOF
   exit
 }
@@ -66,12 +34,12 @@ function parse_yaml {
    }'
 }
 
-while getopts :hn:d:g: flag;do
+while getopts :hc:d:g: flag;do
    case $flag in 
       h)
         usage ;;
-      n)
-        name="$OPTARG" ;;
+      c)
+        config_path="$OPTARG" ;;
       d)
         data_path="$OPTARG" ;;
       g)
@@ -83,18 +51,18 @@ while getopts :hn:d:g: flag;do
    esac
 done
 
-if [ -z "$name" ]; then 
-   echo "No notebook name has been specified, please make sure to use -n --name argument and give a value to it."
+if [ -z "$config_path" ]; then 
+   echo "No configuration path has been specified, please make sure to use -c --config_path argument and give a value to it."
    exit
 else
-   echo "Notebook name: $name"
-   notebook_name=notebook_$name
-   echo ${!notebook_name}
-   if [ -z "${!notebook_name}" ]; then
-      echo "No such name for the notebook" 
-      exit
+   if [[ -d $config_path ]]; then
+      echo "Path to the data folder: $config_path"
+      config_path=$config_path+"/configuration.yaml"
+   elif [[ -f $config_path ]]; then
+      echo "Path to the data file: $config_path"
    else
-      echo "Actual notebook: ${!notebook_name}" 
+      echo "$config_path is not valid."
+      exit 1
    fi
 fi 
 
@@ -117,7 +85,7 @@ else
 fi
 
 # Read the variables fro mthe yaml file
-eval $(parse_yaml $BASEDIR/notebooks/${!notebook_name}_DL4Mic/configuration.yaml)
+eval $(parse_yaml $config_path)
 
 if [ $gpu_flag -eq 1 ]; then
    base_img="nvidia/cuda:${cuda_version}-base-ubuntu${ubuntu_version}"
@@ -126,16 +94,15 @@ else
 fi
 
 # Build and launch the docker
-docker build $BASEDIR --no-cache -t "${name}_dl4mic" \
+docker build $BASEDIR --no-cache -t "notebook_dl4mic" \
        --build-arg BASE_IMAGE="${base_img}" \
        --build-arg PYTHON_VERSIOM="${python_version}" \
-       --build-arg NOTEBOOK_NAME="${!notebook_name}_DL4Mic.ipynb" \
        --build-arg PATH_TO_NOTEBOOK="${notebook_url}" \
        --build-arg PATH_TO_REQUIREMENTS="${requirements_url}" \
        --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
 
 if [ $gpu_flag -eq 1 ]; then
-   docker run -it --gpus all -p 8888:8888 -v $data_path:/home/dataset ${name}_dl4mic
+   docker run -it --gpus all -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
 else
-   docker run -it -p 8888:8888 -v $data_path:/home/dataset ${name}_dl4mic
+   docker run -it -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
 fi
