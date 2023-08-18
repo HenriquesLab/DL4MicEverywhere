@@ -1,5 +1,5 @@
-notebook_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/YOLOv2_ZeroCostDL4Mic.ipynb
-requirements_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/master/requirements_files/YOLO_v2_requirements_simple.txt
+notebook_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/07c272c875a80b1fe4405bda15ea7c4dc208f3e1/Colab_notebooks/YOLOv2_ZeroCostDL4Mic.ipynb
+requirements_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/07c272c875a80b1fe4405bda15ea7c4dc208f3e1/requirements_files/YOLO_v2_requirements_simple.txt
 base_img: nvidia/cuda:11.8.0-base-ubuntu22.04
 python_version: 10
 sections_to_remove: 1.1. 1.2. 2. 6.3.
