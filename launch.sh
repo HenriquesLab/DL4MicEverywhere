@@ -1,4 +1,5 @@
 #!/bin/bash
+BASEDIR=$(dirname "$0")
 
 # As there are not key-value lists on bash versions lower to 4 and mac computers cannot have that version, 
 # this is a way to create this key-value list
@@ -20,14 +21,13 @@ notebook_pix2pix="pix2pix"
 
 usage() {
   cat << EOF # remove the space between << and EOF, this is due to web plugin issue
-Usage: $(basename "${BASH_SOURCE[0]}") [-h] -v version -n notebook_name
+Usage: $(basename "${BASH_SOURCE[0]}") [-h] -n notebook_name -d dataset_path
 
 Script description here.
 
 Available options:
 
 -h, --help      Print this help and exit
--v, --version   Version of the notebook
 -n, --name      Name of the notebook:  - care2d
                                        - care3d
                                        - cyclegan
@@ -67,12 +67,10 @@ function parse_yaml {
 }
 
 
-while getopts :hv:n:d: flag;do
+while getopts :hn:d: flag;do
    case $flag in 
       h)
         usage ;;
-      v)
-        version="$OPTARG" ;;
       n)
         name="$OPTARG" ;;
       d)
@@ -99,26 +97,18 @@ else
    fi
 fi 
 
-if [ -z "$version" ]; then 
-   echo "No version has been specified, please make sure to use -v --version argument and give a value to it."
-   exit
-else
-   echo "Version: $version"
-fi 
-
 if [ -z "$data_path" ]; then 
    echo "No data path has been specified, please make sure to use -d --data_path argument and give a value to it."
    exit
 else
    echo "Path to the data: $data_path"
 fi 
-echo ""
 
 # Read the variables fro mthe yaml file
-eval $(parse_yaml ./notebooks/${!notebook_name}_DL4Mic/configuration.yaml)
+eval $(parse_yaml $BASEDIR/notebooks/${!notebook_name}_DL4Mic/configuration.yaml)
 
 # Build and launch the docker
-docker build . --no-cache -t "${name}_dl4mic" \
+docker build $BASEDIR --no-cache -t "${name}_dl4mic" \
        --build-arg BASE_IMAGE="${base_img}" \
        --build-arg PYTHON_VERSIOM="${python_version}" \
        --build-arg NOTEBOOK_NAME="${!notebook_name}_DL4Mic.ipynb" \

@@ -13,6 +13,10 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Set timezone for Python installation
+ENV TZ=Europe/Kiev
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Instal Python 
 ARG PYTHON_VERSIOM="9"
 RUN add-apt-repository ppa:deadsnakes/ppa && \
@@ -30,18 +34,22 @@ ENV LD_LIBRARY_PATH lib/:/usr/local/lib/python3.${PYTHON_VERSIOM}/dist-packages/
 
 WORKDIR /home 
 
+# Read all the arguments to load the nteobook and requirements
 ARG NOTEBOOK_NAME="notebook_name"
 ARG PATH_TO_NOTEBOOK="path_to_the_notebook"
 ARG PATH_TO_REQUIREMENTS="path_to_the_requirements"
 ARG SECTIONS_TO_REMOVE=""
 
+# Download the notebook and requirements
 RUN wget "${PATH_TO_NOTEBOOK}?raw=true" -O ${NOTEBOOK_NAME} && \
     wget "${PATH_TO_REQUIREMENTS}?raw=true" -O requirements.txt
 
+# Install the requirements 
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt && \
     rm requirements.txt
 
+# Transfrom the ZCDL4Mic colab notebook to a 'colabless' version
 RUN wget https://github.com/IvanHCenalmor/colab_to_docker/archive/refs/heads/main.zip -O colab_to_docker.zip \
     && unzip colab_to_docker.zip \
     && rm colab_to_docker.zip \
@@ -51,7 +59,8 @@ RUN python colab_to_docker-main/src/transform.py -p . -n ${NOTEBOOK_NAME} -s ${S
     && mv colabless_${NOTEBOOK_NAME} ${NOTEBOOK_NAME} \
     && rm -r colab_to_docker-main
 
+# Install jupyterlab and ipywidgets
 RUN pip install jupyterlab ipywidgets
 
+# Run the notebook
 CMD jupyter-lab ${NOTEBOOK_NAME} --ip='0.0.0.0' --port=8888 --no-browser --allow-root
-ddo
