@@ -115,4 +115,4 @@ requirements_window() {
     continue_window
 }
 
-continue_window
+intro_windows
