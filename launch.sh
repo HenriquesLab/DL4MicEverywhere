@@ -13,8 +13,8 @@ Available options:
 -c, --config_path       Path to the configuration file 'configuration.yaml'     
 -d, --data_path         Path to the data directory
 -g, --gpu               Flag to specify if GPU should be used
--n, --notebook_path     Path to the notebook
--r, --requirements_path Path to the requirements file
+-n, --notebook_path     Path to the notebook (it needs to be relative from where the dockerfile is located)
+-r, --requirements_path Path to the requirements file (it needs to be relative from where the dockerfile is located)
 EOF
   exit
 }
@@ -36,10 +36,12 @@ function parse_yaml {
    }'
 }
 
-while getopts :hc:d:g:n:r: flag;do
+while getopts :hx:c:d:g:n:r: flag;do
    case $flag in 
       h)
         usage ;;
+      x)
+        gui_flag="$OPTARG" ;;
       c)
         config_path="$OPTARG" ;;
       d)
@@ -48,85 +50,105 @@ while getopts :hc:d:g:n:r: flag;do
         gpu_flag="$OPTARG" ;;
       n)
         notebook_path="$OPTARG" ;;
-      g)
+      r)
         requirements_path="$OPTARG" ;;
       \?)
         echo "Invalid option: -$OPTARG"
         echo "Try bash ./test.sh -h for more information."
-        exit ;;
+        exit 1 ;;
    esac
 done
 
-if [ -z "$config_path" ]; then 
-   echo "No configuration path has been specified, please make sure to use -c --config_path argument and give a value to it."
-   exit
+
+if [ -z "$gui_flag" ]; then 
+   echo "No GUI flag has been specified, therefore GUI will not be used."
 else
-   if [[ -d $config_path ]]; then
-      echo "Path to the data folder: $config_path"
-      config_path=$config_path+"/configuration.yaml"
-   elif [[ -f $config_path ]]; then
-      echo "Path to the data file: $config_path"
+   INFO=$(zenity --form --title "GUI" --text "Do you want to use GUI?" --ok-label "Yes" --cancel-label "No")
+   if [ "$INFO" == "Yes" ]; then
+      echo 'GUI will be allowed.'
    else
-      echo "$config_path is not valid."
-      exit 1
+      echo 'GUI is not allowed.'
    fi
-fi 
 
-if [ -z "$data_path" ]; then 
-   echo "No data path has been specified, please make sure to use -d --data_path argument and give a value to it."
-   exit
-else
-   echo "Path to the data: $data_path"
-fi 
-
-if [ -z "$gpu_flag" ]; then 
-   echo "No GPU flag has been specified, therefore GPU will not be used."
-   gpu_flag=0
-else
-   if [ $gpu_flag -eq 1 ]; then
-      echo 'GPU will be allowed.'
-   else
-      echo 'GPU is not allowed.'
-   fi
 fi
 
-# Read the variables fro mthe yaml file
-eval $(parse_yaml $config_path)
+# if [ -z "$config_path" ]; then 
+#    echo "No configuration path has been specified, please make sure to use -c --config_path argument and give a value to it."
+#    exit 1
+# else
+#    if [[ -d $config_path ]]; then
+#       echo "Path to the data folder: $config_path"
+#       config_path=$config_path+"/configuration.yaml"
+#    elif [[ -f $config_path ]]; then
+#       echo "Path to the data file: $config_path"
+#    else
+#       echo "$config_path is not valid."
+#       exit 1
+#    fi
+# fi 
 
-if [ $gpu_flag -eq 1 ]; then
-   base_img="nvidia/cuda:${cuda_version}-base-ubuntu${ubuntu_version}"
-else
-   base_img="ubuntu:${ubuntu_version}"
-fi
+# if [ -z "$data_path" ]; then 
+#    echo "No data path has been specified, please make sure to use -d --data_path argument and give a value to it."
+#    exit 1
+# else
+#    echo "Path to the data: $data_path"
+# fi 
+
+# if [ -z "$gpu_flag" ]; then 
+#    echo "No GPU flag has been specified, therefore GPU will not be used."
+#    gpu_flag=0
+# else
+#    if [ "$gpu_flag" -eq 1 ]; then
+#       echo 'GPU will be allowed.'
+#    else
+#       echo 'GPU is not allowed.'
+#    fi
+# fi
+
+# # Read the variables fro mthe yaml file
+# eval $(parse_yaml $config_path)
+
+# if [ "$gpu_flag" -eq 1 ]; then
+#    base_img="nvidia/cuda:${cuda_version}-base-ubuntu${ubuntu_version}"
+# else
+#    base_img="ubuntu:${ubuntu_version}"
+# fi
 
 
-if [ -z $notebook_path ]; then
-   echo "Path to the notebook that will be used: $notebook_path"
-else
-   notebook_path=""
-   echo "No notebook has been specified, therefore the notebook url specified on 'configuration.yaml' will be used."
-fi
+# if [ -z "$notebook_path" ]; then
+#    notebook_path="${notebook_url}"
+#    echo "No notebook has been specified, therefore the notebook url specified on 'configuration.yaml' will be used."
+# else
+#    if [ - d $notebook_path ]; then
+#       echo "Path to the notebook: $notebook_path"
+#    else
+#       echo "$notebook_path is not valid. REMEMBER: the path needs to be relative from where the dockerfile is located."
+#       exit 1
+#    fi
+# fi
 
-if [ -z $requirements_path ]; then
-   echo "Path to the notebook that will be used: $requirements_path"
-else
-   requirements_path=""
-   echo "No requirements file has been specified, therefore the requirements url specified on 'configuration.yaml' will be used."
-fi
+# if [ -z "$requirements_path" ]; then
+#    requirements_path="${requirements_url}"
+#    echo "No requirements file has been specified, therefore the requirements url specified on 'configuration.yaml' will be used."
+# else
+#    if [ - d $requirements_path ]; then
+#       echo "Path to the requirements file: $requirements_path"
+#    else
+#       echo "$requirements_path is not valid. REMEMBER: the path needs to be relative from where the dockerfile is located."
+#       exit 1
+#    fi
+# fi
 
+# # Build and launch the docker
+# docker build $BASEDIR --no-cache -t "notebook_dl4mic" \
+#        --build-arg BASE_IMAGE="${base_img}" \
+#        --build-arg PYTHON_VERSIOM="${python_version}" \
+#        --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
+#        --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
+#        --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
 
-# Build and launch the docker
-docker build $BASEDIR --no-cache -t "notebook_dl4mic" \
-       --build-arg BASE_IMAGE="${base_img}" \
-       --build-arg PYTHON_VERSIOM="${python_version}" \
-       --build-arg URL_TO_NOTEBOOK="${notebook_url}" \
-       --build-arg URL_TO_REQUIREMENTS="${requirements_url}" \
-       --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
-       --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
-       --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
-
-if [ $gpu_flag -eq 1 ]; then
-   docker run -it --gpus all -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
-else
-   docker run -it -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
-fi
+# if [ $gpu_flag -eq 1 ]; then
+#    docker run -it --gpus all -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
+# else
+#    docker run -it -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
+# fi

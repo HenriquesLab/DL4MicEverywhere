@@ -1,5 +1,5 @@
-notebook_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/0d2bcef99cfd76294b9b91243d68ba6c6727c4fe/Colab_notebooks/U-Net_3D_ZeroCostDL4Mic.ipynb
-requirements_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/0d2bcef99cfd76294b9b91243d68ba6c6727c4fe/requirements_files/3D_UNet_requirements_simple.txt
+notebook_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/0d2bcef99cfd76294b9b91243d68ba6c6727c4fe/Colab_notebooks/U-Net_3D_ZeroCostDL4Mic.ipynb?raw=true
+requirements_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/0d2bcef99cfd76294b9b91243d68ba6c6727c4fe/requirements_files/3D_UNet_requirements_simple.txt?raw=true
 cuda_version: 11.8.0
 ubuntu_version: 22.04
 python_version: 3.10
