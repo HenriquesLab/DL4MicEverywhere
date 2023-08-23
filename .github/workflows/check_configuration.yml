@@ -1,0 +1,140 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  extract_changed_files:
+    runs-on: ubuntu-latest  # windows-latest || macos-latest
+    name: Test changed-files
+    outputs:
+      matrix: ${{ steps.create-json.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
+      - name: Get changed configuration.yaml on the commint
+        id: changed-files
+        uses: tj-actions/changed-files@v38
+        with:
+         files: '**/configuration.yaml'
+      - if: ${{ steps.changed-files.outputs.all_changed_files != '' }}
+        name: List and extract all changed files
+        id: create-json
+        run: |
+          echo "Start"
+          files_json="{\"include\":[{\"notebook\":\""
+          echo "$files_json"
+          first=true
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+            if [ "$first" = true ]; then
+              files_json+=$file
+              first=false
+            else
+              files_json+="\"},{\"notebook\":\""$file
+            fi
+            echo "$files_json"
+          done
+          files_json+="\"}]}"
+          echo "$files_json"
+          echo "matrix=$files_json" >> $GITHUB_OUTPUT
+          echo "END"
+  check_keys:
+    if: ${{ needs.extract_changed_files.outputs.matrix != '' }}
+    runs-on: ubuntu-latest
+    name: Check attributes/keys on changed configuration.yaml
+    needs: extract_changed_files
+    strategy:
+      matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+            fetch-depth: 0
+      - name: Check notebook_url attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: notebook_url
+        with:
+          cmd: yq '.notebook_url' '${{ matrix.notebook }}' 
+      - name: Check requirements_url attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: requirements_url
+        with:
+          cmd: yq '.requirements_url' '${{ matrix.notebook }}' 
+      - name: Check cuda_version attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: cuda_version
+        with:
+          cmd: yq '.cuda_version' '${{ matrix.notebook }}' 
+      - name: Check ubuntu_version attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: ubuntu_version
+        with:
+          cmd: yq '.ubuntu_version' '${{ matrix.notebook }}' 
+      - name: Check python_version attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: python_version
+        with:
+          cmd: yq '.python_version' '${{ matrix.notebook }}'
+      - name: Check sections_to_remove attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: sections_to_remove
+        with:
+          cmd: yq '.sections_to_remove' '${{ matrix.notebook }}'  
+      - run: |
+          if [[ 'null' = '${{ steps.notebook_url.outputs.result }}' ]] ; then 
+            echo 'The key notebook_url is not in the configuration.yaml file.' 
+            exit 1
+          elif [[ 'null' = '${{ steps.requirements_url.outputs.result }}' ]] ; then 
+            echo 'The key requirements_url is not in the configuration.yaml file.' 
+            exit 1
+          elif [[ 'null' = '${{ steps.cuda_version.outputs.result }}' ]] ; then 
+            echo 'The key cuda_version is not in the configuration.yaml file.' 
+            exit 1
+          elif [[ 'null' = '${{ steps.ubuntu_version.outputs.result }}' ]] ; then 
+            echo 'The key ubuntu_version is not in the configuration.yaml file.' 
+            exit 1
+          elif [[ 'null' = '${{ steps.python_version.outputs.result }}' ]] ; then 
+            echo 'The key python_version is not in the configuration.yaml file.' 
+            exit 1
+          elif [[ 'null' = '${{ steps.sections_to_remove.outputs.result }}' ]] ; then 
+            echo 'The key sections_to_remove is not in the configuration.yaml file.' 
+            exit 1
+          else 
+            echo 'The configuration.yaml file is defined with all its keys.'
+          fi
+  check_urls:
+    if: ${{ needs.extract_changed_files.outputs.matrix != '' }}
+    runs-on: ubuntu-latest
+    name: Check notebook's and requirements' URLs on changed configuration.yaml
+    needs: extract_changed_files
+    strategy:
+      matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+            fetch-depth: 0
+      - name: Extract the notebook URL
+        id: extract_nb_url
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq '.notebook_url' '${{ matrix.notebook }}' 
+      - name: Extract the requirements URL
+        id: extract_rq_url
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq '.requirements_url' '${{ matrix.notebook }}' 
+      - name: Check that notebook's URL exists
+        uses: filiph/linkcheck@2.0.23
+        with:
+          arguments: ${{ steps.extract_nb_url.outputs.result }}
+      - name: Check that requirements' URL exists
+        uses: filiph/linkcheck@2.0.23
+        with:
+          arguments: ${{ steps.extract_rq_url.outputs.result }}
+
+    
