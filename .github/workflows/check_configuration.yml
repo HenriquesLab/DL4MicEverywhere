@@ -114,7 +114,7 @@ jobs:
     if: ${{ needs.extract_changed_files.outputs.matrix != '' }}
     runs-on: ubuntu-latest
     name: Check notebook's and requirements' URLs on changed configuration.yaml
-    needs: extract_changed_files
+    needs: [extract_changed_files, check_keys]
     strategy:
       matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
     steps:
