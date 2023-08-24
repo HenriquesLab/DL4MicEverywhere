@@ -3,4 +3,4 @@ requirements_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/0d2bcef99c
 cuda_version: 11.8.0
 ubuntu_version: 22.04
 python_version: 3.10
-sections_to_remove: 2. 6.4.
+sections_to_remove: 2. 6.4. 
