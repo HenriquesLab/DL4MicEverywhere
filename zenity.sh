@@ -42,7 +42,7 @@ intro_window() {
     CONTINUE=$(zenity --info \
        --no-wrap \
        --title="Continue" \
-       --text="<big><b>Welcome to DL4Mic_everywhere!</b></big>\nBellow you have the data you need to provide. The paths to both the configuration yaml file and data folder are mandatory.\nThe rest of them are optional, by default the GPU usage is set as <b>No</b> and if no local paths are specified to the notebook and\nrequirementes files, they will be downloaded using the URLs from the configuration yaml file.\n\nValues of the arguments: \n${req_config_text}\n${extra_config_text}\n" \
+       --text="<big><b>Welcome to DL4Mic_everywhere!</b></big>\nBellow you have the buttons to add the data you need to provide in order to run the docker and the notebook. The paths to both\nthe configuration yaml file and data folder are mandatory. The rest of them are optional, by default the GPU usage is set as <b>No</b>\nand if no local paths are specified to the notebook and requirementes files, they will be downloaded using the URLs from\nthe configuration yaml file.\n\nValues of the arguments: \n${req_config_text}\n${extra_config_text}\n" \
        --ok-label="Cancel" \
        --extra-button="Configuration file" \
        --extra-button="Data folder" \

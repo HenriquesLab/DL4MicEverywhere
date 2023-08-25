@@ -1,6 +1,8 @@
 ARG BASE_IMAGE=""
 FROM ${BASE_IMAGE}
 
+ARG GPU_FLAG=""
+
 # Install common packages and nvidia-cuda-toolkit
 RUN apt-get update && \
     apt-get install -y build-essential \
@@ -18,19 +20,19 @@ ENV TZ=Europe/Kiev
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Instal Python 
-ARG PYTHON_VERSIOM="9"
+ARG PYTHON_VERSION=""
 RUN add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && apt-get install -y \
-    python${PYTHON_VERSIOM} python${PYTHON_VERSIOM}-dev python3-pip python${PYTHON_VERSIOM}-venv && \
+    python${PYTHON_VERSION} python${PYTHON_VERSION}-dev python3-pip python${PYTHON_VERSION}-venv && \
     rm -rf /var/lib/apt/lists/* && \
-    python${PYTHON_VERSIOM} -m pip install pip --upgrade && \
-    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${PYTHON_VERSIOM} 0 && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_VERSIOM} 0
+    python${PYTHON_VERSION} -m pip install pip --upgrade && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${PYTHON_VERSION} 0 && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_VERSION} 0
 
-# Run nvidia-cudnn-cu11 for Python
-RUN pip install nvidia-cudnn-cu11==8.6.0.163
-# And export the environment variable LD_LIBRARY_PATH
-ENV LD_LIBRARY_PATH lib/:/usr/local/lib/python${PYTHON_VERSIOM}/dist-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
+# # Run nvidia-cudnn-cu11 for Python
+# RUN pip install nvidia-cudnn-cu11==8.6.0.163
+# # And export the environment variable LD_LIBRARY_PATH
+# ENV LD_LIBRARY_PATH lib/:/usr/local/lib/python${PYTHON_VERSION}/dist-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
 
 WORKDIR /home 
 
