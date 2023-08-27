@@ -15,6 +15,7 @@ Available options:
 -g, --gpu               Flag to specify if GPU should be used
 -n, --notebook_path     Path to the notebook (it needs to be relative from where the dockerfile is located)
 -r, --requirements_path Path to the requirements file (it needs to be relative from where the dockerfile is located)
+-t, --test              Flag to indicate if it is a test run
 EOF
   exit
 }
@@ -159,7 +160,7 @@ requirements_window() {
     zenity_gui
 }
 
-while getopts :hx:c:d:g:n:r: flag;do
+while getopts :hx:c:d:g:n:r:t: flag;do
    case $flag in 
       h)
         usage ;;
@@ -175,6 +176,8 @@ while getopts :hx:c:d:g:n:r: flag;do
         notebook_path="$OPTARG" ;;
       r)
         requirements_path="$OPTARG" ;;
+      t)
+        test_flag="$OPTARG" ;;
       \?)
         echo "Invalid option: -$OPTARG"
         echo "Try bash ./test.sh -h for more information."
@@ -307,11 +310,19 @@ DOCKER_OUT=$? # Gets if the docker image has been built
 
 # If it has been built, run the docker
 if [ $DOCKER_OUT -eq 0 ]; then
+    if [ $test_flag -eq 1 ]; then
+        exit 0
+    fi
     if [ $gpu_flag -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
-       docker run -it --gpus all -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
+        docker run -it --gpus all -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
     else
         # Run the docker image without activating the GPU
-       docker run -it -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
+        docker run -it -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
+    fi
+else
+    echo "The docker image has not been built."
+    if [ $test_flag -eq 1 ]; then
+        exit 1
     fi
 fi

@@ -10,8 +10,8 @@ RUN apt-get update && \
                        curl \
                        wget \ 
                        unzip \
-                       git \
-                       nvidia-cuda-toolkit && \
+                       git && \
+    if [ "$GPU_FLAG" -eq "1" ] ; then apt-get install -y nvidia-cuda-toolkit ; fi && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -29,10 +29,10 @@ RUN add-apt-repository ppa:deadsnakes/ppa && \
     update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${PYTHON_VERSION} 0 && \
     update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_VERSION} 0
 
-# # Run nvidia-cudnn-cu11 for Python
-# RUN pip install nvidia-cudnn-cu11==8.6.0.163
-# # And export the environment variable LD_LIBRARY_PATH
-# ENV LD_LIBRARY_PATH lib/:/usr/local/lib/python${PYTHON_VERSION}/dist-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
+# Run nvidia-cudnn-cu11 for Python
+RUN if [ "$GPU_FLAG" -eq "1" ] ; then pip install nvidia-cudnn-cu11==8.6.0.163 ; fi
+# And export the environment variable LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH lib/:/usr/local/lib/python${PYTHON_VERSION}/dist-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
 
 WORKDIR /home 
 
