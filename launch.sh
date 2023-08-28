@@ -223,7 +223,12 @@ if [ -z "$data_path" ]; then
    echo "No data path has been specified, please make sure to use -d --data_path argument and give a value to it."
    exit 1
 else
-   echo "Path to the data: $data_path"
+   if [[ -d $data_path ]]; then
+      echo "Path to the data: $data_path"
+   else
+      echo "$data_path is not valid."
+      exit 1
+   fi
 fi 
 
 if [ -z "$gpu_flag" ]; then 
@@ -251,7 +256,7 @@ if [ -z "$notebook_path" ]; then
    notebook_path="${notebook_url}"
    echo "No notebook has been specified, therefore the notebook url specified on 'configuration.yaml' will be used."
 else
-   if [ - d $notebook_path ]; then
+   if [ -f "$notebook_path" ]; then
       echo "Path to the notebook: $notebook_path"
    else
       echo "$notebook_path is not valid. REMEMBER: the path needs to be relative from where the dockerfile is located."
@@ -263,7 +268,7 @@ if [ -z "$requirements_path" ]; then
    requirements_path="${requirements_url}"
    echo "No requirements file has been specified, therefore the requirements url specified on 'configuration.yaml' will be used."
 else
-   if [ - d $requirements_path ]; then
+   if [ -f "$requirements_path" ]; then
       echo "Path to the requirements file: $requirements_path"
    else
       echo "$requirements_path is not valid. REMEMBER: the path needs to be relative from where the dockerfile is located."
