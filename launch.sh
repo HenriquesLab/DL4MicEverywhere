@@ -242,6 +242,16 @@ else
    fi
 fi
 
+if [ -z "$test_flag" ]; then 
+   test_flag=0
+else
+   if [ "$test_flag" -eq 1 ]; then
+      echo 'TEST MODE: ON.'
+   else
+      echo 'TEST MODE: OFF.'
+   fi
+fi
+
 # Read the variables fro mthe yaml file
 eval $(parse_yaml $config_path)
 
@@ -314,11 +324,11 @@ fi
 DOCKER_OUT=$? # Gets if the docker image has been built
 
 # If it has been built, run the docker
-if [ $DOCKER_OUT -eq 0 ]; then
+if [ "$DOCKER_OUT" -eq 0 ]; then
     if [ $test_flag -eq 1 ]; then
         exit 0
     fi
-    if [ $gpu_flag -eq 1 ]; then
+    if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
         docker run -it --gpus all -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
     else
@@ -327,7 +337,7 @@ if [ $DOCKER_OUT -eq 0 ]; then
     fi
 else
     echo "The docker image has not been built."
-    if [ $test_flag -eq 1 ]; then
+    if [ "$test_flag" -eq 1 ]; then
         exit 1
     fi
 fi

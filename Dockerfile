@@ -10,7 +10,9 @@ RUN apt-get update && \
                        curl \
                        wget \ 
                        unzip \
-                       git && \
+                       git \
+                       libfreetype6-dev \
+                       pkg-config && \
     if [ "$GPU_FLAG" -eq "1" ] ; then apt-get install -y nvidia-cuda-toolkit ; fi && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -51,14 +53,11 @@ RUN pip install --upgrade pip && \
     rm requirements.txt
 
 # Transfrom the ZCDL4Mic colab notebook to a 'colabless' version
-RUN wget https://github.com/IvanHCenalmor/colab_to_docker/archive/refs/heads/main.zip -O colab_to_docker.zip \
-    && unzip colab_to_docker.zip \
-    && rm colab_to_docker.zip \
-    && pip install nbformat
-
-RUN python colab_to_docker-main/src/transform.py -p . -n notebook.ipynb -s ${SECTIONS_TO_REMOVE}\
+RUN git clone https://github.com/IvanHCenalmor/colab_to_docker.git && \
+    pip install nbformat
+RUN python colab_to_docker/src/transform.py -p . -n notebook.ipynb -s ${SECTIONS_TO_REMOVE}\
     && mv colabless_notebook.ipynb notebook.ipynb \
-    && rm -r colab_to_docker-main
+    && rm -r colab_to_docker
 
 # Install jupyterlab and ipywidgets
 RUN pip install jupyterlab ipywidgets
