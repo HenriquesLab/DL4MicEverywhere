@@ -304,7 +304,7 @@ fi
 
 if [ -z "$gui_flag" ]; then 
   # Build the docker image without GUI
-  docker build $BASEDIR --no-cache -t "notebook_dl4mic" \
+  docker build $BASEDIR --platform linux/amd64 --no-cache -t "notebook_dl4mic" \
         --build-arg BASE_IMAGE="${base_img}" \
         --build-arg GPU_FLAG="${gpu_flag}" \
         --build-arg PYTHON_VERSION="${python_version}" \
@@ -313,7 +313,7 @@ if [ -z "$gui_flag" ]; then
         --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
 else
   # Build the docker image, using the GUI and showing a progess window
-  docker build $BASEDIR --no-cache -t "notebook_dl4mic" \
+  docker build $BASEDIR --platform linux/amd64 --no-cache -t "notebook_dl4mic" \
         --build-arg BASE_IMAGE="${base_img}" \
         --build-arg GPU_FLAG="${gpu_flag}" \
         --build-arg PYTHON_VERSION="${python_version}" \
@@ -330,10 +330,10 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     fi
     if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
-        docker run -it --gpus all -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
+        docker run -it --platform linux/amd64 --gpus all -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
     else
         # Run the docker image without activating the GPU
-        docker run -it -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
+        docker run -it --platform linux/amd64 -p 8888:8888 -v $data_path:/home/dataset notebook_dl4mic
     fi
 else
     echo "The docker image has not been built."
