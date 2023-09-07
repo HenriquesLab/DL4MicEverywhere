@@ -3,19 +3,20 @@ BASEDIR=$(dirname "$0")
 
 usage() {
   cat << EOF # remove the space between << and EOF, this is due to web plugin issue
-Usage: $(basename "${BASH_SOURCE[0]}") [-h] -n notebook_name -d dataset_path
+Usage: $(basename "${BASH_SOURCE[0]}") [-h] -c configuration_path -d dataset_path [-g 0] [-n notebook_path] [-r requirements_path] [-i 0] [-t 0]
 
-Script description here.
+Description of the script here.
 
 Available options:
 
--h, --help              Print this help and exit
--c, --config_path       Path to the configuration file 'configuration.yaml'     
--d, --data_path         Path to the data directory
--g, --gpu               Flag to specify if GPU should be used
--n, --notebook_path     Path to the notebook (it needs to be relative from where the dockerfile is located)
--r, --requirements_path Path to the requirements file (it needs to be relative from where the dockerfile is located)
--t, --test              Flag to indicate if it is a test run
+-h, --help               Print this help and exit.
+-c, --config_path        Path to the configuration file 'configuration.yaml'.   
+-d, --data_path          Path to the data directory.
+-g, --gpu                Flag to specify if GPU should be used.
+-n, --notebook_path      Path to the notebook (it needs to be relative from where the dockerfile is located).
+-r, --requirements_path  Path to the requirements file (it needs to be relative from where the dockerfile is located).
+-i, --interface          Flag to indicate if you want to use a Grafic User Interface (GUI).
+-t, --test               Flag to indicate if it is a test run.
 EOF
   exit
 }
@@ -160,11 +161,11 @@ requirements_window() {
     zenity_gui
 }
 
-while getopts :hx:c:d:g:n:r:t: flag;do
+while getopts :hi:c:d:g:n:r:t: flag;do
    case $flag in 
       h)
         usage ;;
-      x)
+      i)
         gui_flag="$OPTARG" ;;
       c)
         config_path="$OPTARG" ;;
