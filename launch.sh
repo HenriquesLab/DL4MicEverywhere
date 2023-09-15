@@ -172,7 +172,7 @@ local_notebook_flag=0
 local_requirements_flag=0
 
 # Let's parse the arguments
-while getopts :hi:c:d:g:n:r:t:x: flag;do
+while getopts :hic:d:gn:r:t:x flag;do
     case $flag in 
         h)
             usage ;;
@@ -354,7 +354,7 @@ fi
 
 if [ -z "$gui_flag" ]; then 
   # Build the docker image without GUI
-  docker build $BASEDIR --no-cache --platform linux/amd64 -t $docker_tag \
+  docker build $BASEDIR --no-cache  -t $docker_tag \
         --build-arg BASE_IMAGE="${base_img}" \
         --build-arg GPU_FLAG="${gpu_flag}" \
         --build-arg PYTHON_VERSION="${python_version}" \
@@ -364,7 +364,7 @@ if [ -z "$gui_flag" ]; then
         --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
 else
   # Build the docker image, using the GUI and showing a progess window
-  docker build $BASEDIR --no-cache --platform linux/amd64 -t $docker_tag \
+  docker build $BASEDIR --no-cache  -t $docker_tag \
         --build-arg BASE_IMAGE="${base_img}" \
         --build-arg GPU_FLAG="${gpu_flag}" \
         --build-arg PYTHON_VERSION="${python_version}" \
@@ -391,10 +391,10 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     fi
     if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
-        docker run -it --platform linux/amd64 --gpus all -p 8888:8888 -v $data_path:/home/dataset $docker_tag
+        docker run -it  --gpus all -p 8888:8888 -v $data_path:/home/dataset $docker_tag
     else
         # Run the docker image without activating the GPU
-        docker run -it --platform linux/amd64 -p 8888:8888 -v $data_path:/home/dataset $docker_tag
+        docker run -it  -p 8888:8888 -v $data_path:/home/dataset $docker_tag
     fi
 else
     echo "The docker image has not been built."
