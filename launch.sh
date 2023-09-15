@@ -6,7 +6,9 @@ usage() {
   cat << EOF # remove the space between << and EOF, this is due to web plugin issue
 Usage: $(basename "${BASH_SOURCE[0]}") -c configuration_path -d dataset_path [-h|i|t|g] [-n notebook_path] [-r requirements_path] 
 
-Description of the script here.
+Create and deploy a Docker image for the ZeroCostDL4Mic notebooks.
+Requires a local copy of the 'configuration.yaml' file and the 'data' folder.
+Optionally you can also specify the paths to local copies of the notebook.ipynb and requirements.txt files.
 
 Available options:
 
@@ -14,9 +16,9 @@ Available options:
 -c      Path to the configuration file 'configuration.yaml'.   
 -d      Path to the data directory.
 -g      Flag to specify if GPU should be used.
--n      Path to the notebook (it needs to be relative from where the dockerfile is located).
--r      Path to the requirements file (it needs to be relative from where the dockerfile is located).
--i      Flag to indicate if you want to use a Grafic User Interface (GUI).
+-n      Path to the notebook file 'notebook.ipynb'.
+-r      Path to the requirements file 'requirements.txt'.
+-i      Flag to indicate if you want to use a Graphic User Interface (GUI).
 -t      Tag that will be added to the docker image.
 -x      Flag to indicate if it is a test run.
 EOF
@@ -85,7 +87,7 @@ zenity_gui() {
     CONTINUE=$(zenity --info \
        --no-wrap \
        --title="Continue" \
-       --text="<big><b>Welcome to DL4Mic_everywhere!</b></big>\nBellow you have the buttons to add the data you need to provide in order to run the docker and the notebook. The paths to both\nthe configuration yaml file and data folder are mandatory. The rest of them are optional, by default the GPU usage is set as <b>No</b>\nand if no local paths are specified to the notebook and requirementes files, they will be downloaded using the URLs from\nthe configuration yaml file.\n\nValues of the arguments: \n${req_config_text}\n${extra_config_text}\n" \
+       --text="<big><b>Welcome to DL4MicEverywhere!</b></big>\nUse the buttons below to select the configuration.yaml file and the data folder, these are <b>mandatory</b>.\nThe remaining arguments are optional, by default the GPU usage is set as <b>No</b>.\n The notebook.ipynb and requirements.txt files will be downloaded using the URLs in the configuration.yaml unless provided.\n\nCurrent arguments: \n${req_config_text}\n${extra_config_text}\n" \
        --ok-label="Cancel" \
        --extra-button="Configuration file" \
        --extra-button="Data folder" \
@@ -114,7 +116,7 @@ zenity_gui() {
                    --text="You need to specify a path to the data folder."
             zenity_gui
         else
-            echo "Succes!!"
+            echo "Success!!"
         fi
     elif [ $CONTINUE_RC -eq 0 ] ||  [ $CONTINUE_RC -eq 1 ]; then
         echo "OUT"
@@ -134,7 +136,7 @@ config_window() {
 
 data_window() {
     DATA_PATH=$(zenity --file-selection \
-       --title "Select data_path" \
+       --title "Select data directory" \
        --directory)
     zenity_gui
 }
@@ -194,7 +196,7 @@ while getopts :hic:d:gn:r:t:x flag;do
             test_flag=1 ;;
         \?)
             echo "Invalid option: -$OPTARG"
-            echo "Try bash ./test.sh -h for more information."
+            echo "Try bash ./launch.sh -h for more information."
             exit 1 ;;
     esac
 done
@@ -225,15 +227,15 @@ echo ""
 
 if [ -z "$config_path" ]; then 
     # If no configuration path has been specified, then exit with the error
-    echo "No configuration path has been specified, please make sure to use -c argument and give a value to it."
+    echo "No configuration.yaml file path has been specified, please make sure to use -c argument and give a value to it."
     exit 1
 else
     # If a configuration path has been specified, check if it is valid
     if [[ -d $config_path ]]; then
-        echo "Path to the data folder: $config_path"
+        echo "Path to the configuration folder: $config_path"
         config_path=$config_path+"/configuration.yaml"
     elif [[ -f $config_path ]]; then
-        echo "Path to the data file: $config_path"
+        echo "Path to the configuration file: $config_path"
     else
         echo "$config_path is not valid."
         exit 1
