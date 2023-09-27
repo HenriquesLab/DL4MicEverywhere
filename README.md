@@ -2,7 +2,7 @@
 
 ## What is this?
 
-DL4MicEverywhere is a way of containerizing [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) style notebooks using a script that allows the user to bypass the tedious steps of programing the creation of a container.
+DL4MicEverywhere is a deep learning platform with a standalone backend that is docker container commplinat. DL4MicEverywhere expands [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) capabilities by making it cross-operating system compatible as well as high performance computing (HPC) and cloud native.
 
 ## Get started
 
