@@ -342,7 +342,7 @@ if [ "$local_notebook_flag" -eq 1 ]; then
 fi
 
 if [ "$local_requirements_flag" -eq 1 ]; then
-   cp $notebook_path $BASEDIR/requirements.txt
+   cp $requirements_path $BASEDIR/requirements.txt
    requirements_path=./requirements.txt
 fi
 
