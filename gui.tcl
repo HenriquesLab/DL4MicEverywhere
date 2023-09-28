@@ -2,7 +2,7 @@
 
 # Define the shape of the window
 set width 645
-set height 350
+set height 450
 set width_offset [expr { ( [winfo vrootwidth  .] - $width  ) / 2 }]
 set height_offset [expr { ( [winfo vrootheight .] - $height ) / 2 }]
 
@@ -18,25 +18,65 @@ set txt_types {
 }
 
 # Define the selection functions (yaml, folder, ipynb and txt) 
-proc onSelectYaml {yaml_path} {
+proc onSelectYaml {} {
     global yaml_types
+    global yaml_path
+
     set file [tk_getOpenFile -filetypes $yaml_types -parent .]
     set yaml_path $file
 }
-proc onSelectIpynb {ipynb_path} {
+proc onSelectIpynb {} {
     global ipynb_types
+    global ipynb_path
+
     set file [tk_getOpenFile -filetypes $ipynb_types -parent .]
     set ipynb_path $file
 }
-proc onSelectTxt {txt_path} {
+proc onSelectTxt {} {
     global txt_types
+    global txt_path
+
     set file [tk_getOpenFile -filetypes $txt_types -parent .]
     set txt_path $file
 }
 
-proc onSelectfolder {folder_path} {
+proc onSelectfolder {} {
+    global folder_path
+
     set file [tk_chooseDirectory -parent .]
     set folder_path $file
+}
+
+proc onDone {} {
+    global yaml_path
+    global folder_path
+    global ipynb_path
+    global txt_path
+    global gpu
+    
+    if {"$yaml_path" == ""} {
+        tk_messageBox -type ok -icon error -title Error \
+        -message "You need to specify a configuration file."
+    } else {
+        if {"$folder_path" == ""} {
+            tk_messageBox -type ok -icon error -title Error \
+            -message "You need to specify a folder."
+        } else {
+            if {"$ipynb_path" == ""} {
+                set ipynb_path "-"
+            }
+            if {"$txt_path" == ""} {
+                set txt_path "-"
+            }
+
+            puts "$yaml_path"
+            puts "$folder_path"
+            puts "$ipynb_path"
+            puts "$txt_path"
+            puts "$gpu"
+            exit 0
+        }
+    }
 }
 
 ##### Define the frames of the window #####
@@ -60,7 +100,7 @@ pack .fr.opt -fill both -expand 1
 ttk::button .fr.cb -text "Close" -command { exit 1 }
 pack .fr.cb -padx 5 -pady 5 -side right 
 
-ttk::button .fr.ok -text "Done" -command { exit 0 }
+ttk::button .fr.ok -text "Done" -command { onDone }
 pack .fr.ok -side right
 
 #### Manadatory argument section ######
@@ -74,25 +114,32 @@ place .fr.pnl.intro_2 -x 10 -y 30
 
 # Define the button and display to load the path to the 'configuration.yaml' file
 
-button .fr.pnl.byp -text "Select" \
-        -command "onSelectYaml yaml_path"
-place .fr.pnl.byp -x 560 -y 58
+label .fr.pnl.yaml_label -text "Path to the configuration.yaml:"
+place .fr.pnl.yaml_label -x 10 -y 60
 
 entry .fr.pnl.yaml_entry -textvariable yaml_path -width 60
-place .fr.pnl.yaml_entry -x 10 -y 60
+place .fr.pnl.yaml_entry -x 10 -y 80
 
-set yaml_path "Path to the configuration.yaml"
+button .fr.pnl.byp -text "Select" \
+        -command "onSelectYaml"
+place .fr.pnl.byp -x 560 -y 78
+
+set yaml_path ""
 
 # Define the button and display to load the path to the data folder
 
-button .fr.pnl.bdp -text "Select" \
-        -command "onSelectfolder folder_path"
-place .fr.pnl.bdp -x 560 -y 88
+label .fr.pnl.folder_label -text "Path to the folder:"
+place .fr.pnl.folder_label -x 10 -y 110
 
 entry .fr.pnl.folder_entry -textvariable folder_path -width 60
-place .fr.pnl.folder_entry -x 10 -y 90
+place .fr.pnl.folder_entry -x 10 -y 130
 
-set folder_path "Path to the folder"
+button .fr.pnl.bdp -text "Select" \
+        -command "onSelectfolder"
+place .fr.pnl.bdp -x 560 -y 128
+
+
+set folder_path ""
 
 ##### Optional argumwnts section #####
 
@@ -104,30 +151,37 @@ place .fr.opt.intro_2 -x 10 -y 30
 
 # Define the button and display to load the path to the local notebook
 
-button .fr.opt.byp -text "Select" \
-        -command "onSelectIpynb ipynb_path"
-place .fr.opt.byp -x 560 -y 58
+label .fr.opt.ipynb_label -text "Path to the local notebook:"
+place .fr.opt.ipynb_label -x 10 -y 60
 
 entry .fr.opt.ipynb_entry -textvariable ipynb_path -width 60
-place .fr.opt.ipynb_entry -x 10 -y 60
+place .fr.opt.ipynb_entry -x 10 -y 80
 
-set ipynb_path "Path to the local notebook"
+button .fr.opt.byp -text "Select" \
+        -command "onSelectIpynb"
+place .fr.opt.byp -x 560 -y 78
+
+
+set ipynb_path ""
 
 # Define the button and display to load the path to the data folder
 
-button .fr.opt.bdp -text "Select" \
-        -command "onSelectTxt txt_path"
-place .fr.opt.bdp -x 560 -y 88
+label .fr.opt.txt_label -text "Path to the 'requirements.txt:"
+place .fr.opt.txt_label -x 10 -y 110
 
 entry .fr.opt.txt_entry -textvariable txt_path -width 60
-place .fr.opt.txt_entry -x 10 -y 90
+place .fr.opt.txt_entry -x 10 -y 130
 
-set txt_path "Path to the 'requirements.txt'"
+button .fr.opt.bdp -text "Select" \
+        -command "onSelectTxt"
+place .fr.opt.bdp -x 560 -y 128
+
+set txt_path ""
 
 # Define the checkbutton for the GPU usage
 
 checkbutton .fr.opt.gpu -text "Allow GPU" -variable gpu
-place .fr.opt.gpu -x 10 -y 120
+place .fr.opt.gpu -x 10 -y 165
 
 ##### Create a window #####
 

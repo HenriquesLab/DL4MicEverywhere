@@ -43,129 +43,6 @@ function parse_yaml {
    }'
 }
 
-# Function to describe the GUI based on zenity
-zenity_gui() {
-    # Mandatory arguments
-    if [ -z $CONFIG_PATH ]; then
-        config_output="-"
-    else
-        config_output=$CONFIG_PATH
-    fi
-
-    if [ -z $DATA_PATH ]; then
-        data_output="-"
-    else
-        data_output=$DATA_PATH
-    fi
-
-    # Optional arguments
-    if [ -z $GPU_FLAG_RC ]; then
-        GPU_FLAG_RC=0
-    fi
-
-    if [ $GPU_FLAG_RC -eq 0 ]; then
-        gpu_output="<span foreground='red'>No</span>" # "<b>No</No>"
-    else
-        gpu_output="<span foreground='green'>Yes</span>" #"<b>Yes</b>"
-    fi
-
-    if [ -z $NOTEBOOK_PATH ]; then
-        notebook_output="-"
-    else
-        notebook_output=$NOTEBOOK_PATH
-    fi
-
-    if [ -z $REQUIREMENTS_PATH ]; then
-        requirements_output="-"
-    else
-        requirements_output=$REQUIREMENTS_PATH
-    fi
-
-    req_config_text="\tConfiguration file: <b>${config_output}</b>\n\tData folder: <b>${data_output}</b>"
-    extra_config_text="\t(optional) GPU: <b>${gpu_output}</b>\n\t(optional) Local notebook: <b>${notebook_output}</b>\n\t(optional) Local requirements: <b>${requirements_output}</b>"
-
-    CONTINUE=$(zenity --info \
-       --no-wrap \
-       --title="Continue" \
-       --text="<big><b>Welcome to DL4MicEverywhere!</b></big>\nUse the buttons below to select the configuration.yaml file and the data folder, these are <b>mandatory</b>.\nThe remaining arguments are optional, by default the GPU usage is set as <b>No</b>.\n The notebook.ipynb and requirements.txt files will be downloaded using the URLs in the configuration.yaml unless provided.\n\nCurrent arguments: \n${req_config_text}\n${extra_config_text}\n" \
-       --ok-label="Cancel" \
-       --extra-button="Configuration file" \
-       --extra-button="Data folder" \
-       --extra-button="GPU" \
-       --extra-button="Local notebook" \
-       --extra-button="Local requirements" \
-       --extra-button="Done")
-    CONTINUE_RC=$?
-    if [ "$CONTINUE" = "Configuration file" ]; then
-        config_window
-    elif [ "$CONTINUE" = "Data folder" ]; then
-        data_window
-    elif [ "$CONTINUE" = "GPU" ]; then
-        gpu_window
-    elif [ "$CONTINUE" = "Local notebook" ]; then
-        notebook_window
-    elif [ "$CONTINUE" = "Local requirements" ]; then
-        requirements_window
-    elif [ "$CONTINUE" = "Done" ]; then
-        if [ -z $CONFIG_PATH ]; then
-            zenity --error \
-                   --text="You need to specify a path to the configuration file."
-            zenity_gui
-        elif [ -z $DATA_PATH ]; then
-            zenity --error \
-                   --text="You need to specify a path to the data folder."
-            zenity_gui
-        else
-            echo "Success!!"
-        fi
-    elif [ $CONTINUE_RC -eq 0 ] ||  [ $CONTINUE_RC -eq 1 ]; then
-        echo "OUT"
-        exit
-    else
-        echo "An unexpected error has occurred."
-        exit
-    fi
-}
-
-config_window() {
-    CONFIG_PATH=$(zenity --file-selection \
-        --title "Select configuration.yaml" \
-        --file-filter="*.yaml")
-    zenity_gui
-}
-
-data_window() {
-    DATA_PATH=$(zenity --file-selection \
-       --title "Select data directory" \
-       --directory)
-    zenity_gui
-}
-
-gpu_window() {
-    zenity --question \
-        --title="GPU?"\
-        --text="Do you want GPU." \
-        --ok-label="Yes" \
-        --cancel-label="No"
-    GPU_FLAG_RC=$?
-    GPU_FLAG_RC=$(expr 1 - $GPU_FLAG_RC )
-    zenity_gui
-}
-
-notebook_window() {
-    NOTEBOOK_PATH=$(zenity --file-selection \
-       --title "Select Notebook.ipynb" \
-       --file-filter="*.ipynb")
-    zenity_gui
-}
-
-requirements_window() {
-    REQUIREMENTS_PATH=$(zenity --file-selection \
-       --title "Select requirements.txt" \
-       --file-filter="*.txt")
-    zenity_gui
-}
-
 # Let's define the default values for the flags
 gui_flag=0
 gpu_flag=0
@@ -204,22 +81,38 @@ done
 
 # Let's check the arguments
 
-echo ""
+# Prints if the test flag has been set
+if [ "$test_flag" -eq 1 ]; then
+    echo 'TEST MODE: ON.'
+else
+    echo 'TEST MODE: OFF.'
+fi
 
 if [ $gui_flag -eq 0 ]; then 
     # If the GUI flag has not been specified
-    echo "No GUI flag has been specified, therefore GUI will not be used."
+    if [ "$test_flag" -eq 1 ]; then
+        echo "No GUI flag has been specified, therefore GUI will not be used."
+    fi
 else
     # If the GUI flag has been specified, run the function to show the GUI and read the arguments
-    zenity_gui
-    config_path="$CONFIG_PATH"
-    data_path="$DATA_PATH"
-    gpu_flag="$GPU_FLAG_RC"
-    if [ ! -z $NOTEBOOK_PATH ]; then
-        notebook_path="$NOTEBOOK_PATH"
+    
+    gui_arguments=$(wish gui.tcl)
+
+    IFS=$'\n' read -d '' -r -a strarr <<<"$gui_arguments"
+    
+    config_path=${strarr[0]}
+    data_path=${strarr[1]}
+
+    notebook_aux=${strarr[2]}
+    requirements_aux=${strarr[3]}
+    
+    gpu_flag=${strarr[4]}
+
+    if [ $notebook_aux != "-" ]; then
+        notebook_path="$notebook_aux"
     fi
-    if [ ! -z $REQUIREMENTS_PATH ]; then
-        requirements_path="$REQUIREMENTS_PATH" 
+    if [ $requirements_aux != "-" ]; then
+        requirements_path="$requirements_aux" 
     fi
 fi
 
@@ -232,10 +125,14 @@ if [ -z "$config_path" ]; then
 else
     # If a configuration path has been specified, check if it is valid
     if [[ -d $config_path ]]; then
-        echo "Path to the configuration folder: $config_path"
+        if [ "$test_flag" -eq 1 ]; then
+            echo "Path to the configuration folder: $config_path"
+        fi
         config_path=$config_path+"/configuration.yaml"
     elif [[ -f $config_path ]]; then
-        echo "Path to the configuration file: $config_path"
+        if [ "$test_flag" -eq 1 ]; then
+            echo "Path to the configuration folder: $config_path"
+        fi
     else
         echo "$config_path is not valid."
         exit 1
@@ -249,25 +146,23 @@ if [ -z "$data_path" ]; then
 else
     # If a data path has been specified, check if it is valid
     if [[ -d $data_path ]]; then
-        echo "Path to the data: $data_path"
+        if [ "$test_flag" -eq 1 ]; then
+            echo "Path to the data: $data_path"
+        fi
     else
         echo "$data_path is not valid."
         exit 1
     fi
 fi 
 
-# Prints if the GPU flag has been set
-if [ "$gpu_flag" -eq 1 ]; then
-    echo 'GPU will be allowed.'
-else
-    echo 'GPU is not allowed.'
-fi
 
-# Prints if the test flag has been set
 if [ "$test_flag" -eq 1 ]; then
-    echo 'TEST MODE: ON.'
-else
-    echo 'TEST MODE: OFF.'
+    # Prints if the GPU flag has been set if the test flag has been set
+    if [ "$gpu_flag" -eq 1 ]; then
+        echo 'GPU will be allowed.'
+    else
+        echo 'GPU is not allowed.'
+    fi
 fi
 
 # Read the variables fro mthe yaml file
@@ -285,13 +180,21 @@ if [ -z "$notebook_path" ]; then
     notebook_path="${notebook_url}"
     # For the docker's tag if not specified
     aux_docker_tag="$(basename $notebook_path .ipynb?raw=true)"
-    echo "No notebook has been specified, therefore the notebook url specified on 'configuration.yaml' will be used."
+
+    if [ "$test_flag" -eq 1 ]; then
+        echo "No notebook has been specified, therefore the notebook url specified on 'configuration.yaml' will be used."
+    fi
+
 else
     # Otherwise check if the path is valid
     # For the docker's tag if not specified
     aux_docker_tag="$(basename $notebook_path .ipynb)"
     if [ -f "$notebook_path" ]; then
-        echo "Path to the notebook: $notebook_path"
+    
+        if [ "$test_flag" -eq 1 ]; then
+            echo "Path to the notebook: $notebook_path"
+        fi
+        
         # If the notebook path is not valid, activate its flag for future processing
         local_notebook_flag=1
     else
@@ -303,11 +206,16 @@ fi
 if [ -z "$requirements_path" ]; then
     # If no local requirements path has been specified, then the URL from the configuration file will be used
     requirements_path="${requirements_url}"
-    echo "No requirements file has been specified, therefore the requirements url specified on 'configuration.yaml' will be used."
+    local_requirements_flag=0
+    if [ "$test_flag" -eq 1 ]; then 
+        echo "No requirements file has been specified, therefore the requirements url specified on 'configuration.yaml' will be used."
+    fi
 else
     # Otherwise check if the path is valid
     if [ -f "$requirements_path" ]; then
-        echo "Path to the requirements file: $requirements_path"
+        if [ "$test_flag" -eq 1 ]; then 
+            echo "Path to the requirements file: $requirements_path"
+        fi
         # If the notebook path is not valid, activate its flag for future processing
         local_requirements_flag=1
     else
@@ -319,31 +227,37 @@ fi
 if [ -z "$docker_tag" ]; then
     # If no tag has been specified for the docker image, then the default tag will be used (the name of the notebook)
     docker_tag=$aux_docker_tag
-    echo "No tag has been specified for the docker image, therefore the default tag $docker_tag will be used."
+
+    if [ "$test_flag" -eq 1 ]; then 
+        echo "No tag has been specified for the docker image, therefore the default tag $docker_tag will be used."
+    fi
 fi
 docker_tag=$(echo $docker_tag | tr '[:upper:]' '[:lower:]')
 
-echo ""
-echo "base_img: $base_img"
-echo "python_version: $python_version"
-echo "notebook_path: $notebook_path"
-echo "requirements_path: $requirements_path"
-echo "sections_to_remove: $sections_to_remove"
-echo "docker_tag: $docker_tag"
-echo ""
+
+if [ "$test_flag" -eq 1 ]; then 
+    echo ""
+    echo "base_img: $base_img"
+    echo "python_version: $python_version"
+    echo "notebook_path: $notebook_path"
+    echo "requirements_path: $requirements_path"
+    echo "sections_to_remove: $sections_to_remove"
+    echo "docker_tag: $docker_tag"
+    echo ""
+fi
 
 notebook_name="$(basename "$notebook_path" ?raw=true)"
 
 # Local files, if included, need to be remocreated in same folder as the dockerfile,
 # then they will be deleted
 if [ "$local_notebook_flag" -eq 1 ]; then
-   cp $notebook_path $BASEDIR/notebook.ipynb
-   notebook_path=./notebook.ipynb
+    cp $notebook_path $BASEDIR/notebook.ipynb
+    notebook_path=./notebook.ipynb
 fi
 
 if [ "$local_requirements_flag" -eq 1 ]; then
-   cp $notebook_path $BASEDIR/requirements.txt
-   requirements_path=./requirements.txt
+    cp $requirements_path $BASEDIR/requirements.txt
+    requirements_path=./requirements.txt
 fi
 
 # Check if there is the errata in ~/.docker/config.json where credsStore should be credStore
@@ -354,28 +268,20 @@ if grep -q credsStore ~/.docker/config.json; then
     perl -pi -e "s/credsStore/credStore/g" ~/.docker/config.json 
 fi
 
-if [ -z "$gui_flag" ]; then 
-  # Build the docker image without GUI
-  docker build $BASEDIR --no-cache  -t $docker_tag \
-        --build-arg BASE_IMAGE="${base_img}" \
-        --build-arg GPU_FLAG="${gpu_flag}" \
-        --build-arg PYTHON_VERSION="${python_version}" \
-        --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
-        --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
-        --build-arg NOTEBOOK_NAME="${notebook_name}" \
-        --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
-else
-  # Build the docker image, using the GUI and showing a progess window
-  docker build $BASEDIR --no-cache  -t $docker_tag \
-        --build-arg BASE_IMAGE="${base_img}" \
-        --build-arg GPU_FLAG="${gpu_flag}" \
-        --build-arg PYTHON_VERSION="${python_version}" \
-        --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
-        --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
-        --build-arg NOTEBOOK_NAME="${notebook_name}" \
-        --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" # | zenity --progress --title "Building the image" --text "The docker is building..."
-fi
+
+# Build the docker image without GUI
+docker build $BASEDIR --no-cache  -t $docker_tag \
+    --build-arg BASE_IMAGE="${base_img}" \
+    --build-arg GPU_FLAG="${gpu_flag}" \
+    --build-arg PYTHON_VERSION="${python_version}" \
+    --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
+    --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
+    --build-arg NOTEBOOK_NAME="${notebook_name}" \
+    --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
+
 DOCKER_OUT=$? # Gets if the docker image has been built
+
+echo "Docker image built: $DOCKER_OUT"
 
 # Local files, if included, need to be removed to avoid the generation of many files
 if [ "$local_notebook_flag" -eq 1 ]; then
