@@ -1,6 +1,0 @@
-notebook_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/0d2bcef99cfd76294b9b91243d68ba6c6727c4fe/Colab_notebooks/StarDist_3D_ZeroCostDL4Mic.ipynb?raw=true
-requirements_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/cfbb6b9d7a5b2d190749e708c39b5c3b98b0f70d/requirements_files/StarDist_3D_requirements_simple.txt?raw=true
-cuda_version: 11.8.0
-ubuntu_version: 22.04
-python_version: 3.10
-sections_to_remove: 1.1. 1.2. 2. 6.2. 
