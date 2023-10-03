@@ -1,8 +1,8 @@
 #! /usr/local/bin/wish
 
 # Define the shape of the window
-set width 645
-set height 450
+set width 650
+set height 500
 set width_offset [expr { ( [winfo vrootwidth  .] - $width  ) / 2 }]
 set height_offset [expr { ( [winfo vrootheight .] - $height ) / 2 }]
 
@@ -40,58 +40,126 @@ proc onSelectTxt {} {
     set txt_path $file
 }
 
-proc onSelectfolder {} {
-    global folder_path
+proc onSelectData {} {
+    global data_path
 
     set file [tk_chooseDirectory -parent .]
-    set folder_path $file
+    set data_path $file
+}
+
+proc onSelectResult {} {
+    global result_path
+
+    set file [tk_chooseDirectory -parent .]
+    set result_path $file
 }
 
 proc onDone {} {
-    global yaml_path
-    global folder_path
-    global ipynb_path
-    global txt_path
-    global gpu
-    
-    if {"$yaml_path" == ""} {
-        tk_messageBox -type ok -icon error -title Error \
-        -message "You need to specify a configuration file."
-    } else {
-        if {"$folder_path" == ""} {
-            tk_messageBox -type ok -icon error -title Error \
-            -message "You need to specify a folder."
-        } else {
-            if {"$ipynb_path" == ""} {
-                set ipynb_path "-"
-            }
-            if {"$txt_path" == ""} {
-                set txt_path "-"
-            }
 
-            puts "$yaml_path"
-            puts "$folder_path"
-            puts "$ipynb_path"
-            puts "$txt_path"
-            puts "$gpu"
-            exit 0
+    global data_path
+    global result_path
+
+    if {"$data_path" == ""} {
+        tk_messageBox -type ok -icon error -title Error \
+        -message "ADVANCED MODE: You need to specify a data folder."
+    } else {
+        if {"$result_path" == ""} {
+            tk_messageBox -type ok -icon error -title Error \
+            -message "ADVANCED MODE: You need to specify a result folder."
+        } else {
+            global advanced_options
+            
+            if {"$advanced_options" == 0} {
+                # The user has selected the simple mode
+                global simpleNotebook
+                if {"$simpleNotebook" == "-"} {
+                    tk_messageBox -type ok -icon error -title Error \
+                    -message "SIMPLE MODE: You need to specify a notebook."
+                } else {
+                    puts "$advanced_options"
+                    puts "$data_path"
+                    puts "$result_path"
+                    puts "$simpleNotebook"
+                    
+                    exit 0
+                }
+            } else {
+                # The user has selected the advanced mode
+                global yaml_path
+                global ipynb_path
+                global txt_path
+                global gpu
+                global tag
+                
+                if {"$yaml_path" == ""} {
+                    tk_messageBox -type ok -icon error -title Error \
+                    -message "ADVANCED MODE: You need to specify a configuration file."
+                } else {
+                    if {"$ipynb_path" == ""} {
+                        set ipynb_path "-"
+                    }
+                    if {"$txt_path" == ""} {
+                        set txt_path "-"
+                    }
+                    if {"$tag" == ""} {
+                        set txt_path "-"
+                    }
+
+                    puts "$advanced_options"
+                    puts "$data_path"
+                    puts "$result_path"
+
+                    puts "$yaml_path"
+                    puts "$ipynb_path"
+                    puts "$txt_path"
+                    puts "$gpu"
+                    puts "$tag"
+                    
+                    exit 0
+                }
+            }
         }
     }
 }
 
+proc onAdvanced {} {
+    global advanced_options
+    if {"$advanced_options" == 0} {
+        set advanced_options 1
+        pack .fr.advanced -fill both -expand 1
+    } else {
+        set advanced_options 0
+        pack .fr.advanced -fill both -expand 0
+    }
+
+    place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.22 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebooks -relx 0.01 -rely [expr 0.32 / ( 2 - $advanced_options ) ]
+    place .fr.principal.data_label -relx 0.01 -rely [expr 0.44 / ( 2 - $advanced_options ) ]
+    place .fr.principal.data_entry -relx 0.01 -rely [expr 0.54 / ( 2 - $advanced_options ) ]
+    place .fr.principal.data_btn -relx 0.87 -rely [expr 0.535 / ( 2 - $advanced_options ) ]
+    place .fr.principal.result_label -relx 0.01 -rely [expr 0.66 / ( 2 - $advanced_options ) ]
+    place .fr.principal.result_entry -relx 0.01 -rely [expr 0.76 / ( 2 - $advanced_options ) ]
+    place .fr.principal.result_btn -relx 0.87 -rely [expr 0.755 / ( 2 - $advanced_options ) ]
+
+
+}
+
+# The flag that indicates if "Advanced options" will be used
+set advanced_options 0
+
 ##### Define the frames of the window #####
 
 # Define the frames to display the information
-# It will be divided in three sections (mandatory arguments, optional and "Done" and "Cancel" buttons.)
+# It will be divided in three sections (mandatory arguments, advanced and "Run" and "Cancel" buttons.)
 
 frame .fr
 pack .fr -fill both -expand 1
 
-frame .fr.pnl -relief raised -borderwidth 1
-pack .fr.pnl -fill both -expand 1
+frame .fr.principal -relief raised -borderwidth 1
+pack .fr.principal -fill both -expand 1
 
-frame .fr.opt -relief raised -borderwidth 1
-pack .fr.opt -fill both -expand 1
+frame .fr.advanced -relief raised -borderwidth 1
+pack .fr.advanced -fill both -expand 0
 
 ##### Buttons section #####
 
@@ -100,88 +168,122 @@ pack .fr.opt -fill both -expand 1
 ttk::button .fr.cb -text "Close" -command { exit 1 }
 pack .fr.cb -padx 5 -pady 5 -side right 
 
-ttk::button .fr.ok -text "Done" -command { onDone }
+ttk::button .fr.ok -text "Run" -command { onDone }
 pack .fr.ok -side right
 
 #### Manadatory argument section ######
 
 # Define the text that will be the introduction to the window
 
-label .fr.pnl.intro_1 -text "Welcome to DL4MicEverywhere!"
-place .fr.pnl.intro_1 -x 10 -y 10
-label .fr.pnl.intro_2 -text "Use the buttons below to select the configuration.yaml file and the data folder, these are mandatory."
-place .fr.pnl.intro_2 -x 10 -y 30
+label .fr.principal.intro_1 -text "Welcome to DL4MicEverywhere!"
+place .fr.principal.intro_1 -relx 0.01 -rely 0.0
 
-# Define the button and display to load the path to the 'configuration.yaml' file
+# Define the list with possible default notebooks
 
-label .fr.pnl.yaml_label -text "Path to the configuration.yaml:"
-place .fr.pnl.yaml_label -x 10 -y 60
+set notebookList "-"
+append notebookList " " $argv
 
-entry .fr.pnl.yaml_entry -textvariable yaml_path -width 60
-place .fr.pnl.yaml_entry -x 10 -y 80
+label .fr.principal.notebook_label -text "List of default notebooks:"
+place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.22 / ( 2 - $advanced_options ) ]
 
-button .fr.pnl.byp -text "Select" \
-        -command "onSelectYaml"
-place .fr.pnl.byp -x 560 -y 78
+ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable simpleNotebook -state readonly
+place .fr.principal.notebooks -relx 0.01 -rely [expr 0.32 / ( 2 - $advanced_options ) ]
 
-set yaml_path ""
+set simpleNotebook "-"
+
 
 # Define the button and display to load the path to the data folder
 
-label .fr.pnl.folder_label -text "Path to the folder:"
-place .fr.pnl.folder_label -x 10 -y 110
 
-entry .fr.pnl.folder_entry -textvariable folder_path -width 60
-place .fr.pnl.folder_entry -x 10 -y 130
+label .fr.principal.data_label -text "Path to the data folder:"
+place .fr.principal.data_label -relx 0.01 -rely [expr 0.44 / ( 2 - $advanced_options ) ]
 
-button .fr.pnl.bdp -text "Select" \
-        -command "onSelectfolder"
-place .fr.pnl.bdp -x 560 -y 128
+entry .fr.principal.data_entry -textvariable data_path -width 60
+place .fr.principal.data_entry -relx 0.01 -rely [expr 0.54 / ( 2 - $advanced_options ) ]
+
+button .fr.principal.data_btn -text "Select" \
+        -command "onSelectData"
+place .fr.principal.data_btn -relx 0.87 -rely [expr 0.535 / ( 2 - $advanced_options ) ]
+
+set data_path ""
+
+# Define the button and display to load the path to the result folder
+
+label .fr.principal.result_label -text "Path to the result/output folder:"
+place .fr.principal.result_label -relx 0.01 -rely [expr 0.66 / ( 2 - $advanced_options ) ]
+
+entry .fr.principal.result_entry -textvariable result_path -width 60
+place .fr.principal.result_entry -relx 0.01 -rely [expr 0.76 / ( 2 - $advanced_options ) ]
+
+button .fr.principal.result_btn -text "Select" \
+        -command "onSelectResult"
+place .fr.principal.result_btn -relx 0.87 -rely [expr 0.755 / ( 2 - $advanced_options ) ]
+
+set result_path ""
+
+##### Advanced arguments section #####
+
+button .fr.principal.advanced -text "Advanced options" \
+        -command "onAdvanced"
+place .fr.principal.advanced -relx 0.01 -rely 0.9
 
 
-set folder_path ""
+# Define the button and display to load the path to the 'configuration.yaml' file
 
-##### Optional argumwnts section #####
+label .fr.advanced.yaml_label -text "Path to the configuration.yaml:"
+place .fr.advanced.yaml_label -relx 0.01 -rely 0.0
 
-# Define the text for this section
-label .fr.opt.intro_1 -text "These arguments are optional, there is no need to use them if it is not wanted."
-place .fr.opt.intro_1 -x 10 -y 10
-label .fr.opt.intro_2 -text "The default value for the GPU usage is false."
-place .fr.opt.intro_2 -x 10 -y 30
+entry .fr.advanced.yaml_entry -textvariable yaml_path -width 60
+place .fr.advanced.yaml_entry -relx 0.01 -rely 0.09
+
+button .fr.advanced.byp -text "Select" \
+        -command "onSelectYaml"
+place .fr.advanced.byp -relx 0.87 -rely 0.085
+
+set yaml_path ""
 
 # Define the button and display to load the path to the local notebook
 
-label .fr.opt.ipynb_label -text "Path to the local notebook:"
-place .fr.opt.ipynb_label -x 10 -y 60
+label .fr.advanced.ipynb_label -text "Path to the local notebook:"
+place .fr.advanced.ipynb_label -relx 0.01 -rely 0.22
 
-entry .fr.opt.ipynb_entry -textvariable ipynb_path -width 60
-place .fr.opt.ipynb_entry -x 10 -y 80
+entry .fr.advanced.ipynb_entry -textvariable ipynb_path -width 60
+place .fr.advanced.ipynb_entry -relx 0.01 -rely 0.32
 
-button .fr.opt.byp -text "Select" \
+button .fr.advanced.bnp -text "Select" \
         -command "onSelectIpynb"
-place .fr.opt.byp -x 560 -y 78
-
+place .fr.advanced.bnp -relx 0.87 -rely 0.315
 
 set ipynb_path ""
 
 # Define the button and display to load the path to the data folder
 
-label .fr.opt.txt_label -text "Path to the 'requirements.txt:"
-place .fr.opt.txt_label -x 10 -y 110
+label .fr.advanced.txt_label -text "Path to the 'requirements.txt:"
+place .fr.advanced.txt_label -relx 0.01 -rely 0.44
 
-entry .fr.opt.txt_entry -textvariable txt_path -width 60
-place .fr.opt.txt_entry -x 10 -y 130
+entry .fr.advanced.txt_entry -textvariable txt_path -width 60
+place .fr.advanced.txt_entry -relx 0.01 -rely 0.54
 
-button .fr.opt.bdp -text "Select" \
+button .fr.advanced.btp -text "Select" \
         -command "onSelectTxt"
-place .fr.opt.bdp -x 560 -y 128
+place .fr.advanced.btp -relx 0.87 -rely 0.535
 
 set txt_path ""
 
 # Define the checkbutton for the GPU usage
 
-checkbutton .fr.opt.gpu -text "Allow GPU" -variable gpu
-place .fr.opt.gpu -x 10 -y 165
+checkbutton .fr.advanced.gpu -text "Allow GPU" -variable gpu
+place .fr.advanced.gpu -relx 0.1 -rely 0.76 
+
+# Define the docker tag text entry
+
+label .fr.advanced.tag_label -text "Docker tag:"
+place .fr.advanced.tag_label -relx 0.3 -rely 0.76
+
+entry .fr.advanced.tag -textvariable tag -width 30
+place .fr.advanced.tag -relx 0.425 -rely 0.755 
+
+set tag ""
 
 ##### Create a window #####
 
