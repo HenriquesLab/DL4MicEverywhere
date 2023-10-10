@@ -9,7 +9,12 @@ on:
 
 jobs:
   check_keys:
-    runs-on: ubuntu-latest
+    
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+          os: [ubuntu-latest, windows-latest, macos-latest]
+
     name: Check attributes/keys
     steps:
       - name: Checkout
@@ -46,6 +51,16 @@ jobs:
         id: sections_to_remove
         with:
           cmd: yq '.sections_to_remove' '${{ inputs.config_file }}'  
+      - name: Check version attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: version
+        with:
+          cmd: yq '.version' '${{ inputs.config_file }}'  
+      - name: Check description attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: description
+        with:
+          cmd: yq '.description' '${{ inputs.config_file }}'  
       - run: |
           if [[ 'null' = '${{ steps.notebook_url.outputs.result }}' ]] ; then 
             echo 'The key notebook_url is not in the configuration.yaml file.' 
@@ -65,11 +80,22 @@ jobs:
           elif [[ 'null' = '${{ steps.sections_to_remove.outputs.result }}' ]] ; then 
             echo 'The key sections_to_remove is not in the configuration.yaml file.' 
             exit 1
+          elif [[ 'null' = '${{ steps.version.outputs.result }}' ]] ; then 
+            echo 'The key version is not in the configuration.yaml file.' 
+            exit 1
+          elif [[ 'null' = '${{ steps.description.outputs.result }}' ]] ; then 
+            echo 'The key description is not in the configuration.yaml file.' 
+            exit 1
           else 
             echo 'The configuration.yaml file is defined with all its keys.'
           fi
   check_urls:
-    runs-on: ubuntu-latest
+    
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+          os: [ubuntu-latest, windows-latest, macos-latest]
+
     name: Check notebook's and requirements' URLs
     needs: [check_keys]
     steps:
@@ -96,7 +122,12 @@ jobs:
         with:
           arguments: ${{ steps.extract_rq_url.outputs.result }}
   check_docker_build:
-    runs-on: ubuntu-latest
+    
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+          os: [ubuntu-latest, windows-latest, macos-latest]
+
     name: Check running 'docker build'
     needs: [check_keys, check_urls]
     steps:

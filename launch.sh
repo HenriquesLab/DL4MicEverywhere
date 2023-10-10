@@ -269,7 +269,7 @@ if [ -z "$docker_tag" ]; then
 fi
 docker_tag=$(echo $docker_tag | tr '[:upper:]' '[:lower:]')
 
-if [ "$test_flag" -eq 1 ]; then 
+if [ "$test_flag" -eq 1 ]; then
     echo ""
     echo "base_img: $base_img"
     echo "python_version: $python_version"
@@ -302,7 +302,6 @@ if grep -q credsStore ~/.docker/config.json; then
     perl -pi -e "s/credsStore/credStore/g" ~/.docker/config.json 
 fi
 
-
 # Build the docker image without GUI
 docker build $BASEDIR --no-cache  -t $docker_tag \
     --build-arg BASE_IMAGE="${base_img}" \
@@ -314,8 +313,6 @@ docker build $BASEDIR --no-cache  -t $docker_tag \
     --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
 
 DOCKER_OUT=$? # Gets if the docker image has been built
-
-echo "Docker image built: $DOCKER_OUT"
 
 # Local files, if included, need to be removed to avoid the generation of many files
 if [ "$local_notebook_flag" -eq 1 ]; then
@@ -331,12 +328,24 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     if [ $test_flag -eq 1 ]; then
         exit 0
     fi
+
+    # Find a usable port
+    port=8888
+    while ( lsof -i:$port &> /dev/null )
+    do
+        port=$((port+1))
+        if [ $port -gt 9000 ]; then
+            # We want the port to be between 8000 and 9000
+            port=8000
+        fi
+    done
+
     if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
-        docker run -it  --gpus all -p 8888:8888 -v $data_path:/home/data -v $result_path:/home/results $docker_tag
+        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag:latest" jupyter lab "${notebook_name}" --ip='0.0.0.0' --port=$port --no-browser --allow-root
     else
         # Run the docker image without activating the GPU
-        docker run -it  -p 8888:8888 -v $data_path:/home/data -v $result_path:/home/results $docker_tag
+        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag:latest" jupyter lab "${notebook_name}" --ip='0.0.0.0' --port=$port --no-browser --allow-root
     fi
 else
     echo "The docker image has not been built."
@@ -344,4 +353,3 @@ else
         exit 1
     fi
 fi
-exit 1

@@ -15,7 +15,8 @@ RUN apt-get update && \
                        ffmpeg \
                        libsm6 \
                        libxext6 \
-                       pkg-config && \
+                       pkg-config \
+                       nodejs && \
     if [ "$GPU_FLAG" -eq "1" ] ; then apt-get install -y nvidia-cuda-toolkit ; fi && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -67,4 +68,5 @@ RUN python colab_to_docker/src/transform.py -p . -n ${NOTEBOOK_NAME} -s ${SECTIO
 RUN pip install jupyterlab ipywidgets
 
 # Run the notebook
-CMD jupyter-lab "$NOTEBOOK_NAME" --ip='0.0.0.0' --port=8888 --no-browser --allow-root
+CMD bash 
+# CMD jupyter-lab "$NOTEBOOK_NAME" --ip='0.0.0.0' --port=8888 --no-browser --allow-root
