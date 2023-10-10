@@ -2,7 +2,7 @@
 
 # Define the shape of the window
 set width 650
-set height 500
+set height 700
 set width_offset [expr { ( [winfo vrootwidth  .] - $width  ) / 2 }]
 set height_offset [expr { ( [winfo vrootheight .] - $height ) / 2 }]
 
@@ -132,20 +132,44 @@ proc onAdvanced {} {
         pack .fr.advanced -fill both -expand 0
     }
 
-    place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.22 / ( 2 - $advanced_options ) ]
-    place .fr.principal.notebooks -relx 0.01 -rely [expr 0.32 / ( 2 - $advanced_options ) ]
-    place .fr.principal.data_label -relx 0.01 -rely [expr 0.44 / ( 2 - $advanced_options ) ]
-    place .fr.principal.data_entry -relx 0.01 -rely [expr 0.54 / ( 2 - $advanced_options ) ]
-    place .fr.principal.data_btn -relx 0.87 -rely [expr 0.535 / ( 2 - $advanced_options ) ]
-    place .fr.principal.result_label -relx 0.01 -rely [expr 0.66 / ( 2 - $advanced_options ) ]
-    place .fr.principal.result_entry -relx 0.01 -rely [expr 0.76 / ( 2 - $advanced_options ) ]
-    place .fr.principal.result_btn -relx 0.87 -rely [expr 0.755 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.2 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebooks -relx 0.01 -rely [expr 0.28 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebook_description -relx 0.35 -rely [expr 0.2 / ( 2 - $advanced_options ) ]
+    place .fr.principal.update_text -relx 0.01 -rely [expr 0.37 / ( 2 - $advanced_options ) ]
 
+    place .fr.principal.data_label -relx 0.01 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
+    place .fr.principal.data_entry -relx 0.01 -rely [expr 0.52 / ( 2 - $advanced_options ) ]
+    place .fr.principal.data_btn -relx 0.87 -rely [expr 0.515 / ( 2 - $advanced_options ) ]
+
+    place .fr.principal.result_label -relx 0.01 -rely [expr 0.6 / ( 2 - $advanced_options ) ]
+    place .fr.principal.result_entry -relx 0.01 -rely [expr 0.67 / ( 2 - $advanced_options ) ]
+    place .fr.principal.result_btn -relx 0.87 -rely [expr 0.665 / ( 2 - $advanced_options ) ]
 
 }
 
+proc parseYaml {notebook_name} {
+    global update
+
+    # Read a yaml file
+    catch {exec /bin/bash parse_yaml.sh "$notebook_name"} output
+
+    set arguments [split $output \n]
+
+    # Get the arguments that we want
+    .fr.principal.notebook_description delete 0.0 end
+    .fr.principal.notebook_description insert end [lindex $arguments 1]
+
+    if {[lindex $arguments 0] == 1} {
+        set update "There is an updated version of this notebook."
+    } else {
+        set update ""
+    }
+}
+
+
 # The flag that indicates if "Advanced options" will be used
 set advanced_options 0
+set update ""
 
 ##### Define the frames of the window #####
 
@@ -183,11 +207,20 @@ place .fr.principal.intro_1 -relx 0.01 -rely 0.0
 set notebookList "-"
 append notebookList " " $argv
 
+font create myFont -family Helvetica -size 10
+
 label .fr.principal.notebook_label -text "List of default notebooks:"
-place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.22 / ( 2 - $advanced_options ) ]
+place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.2 / ( 2 - $advanced_options ) ]
 
 ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable simpleNotebook -state readonly
-place .fr.principal.notebooks -relx 0.01 -rely [expr 0.32 / ( 2 - $advanced_options ) ]
+place .fr.principal.notebooks -relx 0.01 -rely [expr 0.28 / ( 2 - $advanced_options ) ]
+bind .fr.principal.notebooks <<ComboboxSelected>> { parseYaml [%W get]}
+
+text .fr.principal.notebook_description -width 55 -height 5 -borderwidth 1 -relief sunken
+place .fr.principal.notebook_description -relx 0.35 -rely [expr 0.2 / ( 2 - $advanced_options ) ]
+
+label .fr.principal.update_text -textvariable update -foreground orange -font myFont
+place .fr.principal.update_text -relx 0.01 -rely [expr 0.37 / ( 2 - $advanced_options ) ]
 
 set simpleNotebook "-"
 
@@ -196,28 +229,28 @@ set simpleNotebook "-"
 
 
 label .fr.principal.data_label -text "Path to the data folder:"
-place .fr.principal.data_label -relx 0.01 -rely [expr 0.44 / ( 2 - $advanced_options ) ]
+place .fr.principal.data_label -relx 0.01 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
 
 entry .fr.principal.data_entry -textvariable data_path -width 60
-place .fr.principal.data_entry -relx 0.01 -rely [expr 0.54 / ( 2 - $advanced_options ) ]
+place .fr.principal.data_entry -relx 0.01 -rely [expr 0.52 / ( 2 - $advanced_options ) ]
 
 button .fr.principal.data_btn -text "Select" \
         -command "onSelectData"
-place .fr.principal.data_btn -relx 0.87 -rely [expr 0.535 / ( 2 - $advanced_options ) ]
+place .fr.principal.data_btn -relx 0.87 -rely [expr 0.515 / ( 2 - $advanced_options ) ]
 
 set data_path ""
 
 # Define the button and display to load the path to the result folder
 
 label .fr.principal.result_label -text "Path to the result/output folder:"
-place .fr.principal.result_label -relx 0.01 -rely [expr 0.66 / ( 2 - $advanced_options ) ]
+place .fr.principal.result_label -relx 0.01 -rely [expr 0.6 / ( 2 - $advanced_options ) ]
 
 entry .fr.principal.result_entry -textvariable result_path -width 60
-place .fr.principal.result_entry -relx 0.01 -rely [expr 0.76 / ( 2 - $advanced_options ) ]
+place .fr.principal.result_entry -relx 0.01 -rely [expr 0.67 / ( 2 - $advanced_options ) ]
 
 button .fr.principal.result_btn -text "Select" \
         -command "onSelectResult"
-place .fr.principal.result_btn -relx 0.87 -rely [expr 0.755 / ( 2 - $advanced_options ) ]
+place .fr.principal.result_btn -relx 0.87 -rely [expr 0.665 / ( 2 - $advanced_options ) ]
 
 set result_path ""
 
@@ -225,69 +258,67 @@ set result_path ""
 
 button .fr.principal.advanced -text "Advanced options" \
         -command "onAdvanced"
-place .fr.principal.advanced -relx 0.01 -rely 0.9
-
+place .fr.principal.advanced -relx 0.01 -rely 0.93
 
 # Define the button and display to load the path to the 'configuration.yaml' file
 
 label .fr.advanced.yaml_label -text "Path to the configuration.yaml:"
-place .fr.advanced.yaml_label -relx 0.01 -rely 0.0
+place .fr.advanced.yaml_label -relx 0.01 -rely 0.2
 
 entry .fr.advanced.yaml_entry -textvariable yaml_path -width 60
-place .fr.advanced.yaml_entry -relx 0.01 -rely 0.09
+place .fr.advanced.yaml_entry -relx 0.01 -rely 0.27
 
 button .fr.advanced.byp -text "Select" \
         -command "onSelectYaml"
-place .fr.advanced.byp -relx 0.87 -rely 0.085
+place .fr.advanced.byp -relx 0.87 -rely 0.265
 
 set yaml_path ""
 
 # Define the button and display to load the path to the local notebook
 
 label .fr.advanced.ipynb_label -text "Path to the local notebook:"
-place .fr.advanced.ipynb_label -relx 0.01 -rely 0.22
+place .fr.advanced.ipynb_label -relx 0.01 -rely 0.35
 
 entry .fr.advanced.ipynb_entry -textvariable ipynb_path -width 60
-place .fr.advanced.ipynb_entry -relx 0.01 -rely 0.32
+place .fr.advanced.ipynb_entry -relx 0.01 -rely 0.42
 
 button .fr.advanced.bnp -text "Select" \
         -command "onSelectIpynb"
-place .fr.advanced.bnp -relx 0.87 -rely 0.315
+place .fr.advanced.bnp -relx 0.87 -rely 0.415
 
 set ipynb_path ""
 
 # Define the button and display to load the path to the data folder
 
-label .fr.advanced.txt_label -text "Path to the 'requirements.txt:"
-place .fr.advanced.txt_label -relx 0.01 -rely 0.44
+label .fr.advanced.txt_label -text "Path to the requirements.txt:"
+place .fr.advanced.txt_label -relx 0.01 -rely 0.50
 
 entry .fr.advanced.txt_entry -textvariable txt_path -width 60
-place .fr.advanced.txt_entry -relx 0.01 -rely 0.54
+place .fr.advanced.txt_entry -relx 0.01 -rely 0.57
 
 button .fr.advanced.btp -text "Select" \
         -command "onSelectTxt"
-place .fr.advanced.btp -relx 0.87 -rely 0.535
+place .fr.advanced.btp -relx 0.87 -rely 0.565
 
 set txt_path ""
 
 # Define the checkbutton for the GPU usage
 
 checkbutton .fr.advanced.gpu -text "Allow GPU" -variable gpu
-place .fr.advanced.gpu -relx 0.1 -rely 0.76 
+place .fr.advanced.gpu -relx 0.1 -rely 0.71
 
 # Define the docker tag text entry
 
 label .fr.advanced.tag_label -text "Docker tag:"
-place .fr.advanced.tag_label -relx 0.3 -rely 0.76
+place .fr.advanced.tag_label -relx 0.3 -rely 0.71
 
 entry .fr.advanced.tag -textvariable tag -width 30
-place .fr.advanced.tag -relx 0.425 -rely 0.755 
+place .fr.advanced.tag -relx 0.425 -rely 0.705 
 
 set tag ""
 
 ##### Create a window #####
 
 # Create the window, give a name to it and locate it in the middle of the screen
-
 wm title . "DL4MicEverywhere"
 wm geometry . ${width}x${height}+${width_offset}+${height_offset}

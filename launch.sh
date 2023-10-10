@@ -15,6 +15,7 @@ Available options:
 -h      Print this help and exit.
 -c      Path to the configuration file 'configuration.yaml'.   
 -d      Path to the data directory.
+-o      Path to the output directory.
 -g      Flag to specify if GPU should be used.
 -n      Path to the notebook file 'notebook.ipynb'.
 -r      Path to the requirements file 'requirements.txt'.
@@ -95,9 +96,12 @@ if [ $gui_flag -eq 0 ]; then
     fi
 else
     # If the GUI flag has been specified, run the function to show the GUI and read the arguments
-
     notebook_list=$(ls ./notebooks)
     gui_arguments=$(wish gui.tcl $notebook_list)
+
+    if [ -z "$gui_arguments" ]; then
+        exit 1
+    fi
 
     IFS=$'\n' read -d '' -r -a strarr <<<"$gui_arguments"
     
@@ -109,7 +113,6 @@ else
         simple_notebook_name=${strarr[3]}
 
         config_path=$BASEDIR/notebooks/$simple_notebook_name/configuration.yaml
-
     else
         data_path=${strarr[1]}
         result_path=${strarr[2]}
@@ -133,8 +136,6 @@ else
         fi
     fi
 fi
-
-echo ""
 
 if [ -z "$config_path" ]; then 
     # If no configuration path has been specified, then exit with the error
