@@ -15,6 +15,7 @@ Available options:
 -h      Print this help and exit.
 -c      Path to the configuration file 'configuration.yaml'.   
 -d      Path to the data directory.
+-o      Path to the output directory.
 -g      Flag to specify if GPU should be used.
 -n      Path to the notebook file 'notebook.ipynb'.
 -r      Path to the requirements file 'requirements.txt'.
@@ -51,7 +52,7 @@ local_notebook_flag=0
 local_requirements_flag=0
 
 # Let's parse the arguments
-while getopts :hic:d:gn:r:t:x flag;do
+while getopts :hic:d:o:gn:r:t:x flag;do
     case $flag in 
         h)
             usage ;;
@@ -61,6 +62,8 @@ while getopts :hic:d:gn:r:t:x flag;do
             config_path="$OPTARG" ;;
         d)
             data_path="$OPTARG" ;;
+        o)
+            result_path="$OPTARG" ;;
         g)
             gpu_flag=1 ;;
         n)
@@ -84,8 +87,6 @@ done
 # Prints if the test flag has been set
 if [ "$test_flag" -eq 1 ]; then
     echo 'TEST MODE: ON.'
-else
-    echo 'TEST MODE: OFF.'
 fi
 
 if [ $gui_flag -eq 0 ]; then 
@@ -95,28 +96,46 @@ if [ $gui_flag -eq 0 ]; then
     fi
 else
     # If the GUI flag has been specified, run the function to show the GUI and read the arguments
-    
-    gui_arguments=$(wish gui.tcl)
+    notebook_list=$(ls ./notebooks)
+    gui_arguments=$(wish scripts/gui.tcl $notebook_list)
+
+    if [ -z "$gui_arguments" ]; then
+        exit 1
+    fi
 
     IFS=$'\n' read -d '' -r -a strarr <<<"$gui_arguments"
     
-    config_path=${strarr[0]}
-    data_path=${strarr[1]}
+    advanced_options=${strarr[0]}
 
-    notebook_aux=${strarr[2]}
-    requirements_aux=${strarr[3]}
-    
-    gpu_flag=${strarr[4]}
+    if [ $advanced_options -eq 0 ]; then
+        data_path=${strarr[1]}
+        result_path=${strarr[2]}
+        simple_notebook_name=${strarr[3]}
 
-    if [ $notebook_aux != "-" ]; then
-        notebook_path="$notebook_aux"
-    fi
-    if [ $requirements_aux != "-" ]; then
-        requirements_path="$requirements_aux" 
+        config_path=$BASEDIR/notebooks/$simple_notebook_name/configuration.yaml
+    else
+        data_path=${strarr[1]}
+        result_path=${strarr[2]}
+
+        config_path=${strarr[3]}
+
+        notebook_aux=${strarr[4]}
+        requirements_aux=${strarr[5]}
+        
+        gpu_flag=${strarr[6]}
+        tag_aux=${strarr[7]}
+
+        if [ $notebook_aux != "-" ]; then
+            notebook_path="$notebook_aux"
+        fi
+        if [ $requirements_aux != "-" ]; then
+            requirements_path="$requirements_aux" 
+        fi
+        if [ $tag_aux != "-" ]; then
+            docker_tag="$tag_aux" 
+        fi
     fi
 fi
-
-echo ""
 
 if [ -z "$config_path" ]; then 
     # If no configuration path has been specified, then exit with the error
@@ -151,6 +170,22 @@ else
         fi
     else
         echo "$data_path is not valid."
+        exit 1
+    fi
+fi 
+
+if [ -z "$result_path" ]; then 
+    # If no result path has been specified, then exit with the error
+    echo "No result path has been specified, please make sure to use -d argument and give a value to it."
+    exit 1
+else
+    # If a result path has been specified, check if it is valid
+    if [[ -d $result_path ]]; then
+        if [ "$test_flag" -eq 1 ]; then
+            echo "Path to the data: $result_path"
+        fi
+    else
+        echo "$result_path is not valid."
         exit 1
     fi
 fi 
@@ -234,8 +269,7 @@ if [ -z "$docker_tag" ]; then
 fi
 docker_tag=$(echo $docker_tag | tr '[:upper:]' '[:lower:]')
 
-
-if [ "$test_flag" -eq 1 ]; then 
+if [ "$test_flag" -eq 1 ]; then
     echo ""
     echo "base_img: $base_img"
     echo "python_version: $python_version"
@@ -268,6 +302,8 @@ if grep -q credsStore ~/.docker/config.json; then
     perl -pi -e "s/credsStore/credStore/g" ~/.docker/config.json 
 fi
 
+# Execute the pre building tests
+/bin/bash /scripts/pre_build_test.sh
 
 # Build the docker image without GUI
 docker build $BASEDIR --no-cache  -t $docker_tag \
@@ -281,7 +317,8 @@ docker build $BASEDIR --no-cache  -t $docker_tag \
 
 DOCKER_OUT=$? # Gets if the docker image has been built
 
-echo "Docker image built: $DOCKER_OUT"
+# Execute the post building tests
+/bin/bash /scripts/post_build_test.sh
 
 # Local files, if included, need to be removed to avoid the generation of many files
 if [ "$local_notebook_flag" -eq 1 ]; then
@@ -297,12 +334,24 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     if [ $test_flag -eq 1 ]; then
         exit 0
     fi
+
+    # Find a usable port
+    port=8888
+    while ( lsof -i:$port &> /dev/null )
+    do
+        port=$((port+1))
+        if [ $port -gt 9000 ]; then
+            # We want the port to be between 8000 and 9000
+            port=8000
+        fi
+    done
+
     if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
-        docker run -it  --gpus all -p 8888:8888 -v $data_path:/home/dataset $docker_tag
+        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag:latest" jupyter lab "${notebook_name}" --ip='0.0.0.0' --port=$port --no-browser --allow-root
     else
         # Run the docker image without activating the GPU
-        docker run -it  -p 8888:8888 -v $data_path:/home/dataset $docker_tag
+        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag:latest" jupyter lab "${notebook_name}" --ip='0.0.0.0' --port=$port --no-browser --allow-root
     fi
 else
     echo "The docker image has not been built."
@@ -310,4 +359,3 @@ else
         exit 1
     fi
 fi
-exit 1

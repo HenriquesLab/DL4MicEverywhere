@@ -10,7 +10,12 @@ on:
       - main
 jobs:
   extract_changed_files:
-    runs-on: ubuntu-latest  # windows-latest || macos-latest
+    
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+          os: [ubuntu-latest, windows-latest, macos-latest]
+
     name: Find changed-files
     outputs:
       matrix: ${{ steps.create-json.outputs.matrix }}
