@@ -5,4 +5,4 @@ ubuntu_version: 22.04
 python_version: 3.10
 sections_to_remove: 1.1. 1.2. 2. 6.2. 
 version: 0.0.1
-description: "U-Net_2D_Multilabel_DL4Mic is the conversion of the 2D U-Net Multilabel from ZeroCostDL4Mic. "
+description: "U-Net_2D_Multilabel_DL4Mic is the conversion of the 2D U-Net Multilabel from ZeroCostDL4Mic.  "
