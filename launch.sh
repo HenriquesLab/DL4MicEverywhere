@@ -97,7 +97,7 @@ if [ $gui_flag -eq 0 ]; then
 else
     # If the GUI flag has been specified, run the function to show the GUI and read the arguments
     notebook_list=$(ls ./notebooks)
-    gui_arguments=$(wish gui.tcl $notebook_list)
+    gui_arguments=$(wish scripts/gui.tcl $notebook_list)
 
     if [ -z "$gui_arguments" ]; then
         exit 1
@@ -302,6 +302,9 @@ if grep -q credsStore ~/.docker/config.json; then
     perl -pi -e "s/credsStore/credStore/g" ~/.docker/config.json 
 fi
 
+# Execute the pre building tests
+/bin/bash /scripts/pre_build_test.sh
+
 # Build the docker image without GUI
 docker build $BASEDIR --no-cache  -t $docker_tag \
     --build-arg BASE_IMAGE="${base_img}" \
@@ -313,6 +316,9 @@ docker build $BASEDIR --no-cache  -t $docker_tag \
     --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
 
 DOCKER_OUT=$? # Gets if the docker image has been built
+
+# Execute the post building tests
+/bin/bash /scripts/post_build_test.sh
 
 # Local files, if included, need to be removed to avoid the generation of many files
 if [ "$local_notebook_flag" -eq 1 ]; then
