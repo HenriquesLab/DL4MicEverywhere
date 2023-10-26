@@ -132,18 +132,25 @@ proc onAdvanced {} {
         pack .fr.advanced -fill both -expand 0
     }
 
-    place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.2 / ( 2 - $advanced_options ) ]
-    place .fr.principal.notebooks -relx 0.01 -rely [expr 0.28 / ( 2 - $advanced_options ) ]
-    place .fr.principal.notebook_description -relx 0.35 -rely [expr 0.2 / ( 2 - $advanced_options ) ]
-    place .fr.principal.update_text -relx 0.01 -rely [expr 0.37 / ( 2 - $advanced_options ) ]
+    place .fr.principal.intro_2 -relx 0.01 -rely [expr 0.06 / ( 2 - $advanced_options ) ]
+    place .fr.principal.intro_3 -relx 0.01 -rely [expr 0.12 / ( 2 - $advanced_options ) ]
+    place .fr.principal.intro_4 -relx 0.01 -rely [expr 0.18 / ( 2 - $advanced_options ) ]
+    place .fr.principal.intro_5 -relx 0.01 -rely [expr 0.24 / ( 2 - $advanced_options ) ]
+    place .fr.principal.intro_6 -relx 0.01 -rely [expr 0.30 / ( 2 - $advanced_options ) ]
+    place .fr.principal.intro_7 -relx 0.01 -rely [expr 0.36 / ( 2 - $advanced_options ) ]
 
-    place .fr.principal.data_label -relx 0.01 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
-    place .fr.principal.data_entry -relx 0.01 -rely [expr 0.52 / ( 2 - $advanced_options ) ]
-    place .fr.principal.data_btn -relx 0.87 -rely [expr 0.515 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebooks -relx 0.01 -rely [expr 0.53 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebook_description -relx 0.35 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
+    place .fr.principal.update_text -relx 0.01 -rely [expr 0.62 / ( 2 - $advanced_options ) ]
 
-    place .fr.principal.result_label -relx 0.01 -rely [expr 0.6 / ( 2 - $advanced_options ) ]
-    place .fr.principal.result_entry -relx 0.01 -rely [expr 0.67 / ( 2 - $advanced_options ) ]
-    place .fr.principal.result_btn -relx 0.87 -rely [expr 0.665 / ( 2 - $advanced_options ) ]
+    place .fr.principal.data_label -relx 0.01 -rely [expr 0.67 / ( 2 - $advanced_options ) ]
+    place .fr.principal.data_entry -relx 0.01 -rely [expr 0.74 / ( 2 - $advanced_options ) ]
+    place .fr.principal.data_btn -relx 0.87 -rely [expr 0.735 / ( 2 - $advanced_options ) ]
+
+    place .fr.principal.result_label -relx 0.01 -rely [expr 0.83 / ( 2 - $advanced_options ) ]
+    place .fr.principal.result_entry -relx 0.01 -rely [expr 0.89 / ( 2 - $advanced_options ) ]
+    place .fr.principal.result_btn -relx 0.87 -rely [expr 0.885 / ( 2 - $advanced_options ) ]
 
 }
 
@@ -195,12 +202,27 @@ pack .fr.cb -padx 5 -pady 5 -side right
 ttk::button .fr.ok -text "Run" -command { onDone }
 pack .fr.ok -side right
 
+ttk::button .fr.advance -text "Advanced options" -command { onAdvanced }
+pack .fr.advance -padx 5 -side left 
+
 #### Manadatory argument section ######
 
 # Define the text that will be the introduction to the window
 
 label .fr.principal.intro_1 -text "Welcome to DL4MicEverywhere!"
 place .fr.principal.intro_1 -relx 0.01 -rely 0.0
+label .fr.principal.intro_2 -text "DL4MicEverywhere allows you to build and run a Docker image for the ZeroCostDL4Mic notebooks."
+place .fr.principal.intro_2 -relx 0.01 -rely [expr 0.06 / ( 2 - $advanced_options ) ]
+label .fr.principal.intro_3 -text "It is designed for different type of users, therefore there are basic and advanced options."
+place .fr.principal.intro_3 -relx 0.01 -rely [expr 0.12 / ( 2 - $advanced_options ) ]
+label .fr.principal.intro_4 -text "In the basic options that are shown, you only need to select three parameters:"
+place .fr.principal.intro_4 -relx 0.01 -rely [expr 0.18 / ( 2 - $advanced_options ) ]
+label .fr.principal.intro_5 -text "    - A notebook from the given notebook list, it will be the one loaded on the Docker."
+place .fr.principal.intro_5 -relx 0.01 -rely [expr 0.24 / ( 2 - $advanced_options ) ]
+label .fr.principal.intro_6 -text "    - The path to the folder where you have the data you want to use in the notebook."
+place .fr.principal.intro_6 -relx 0.01 -rely [expr 0.30 / ( 2 - $advanced_options ) ]
+label .fr.principal.intro_7 -text "    - The path to the folder where you want to store the results of the notebook."
+place .fr.principal.intro_7 -relx 0.01 -rely [expr 0.36 / ( 2 - $advanced_options ) ]
 
 # Define the list with possible default notebooks
 
@@ -210,17 +232,17 @@ append notebookList " " $argv
 font create myFont -family Helvetica -size 10
 
 label .fr.principal.notebook_label -text "List of default notebooks:"
-place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.2 / ( 2 - $advanced_options ) ]
+place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
 
 ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable simpleNotebook -state readonly
-place .fr.principal.notebooks -relx 0.01 -rely [expr 0.28 / ( 2 - $advanced_options ) ]
+place .fr.principal.notebooks -relx 0.01 -rely [expr 0.53 / ( 2 - $advanced_options ) ]
 bind .fr.principal.notebooks <<ComboboxSelected>> { parseYaml [%W get]}
 
 text .fr.principal.notebook_description -width 55 -height 5 -borderwidth 1 -relief sunken
-place .fr.principal.notebook_description -relx 0.35 -rely [expr 0.2 / ( 2 - $advanced_options ) ]
+place .fr.principal.notebook_description -relx 0.35 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
 
 label .fr.principal.update_text -textvariable update -foreground orange -font myFont
-place .fr.principal.update_text -relx 0.01 -rely [expr 0.37 / ( 2 - $advanced_options ) ]
+place .fr.principal.update_text -relx 0.01 -rely [expr 0.62 / ( 2 - $advanced_options ) ]
 
 set simpleNotebook "-"
 
@@ -229,91 +251,102 @@ set simpleNotebook "-"
 
 
 label .fr.principal.data_label -text "Path to the data folder:"
-place .fr.principal.data_label -relx 0.01 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
+place .fr.principal.data_label -relx 0.01 -rely [expr 0.67 / ( 2 - $advanced_options ) ]
 
 entry .fr.principal.data_entry -textvariable data_path -width 60
-place .fr.principal.data_entry -relx 0.01 -rely [expr 0.52 / ( 2 - $advanced_options ) ]
+place .fr.principal.data_entry -relx 0.01 -rely [expr 0.74 / ( 2 - $advanced_options ) ]
 
 button .fr.principal.data_btn -text "Select" \
         -command "onSelectData"
-place .fr.principal.data_btn -relx 0.87 -rely [expr 0.515 / ( 2 - $advanced_options ) ]
+place .fr.principal.data_btn -relx 0.87 -rely [expr 0.735 / ( 2 - $advanced_options ) ]
 
 set data_path ""
 
 # Define the button and display to load the path to the result folder
 
 label .fr.principal.result_label -text "Path to the result/output folder:"
-place .fr.principal.result_label -relx 0.01 -rely [expr 0.6 / ( 2 - $advanced_options ) ]
+place .fr.principal.result_label -relx 0.01 -rely [expr 0.83 / ( 2 - $advanced_options ) ]
 
 entry .fr.principal.result_entry -textvariable result_path -width 60
-place .fr.principal.result_entry -relx 0.01 -rely [expr 0.67 / ( 2 - $advanced_options ) ]
+place .fr.principal.result_entry -relx 0.01 -rely [expr 0.89 / ( 2 - $advanced_options ) ]
 
 button .fr.principal.result_btn -text "Select" \
         -command "onSelectResult"
-place .fr.principal.result_btn -relx 0.87 -rely [expr 0.665 / ( 2 - $advanced_options ) ]
+place .fr.principal.result_btn -relx 0.87 -rely [expr 0.885 / ( 2 - $advanced_options ) ]
 
 set result_path ""
 
 ##### Advanced arguments section #####
 
-button .fr.principal.advanced -text "Advanced options" \
-        -command "onAdvanced"
-place .fr.principal.advanced -relx 0.01 -rely 0.93
+# Define the text of the advanced option
+
+label .fr.advanced.intro_1 -text "In the advanced options that you have displayed you will find:"
+place .fr.advanced.intro_1 -relx 0.01 -rely 0.0
+label .fr.advanced.intro_2 -text "    - The path to a local 'configuration.yaml' file with the info for the Docker."
+place .fr.advanced.intro_2 -relx 0.01 -rely 0.06
+label .fr.advanced.intro_3 -text "    - The path to a local notebook file that will be loaded in the Docker."
+place .fr.advanced.intro_3 -relx 0.01 -rely 0.12
+label .fr.advanced.intro_4 -text "    - The path to a local requirequirements file that will be loaded in the Docker."
+place .fr.advanced.intro_4 -relx 0.01 -rely 0.18
+label .fr.advanced.intro_5 -text "    - Checkbox to allow the GPU usage in the Docker."
+place .fr.advanced.intro_5 -relx 0.01 -rely 0.24
+label .fr.advanced.intro_6 -text "    - Tag that will be given to the generated Docker."
+place .fr.advanced.intro_6 -relx 0.01 -rely 0.30
 
 # Define the button and display to load the path to the 'configuration.yaml' file
 
 label .fr.advanced.yaml_label -text "Path to the configuration.yaml:"
-place .fr.advanced.yaml_label -relx 0.01 -rely 0.2
+place .fr.advanced.yaml_label -relx 0.01 -rely 0.37
 
 entry .fr.advanced.yaml_entry -textvariable yaml_path -width 60
-place .fr.advanced.yaml_entry -relx 0.01 -rely 0.27
+place .fr.advanced.yaml_entry -relx 0.01 -rely 0.44
 
 button .fr.advanced.byp -text "Select" \
         -command "onSelectYaml"
-place .fr.advanced.byp -relx 0.87 -rely 0.265
+place .fr.advanced.byp -relx 0.87 -rely 0.435
 
 set yaml_path ""
 
 # Define the button and display to load the path to the local notebook
 
 label .fr.advanced.ipynb_label -text "Path to the local notebook:"
-place .fr.advanced.ipynb_label -relx 0.01 -rely 0.35
+place .fr.advanced.ipynb_label -relx 0.01 -rely 0.52
 
 entry .fr.advanced.ipynb_entry -textvariable ipynb_path -width 60
-place .fr.advanced.ipynb_entry -relx 0.01 -rely 0.42
+place .fr.advanced.ipynb_entry -relx 0.01 -rely 0.59
 
 button .fr.advanced.bnp -text "Select" \
         -command "onSelectIpynb"
-place .fr.advanced.bnp -relx 0.87 -rely 0.415
+place .fr.advanced.bnp -relx 0.87 -rely 0.585
 
 set ipynb_path ""
 
 # Define the button and display to load the path to the data folder
 
 label .fr.advanced.txt_label -text "Path to the requirements.txt:"
-place .fr.advanced.txt_label -relx 0.01 -rely 0.50
+place .fr.advanced.txt_label -relx 0.01 -rely 0.67
 
 entry .fr.advanced.txt_entry -textvariable txt_path -width 60
-place .fr.advanced.txt_entry -relx 0.01 -rely 0.57
+place .fr.advanced.txt_entry -relx 0.01 -rely 0.74
 
 button .fr.advanced.btp -text "Select" \
         -command "onSelectTxt"
-place .fr.advanced.btp -relx 0.87 -rely 0.565
+place .fr.advanced.btp -relx 0.87 -rely 0.735
 
 set txt_path ""
 
 # Define the checkbutton for the GPU usage
 
 checkbutton .fr.advanced.gpu -text "Allow GPU" -variable gpu
-place .fr.advanced.gpu -relx 0.1 -rely 0.71
+place .fr.advanced.gpu -relx 0.1 -rely 0.87
 
 # Define the docker tag text entry
 
 label .fr.advanced.tag_label -text "Docker tag:"
-place .fr.advanced.tag_label -relx 0.3 -rely 0.71
+place .fr.advanced.tag_label -relx 0.3 -rely 0.87
 
 entry .fr.advanced.tag -textvariable tag -width 30
-place .fr.advanced.tag -relx 0.425 -rely 0.705 
+place .fr.advanced.tag -relx 0.425 -rely 0.865 
 
 set tag ""
 

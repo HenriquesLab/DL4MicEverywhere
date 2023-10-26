@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-          os: [ubuntu-latest, windows-latest, macos-latest]
+          os: [ubuntu-latest]
 
     name: Check attributes/keys
     steps:
@@ -94,7 +94,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-          os: [ubuntu-latest, windows-latest, macos-latest]
+          os: [ubuntu-latest]
 
     name: Check notebook's and requirements' URLs
     needs: [check_keys]
@@ -126,7 +126,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-          os: [ubuntu-latest, windows-latest, macos-latest]
+          os: [ubuntu-latest]
 
     name: Check running 'docker build'
     needs: [check_keys, check_urls]

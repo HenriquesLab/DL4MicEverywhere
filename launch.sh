@@ -4,24 +4,36 @@ BASEDIR=$(dirname "$0")
 # Function with the text to describe the usage of the bash script
 usage() {
   cat << EOF # remove the space between << and EOF, this is due to web plugin issue
-Usage: $(basename "${BASH_SOURCE[0]}") -c configuration_path -d dataset_path [-h|i|t|g] [-n notebook_path] [-r requirements_path] 
 
-Create and deploy a Docker image for the ZeroCostDL4Mic notebooks.
-Requires a local copy of the 'configuration.yaml' file and the 'data' folder.
-Optionally you can also specify the paths to local copies of the notebook.ipynb and requirements.txt files.
+Welcome to DL4MicEverywhere!
 
-Available options:
+DL4MicEverywhere allows you to build and run a Docker image for the ZeroCostDL4Mic notebooks. 
+This script is designed for different types of users. 
+Below, you will find examples of the simplest usage case and all the available options that will lead you to a more advanced experience.
 
--h      Print this help and exit.
--c      Path to the configuration file 'configuration.yaml'.   
--d      Path to the data directory.
--o      Path to the output directory.
--g      Flag to specify if GPU should be used.
--n      Path to the notebook file 'notebook.ipynb'.
--r      Path to the requirements file 'requirements.txt'.
--i      Flag to indicate if you want to use a Graphic User Interface (GUI).
--t      Tag that will be added to the docker image.
--x      Flag to indicate if it is a test run.
+The simplest usage case consists of providing three paths (these are always mandatory):
+ - The path to the configuration file 'configuration.yaml'.
+ - The path to the folder where you store the data you want to use in your notebook.
+ - The path to the folder where you want to store the results of your notebook.
+
+Code example:
+    $(basename "${BASH_SOURCE[0]}") -c configuration_path -d dataset_path -o output_path
+
+The list of all available arguments is:
+ -h      Print this help and exit. (optional)
+ -c      Path to the configuration file 'configuration.yaml'.   
+ -d      Path to the folder where you store the data you want to use in your notebook.
+ -o      Path to the output folder where you want to store the results of your notebook.
+ -g      Flag to specify if GPU should be used. (optional)
+ -n      Path to a local notebook file 'notebook.ipynb'. (optional)
+ -r      Path to a localrequirements file 'requirements.txt'. (optional)
+ -i      Flag to indicate if you want to use a Graphic User Interface (GUI). (optional)
+ -t      Tag that will be added to the docker image when building. (optional)
+ -x      Flag to indicate if it is a test run. Allowiing to print usefull information for debugging. (optional)
+
+Code example:
+    $(basename "${BASH_SOURCE[0]}") -c configuration_path -d dataset_path -o output_path [-h|i|t|g] [-n notebook_path] [-r requirements_path] 
+
 EOF
   exit
 }
@@ -86,7 +98,7 @@ done
 
 # Prints if the test flag has been set
 if [ "$test_flag" -eq 1 ]; then
-    echo 'TEST MODE: ON.'
+    echo 'Test mode ACTIVATED.'
 fi
 
 if [ $gui_flag -eq 0 ]; then 
@@ -97,7 +109,7 @@ if [ $gui_flag -eq 0 ]; then
 else
     # If the GUI flag has been specified, run the function to show the GUI and read the arguments
     notebook_list=$(ls ./notebooks)
-    gui_arguments=$(wish scripts/gui.tcl $notebook_list)
+    gui_arguments=$(wish gui.tcl $notebook_list)
 
     if [ -z "$gui_arguments" ]; then
         exit 1
@@ -139,7 +151,7 @@ fi
 
 if [ -z "$config_path" ]; then 
     # If no configuration path has been specified, then exit with the error
-    echo "No configuration.yaml file path has been specified, please make sure to use -c argument and give a value to it."
+    echo "No path to the configuration.yaml file has been specified, please make sure to use -c argument and give a value to it."
     exit 1
 else
     # If a configuration path has been specified, check if it is valid
@@ -160,7 +172,7 @@ fi
 
 if [ -z "$data_path" ]; then 
     # If no data path has been specified, then exit with the error
-    echo "No data path has been specified, please make sure to use -d argument and give a value to it."
+    echo "No path to the data folder has been specified, please make sure to use -d argument and give a value to it."
     exit 1
 else
     # If a data path has been specified, check if it is valid
@@ -176,7 +188,7 @@ fi
 
 if [ -z "$result_path" ]; then 
     # If no result path has been specified, then exit with the error
-    echo "No result path has been specified, please make sure to use -d argument and give a value to it."
+    echo "No path to the result/output folder has been specified, please make sure to use -o argument and give a value to it."
     exit 1
 else
     # If a result path has been specified, check if it is valid
@@ -200,7 +212,7 @@ if [ "$test_flag" -eq 1 ]; then
     fi
 fi
 
-# Read the variables fro mthe yaml file
+# Read the variables from the yaml file
 eval $(parse_yaml $config_path)
 
 # Base image is selected based on the GPU selection
@@ -267,6 +279,7 @@ if [ -z "$docker_tag" ]; then
         echo "No tag has been specified for the docker image, therefore the default tag $docker_tag will be used."
     fi
 fi
+
 docker_tag=$(echo $docker_tag | tr '[:upper:]' '[:lower:]')
 
 if [ "$test_flag" -eq 1 ]; then
@@ -303,7 +316,7 @@ if grep -q credsStore ~/.docker/config.json; then
 fi
 
 # Execute the pre building tests
-/bin/bash /scripts/pre_build_test.sh
+/bin/bash pre_build_test.sh
 
 # Build the docker image without GUI
 docker build $BASEDIR --no-cache  -t $docker_tag \
@@ -318,9 +331,9 @@ docker build $BASEDIR --no-cache  -t $docker_tag \
 DOCKER_OUT=$? # Gets if the docker image has been built
 
 # Execute the post building tests
-/bin/bash /scripts/post_build_test.sh
+/bin/bash post_build_test.sh
 
-# Local files, if included, need to be removed to avoid the generation of many files
+# Local files, if included, need to be removed to avoid the overcrowding the folder
 if [ "$local_notebook_flag" -eq 1 ]; then
    rm $BASEDIR/notebook.ipynb
 fi
