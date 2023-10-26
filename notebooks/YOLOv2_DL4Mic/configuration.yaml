@@ -5,4 +5,4 @@ ubuntu_version: 22.04
 python_version: 3.7
 sections_to_remove: 1.1. 1.2. 2. 6.3. 
 version: 0.0.1
-description: "YOLOv2_DL4Mic is the conversion of the YOLOv2 from ZeroCostDL4Mic."
+description: "YOLOv2_DL4Mic is the conversion of the YOLOv2 from ZeroCostDL4Mic. "
