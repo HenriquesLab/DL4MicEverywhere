@@ -139,6 +139,6 @@ jobs:
       - name: Check running the 'docker build command'
         id: notebook_url
         run: |
-          sudo bash launch.sh -c '${{ inputs.config_file }}' -d . -x
+          sudo bash launch.sh -c '${{ inputs.config_file }}' -d . -o . -x
           exit $?
     

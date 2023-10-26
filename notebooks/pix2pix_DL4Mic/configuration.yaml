@@ -5,4 +5,4 @@ ubuntu_version: 22.04
 python_version: 3.8
 sections_to_remove: 2. 6.3. 
 version: 0.0.1
-description: "pix2pix_DL4Mic is the conversion of the pix2pix from ZeroCostDL4Mic."
+description: "pix2pix_DL4Mic is the conversion of the pix2pix from ZeroCostDL4Mic. "

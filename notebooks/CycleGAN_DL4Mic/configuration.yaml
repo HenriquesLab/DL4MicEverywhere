@@ -5,4 +5,4 @@ ubuntu_version: 22.04
 python_version: 3.10
 sections_to_remove: 2. 6.3. 
 version: 0.0.1
-description: "CycleGAN_DL4Mic is the conversion of the CycleGAN from ZeroCostDL4Mic."
+description: "CycleGAN_DL4Mic is the conversion of the CycleGAN from ZeroCostDL4Mic. "
