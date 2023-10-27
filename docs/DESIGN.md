@@ -1,5 +1,3 @@
-Here is a draft design.md file for the DL4MicEverywhere repository based on the information provided:
-
 # DL4MicEverywhere Design
 
 ## Overview

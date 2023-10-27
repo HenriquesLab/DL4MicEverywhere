@@ -46,5 +46,6 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 - [User Guide](docs/USER_GUIDE.md)
 - [Example Notebooks](examples)
 - [Technical Design](docs/DESIGN.md)
+- [FAQ](docs/FAQ.md)
 
 Let us know if anything needs clarification!
