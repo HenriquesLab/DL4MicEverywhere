@@ -1,0 +1,37 @@
+# Contributing to DL4MicEverywhere
+ 
+We welcome contributions to help improve and expand DL4MicEverywhere! Here are some ways you can get involved:
+
+## Reporting bugs and issues
+
+If you encounter any bugs or problems with the software, please open a GitHub issue detailing the problem. Include steps to reproduce the issue if applicable. Screenshots are also helpful. This provides a trackable way to get things fixed.
+
+## Suggesting new features
+
+Have an idea for a new feature or improvement? Open an issue to describe your proposal and start a discussion. Focus on the problem to be solved rather than prescribing a specific implementation.
+
+## Contributing code
+
+Code contributions are welcome via pull requests. Please follow these guidelines:
+
+- Fork the repo and create a new branch for your contribution
+- Write clear, concise commit messages documenting your changes
+- Ensure your code follows existing style and conventions
+- Add/update any relevant documentation like docstrings, comments etc
+- Open a PR with details on the change and tag reviewers
+
+Ensure your code passes all existing tests and linting checks. Adding new test cases is highly encouraged.
+
+## Adding new notebooks
+
+To add a new Jupyter notebook, create a YAML config file under `notebooks/configs` using existing files as a template. Specify the notebook URL, resource requirements, and other metadata. Open a PR with your config - once merged, an automated workflow will handle building and testing. Consider first contributing the notebook to the [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) project and then benefit from our automated conversion.
+
+## Helping with documentation
+
+The docs could always use improvement! Spelling/grammar fixes, clarifications, new sections etc. Just open PRs against the `docs/` files.
+
+## Engaging with the community
+
+Join the discussions on GitHub issues and PRs. Share your experience and expertise. Help new users get started. The more people engaged, the better this resource becomes!
+
+Thank you for considering contributing to DL4MicEverywhere!
