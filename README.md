@@ -3,8 +3,9 @@
 [![GitHub stars](https://img.shields.io/github/stars/HenriquesLab/DL4MicEverywhere?style=social)](https://github.com/HenriquesLab/DL4MicEverywhere/)
 [![GitHub forks](https://img.shields.io/github/forks/HenriquesLab/DL4MicEverywhere?style=social)](https://github.com/HenriquesLab/DL4MicEverywhere/)
 
+<img src="https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/docs/logo/dl4miceverywhere-logo.png?token=GHSAT0AAAAAABPNVWK7MI5JFDQBQBGXBVKOZJ37NKQ" align="right" width="350"/>
 
-# DL4MicEverywhere
+# DL4MicEverywhere1
 
 DL4MicEverywhere makes state-of-the-art deep learning accessible to microscopy researchers through interactive Jupyter notebooks packaged in standalone Docker containers.
 
