@@ -12,7 +12,7 @@ DL4MicEverywhere makes state-of-the-art deep learning accessible to microscopy r
 
 ## Key Features
 
-- 28 Jupyter notebooks with intuitive graphical interface requiring no coding  
+- 28+ Jupyter notebooks with intuitive graphical interface requiring no coding  
 - Docker-based packaging for enhanced portability and reproducibility
 - Expanding [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic)'s capabilities for local use
 - Segmentation, reconstruction, registration, denoising and other workflows 
