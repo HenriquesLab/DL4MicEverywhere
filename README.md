@@ -45,6 +45,7 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 ## Documentation
 
 - [User Guide](docs/USER_GUIDE.md)
+- [Data Preparation](docs/DATA.md)
 - [Example Notebooks](examples)
 - [Contributing Guidelines](CONTRIBUTING.md)
 - [Technical Design](docs/DESIGN.md)
