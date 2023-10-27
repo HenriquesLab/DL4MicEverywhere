@@ -4,10 +4,14 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
   pull_request:
     types: [opened, reopened]
     branches:
       - main
+    paths-ignore:
+      - '**.md'
 jobs:
   extract_changed_files:
     
