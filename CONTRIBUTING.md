@@ -34,4 +34,15 @@ The docs could always use improvement! Spelling/grammar fixes, clarifications, n
 
 Join the discussions on GitHub issues and PRs. Share your experience and expertise. Help new users get started. The more people engaged, the better this resource becomes!
 
+## Authorship Expectations
+
+The default way to recognise contributions is via the [contributors](https://github.com/HenriquesLab/DL4MicEverywhere/graphs/contributors) section of the repository. The attribution of authorship to future publications derived from the DL4MicEverywhere project are not given "automatically" to contributors and follow the guidelines:
+- Authorship roles and expectations are discussed early on in the project and ultimately decided by the senior project leads (Ricardo Henriques and Estibaliz Gomez de Mariscal). This is often an ongoing conversation throughout the project, as roles and contributions may change over time.
+- All authors are expected to contribute significantly to the project. This includes conception, design, development of functionality, data acquisition, analysis and interpretation, and drafting and revising the manuscripts. These contributions are done with prior discussion and agreement of the senior project lead and core development team.
+
+## Code of Conduct
+
+Please note that this project is follows a [Contributor Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/). By participating in this project you agree to abide by its terms.
+
+
 Thank you for considering contributing to DL4MicEverywhere!
