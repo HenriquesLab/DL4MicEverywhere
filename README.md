@@ -5,7 +5,7 @@
 
 <img src="https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/docs/logo/dl4miceverywhere-logo.jpg?token=GHSAT0AAAAAACJQSOW4O7GCMEEYHLHQCK4YZJ4AFSA" align="right" width="350"/>
 
-# DL4MicEverywhere1
+# DL4MicEverywhere
 
 DL4MicEverywhere makes state-of-the-art deep learning accessible to microscopy researchers through interac"tive Jupyter notebooks packaged in standalone Docker containers.
 
