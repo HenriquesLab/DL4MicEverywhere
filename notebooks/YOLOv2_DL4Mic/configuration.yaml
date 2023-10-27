@@ -1,8 +1,8 @@
-notebook_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/302e4fe2bdf0a5df01aa2b3fc8fdf0de958155b7/Colab_notebooks/YOLOv2_ZeroCostDL4Mic.ipynb?raw=true
-requirements_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/302e4fe2bdf0a5df01aa2b3fc8fdf0de958155b7/requirements_files/YOLO_v2_requirements_simple.txt?raw=true
+notebook_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/388b177f77f12f4eef49b5740ccd3b00e074a03d/Colab_notebooks/YOLOv2_ZeroCostDL4Mic.ipynb?raw=true
+requirements_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/388b177f77f12f4eef49b5740ccd3b00e074a03d/requirements_files/YOLO_v2_requirements_simple.txt?raw=true
 cuda_version: 11.8.0
 ubuntu_version: 22.04
 python_version: 3.7
 sections_to_remove: 1.1. 1.2. 2. 6.3. 
 version: 0.0.1
-description: "YOLOv2_DL4Mic is the conversion of the YOLOv2 from ZeroCostDL4Mic.  "
+description: "YOLOv2_DL4Mic is the conversion of the YOLOv2 from ZeroCostDL4Mic."

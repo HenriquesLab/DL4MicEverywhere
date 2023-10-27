@@ -1,8 +1,8 @@
-notebook_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/fnet_3D_ZeroCostDL4Mic.ipynb?raw=true
-requirements_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/master/requirements_files/fnet_3D_requirements_simple.txt?raw=true
+notebook_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/388b177f77f12f4eef49b5740ccd3b00e074a03d/Colab_notebooks/fnet_3D_ZeroCostDL4Mic.ipynb?raw=true
+requirements_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/388b177f77f12f4eef49b5740ccd3b00e074a03d/requirements_files/fnet_3D_requirements_simple.txt?raw=true
 cuda_version: 11.8.0
 ubuntu_version: 22.04
 python_version: 3.8
 sections_to_remove: 1.1. 1.2. 2. 6.3.  
 version: 0.0.1
-description: "fnet_3D_DL4Mic is the conversion of the 3D fnet from ZeroCostDL4Mic.  "
+description: "fnet_3D_DL4Mic is the conversion of the 3D fnet from ZeroCostDL4Mic."
