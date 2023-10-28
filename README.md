@@ -7,7 +7,7 @@
 
 # DL4MicEverywhere
 
-DL4MicEverywhere makes state-of-the-art deep learning accessible to microscopy researchers through interactive Jupyter notebooks packaged in standalone Docker containers.
+DL4MicEverywhere provides researchers an accessible gateway to state-of-the-art deep learning techniques for bioimage analysis through interactive Jupyter notebooks with intuitive graphical interfaces that require no coding expertise. It expands the capabilities of [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) by enabling users to run the notebooks locally on their own machines or remotely on diverse computing infrastructure including laptops, workstations, high-performance computing (HPC) and cloud infrastructure.
 
 ![Sample Notebook](images/sample_notebook.png)
 
@@ -16,9 +16,9 @@ DL4MicEverywhere makes state-of-the-art deep learning accessible to microscopy r
 - 15 Jupyter notebooks with intuitive graphical interface requiring no coding (scaling to 28+ soon) 
 - Docker-based packaging for enhanced portability and reproducibility
 - Expanding [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic)'s capabilities for local use
-- Segmentation, reconstruction, registration, denoising and other workflows 
-- Runs on laptops, workstations, HPC and cloud with Docker
-- Automatic build testing and versioning enhance reliability
+- Covers a wide range of microscopy analysis tasks, including segmentation, reconstruction, registration, denoising, and more
+- Compatible with various computing environments, including laptops, workstations, HPC, and cloud with Docker
+- Automated build testing and versioning enhance reliability
 
 ## Getting Started
 
@@ -54,3 +54,7 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 
 
 Let us know if anything needs clarification!
+
+## Acknowledgements
+
+We thank the [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) contributors for their work on the original notebooks. We also thank the [AI4Life](https://ai4life.eurobioimaging.eu/) consortium for their support, and continous feedback.
