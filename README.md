@@ -3,7 +3,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/HenriquesLab/DL4MicEverywhere?style=social)](https://github.com/HenriquesLab/DL4MicEverywhere/)
 [![GitHub forks](https://img.shields.io/github/forks/HenriquesLab/DL4MicEverywhere?style=social)](https://github.com/HenriquesLab/DL4MicEverywhere/)
 
-<img src="https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/docs/logo/dl4miceverywhere-logo.png?token=GHSAT0AAAAAABPNVWK63OVZILFHNLKUN7I4ZJ4E3EQ" align="right" width="350"/>
+<img src="https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/docs/logo/dl4miceverywhere-logo.png?token=GHSAT0AAAAAABPNVWK7JQMAZUHU27NMVNYKZJ6IVEA" align="right" width="350"/>
 
 # DL4MicEverywhere
 
