@@ -1,6 +1,14 @@
 #!/bin/bash
 BASEDIR=$(dirname "$0")
 
+# Check if script is run as root but only on Unix-like systems
+if [[ "$OSTYPE" == "linux-gnu"* || "$OSTYPE" == "darwin"* ]]; then
+  if [ "$EUID" -ne 0 ]; then
+    echo "Please run this script as root (by using sudo). Otherwise docker won't work properly."
+    exit
+  fi
+fi
+
 # Function with the text to describe the usage of the bash script
 usage() {
   cat << EOF # remove the space between << and EOF, this is due to web plugin issue
@@ -95,6 +103,12 @@ done
     
 
 # Let's check the arguments
+
+if [ $# -eq 0 ]; then
+    echo "No arguments provided."
+    echo "You can start the script with -h for help, -c for configuration, or -i for showing a Graphic User Interface."
+    exit 1
+fi
 
 # Prints if the test flag has been set
 if [ "$test_flag" -eq 1 ]; then
