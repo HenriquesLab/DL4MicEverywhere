@@ -25,7 +25,7 @@ jobs:
       - name: List configurations
         id: list_configs
         run: |
-            configurations=$(ls ./notebooks/*/configuration.yaml)
+            configurations=$(ls ./notebooks/*/*/configuration.yaml)
             echo $configurations
             echo "configurations=$configurations" >> $GITHUB_OUTPUT
 

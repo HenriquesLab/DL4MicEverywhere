@@ -71,15 +71,15 @@ proc onDone {} {
             
             if {"$advanced_options" == 0} {
                 # The user has selected the simple mode
-                global simpleNotebook
-                if {"$simpleNotebook" == "-"} {
+                global selectedNotebook
+                if {"$selectedNotebook" == "-"} {
                     tk_messageBox -type ok -icon error -title Error \
                     -message "SIMPLE MODE: You need to specify a notebook."
                 } else {
                     puts "$advanced_options"
                     puts "$data_path"
                     puts "$result_path"
-                    puts "$simpleNotebook"
+                    puts "$selectedNotebook"
                     
                     exit 0
                 }
@@ -140,9 +140,9 @@ proc onAdvanced {} {
     place .fr.principal.intro_7 -relx 0.01 -rely [expr 0.36 / ( 2 - $advanced_options ) ]
 
     place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
-    place .fr.principal.notebooks -relx 0.01 -rely [expr 0.53 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebooks_folders -relx 0.01 -rely [expr 0.52 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebooks -relx 0.01 -rely [expr 0.59 / ( 2 - $advanced_options ) ]
     place .fr.principal.notebook_description -relx 0.35 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
-    place .fr.principal.update_text -relx 0.01 -rely [expr 0.62 / ( 2 - $advanced_options ) ]
 
     place .fr.principal.data_label -relx 0.01 -rely [expr 0.67 / ( 2 - $advanced_options ) ]
     place .fr.principal.data_entry -relx 0.01 -rely [expr 0.74 / ( 2 - $advanced_options ) ]
@@ -154,29 +154,43 @@ proc onAdvanced {} {
 
 }
 
+proc onComboboxFolder {notebook_folder} {
+    global selectedFolder
+    global notebookList
+
+    set selectedFolder "$notebook_folder"
+
+    # Get notebooks on that folder
+    catch {exec ls ./notebooks/$selectedFolder} output
+
+    set notebookList "-"
+    append notebookList " " $output
+
+    .fr.principal.notebooks configure -values $notebookList
+}
+
 proc parseYaml {notebook_name} {
-    global update
+    global selectedFolder
 
     # Read a yaml file
-    catch {exec /bin/bash parse_yaml.sh "$notebook_name"} output
+    catch {exec /bin/bash parse_yaml.sh "$selectedFolder/$notebook_name"} output
 
     set arguments [split $output \n]
 
     # Get the arguments that we want
     .fr.principal.notebook_description delete 0.0 end
-    .fr.principal.notebook_description insert end [lindex $arguments 1]
 
     if {[lindex $arguments 0] == 1} {
-        set update "There is an updated version of this notebook."
-    } else {
-        set update ""
+        .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
+        .fr.principal.notebook_description insert end "There is an updated version of this notebook.\n\n" highlight
     }
+    .fr.principal.notebook_description insert end [lindex $arguments 1]
+
 }
 
 
 # The flag that indicates if "Advanced options" will be used
 set advanced_options 0
-set update ""
 
 ##### Define the frames of the window #####
 
@@ -226,26 +240,28 @@ place .fr.principal.intro_7 -relx 0.01 -rely [expr 0.36 / ( 2 - $advanced_option
 
 # Define the list with possible default notebooks
 
+set folderList "-"
+append folderList " " $argv
+set selectedFolder "-"
+
 set notebookList "-"
-append notebookList " " $argv
+set selectedNotebook "-"
 
 font create myFont -family Helvetica -size 10
 
 label .fr.principal.notebook_label -text "List of default notebooks:"
 place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
 
-ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable simpleNotebook -state readonly
-place .fr.principal.notebooks -relx 0.01 -rely [expr 0.53 / ( 2 - $advanced_options ) ]
+ttk::combobox .fr.principal.notebooks_folders -values $folderList -textvariable selectedFolder -state readonly
+place .fr.principal.notebooks_folders -relx 0.01 -rely [expr 0.52 / ( 2 - $advanced_options ) ]
+bind .fr.principal.notebooks_folders <<ComboboxSelected>> { onComboboxFolder [%W get]}
+
+ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable selectedNotebook -state readonly
+place .fr.principal.notebooks -relx 0.01 -rely [expr 0.59 / ( 2 - $advanced_options ) ]
 bind .fr.principal.notebooks <<ComboboxSelected>> { parseYaml [%W get]}
 
 text .fr.principal.notebook_description -width 55 -height 5 -borderwidth 1 -relief sunken
 place .fr.principal.notebook_description -relx 0.35 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
-
-label .fr.principal.update_text -textvariable update -foreground orange -font myFont
-place .fr.principal.update_text -relx 0.01 -rely [expr 0.62 / ( 2 - $advanced_options ) ]
-
-set simpleNotebook "-"
-
 
 # Define the button and display to load the path to the data folder
 

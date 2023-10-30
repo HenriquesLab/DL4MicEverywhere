@@ -339,7 +339,6 @@ build_flag=1
 
 # In case testing is chossing, the building is forced to be done, without questions
 if [ $test_flag -eq 0 ]; then
-    
     if docker image inspect $docker_tag >/dev/null 2>&1; then
         echo "Image exists locally. Do you wish to build and replace the existing one?"
         select yn in "Yes" "No"; do
@@ -384,6 +383,8 @@ else
             --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
 
         DOCKER_OUT=$? # Gets if the docker image has been built
+    else
+        DOCKER_OUT=0 # In case that is already built, it is good to run
     fi
 fi
 
