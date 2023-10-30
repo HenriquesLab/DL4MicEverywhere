@@ -71,6 +71,7 @@ proc onDone {} {
             
             if {"$advanced_options" == 0} {
                 # The user has selected the simple mode
+                global selectedFolder
                 global selectedNotebook
                 if {"$selectedNotebook" == "-"} {
                     tk_messageBox -type ok -icon error -title Error \
@@ -79,6 +80,7 @@ proc onDone {} {
                     puts "$advanced_options"
                     puts "$data_path"
                     puts "$result_path"
+                    puts "$selectedFolder"
                     puts "$selectedNotebook"
                     
                     exit 0
@@ -140,7 +142,7 @@ proc onAdvanced {} {
     place .fr.principal.intro_7 -relx 0.01 -rely [expr 0.36 / ( 2 - $advanced_options ) ]
 
     place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
-    place .fr.principal.notebooks_folders -relx 0.01 -rely [expr 0.52 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebooks_folders -relx 0.01 -rely [expr 0.51 / ( 2 - $advanced_options ) ]
     place .fr.principal.notebooks -relx 0.01 -rely [expr 0.59 / ( 2 - $advanced_options ) ]
     place .fr.principal.notebook_description -relx 0.35 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
 
@@ -253,7 +255,7 @@ label .fr.principal.notebook_label -text "List of default notebooks:"
 place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
 
 ttk::combobox .fr.principal.notebooks_folders -values $folderList -textvariable selectedFolder -state readonly
-place .fr.principal.notebooks_folders -relx 0.01 -rely [expr 0.52 / ( 2 - $advanced_options ) ]
+place .fr.principal.notebooks_folders -relx 0.01 -rely [expr 0.51 / ( 2 - $advanced_options ) ]
 bind .fr.principal.notebooks_folders <<ComboboxSelected>> { onComboboxFolder [%W get]}
 
 ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable selectedNotebook -state readonly

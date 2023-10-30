@@ -136,9 +136,10 @@ else
     if [ $advanced_options -eq 0 ]; then
         data_path=${strarr[1]}
         result_path=${strarr[2]}
-        simple_notebook_name=${strarr[3]}
+        selectedFolder=${strarr[3]}
+        selectedNotebook=${strarr[4]}
 
-        config_path=$BASEDIR/notebooks/$simple_notebook_name/configuration.yaml
+        config_path=$BASEDIR/notebooks/$selectedFolder/$selectedNotebook/configuration.yaml
     else
         data_path=${strarr[1]}
         result_path=${strarr[2]}
