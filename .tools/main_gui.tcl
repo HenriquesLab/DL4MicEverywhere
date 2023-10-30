@@ -227,17 +227,17 @@ pack .fr.advance -padx 5 -side left
 
 label .fr.principal.intro_1 -text "Welcome to DL4MicEverywhere!"
 place .fr.principal.intro_1 -relx 0.01 -rely 0.0
-label .fr.principal.intro_2 -text "DL4MicEverywhere allows you to build and run a Docker image for the ZeroCostDL4Mic notebooks."
+label .fr.principal.intro_2 -text "Providing an easy way to apply deep learning to microscopy using interactive Jupyter notebooks."
 place .fr.principal.intro_2 -relx 0.01 -rely [expr 0.06 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_3 -text "There are basic and advanced options."
+label .fr.principal.intro_3 -text " "
 place .fr.principal.intro_3 -relx 0.01 -rely [expr 0.12 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_4 -text "In the basic options, you only need to select three parameters:"
+label .fr.principal.intro_4 -text "To get started, specify:"
 place .fr.principal.intro_4 -relx 0.01 -rely [expr 0.18 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_5 -text "    - A notebook from the given list, it will be the one loaded on the Docker container."
+label .fr.principal.intro_5 -text "    - Notebook: Select from the available deep learning workflows"
 place .fr.principal.intro_5 -relx 0.01 -rely [expr 0.24 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_6 -text "    - The path to the folder containing the data you want to use in the notebook."
+label .fr.principal.intro_6 -text "    - Data folder: Location of your input microscopy images"
 place .fr.principal.intro_6 -relx 0.01 -rely [expr 0.30 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_7 -text "    - The path to the folder where you want to store the results of the notebook."
+label .fr.principal.intro_7 -text "    - Output folder: Where to save your results"
 place .fr.principal.intro_7 -relx 0.01 -rely [expr 0.36 / ( 2 - $advanced_options ) ]
 
 # Define the list with possible default notebooks
@@ -268,7 +268,7 @@ place .fr.principal.notebook_description -relx 0.35 -rely [expr 0.45 / ( 2 - $ad
 # Define the button and display to load the path to the data folder
 
 
-label .fr.principal.data_label -text "Path to the data folder:"
+label .fr.principal.data_label -text "Path to data folder:"
 place .fr.principal.data_label -relx 0.01 -rely [expr 0.67 / ( 2 - $advanced_options ) ]
 
 entry .fr.principal.data_entry -textvariable data_path -width 60
@@ -282,7 +282,7 @@ set data_path ""
 
 # Define the button and display to load the path to the result folder
 
-label .fr.principal.result_label -text "Path to the result/output folder:"
+label .fr.principal.result_label -text "Path to output folder:"
 place .fr.principal.result_label -relx 0.01 -rely [expr 0.83 / ( 2 - $advanced_options ) ]
 
 entry .fr.principal.result_entry -textvariable result_path -width 60
@@ -298,17 +298,17 @@ set result_path ""
 
 # Define the text of the advanced option
 
-label .fr.advanced.intro_1 -text "In the advanced options you can provide:"
+label .fr.advanced.intro_1 -text "Advanced options allow you to specify:"
 place .fr.advanced.intro_1 -relx 0.01 -rely 0.0
-label .fr.advanced.intro_2 -text "    - The path to a local 'configuration.yaml' file with the info to build a Docker container image."
+label .fr.advanced.intro_2 -text "    - Path to a local 'configuration.yaml' file for Docker container image construction"
 place .fr.advanced.intro_2 -relx 0.01 -rely 0.06
-label .fr.advanced.intro_3 -text "    - The path to a local notebook file that will be loaded in the Docker container."
+label .fr.advanced.intro_3 -text "    - Path to a local notebook file to be loaded into the Docker container"
 place .fr.advanced.intro_3 -relx 0.01 -rely 0.12
-label .fr.advanced.intro_4 -text "    - The path to the local requirements.txt file used to setup the Docker container image."
+label .fr.advanced.intro_4 -text "    - Path to the local 'requirements.txt' file for Docker container image setup"
 place .fr.advanced.intro_4 -relx 0.01 -rely 0.18
-label .fr.advanced.intro_5 -text "    - Checkbox to setup a GPU-enabled Docker container image. A GPU has to be properly installed to be able to use it."
+label .fr.advanced.intro_5 -text "    - Checkbox for setting up a GPU-enabled Docker container image. Ensure a GPU is available"
 place .fr.advanced.intro_5 -relx 0.01 -rely 0.24
-label .fr.advanced.intro_6 -text "    - The tag to name the generated Docker image."
+label .fr.advanced.intro_6 -text "    - Tag for naming the generated Docker image"
 place .fr.advanced.intro_6 -relx 0.01 -rely 0.30
 
 # Define the button and display to load the path to the 'configuration.yaml' file
