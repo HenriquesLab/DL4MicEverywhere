@@ -213,13 +213,13 @@ label .fr.principal.intro_1 -text "Welcome to DL4MicEverywhere!"
 place .fr.principal.intro_1 -relx 0.01 -rely 0.0
 label .fr.principal.intro_2 -text "DL4MicEverywhere allows you to build and run a Docker image for the ZeroCostDL4Mic notebooks."
 place .fr.principal.intro_2 -relx 0.01 -rely [expr 0.06 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_3 -text "It is designed for different type of users, therefore there are basic and advanced options."
+label .fr.principal.intro_3 -text "There are basic and advanced options."
 place .fr.principal.intro_3 -relx 0.01 -rely [expr 0.12 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_4 -text "In the basic options that are shown, you only need to select three parameters:"
+label .fr.principal.intro_4 -text "In the basic options, you only need to select three parameters:"
 place .fr.principal.intro_4 -relx 0.01 -rely [expr 0.18 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_5 -text "    - A notebook from the given notebook list, it will be the one loaded on the Docker."
+label .fr.principal.intro_5 -text "    - A notebook from the given list, it will be the one loaded on the Docker container."
 place .fr.principal.intro_5 -relx 0.01 -rely [expr 0.24 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_6 -text "    - The path to the folder where you have the data you want to use in the notebook."
+label .fr.principal.intro_6 -text "    - The path to the folder containing the data you want to use in the notebook."
 place .fr.principal.intro_6 -relx 0.01 -rely [expr 0.30 / ( 2 - $advanced_options ) ]
 label .fr.principal.intro_7 -text "    - The path to the folder where you want to store the results of the notebook."
 place .fr.principal.intro_7 -relx 0.01 -rely [expr 0.36 / ( 2 - $advanced_options ) ]
@@ -280,17 +280,17 @@ set result_path ""
 
 # Define the text of the advanced option
 
-label .fr.advanced.intro_1 -text "In the advanced options that you have displayed you will find:"
+label .fr.advanced.intro_1 -text "In the advanced options you can provide:"
 place .fr.advanced.intro_1 -relx 0.01 -rely 0.0
-label .fr.advanced.intro_2 -text "    - The path to a local 'configuration.yaml' file with the info for the Docker."
+label .fr.advanced.intro_2 -text "    - The path to a local 'configuration.yaml' file with the info to build a Docker container image."
 place .fr.advanced.intro_2 -relx 0.01 -rely 0.06
-label .fr.advanced.intro_3 -text "    - The path to a local notebook file that will be loaded in the Docker."
+label .fr.advanced.intro_3 -text "    - The path to a local notebook file that will be loaded in the Docker container."
 place .fr.advanced.intro_3 -relx 0.01 -rely 0.12
-label .fr.advanced.intro_4 -text "    - The path to a local requirequirements file that will be loaded in the Docker."
+label .fr.advanced.intro_4 -text "    - The path to the local requirements.txt file used to setup the Docker container image."
 place .fr.advanced.intro_4 -relx 0.01 -rely 0.18
-label .fr.advanced.intro_5 -text "    - Checkbox to allow the GPU usage in the Docker."
+label .fr.advanced.intro_5 -text "    - Checkbox to setup a GPU-enabled Docker container image. A GPU has to be properly installed to be able to use it."
 place .fr.advanced.intro_5 -relx 0.01 -rely 0.24
-label .fr.advanced.intro_6 -text "    - Tag that will be given to the generated Docker."
+label .fr.advanced.intro_6 -text "    - The tag to name the generated Docker image."
 place .fr.advanced.intro_6 -relx 0.01 -rely 0.30
 
 # Define the button and display to load the path to the 'configuration.yaml' file
