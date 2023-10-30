@@ -123,7 +123,7 @@ if [ $gui_flag -eq 0 ]; then
 else
     # If the GUI flag has been specified, run the function to show the GUI and read the arguments
     notebook_list=$(ls ./notebooks)
-    gui_arguments=$(wish .tools/gui.tcl $notebook_list)
+    gui_arguments=$(wish .tools/main_gui.tcl $notebook_list)
 
     if [ -z "$gui_arguments" ]; then
         exit 1
@@ -336,18 +336,23 @@ fi
 /bin/bash .tools/pre_build_test.sh
 
 # Check if an image with that tag exists locally and ask if the user whants to replace it.
-build_flag=1
+build_flag=0
 
 # In case testing is chossing, the building is forced to be done, without questions
 if [ $test_flag -eq 0 ]; then
     if docker image inspect $docker_tag >/dev/null 2>&1; then
-        echo "Image exists locally. Do you wish to build and replace the existing one?"
-        select yn in "Yes" "No"; do
-            case $yn in
-                Yes ) build_flag=1; break;;
-                No ) build_flag=0; break;;
-            esac
-        done
+        if [ $gui_flag -eq 1 ]; then 
+            # If the GUI flag has been specified, show a window for ansewring local question
+            build_flag=$(wish .tools/local_img_gui.tcl)
+        else
+            echo "Image exists locally. Do you want to build and replace the existing one?"
+            select yn in "Yes" "No"; do
+                case $yn in
+                    Yes ) build_flag=2; break;;
+                    No ) build_flag=1; break;;
+                esac
+            done
+        fi
     else
         # In case the image is not locally, check if it is on docker hub
         possible_dockerhub_tag=henriqueslab/dl4miceverywhere:$docker_tag-$version
@@ -356,24 +361,29 @@ if [ $test_flag -eq 0 ]; then
         fi
 
         if docker manifest inspect "${possible_dockerhub_tag}" >/dev/null 2>&1; then
-            echo "The image ${possible_dockerhub_tag} is already available on docker hub. Do you preffer to pull it (faster option) instead of building it?"
-            select yn in "Yes" "No"; do
-                case $yn in
-                    Yes ) build_flag=2; break;;
-                    No ) break;;
-                esac
-            done
+            if [ $gui_flag -eq 1 ]; then 
+                # If the GUI flag has been specified, show a window for ansewring hub question
+                build_flag=$(wish .tools/hub_img_gui.tcl)
+            else
+                echo "The image ${possible_dockerhub_tag} is already available on docker hub. Do you preffer to pull it (faster option) instead of building it?"
+                select yn in "Yes" "No"; do
+                    case $yn in
+                        Yes ) build_flag=3; break;;
+                        No ) break;;
+                    esac
+                done
+            fi
         fi
     fi 
 fi
 
 # Pull the docker image from docker hub
-if [ "$build_flag" -eq 2 ]; then
+if [ "$build_flag" -eq 3 ]; then
     docker pull "${possible_dockerhub_tag}"
     DOCKER_OUT=$? # Gets if the docker image has been pulled
 else
     # Build the docker image without GUI
-    if [ "$build_flag" -eq 1 ]; then
+    if [ "$build_flag" -eq 2 ]; then
         docker build $BASEDIR --no-cache -t $docker_tag \
             --build-arg BASE_IMAGE="${base_img}" \
             --build-arg GPU_FLAG="${gpu_flag}" \
@@ -385,7 +395,12 @@ else
 
         DOCKER_OUT=$? # Gets if the docker image has been built
     else
-        DOCKER_OUT=0 # In case that is already built, it is good to run
+        if [ "$build_flag" -eq 1 ]; then
+            DOCKER_OUT=0 # In case that is already built, it is good to run
+        else
+            # build flag is still 0, an error ocurred
+            exit 1
+        fi
     fi
 fi
 
