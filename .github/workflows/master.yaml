@@ -1,4 +1,4 @@
-name: Check modified configuration.yaml
+name: Main testing on pushing and pull request
 
 on:
   push:

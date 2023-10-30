@@ -1,9 +1,9 @@
 
 #!/bin/bash
-BASEDIR=$(dirname "$0")
+# BASEDIR=$(dirname "$0")
 
 # Function to parse and read the configuration yaml file
-function parse_yaml {
+function get_yaml_args {
    local prefix=$2
    local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
    sed -ne "s|^\($s\):|\1|" \
@@ -20,14 +20,15 @@ function parse_yaml {
    }'
 }
 
-eval $(parse_yaml "$BASEDIR/notebooks/$1/configuration.yaml")
+# eval $(get_yaml_args "$BASEDIR/notebooks/$1/configuration.yaml")
+eval $(get_yaml_args "./notebooks/$1/configuration.yaml")
 
 local_version=$version
 local_description=$description
 
 wget -q https://raw.githubusercontent.com/IvanHCenalmor/playground/main/notebooks/CARE_2D_DL4Mic/configuration.yaml
 # wget -q https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/tree/main/notebooks/$1/configuration.yaml
-eval $(parse_yaml "./configuration.yaml")
+eval $(get_yaml_args "./configuration.yaml")
 rm ./configuration.yaml
 
 if [ $version == $local_version ]; then

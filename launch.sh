@@ -123,7 +123,7 @@ if [ $gui_flag -eq 0 ]; then
 else
     # If the GUI flag has been specified, run the function to show the GUI and read the arguments
     notebook_list=$(ls ./notebooks)
-    gui_arguments=$(wish gui.tcl $notebook_list)
+    gui_arguments=$(wish .tools/gui.tcl $notebook_list)
 
     if [ -z "$gui_arguments" ]; then
         exit 1
@@ -333,7 +333,7 @@ if grep -q credsStore ~/.docker/config.json; then
 fi
 
 # Execute the pre building tests
-#/bin/bash pre_build_test.sh
+/bin/bash .tools/pre_build_test.sh
 
 # Check if an image with that tag exists locally and ask if the user whants to replace it.
 build_flag=1
@@ -374,7 +374,7 @@ if [ "$build_flag" -eq 2 ]; then
 else
     # Build the docker image without GUI
     if [ "$build_flag" -eq 1 ]; then
-        docker build $BASEDIR --no-cache  -t $docker_tag \
+        docker build $BASEDIR --no-cache -t $docker_tag \
             --build-arg BASE_IMAGE="${base_img}" \
             --build-arg GPU_FLAG="${gpu_flag}" \
             --build-arg PYTHON_VERSION="${python_version}" \
@@ -390,7 +390,7 @@ else
 fi
 
 # Execute the post building tests
-# /bin/bash post_build_test.sh
+/bin/bash .tools/post_build_test.sh
 
 # Local files, if included, need to be removed to avoid the overcrowding the folder
 if [ "$local_notebook_flag" -eq 1 ]; then
