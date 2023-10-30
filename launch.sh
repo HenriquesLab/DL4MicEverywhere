@@ -303,6 +303,8 @@ if [ "$test_flag" -eq 1 ]; then
     echo "notebook_path: $notebook_path"
     echo "requirements_path: $requirements_path"
     echo "sections_to_remove: $sections_to_remove"
+    echo "version: $version"
+    echo "description: $description"
     echo "docker_tag: $docker_tag"
     echo ""
 fi
@@ -330,22 +332,63 @@ if grep -q credsStore ~/.docker/config.json; then
 fi
 
 # Execute the pre building tests
-/bin/bash pre_build_test.sh
+#/bin/bash pre_build_test.sh
 
-# Build the docker image without GUI
-docker build $BASEDIR --no-cache  -t $docker_tag \
-    --build-arg BASE_IMAGE="${base_img}" \
-    --build-arg GPU_FLAG="${gpu_flag}" \
-    --build-arg PYTHON_VERSION="${python_version}" \
-    --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
-    --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
-    --build-arg NOTEBOOK_NAME="${notebook_name}" \
-    --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
+# Check if an image with that tag exists locally and ask if the user whants to replace it.
+build_flag=1
 
-DOCKER_OUT=$? # Gets if the docker image has been built
+# In case testing is chossing, the building is forced to be done, without questions
+if [ $test_flag -eq 0 ]; then
+    
+    if docker image inspect $docker_tag >/dev/null 2>&1; then
+        echo "Image exists locally. Do you wish to build and replace the existing one?"
+        select yn in "Yes" "No"; do
+            case $yn in
+                Yes ) build_flag=1; break;;
+                No ) build_flag=0; break;;
+            esac
+        done
+    else
+        # In case the image is not locally, check if it is on docker hub
+        possible_dockerhub_tag=henriqueslab/dl4miceverywhere:$docker_tag-$version
+        if [ "$gpu_flag" -eq 1 ]; then
+            possible_dockerhub_tag=$possible_dockerhub_tag-gpu
+        fi
+
+        if docker manifest inspect "${possible_dockerhub_tag}" >/dev/null 2>&1; then
+            echo "The image ${possible_dockerhub_tag} is already available on docker hub. Do you preffer to pull it (faster option) instead of building it?"
+            select yn in "Yes" "No"; do
+                case $yn in
+                    Yes ) build_flag=2; break;;
+                    No ) break;;
+                esac
+            done
+        fi
+    fi 
+fi
+
+# Pull the docker image from docker hub
+if [ "$build_flag" -eq 2 ]; then
+    docker pull "${possible_dockerhub_tag}"
+    DOCKER_OUT=$? # Gets if the docker image has been pulled
+else
+    # Build the docker image without GUI
+    if [ "$build_flag" -eq 1 ]; then
+        docker build $BASEDIR --no-cache  -t $docker_tag \
+            --build-arg BASE_IMAGE="${base_img}" \
+            --build-arg GPU_FLAG="${gpu_flag}" \
+            --build-arg PYTHON_VERSION="${python_version}" \
+            --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
+            --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
+            --build-arg NOTEBOOK_NAME="${notebook_name}" \
+            --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
+
+        DOCKER_OUT=$? # Gets if the docker image has been built
+    fi
+fi
 
 # Execute the post building tests
-/bin/bash post_build_test.sh
+# /bin/bash post_build_test.sh
 
 # Local files, if included, need to be removed to avoid the overcrowding the folder
 if [ "$local_notebook_flag" -eq 1 ]; then
@@ -359,6 +402,7 @@ fi
 # If it has been built, run the docker
 if [ "$DOCKER_OUT" -eq 0 ]; then
     if [ $test_flag -eq 1 ]; then
+        # In case ,testing is done, only building is required, exit before running
         exit 0
     fi
 

@@ -89,8 +89,8 @@ jobs:
           else 
             echo 'The configuration.yaml file is defined with all its keys.'
           fi
-  check_urls:
-    
+  
+  check_urls:  
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -121,8 +121,8 @@ jobs:
         uses: filiph/linkcheck@2.0.23
         with:
           arguments: ${{ steps.extract_rq_url.outputs.result }}
+
   check_docker_build:
-    
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -137,7 +137,6 @@ jobs:
             fetch-depth: 0
       - run: ls
       - name: Check running the 'docker build command'
-        id: notebook_url
         run: |
           sudo bash launch.sh -c '${{ inputs.config_file }}' -d . -o . -x
           exit $?
