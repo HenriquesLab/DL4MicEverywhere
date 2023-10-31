@@ -129,9 +129,23 @@ proc onAdvanced {} {
     if {"$advanced_options" == 0} {
         set advanced_options 1
         pack .fr.advanced -fill both -expand 1
+        .fr.principal.notebooks configure -state disable
+        .fr.principal.notebooks_folders configure -state disable
+
+        .fr.principal.notebook_description delete 0.0 end
+        .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
+        .fr.principal.notebook_description insert end "On advanced mode, default notebooks are disabled." highlight
     } else {
         set advanced_options 0
         pack .fr.advanced -fill both -expand 0
+        .fr.principal.notebooks configure -state normal
+        .fr.principal.notebooks_folders configure -state normal
+
+        .fr.principal.notebook_description delete 0.0 end
+        global selectedNotebook
+        if {"$selectedNotebook" != "-"} {
+            parseYaml $selectedNotebook
+        }
     }
 
     place .fr.principal.intro_2 -relx 0.01 -rely [expr 0.06 / ( 2 - $advanced_options ) ]
@@ -158,15 +172,20 @@ proc onAdvanced {} {
 
 proc onComboboxFolder {notebook_folder} {
     global selectedFolder
+    global selectedNotebook
     global notebookList
 
     set selectedFolder "$notebook_folder"
 
-    # Get notebooks on that folder
-    catch {exec ls ./notebooks/$selectedFolder} output
-
     set notebookList "-"
-    append notebookList " " $output
+    # Get notebooks on that folder
+    if {"$selectedFolder" != "-"} {
+        catch {exec ls ./notebooks/$selectedFolder} output
+        append notebookList " " $output
+    } else {
+        set selectedNotebook "-"
+    }
+
 
     .fr.principal.notebooks configure -values $notebookList
 }
@@ -190,9 +209,17 @@ proc parseYaml {notebook_name} {
 
 }
 
-
 # The flag that indicates if "Advanced options" will be used
 set advanced_options 0
+
+# Read the OS of the computer
+set operative_system $argv
+set is_mac 0
+
+# Check if it is mac to change the display
+if {[string match darwin* $operative_system]} {
+    set is_mac 1
+}
 
 ##### Define the frames of the window #####
 
@@ -225,7 +252,7 @@ pack .fr.advance -padx 5 -side left
 
 image create photo img1 -file "docs/logo/dl4miceverywhere-logo-small.png"
 label .fr.principal.logo -image img1
-place .fr.principal.logo -x 430 -y 5
+place .fr.principal.logo -x 450 -y 5
 
 # Define the text that will be the introduction to the window
 
@@ -247,7 +274,9 @@ place .fr.principal.intro_7 -relx 0.01 -rely [expr 0.36 / ( 2 - $advanced_option
 # Define the list with possible default notebooks
 
 set folderList "-"
-append folderList " " $argv
+
+catch {exec ls ./notebooks} aux_notebok_folder_list
+append folderList " " $aux_notebok_folder_list
 set selectedFolder "-"
 
 set notebookList "-"
@@ -266,7 +295,7 @@ ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable select
 place .fr.principal.notebooks -relx 0.01 -rely [expr 0.59 / ( 2 - $advanced_options ) ]
 bind .fr.principal.notebooks <<ComboboxSelected>> { parseYaml [%W get]}
 
-text .fr.principal.notebook_description -width 52 -height 5 -borderwidth 1 -relief sunken
+text .fr.principal.notebook_description -width [expr 35 + ($is_mac * 15) ] -height [expr 4 + ($is_mac * 2) ] -borderwidth 1 -relief sunken
 place .fr.principal.notebook_description -relx 0.365 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
 
 # Define the button and display to load the path to the data folder
@@ -310,7 +339,7 @@ label .fr.advanced.intro_3 -text "    - Path to a local notebook file to be load
 place .fr.advanced.intro_3 -relx 0.01 -rely 0.12
 label .fr.advanced.intro_4 -text "    - Path to the local 'requirements.txt' file for Docker container image setup"
 place .fr.advanced.intro_4 -relx 0.01 -rely 0.18
-label .fr.advanced.intro_5 -text "    - Checkbox for setting up a GPU-enabled Docker container image. Ensure a GPU is available"
+label .fr.advanced.intro_5 -text "    - Checkbox for setting up a GPU-enabled Docker container image"
 place .fr.advanced.intro_5 -relx 0.01 -rely 0.24
 label .fr.advanced.intro_6 -text "    - Tag for naming the generated Docker image"
 place .fr.advanced.intro_6 -relx 0.01 -rely 0.30
@@ -360,15 +389,15 @@ set txt_path ""
 # Define the checkbutton for the GPU usage
 
 checkbutton .fr.advanced.gpu -text "Allow GPU" -variable gpu
-place .fr.advanced.gpu -relx 0.1 -rely 0.87
+place .fr.advanced.gpu -relx 0.2 -rely 0.87
 
 # Define the docker tag text entry
 
 label .fr.advanced.tag_label -text "Docker tag:"
-place .fr.advanced.tag_label -relx 0.3 -rely 0.87
+place .fr.advanced.tag_label -relx 0.4 -rely 0.87
 
-entry .fr.advanced.tag -textvariable tag -width 30
-place .fr.advanced.tag -relx 0.425 -rely 0.865 
+entry .fr.advanced.tag -textvariable tag -width 20
+place .fr.advanced.tag -relx 0.545 -rely 0.865 
 
 set tag ""
 
