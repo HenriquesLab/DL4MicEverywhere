@@ -1,0 +1,13 @@
+notebook_url: https://raw.githubusercontent.com/BSEL-UC3M/FRU-Net-TEM-segmentation/main/FRUnet_TEM_Exosomes_sEV.ipynb
+requirements_url: https://raw.githubusercontent.com/BSEL-UC3M/FRU-Net-TEM-segmentation/main/requirements.txt
+cuda_version: 11.2.0
+ubuntu_version: 22.04
+python_version: 3.7
+sections_to_remove: 
+version: 0.0.1
+description: "Ready to use notebook for the segmentation of small extrcaellular vesicles
+  in transmission electron microscopy (TEM) images. The notebook will download the original code and dataset, and make the inference with a trained model."
+cite:
+- doi: https://doi.org/10.1038/s41598-019-49431-3
+  text: Gómez-de-Mariscal, E. et al., Deep-Learning-Based Segmentation of SmallExtracellular
+    Vesicles in Transmission Electron Microscopy Images Scientific Reports, (2019)
