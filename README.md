@@ -50,6 +50,7 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 - [Contributing Guidelines](CONTRIBUTING.md)
 - [Technical Design](docs/DESIGN.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Notebooks](docs/NOTEBOOKS.md)
 - [FAQ](docs/FAQ.md)
 
 
