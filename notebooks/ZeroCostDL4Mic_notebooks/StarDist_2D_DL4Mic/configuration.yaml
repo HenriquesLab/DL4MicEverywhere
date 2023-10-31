@@ -1,5 +1,5 @@
-notebook_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/388b177f77f12f4eef49b5740ccd3b00e074a03d/Colab_notebooks/StarDist_2D_ZeroCostDL4Mic.ipynb?raw=true
-requirements_url: https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/388b177f77f12f4eef49b5740ccd3b00e074a03d/requirements_files/StarDist_2D_requirements_simple.txt?raw=true
+notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/StarDist_2D_ZeroCostDL4Mic.ipynb
+requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/StarDist_2D_requirements_simple.txt
 cuda_version: 11.8.0
 ubuntu_version: 22.04
 python_version: 3.10

@@ -241,7 +241,7 @@ if [ -z "$notebook_path" ]; then
     # Use the URL from the configuration file if no local notebook path is specified
     notebook_path="${notebook_url}"
     # Set the docker's tag if not specified
-    aux_docker_tag="$(basename $notebook_path .ipynb?raw=true)"
+    aux_docker_tag="$(basename $notebook_path .ipynb)"
 
     if [ "$test_flag" -eq 1 ]; then
         echo "Since no notebook was specified, the notebook URL from 'configuration.yaml' will be used."
@@ -310,7 +310,7 @@ if [ "$test_flag" -eq 1 ]; then
     echo ""
 fi
 
-notebook_name="$(basename "$notebook_path" ?raw=true)"
+notebook_name="$(basename "$notebook_path")"
 
 # Local files, if included, need to be remocreated in same folder as the dockerfile,
 # then they will be deleted
