@@ -6,7 +6,7 @@ import pandas as pd
 save_dir = '../docs/NOTEBOOKS.md'
 
 
-zcdl4m_url = "https://github.com/HenriquesLab/ZeroCostDL4Mic/wiki/Home.md"
+zcdl4m_url = "https://raw.github.com/wiki/HenriquesLab/ZeroCostDL4Mic/Home.md"
 # Recover the text information from the wiki
 urlretrieve(zcdl4m_url, 'Home.md')
 
