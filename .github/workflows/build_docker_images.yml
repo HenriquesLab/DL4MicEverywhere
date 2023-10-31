@@ -61,11 +61,14 @@ jobs:
                 echo "$files_json"
                 echo "matrix=$files_json" >> $GITHUB_OUTPUT
                 echo "END"
+            - name: Print matrix
+              run: |
+                echo ${{ steps.list_configs.outputs.matrix }}
 
     build_images:
         name: Build Docker images
         runs-on: [self-hosted, dl4miceverywhere-builder]
-        needs: [setup_environment, list_configs]
+        needs: list_configs
         strategy:
           # super important if you want to see all results, even if one fails
           # fail-fast is true by default
