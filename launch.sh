@@ -345,7 +345,10 @@ fi
 build_flag=0
 
 # In case testing is chossing, the building is forced to be done, without questions
-if [ $test_flag -eq 0 ]; then
+if [ $test_flag -eq 1 ]; then
+# In case of testing, the building is always done
+    build_flag=2
+else
     if docker image inspect $docker_tag >/dev/null 2>&1; then
         if [ $gui_flag -eq 1 ]; then 
             # If the GUI flag has been specified, show a window for ansewring local question
@@ -380,7 +383,7 @@ if [ $test_flag -eq 0 ]; then
                 done
             fi
         fi
-    fi 
+    fi
 fi
 
 # Pull the docker image from docker hub
@@ -390,8 +393,8 @@ if [ "$build_flag" -eq 3 ]; then
 else
     # Build the docker image without GUI
     if [ "$build_flag" -eq 2 ]; then
-        if [ $test_flag -eq 1 ]; then
-            # In case test is enabled, instead of classic building, buildx will be used
+        if [ $test_flag -eq 1 ] && [[ "$OSTYPE" != "darwin"* ]]; then
+            # In case test is enabled and that the OS is not MacOS, instead of classic building, buildx will be used
             # in order to build for both arm64 and amd64
             docker buildx build --platform=linux/amd64,linux/arm64 \
                 $BASEDIR --no-cache -t $docker_tag \
