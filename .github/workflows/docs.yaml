@@ -1,5 +1,4 @@
-name: update-documentation
-
+name: Update Documentation
 on:
   push:
     branches: [ master ]
