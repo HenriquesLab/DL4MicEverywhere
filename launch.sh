@@ -390,16 +390,32 @@ if [ "$build_flag" -eq 3 ]; then
 else
     # Build the docker image without GUI
     if [ "$build_flag" -eq 2 ]; then
-        docker build $BASEDIR --no-cache -t $docker_tag \
-            --build-arg BASE_IMAGE="${base_img}" \
-            --build-arg GPU_FLAG="${gpu_flag}" \
-            --build-arg PYTHON_VERSION="${python_version}" \
-            --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
-            --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
-            --build-arg NOTEBOOK_NAME="${notebook_name}" \
-            --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
+        if [ $test_flag -eq 1 ]; then
+            # In case test is enabled, instead of classic building, buildx will be used
+            # in order to build for both arm64 and amd64
+            docker buildx build --platform=linux/amd64,linux/arm64 \
+                $BASEDIR --no-cache -t $docker_tag \
+                --build-arg BASE_IMAGE="${base_img}" \
+                --build-arg GPU_FLAG="${gpu_flag}" \
+                --build-arg PYTHON_VERSION="${python_version}" \
+                --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
+                --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
+                --build-arg NOTEBOOK_NAME="${notebook_name}" \
+                --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
 
-        DOCKER_OUT=$? # Gets if the docker image has been built
+            DOCKER_OUT=$? # Gets if the docker image has been built
+        else
+            docker build $BASEDIR --no-cache -t $docker_tag \
+                --build-arg BASE_IMAGE="${base_img}" \
+                --build-arg GPU_FLAG="${gpu_flag}" \
+                --build-arg PYTHON_VERSION="${python_version}" \
+                --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
+                --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
+                --build-arg NOTEBOOK_NAME="${notebook_name}" \
+                --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
+
+            DOCKER_OUT=$? # Gets if the docker image has been built
+        fi
     else
         if [ "$build_flag" -eq 1 ]; then
             DOCKER_OUT=0 # In case that is already built, it is good to run
