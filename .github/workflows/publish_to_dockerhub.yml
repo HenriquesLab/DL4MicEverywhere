@@ -30,7 +30,7 @@ jobs:
     name: Get the list of configuration files on the repository
     runs-on: [self-hosted, dl4miceverywhere-builder]
     outputs: 
-        configurations: ${{ steps.list_configs.outputs.configurations }}
+        configurations: ${{ steps.list_configs.outputs.configurations_list_output }}
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -54,7 +54,7 @@ jobs:
             done
             files_json+="\"}]}"
             echo "$files_json"
-            echo "configurations=$files_json" >> $GITHUB_OUTPUT
+            echo "configurations_list_output=$files_json" >> $GITHUB_OUTPUT
             echo "END"
 
   push_to_registry:
