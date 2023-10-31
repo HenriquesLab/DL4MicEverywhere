@@ -76,12 +76,12 @@ jobs:
               uses: mikefarah/yq@master
               id: version
               with:
-                  cmd: yq '.version' '${{ matrix.config_file }}'  
+                  cmd: yq '.version' '${{ matrix.config_file.notebook }}'  
             - name: Get notebook_path
               uses: mikefarah/yq@master
               id: notebook_path
               with:
-                  cmd: yq '.version' '${{ matrix.config_file }}' 
+                  cmd: yq '.version' '${{ matrix.config_file.notebook }}' 
             
             - name: Build and push image
               run: |
@@ -89,9 +89,9 @@ jobs:
                   notebook_name="$(echo $docker_tag | tr '[:upper:]' '[:lower:]')"
                   if [ ${{ matrix.gpu }} -eq 0 ]; then
                       tag=henriqueslab/dl4miceverywhere:"$notebook_name"-${{ steps.version.outputs.result }}
-                      bash launch.sh -c '${{ matrix.config_file }}' -d . -o . -x -t "$tag"
+                      bash launch.sh -c '${{ matrix.config_file.notebook }}' -d . -o . -x -t "$tag"
                   else
                       tag=henriqueslab/dl4miceverywhere:"$notebook_name"-${{ steps.version.outputs.result }}-gpu
-                      bash launch.sh -c '${{ matrix.config_file }}' -d . -o . -x -g -t "$tag"
+                      bash launch.sh -c '${{ matrix.config_file.notebook }}' -d . -o . -x -g -t "$tag"
                   fi
                   docker image push "$tag"
