@@ -76,8 +76,8 @@ jobs:
             - name: Build and push image
               run: |
                   aux_docker_tag="$(basename ${{ steps.notebook_url.outputs.result }} .ipynb)"
-                  notebook_name="$(echo $docker_tag | tr '[:upper:]' '[:lower:]')"
-                  tag=henriqueslab/dl4miceverywhere:"$notebook_name"-${{ steps.version.outputs.result }}
+                  notebook_name="$(echo $aux_docker_tag | tr '[:upper:]' '[:lower:]')"
+                  tag="henriqueslab/dl4miceverywhere:$notebook_name-${{ steps.version.outputs.result }}"
                   bash launch.sh -c '${{ matrix.notebook }}' -d . -o . -x -t "$tag"
                   docker image push "$tag"
 
