@@ -28,7 +28,7 @@ on:
 jobs:
   list_configs:
     name: Get the list of configuration files on the repository
-    runs-on: [self-hosted, macOS]
+    runs-on: [self-hosted, dl4miceverywhere-builder]
     outputs: 
         configurations: ${{ steps.list_configs.outputs.configurations }}
     steps:
@@ -43,7 +43,7 @@ jobs:
 
   push_to_registry:
     name: Push Docker image to Docker Hub
-    runs-on: [self-hosted, macOS]
+    runs-on: [self-hosted, dl4miceverywhere-builder]
     needs: list_configs
     strategy:
         matrix: 
