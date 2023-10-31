@@ -72,7 +72,7 @@ jobs:
               uses: mikefarah/yq@master
               id: notebook_path
               with:
-                  cmd: yq '.version' '${{ matrix.notebook }}' 
+                  cmd: yq '.notebook_path' '${{ matrix.notebook }}' 
 
             - name: Build and push image
               run: |
