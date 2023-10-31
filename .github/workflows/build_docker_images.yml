@@ -53,6 +53,7 @@ jobs:
         runs-on: [self-hosted, dl4miceverywhere-builder]
         needs: list_configs
         strategy:
+            fail-fast: false
             matrix: ${{ fromJson(needs.list_configs.outputs.matrix) }} 
         steps:
             - name: Checkout
@@ -75,6 +76,7 @@ jobs:
               id: version
               with:
                   cmd: yq '.version' '${{ matrix.notebook }}'  
+                  
             - name: Get notebook_path
               uses: mikefarah/yq@master
               id: notebook_path
