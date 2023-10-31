@@ -3,7 +3,7 @@ from urllib.request import urlretrieve
 import pandas as pd
 
 # Link to the markdown with all the information about ZCDL4M
-save_dir = '../docs/NOTEBOOKS.md'
+save_dir = 'docs/NOTEBOOKS.md'
 
 
 zcdl4m_url = "https://raw.github.com/wiki/HenriquesLab/ZeroCostDL4Mic/Home.md"
