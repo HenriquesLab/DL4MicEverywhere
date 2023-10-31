@@ -56,31 +56,31 @@ jobs:
                 username: ${{ secrets.DOCKERHUB_USERNAME }}
                 password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-            # - name: Get version
-            #   uses: mikefarah/yq@master
-            #   id: version
-            #   with:
-            #       cmd: yq '.version' '${{ matrix.notebook }}'  
-
-            # - name: Get notebook_path
-            #   uses: mikefarah/yq@master
-            #   id: notebook_path
-            #   with:
-            #       cmd: yq '.version' '${{ matrix.notebook }}' 
-
-            # - name: Set up QEMU
-            #   uses: docker/setup-qemu-action@v3
+            - name: Set up QEMU
+              uses: docker/setup-qemu-action@v3
     
-            # - name: Set up Docker Buildx
-            #   uses: docker/setup-buildx-action@v3
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
                 
-            # - name: Build and push image
-            #   run: |
-            #       aux_docker_tag="$(basename ${{ steps.notebook_path.outputs.result }} .ipynb)"
-            #       notebook_name="$(echo $docker_tag | tr '[:upper:]' '[:lower:]')"
-            #       tag=henriqueslab/dl4miceverywhere:"$notebook_name"-${{ steps.version.outputs.result }}
-            #       bash launch.sh -c '${{ matrix.notebook }}' -d . -o . -x -t "$tag"
-            #       docker image push "$tag"
+            - name: Get version
+              uses: mikefarah/yq@master
+              id: version
+              with:
+                  cmd: yq '.version' '${{ matrix.notebook }}'  
+
+            - name: Get notebook_path
+              uses: mikefarah/yq@master
+              id: notebook_path
+              with:
+                  cmd: yq '.version' '${{ matrix.notebook }}' 
+
+            - name: Build and push image
+              run: |
+                  aux_docker_tag="$(basename ${{ steps.notebook_path.outputs.result }} .ipynb)"
+                  notebook_name="$(echo $docker_tag | tr '[:upper:]' '[:lower:]')"
+                  tag=henriqueslab/dl4miceverywhere:"$notebook_name"-${{ steps.version.outputs.result }}
+                  bash launch.sh -c '${{ matrix.notebook }}' -d . -o . -x -t "$tag"
+                  docker image push "$tag"
 
             # aux_docker_tag="$(basename ${{ steps.notebook_path.outputs.result }} .ipynb)"
             # notebook_name="$(echo $docker_tag | tr '[:upper:]' '[:lower:]')"
