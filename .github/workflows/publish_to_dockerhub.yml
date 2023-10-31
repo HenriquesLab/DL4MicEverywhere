@@ -37,9 +37,25 @@ jobs:
       - name: List configurations
         id: list_configs
         run: |
-            configurations=$(ls ./notebooks/*/*/configuration.yaml)
-            echo $configurations
-            echo "configurations=$configurations" >> $GITHUB_OUTPUT
+            configurations_list=$(ls ./notebooks/*/*/configuration.yaml)
+            echo "Start"
+            files_json="{\"include\":[{\"notebook\":\""
+            echo "$files_json"
+            first=true
+            for file in  $configurations_list; do
+              echo "$file was changed"
+              if [ "$first" = true ]; then
+                files_json+=$file
+                first=false
+              else
+                files_json+="\"},{\"notebook\":\""$file
+              fi
+              echo "$files_json"
+            done
+            files_json+="\"}]}"
+            echo "$files_json"
+            echo "configurations=$files_json" >> $GITHUB_OUTPUT
+            echo "END"
 
   push_to_registry:
     name: Push Docker image to Docker Hub
