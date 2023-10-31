@@ -46,13 +46,40 @@ while l < len(fileString):
     else:
         l += 1
 
+
+
+# Get the relative paths and urls in the wiki
+l = 0
+dict_list = []
+while l < len(fileString):
+    # Identify the very first line where references start
+    if fileString[l].__contains__("  [1]:"):
+        for k in range(l, len(fileString)):
+            # Only check those defining something
+            if fileString[k].__contains__("]:"):
+
+                string = fileString[k].split("[")[1]
+                ref = string.split("]: ")[0]
+                ref_url = string.split("]: ")[1]
+                ref_url = ref_url.split("\n")[0]
+
+                dict_list.append((ref, ref_url))
+        l = k
+    else:
+        l += 1
+# Make a dictionary
+Dict = dict(dict_list)
 # remove the temporary files
 os.remove("Home.md")
-
 # Clean non desired columns from the table
 col = [c for c in nd.columns if c.__contains__("Colab")]
 nd = nd.drop(columns=col)
+# Create a text file with markdown format (i.e. text)
 notebooks = nd.to_markdown(index=False)
+# Replace all the referenced links
+for ref, ref_url in Dict.items():
+    notebooks = notebooks.replace(f"[{ref}]", f"[{ref_url}]")
+# Store the text as a markdown
 with open(save_dir, 'w') as f:
     f.write(notebooks)
 print(f"Notebook markdown stored at {save_dir}")
