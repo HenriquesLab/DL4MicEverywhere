@@ -18,7 +18,7 @@ jobs:
         name: Get the list of configuration files on the repository
         runs-on: [self-hosted, dl4miceverywhere-builder]
         outputs: 
-            matrix: ${{ steps.list_configs.outputs.configurations }}
+            matrix: ${{ steps.list_configs.outputs.matrix }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
