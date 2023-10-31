@@ -78,7 +78,7 @@ nd = nd.drop(columns=col)
 notebooks = nd.to_markdown(index=False)
 # Replace all the referenced links
 for ref, ref_url in Dict.items():
-    notebooks = notebooks.replace(f"[{ref}]", f"[{ref_url}]")
+    notebooks = notebooks.replace(f"[{ref}]", f"({ref_url})")
 # Store the text as a markdown
 with open(save_dir, 'w') as f:
     f.write(notebooks)
