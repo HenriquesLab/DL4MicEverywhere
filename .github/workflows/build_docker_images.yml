@@ -34,7 +34,7 @@ jobs:
 
     list_configs:
         name: Get the list of configuration files on the repository
-        runs-on: [self-hosted, ocbmacmini]
+        runs-on: [self-hosted, dl4miceverywhere-builder]
         needs: setup_environment
         outputs: 
             matrix: ${{ steps.list_configs.outputs.configurations }}
@@ -64,7 +64,7 @@ jobs:
 
     build_images:
         name: Build Docker images
-        runs-on: [self-hosted, ocbmacmini]
+        runs-on: [self-hosted, dl4miceverywhere-builder]
         needs: [setup_environment, list_configs]
         strategy:
           # super important if you want to see all results, even if one fails
