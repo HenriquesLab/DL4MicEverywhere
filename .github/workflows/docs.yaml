@@ -1,0 +1,19 @@
+name: update-documentation
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  update-documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: install requirements
+        run: pip install -r .tools/requirements
+      - name: generate notebooks list
+        run: python3 .tools/list_of_notebooks.py
