@@ -1,13 +1,13 @@
 #!/bin/bash
 BASEDIR=$(dirname "$0")
 
-# Check if script is run as root but only on Unix-like systems
-if [[ "$OSTYPE" == "linux-gnu"* || "$OSTYPE" == "darwin"* ]]; then
-  if [ "$EUID" -ne 0 ]; then
-    echo "Please run this script as root (by using sudo). Otherwise docker won't work properly."
-    exit
-  fi
-fi
+# # Check if script is run as root but only on Unix-like systems
+# if [[ "$OSTYPE" == "linux-gnu"* || "$OSTYPE" == "darwin"* ]]; then
+#   if [ "$EUID" -ne 0 ]; then
+#     echo "Please run this script as root (by using sudo). Otherwise docker won't work properly."
+#     exit
+#   fi
+# fi
 
 # Function with the text to describe the usage of the bash script
 usage() {
