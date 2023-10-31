@@ -17,3 +17,6 @@ jobs:
         run: pip install -r .tools/requirements.txt
       - name: generate notebooks list
         run: python3 .tools/list_of_notebooks.py
+      - name: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: boot - update notebook list
