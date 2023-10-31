@@ -16,7 +16,7 @@ on:
 jobs:
     setup_environment:
         name: Setup environment
-        runs-on: [self-hosted, ocbmacmini]
+        runs-on: [self-hosted, macOS]
         steps:
             - name: Checkout
               uses: actions/checkout@v4
