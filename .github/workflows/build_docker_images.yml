@@ -53,9 +53,7 @@ jobs:
         runs-on: [self-hosted, dl4miceverywhere-builder]
         needs: list_configs
         strategy:
-            matrix:
-              gpu: [0, 1]
-              config_file:  ${{ fromJson(needs.list_configs.outputs.matrix) }} 
+            matrix: ${{ fromJson(needs.list_configs.outputs.matrix) }} 
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -76,22 +74,28 @@ jobs:
               uses: mikefarah/yq@master
               id: version
               with:
-                  cmd: yq '.version' '${{ matrix.config_file.notebook }}'  
+                  cmd: yq '.version' '${{ matrix.notebook }}'  
             - name: Get notebook_path
               uses: mikefarah/yq@master
               id: notebook_path
               with:
-                  cmd: yq '.version' '${{ matrix.config_file.notebook }}' 
+                  cmd: yq '.version' '${{ matrix.notebook }}' 
             
             - name: Build and push image
               run: |
                   aux_docker_tag="$(basename ${{ steps.notebook_path.outputs.result }} .ipynb)"
                   notebook_name="$(echo $docker_tag | tr '[:upper:]' '[:lower:]')"
-                  if [ ${{ matrix.gpu }} -eq 0 ]; then
-                      tag=henriqueslab/dl4miceverywhere:"$notebook_name"-${{ steps.version.outputs.result }}
-                      bash launch.sh -c '${{ matrix.config_file.notebook }}' -d . -o . -x -t "$tag"
-                  else
-                      tag=henriqueslab/dl4miceverywhere:"$notebook_name"-${{ steps.version.outputs.result }}-gpu
-                      bash launch.sh -c '${{ matrix.config_file.notebook }}' -d . -o . -x -g -t "$tag"
-                  fi
+                  tag=henriqueslab/dl4miceverywhere:"$notebook_name"-${{ steps.version.outputs.result }}
+                  bash launch.sh -c '${{ matrix.notebook }}' -d . -o . -x -t "$tag"
                   docker image push "$tag"
+
+            # aux_docker_tag="$(basename ${{ steps.notebook_path.outputs.result }} .ipynb)"
+            # notebook_name="$(echo $docker_tag | tr '[:upper:]' '[:lower:]')"
+            # if [ ${{ matrix.gpu }} -eq 0 ]; then
+            #     tag=henriqueslab/dl4miceverywhere:"$notebook_name"-${{ steps.version.outputs.result }}
+            #     bash launch.sh -c '${{ matrix.notebook }}' -d . -o . -x -t "$tag"
+            # else
+            #     tag=henriqueslab/dl4miceverywhere:"$notebook_name"-${{ steps.version.outputs.result }}-gpu
+            #     bash launch.sh -c '${{ matrix.notebook }}' -d . -o . -x -g -t "$tag"
+            # fi
+            # docker image push "$tag"
