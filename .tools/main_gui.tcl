@@ -1,7 +1,7 @@
 #! /usr/local/bin/wish
 
 # Define the shape of the window
-set width 650
+set width 600
 set height 700
 set width_offset [expr { ( [winfo vrootwidth  .] - $width  ) / 2 }]
 set height_offset [expr { ( [winfo vrootheight .] - $height ) / 2 }]
@@ -144,7 +144,7 @@ proc onAdvanced {} {
     place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
     place .fr.principal.notebooks_folders -relx 0.01 -rely [expr 0.51 / ( 2 - $advanced_options ) ]
     place .fr.principal.notebooks -relx 0.01 -rely [expr 0.59 / ( 2 - $advanced_options ) ]
-    place .fr.principal.notebook_description -relx 0.35 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebook_description -relx 0.365 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
 
     place .fr.principal.data_label -relx 0.01 -rely [expr 0.67 / ( 2 - $advanced_options ) ]
     place .fr.principal.data_entry -relx 0.01 -rely [expr 0.74 / ( 2 - $advanced_options ) ]
@@ -223,13 +223,17 @@ pack .fr.advance -padx 5 -side left
 
 #### Manadatory argument section ######
 
+image create photo img1 -file "docs/logo/dl4miceverywhere-logo-small.png"
+label .fr.principal.logo -image img1
+place .fr.principal.logo -x 430 -y 5
+
 # Define the text that will be the introduction to the window
 
 label .fr.principal.intro_1 -text "Welcome to DL4MicEverywhere!"
 place .fr.principal.intro_1 -relx 0.01 -rely 0.0
-label .fr.principal.intro_2 -text "Providing an easy way to apply deep learning to microscopy using interactive Jupyter notebooks."
+label .fr.principal.intro_2 -text "Providing an easy way to apply deep learning to microscopy"
 place .fr.principal.intro_2 -relx 0.01 -rely [expr 0.06 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_3 -text " "
+label .fr.principal.intro_3 -text "using interactive Jupyter notebooks."
 place .fr.principal.intro_3 -relx 0.01 -rely [expr 0.12 / ( 2 - $advanced_options ) ]
 label .fr.principal.intro_4 -text "To get started, specify:"
 place .fr.principal.intro_4 -relx 0.01 -rely [expr 0.18 / ( 2 - $advanced_options ) ]
@@ -262,8 +266,8 @@ ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable select
 place .fr.principal.notebooks -relx 0.01 -rely [expr 0.59 / ( 2 - $advanced_options ) ]
 bind .fr.principal.notebooks <<ComboboxSelected>> { parseYaml [%W get]}
 
-text .fr.principal.notebook_description -width 55 -height 5 -borderwidth 1 -relief sunken
-place .fr.principal.notebook_description -relx 0.35 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
+text .fr.principal.notebook_description -width 52 -height 5 -borderwidth 1 -relief sunken
+place .fr.principal.notebook_description -relx 0.365 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
 
 # Define the button and display to load the path to the data folder
 
