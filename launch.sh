@@ -14,30 +14,30 @@ usage() {
   cat << EOF # remove the space between << and EOF, this is due to web plugin issue
 
 Welcome to DL4MicEverywhere!
+Providing an easy way to apply deep learning to microscopy using interactive Jupyter notebooks.
+DL4MicEverywhere enables you to build/pull and run a notebook docker image. 
 
-DL4MicEverywhere allows you to build and run a Docker image for the ZeroCostDL4Mic notebooks. 
-This script is designed for different types of users. 
-Below, you will find examples of the simplest usage case and all the available options that will lead you to a more advanced experience.
+Below, you'll find examples of the most basic usage case, as well as all the available options for a more advanced experience.
 
-The simplest usage case consists of providing three paths (these are always mandatory):
+The most basic usage case involves providing three paths (these are always required):
  - The path to the configuration file 'configuration.yaml'.
- - The path to the folder where you store the data you want to use in your notebook.
- - The path to the folder where you want to store the results of your notebook.
+ - The path to the folder containing the data for your notebook.
+ - The path to the folder where you wish to save your notebook's results.
 
 Code example:
     $(basename "${BASH_SOURCE[0]}") -c configuration_path -d dataset_path -o output_path
 
-The list of all available arguments is:
- -h      Print this help and exit. (optional)
+Here is a list of all available arguments:
+ -h      Display this help message and exit. (optional)
  -c      Path to the configuration file 'configuration.yaml'.   
- -d      Path to the folder where you store the data you want to use in your notebook.
- -o      Path to the output folder where you want to store the results of your notebook.
- -g      Flag to specify if GPU should be used. (optional)
+ -d      Path to the folder containing the data for your notebook.
+ -o      Path to the folder where you wish to save your notebook's results.
+ -g      Flag to indicate if GPU should be used. (optional)
  -n      Path to a local notebook file 'notebook.ipynb'. (optional)
- -r      Path to a localrequirements file 'requirements.txt'. (optional)
+ -r      Path to a local requirements file 'requirements.txt'. (optional)
  -i      Flag to indicate if you want to use a Graphic User Interface (GUI). (optional)
- -t      Tag that will be added to the docker image when building. (optional)
- -x      Flag to indicate if it is a test run. Allowiing to print usefull information for debugging. (optional)
+ -t      Tag to be added to the docker image during building. (optional)
+ -x      Flag to indicate if it is a test run. This allows for the printing of useful debugging information. (optional)
 
 Code example:
     $(basename "${BASH_SOURCE[0]}") -c configuration_path -d dataset_path -o output_path [-h|i|t|g] [-n notebook_path] [-r requirements_path] 
@@ -186,44 +186,44 @@ else
 fi 
 
 if [ -z "$data_path" ]; then 
-    # If no data path has been specified, then exit with the error
-    echo "No path to the data folder has been specified, please make sure to use -d argument and give a value to it."
+    # Exit with an error if no data path is specified
+    echo "Please specify a path to the data folder using the -d argument."
     exit 1
 else
-    # If a data path has been specified, check if it is valid
+    # Validate the specified data path
     if [[ -d $data_path ]]; then
         if [ "$test_flag" -eq 1 ]; then
-            echo "Path to the data: $data_path"
+            echo "Data path: $data_path"
         fi
     else
-        echo "$data_path is not valid."
+        echo "The specified data path $data_path is not valid."
         exit 1
     fi
 fi 
 
 if [ -z "$result_path" ]; then 
-    # If no result path has been specified, then exit with the error
-    echo "No path to the result/output folder has been specified, please make sure to use -o argument and give a value to it."
+    # Exit with an error if no result path is specified
+    echo "Please specify a path to the output folder using the -o argument."
     exit 1
 else
-    # If a result path has been specified, check if it is valid
+    # Validate the specified result path
     if [[ -d $result_path ]]; then
         if [ "$test_flag" -eq 1 ]; then
-            echo "Path to the data: $result_path"
+            echo "Result path: $result_path"
         fi
     else
-        echo "$result_path is not valid."
+        echo "The specified result path $result_path is not valid."
         exit 1
     fi
 fi 
 
 
 if [ "$test_flag" -eq 1 ]; then
-    # Prints if the GPU flag has been set if the test flag has been set
+    # If the test flag is set, print whether the GPU flag has been set
     if [ "$gpu_flag" -eq 1 ]; then
-        echo 'GPU will be allowed.'
+        echo 'GPU usage is enabled.'
     else
-        echo 'GPU is not allowed.'
+        echo 'GPU usage is disabled.'
     fi
 fi
 
@@ -238,13 +238,13 @@ else
 fi
 
 if [ -z "$notebook_path" ]; then
-    # If no local notebook path has been specified, then the URL from the configuration file will be used
+    # Use the URL from the configuration file if no local notebook path is specified
     notebook_path="${notebook_url}"
-    # For the docker's tag if not specified
+    # Set the docker's tag if not specified
     aux_docker_tag="$(basename $notebook_path .ipynb?raw=true)"
 
     if [ "$test_flag" -eq 1 ]; then
-        echo "No notebook has been specified, therefore the notebook url specified on 'configuration.yaml' will be used."
+        echo "Since no notebook was specified, the notebook URL from 'configuration.yaml' will be used."
     fi
 
 else
@@ -322,6 +322,13 @@ fi
 if [ "$local_requirements_flag" -eq 1 ]; then
    cp $requirements_path $BASEDIR/requirements.txt
    requirements_path=./requirements.txt
+fi
+
+# Check if docker is installed
+if ! command -v docker &> /dev/null
+then
+    echo "Docker could not be found. Please install Docker."
+    exit
 fi
 
 # Check if there is the errata in ~/.docker/config.json where credsStore should be credStore
