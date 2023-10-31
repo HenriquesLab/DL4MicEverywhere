@@ -30,7 +30,7 @@ jobs:
             - name: Setup Python
               uses: actions/setup-python@v4.7.1
               with:
-                  python-version: 3.10
+                  python-version: '3.10'
 
     list_configs:
         name: Get the list of configuration files on the repository

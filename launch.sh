@@ -122,7 +122,6 @@ if [ $gui_flag -eq 0 ]; then
     fi
 else
     # If the GUI flag has been specified, run the function to show the GUI and read the arguments
-    notebook_list=$(ls ./notebooks)
     gui_arguments=$(wish .tools/main_gui.tcl $OSTYPE)
 
     if [ -z "$gui_arguments" ]; then
