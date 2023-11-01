@@ -351,7 +351,7 @@ else
         fi
     else
         # In case the image is not locally, check if it is on docker hub
-        possible_dockerhub_tag=henriqueslab/dl4miceverywhere:$docker_tag-$version
+        possible_dockerhub_tag=henriqueslab/dl4miceverywhere:$docker_tag-v$version
         if [ "$gpu_flag" -eq 1 ]; then
             possible_dockerhub_tag=$possible_dockerhub_tag-gpu
         fi
