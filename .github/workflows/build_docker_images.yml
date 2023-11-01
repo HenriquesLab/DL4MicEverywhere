@@ -109,7 +109,7 @@ jobs:
               with:
                 push: true
                 platforms: linux/amd64
-                tags: henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-v${{ steps.version.outputs.result }} henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-latest
+                tags: henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-v${{ steps.version.outputs.result }}, henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-latest
                 build-args: |
                   BASE_IMAGE="ubuntu:${{ steps.ubuntu_version.outputs.result }}"
                   GPU_FLAG=0
@@ -124,7 +124,7 @@ jobs:
               with:
                 push: true
                 platforms: linux/amd64
-                tags: henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-gpu-v${{ steps.version.outputs.result }} henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-gpu-latest
+                tags: henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-gpu-v${{ steps.version.outputs.result }}, henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-gpu-latest
                 build-args: |
                   BASE_IMAGE="nvidia/cuda:${{ steps.cuda_version.outputs.result }}-base-ubuntu${{ steps.ubuntu_version.outputs.result }}"
                   GPU_FLAG=1
