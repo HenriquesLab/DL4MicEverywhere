@@ -396,11 +396,20 @@ else
         if [ $test_flag -eq 1 ] && [[ "$OSTYPE" != "darwin"* ]]; then
             # In case test is enabled and that the OS is not MacOS, instead of classic building, buildx will be used
             # in order to build for both arm64 and amd64
-            docker buildx create --use --name buildx_instance
-            
+            # docker buildx create --use --name buildx_instance
 
-            docker buildx build --platform=linux/amd64,linux/arm64 \
-                --load $BASEDIR --no-cache -t $docker_tag \
+
+            # docker buildx build --platform=linux/amd64,linux/arm64 \
+            #     --load $BASEDIR --no-cache -t $docker_tag \
+            #     --build-arg BASE_IMAGE="${base_img}" \
+            #     --build-arg GPU_FLAG="${gpu_flag}" \
+            #     --build-arg PYTHON_VERSION="${python_version}" \
+            #     --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
+            #     --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
+            #     --build-arg NOTEBOOK_NAME="${notebook_name}" \
+            #     --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
+
+            docker build $BASEDIR --no-cache -t $docker_tag \
                 --build-arg BASE_IMAGE="${base_img}" \
                 --build-arg GPU_FLAG="${gpu_flag}" \
                 --build-arg PYTHON_VERSION="${python_version}" \
@@ -408,7 +417,6 @@ else
                 --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
                 --build-arg NOTEBOOK_NAME="${notebook_name}" \
                 --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
-
             DOCKER_OUT=$? # Gets if the docker image has been built
         else
             docker build $BASEDIR --no-cache -t $docker_tag \
