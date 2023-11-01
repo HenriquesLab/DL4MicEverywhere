@@ -332,8 +332,8 @@ fi
 build_flag=0
 
 # In case testing is chossing, the building is forced to be done, without questions
-if [ $test_flag -eq 0 ]; then
-# In case of testing, the building is always done
+if [ $test_flag -eq 1 ]; then
+    # In case of testing, the building is always done
     build_flag=2
 else
     if docker image inspect $docker_tag >/dev/null 2>&1; then
@@ -365,17 +365,19 @@ else
                 select yn in "Yes" "No"; do
                     case $yn in
                         Yes ) build_flag=3; break;;
-                        No ) break;;
+                        No )  build_flag=2; break;;
                     esac
                 done
             fi
+        else
+            build_flag=2
         fi
     fi
 fi
 
 # Pull the docker image from docker hub
 if [ "$build_flag" -eq 3 ]; then
-    docker pull "${possible_dockerhub_tag}"
+    docker pull "$possible_dockerhub_tag"
     DOCKER_OUT=$? # Gets if the docker image has been pulled
 else
     # Build the docker image without GUI
