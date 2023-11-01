@@ -113,11 +113,11 @@ jobs:
                 build-args: |
                   BASE_IMAGE=ubuntu:${{ steps.ubuntu_version.outputs.result }}
                   GPU_FLAG=0
-                  PYTHON_VERSION="${{ steps.python_version.outputs.result }}"
-                  PATH_TO_NOTEBOOK="${{ steps.notebook_url.outputs.result }}"
-                  PATH_TO_REQUIREMENTS="${{ steps.requirements_url.outputs.result }}"
-                  NOTEBOOK_NAME="${{ steps.notebook_name.outputs.value }}"
-                  SECTIONS_TO_REMOVE="${{ steps.sections_to_remove.outputs.result }}"
+                  PYTHON_VERSION=${{ steps.python_version.outputs.result }}
+                  PATH_TO_NOTEBOOK=${{ steps.notebook_url.outputs.result }}
+                  PATH_TO_REQUIREMENTS=${{ steps.requirements_url.outputs.result }}
+                  NOTEBOOK_NAME=${{ steps.notebook_name.outputs.value }}
+                  SECTIONS_TO_REMOVE=${{ steps.sections_to_remove.outputs.result }}
 
             - name: Build and push with GPU
               uses: docker/build-push-action@v5
@@ -128,8 +128,8 @@ jobs:
                 build-args: |
                   BASE_IMAGE=nvidia/cuda:${{ steps.cuda_version.outputs.result }}-base-ubuntu${{ steps.ubuntu_version.outputs.result }}
                   GPU_FLAG=1
-                  PYTHON_VERSION="${{ steps.python_version.outputs.result }}"
-                  PATH_TO_NOTEBOOK="${{ steps.notebook_url.outputs.result }}"
-                  PATH_TO_REQUIREMENTS="${{ steps.requirements_url.outputs.result }}"
-                  NOTEBOOK_NAME="${{ steps.notebook_name.outputs.value }}"
-                  SECTIONS_TO_REMOVE="${{ steps.sections_to_remove.outputs.result }}"
+                  PYTHON_VERSION=${{ steps.python_version.outputs.result }}
+                  PATH_TO_NOTEBOOK=${{ steps.notebook_url.outputs.result }}
+                  PATH_TO_REQUIREMENTS=${{ steps.requirements_url.outputs.result }}
+                  NOTEBOOK_NAME=${{ steps.notebook_name.outputs.value }}
+                  SECTIONS_TO_REMOVE=${{ steps.sections_to_remove.outputs.result }}
