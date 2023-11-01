@@ -31,5 +31,3 @@
 #     echo "Docker is not installed."
 #     exit 1
 # fi
-
-echo "PREBUILD"

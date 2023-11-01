@@ -1,13 +1,8 @@
 #!/bin/bash
 BASEDIR=$(dirname "$0")
 
-# Check if script is run as root but only on Unix-like systems
-if [[ "$OSTYPE" == "linux-gnu"* || "$OSTYPE" == "darwin"* ]]; then
-  if [ "$EUID" -ne 0 ]; then
-    echo "Please run this script as root (by using sudo). Otherwise docker won't work properly."
-    exit
-  fi
-fi
+# Run pre_launch_test.sh, stop if it fails
+/bin/bash .tools/pre_launch_test.sh || exit 1
 
 # Function with the text to describe the usage of the bash script
 usage() {
@@ -103,26 +98,24 @@ done
     
 
 # Let's check the arguments
-
 if [ $# -eq 0 ]; then
     echo "No arguments provided."
     echo "You can start the script with -h for help, -c for configuration, or -i for showing a Graphic User Interface."
     exit 1
 fi
 
-# Prints if the test flag has been set
+# Check if test mode is active
 if [ "$test_flag" -eq 1 ]; then
-    echo 'Test mode ACTIVATED.'
+    echo 'Test mode is enabled.'
 fi
 
 if [ $gui_flag -eq 0 ]; then 
-    # If the GUI flag has not been specified
+    # If GUI is not requested
     if [ "$test_flag" -eq 1 ]; then
-        echo "No GUI flag has been specified, therefore GUI will not be used."
+        echo "GUI is not requested, proceeding without GUI."
     fi
 else
     # If the GUI flag has been specified, run the function to show the GUI and read the arguments
-    notebook_list=$(ls ./notebooks)
     gui_arguments=$(wish .tools/main_gui.tcl $OSTYPE)
 
     if [ -z "$gui_arguments" ]; then
@@ -324,13 +317,6 @@ if [ "$local_requirements_flag" -eq 1 ]; then
    requirements_path=./requirements.txt
 fi
 
-# Check if docker is installed
-if ! command -v docker &> /dev/null
-then
-    echo "Docker could not be found. Please install Docker."
-    exit
-fi
-
 # Check if there is the errata in ~/.docker/config.json where credsStore should be credStore
 if grep -q credsStore ~/.docker/config.json; then
     # Apparently, on MaxOS, it returns: 
@@ -346,7 +332,10 @@ fi
 build_flag=0
 
 # In case testing is chossing, the building is forced to be done, without questions
-if [ $test_flag -eq 0 ]; then
+if [ $test_flag -eq 1 ]; then
+    # In case of testing, the building is always done
+    build_flag=2
+else
     if docker image inspect $docker_tag >/dev/null 2>&1; then
         if [ $gui_flag -eq 1 ]; then 
             # If the GUI flag has been specified, show a window for ansewring local question
@@ -362,7 +351,7 @@ if [ $test_flag -eq 0 ]; then
         fi
     else
         # In case the image is not locally, check if it is on docker hub
-        possible_dockerhub_tag=henriqueslab/dl4miceverywhere:$docker_tag-$version
+        possible_dockerhub_tag=henriqueslab/dl4miceverywhere:$docker_tag-v$version
         if [ "$gpu_flag" -eq 1 ]; then
             possible_dockerhub_tag=$possible_dockerhub_tag-gpu
         fi
@@ -376,17 +365,19 @@ if [ $test_flag -eq 0 ]; then
                 select yn in "Yes" "No"; do
                     case $yn in
                         Yes ) build_flag=3; break;;
-                        No ) break;;
+                        No )  build_flag=2; break;;
                     esac
                 done
             fi
+        else
+            build_flag=2
         fi
-    fi 
+    fi
 fi
 
 # Pull the docker image from docker hub
 if [ "$build_flag" -eq 3 ]; then
-    docker pull "${possible_dockerhub_tag}"
+    docker pull "$possible_dockerhub_tag"
     DOCKER_OUT=$? # Gets if the docker image has been pulled
 else
     # Build the docker image without GUI

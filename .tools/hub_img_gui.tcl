@@ -24,7 +24,7 @@ place .fr.principal.text_2 -relx 0.02 -rely 0.5
 ttk::button .fr.yes -text "Yes" -command { puts 3; exit 0 }
 pack .fr.yes -padx 30 -side left 
 
-ttk::button .fr.no -text "No" -command { puts 1; exit 0 }
+ttk::button .fr.no -text "No" -command { puts 2; exit 0 }
 pack .fr.no -padx 30 -side right
 
 ##### Create a window #####
