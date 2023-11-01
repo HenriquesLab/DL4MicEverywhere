@@ -77,9 +77,14 @@ jobs:
               run: |
                   aux_docker_tag="$(basename ${{ steps.notebook_url.outputs.result }} .ipynb)"
                   notebook_name="$(echo $aux_docker_tag | tr '[:upper:]' '[:lower:]')"
-                  tag="henriqueslab/dl4miceverywhere:$notebook_name-${{ steps.version.outputs.result }}"
-                  bash launch.sh -c '${{ matrix.notebook }}' -d . -o . -x -t "$tag"
-                  docker image push "$tag"
+
+                  bash launch.sh -c '${{ matrix.notebook }}' -d . -o . -x -t myimage
+
+                  docker image tag my-myimage henriqueslab/dl4miceverywhere:$notebook_name-v${{ steps.version.outputs.result }}
+                  docker image tag my-myimage henriqueslab/dl4miceverywhere:$notebook_name-latest
+                  
+                  docker image push henriqueslab/dl4miceverywhere --all-tags
+                  docker system prune
 
             # aux_docker_tag="$(basename ${{ steps.notebook_path.outputs.result }} .ipynb)"
             # notebook_name="$(echo $docker_tag | tr '[:upper:]' '[:lower:]')"

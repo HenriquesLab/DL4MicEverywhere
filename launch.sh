@@ -409,7 +409,7 @@ else
             #     --build-arg NOTEBOOK_NAME="${notebook_name}" \
             #     --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
 
-            docker build $BASEDIR --no-cache -t $docker_tag \
+            docker build $BASEDIR --no-cache --platform linux/amd64 -t $docker_tag \
                 --build-arg BASE_IMAGE="${base_img}" \
                 --build-arg GPU_FLAG="${gpu_flag}" \
                 --build-arg PYTHON_VERSION="${python_version}" \
