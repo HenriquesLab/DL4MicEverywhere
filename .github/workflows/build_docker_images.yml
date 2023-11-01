@@ -1,44 +1,17 @@
-name: Build Docker Images
+name: Build and push Docker Images
 
 on:
     workflow_dispatch:
-        inputs:
-          logLevel:
-            description: "Log level"
-            required: true
-            default: "warning"
-            type: choice
-            options:
-              - info
-              - warning
-              - debug
 
 jobs:
-    setup_environment:
-        name: Setup environment
+    list_configs:
+        name: Get the list of configuration files on the repository
         runs-on: [self-hosted, dl4miceverywhere-builder]
+        outputs: 
+            matrix: ${{ steps.list_configs.outputs.matrix }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-
-            - name: Set up QEMU
-              uses: docker/setup-qemu-action@v3
-    
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v3
-
-            - name: Setup Python
-              uses: actions/setup-python@v4.7.1
-              with:
-                  python-version: 3.10
-
-    list_configs:
-        name: Get the list of configuration files on the repository
-        runs-on: [self-hosted, ocbmacmini]
-        needs: setup_environment
-        outputs: 
-            matrix: ${{ steps.list_configs.outputs.configurations }}
-        steps:
             - name: List configurations
               id: list_configs
               run: |
@@ -61,16 +34,17 @@ jobs:
                 echo "$files_json"
                 echo "matrix=$files_json" >> $GITHUB_OUTPUT
                 echo "END"
+            - name: Print matrix
+              run: |
+                echo ${{ steps.list_configs.outputs.matrix }}
 
     build_images:
         name: Build Docker images
-        runs-on: [self-hosted, ocbmacmini]
-        needs: [setup_environment, list_configs]
+        runs-on: [self-hosted, dl4miceverywhere-builder]
+        needs: list_configs
         strategy:
-          # super important if you want to see all results, even if one fails
-          # fail-fast is true by default
-          fail-fast: false
-          matrix: ${{ fromJson(needs.list_configs.outputs.matrix) }} 
+            fail-fast: false
+            matrix: ${{ fromJson(needs.list_configs.outputs.matrix) }} 
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -79,10 +53,83 @@ jobs:
               uses: docker/setup-qemu-action@v3
     
             - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v3
-            
-            - name: Login to DockerHub
-              uses: docker/login-action@v1
+              uses: docker/setup-buildx-action@v3         
+                 
+            - name: Login to Docker Hub
+              uses: docker/login-action@v3
               with:
-                username: ${{ secrets.DOCKER_USERNAME }}
-                password: ${{ secrets.DOCKER_PASSWORD }}
+                username: ${{ secrets.DOCKERHUB_USERNAME }}
+                password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: Check notebook_url attribute on configuration.yaml
+              uses: mikefarah/yq@master
+              id: notebook_url
+              with:
+                cmd: yq '.notebook_url' '${{ matrix.notebook }}' 
+            - name: Check requirements_url attribute on configuration.yaml
+              uses: mikefarah/yq@master
+              id: requirements_url
+              with:
+                cmd: yq '.requirements_url' '${{ matrix.notebook }}' 
+            - name: Check cuda_version attribute on configuration.yaml
+              uses: mikefarah/yq@master
+              id: cuda_version
+              with:
+                cmd: yq '.cuda_version' '${{ matrix.notebook }}' 
+            - name: Check ubuntu_version attribute on configuration.yaml
+              uses: mikefarah/yq@master
+              id: ubuntu_version
+              with:
+                cmd: yq '.ubuntu_version' '${{ matrix.notebook }}' 
+            - name: Check python_version attribute on configuration.yaml
+              uses: mikefarah/yq@master
+              id: python_version
+              with:
+                cmd: yq '.python_version' '${{ matrix.notebook }}'
+            - name: Check sections_to_remove attribute on configuration.yaml
+              uses: mikefarah/yq@master
+              id: sections_to_remove
+              with:
+                cmd: yq '.sections_to_remove' '${{ matrix.notebook }}'  
+            - name: Check version attribute on configuration.yaml
+              uses: mikefarah/yq@master
+              id: version
+              with:
+                cmd: yq '.version' '${{ matrix.notebook }}'  
+
+            - name: Get notebook_name
+              id: notebook_name
+              run: |
+                aux_docker_tag="$(basename ${{ steps.notebook_url.outputs.result }} .ipynb)"
+                notebook_name="$(echo $aux_docker_tag | tr '[:upper:]' '[:lower:]')"
+                echo "value=$notebook_name" >> $GITHUB_OUTPUT
+
+            - name: Build and push without GPU
+              uses: docker/build-push-action@v5
+              with:
+                push: true
+                platforms: linux/amd64
+                tags: henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-v${{ steps.version.outputs.result }}, henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-latest
+                build-args: |
+                  BASE_IMAGE=ubuntu:${{ steps.ubuntu_version.outputs.result }}
+                  GPU_FLAG=0
+                  PYTHON_VERSION=${{ steps.python_version.outputs.result }}
+                  PATH_TO_NOTEBOOK=${{ steps.notebook_url.outputs.result }}
+                  PATH_TO_REQUIREMENTS=${{ steps.requirements_url.outputs.result }}
+                  NOTEBOOK_NAME=${{ steps.notebook_name.outputs.value }}
+                  SECTIONS_TO_REMOVE=${{ steps.sections_to_remove.outputs.result }}
+
+            - name: Build and push with GPU
+              uses: docker/build-push-action@v5
+              with:
+                push: true
+                platforms: linux/amd64
+                tags: henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-gpu-v${{ steps.version.outputs.result }}, henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-gpu-latest
+                build-args: |
+                  BASE_IMAGE=nvidia/cuda:${{ steps.cuda_version.outputs.result }}-base-ubuntu${{ steps.ubuntu_version.outputs.result }}
+                  GPU_FLAG=1
+                  PYTHON_VERSION=${{ steps.python_version.outputs.result }}
+                  PATH_TO_NOTEBOOK=${{ steps.notebook_url.outputs.result }}
+                  PATH_TO_REQUIREMENTS=${{ steps.requirements_url.outputs.result }}
+                  NOTEBOOK_NAME=${{ steps.notebook_name.outputs.value }}
+                  SECTIONS_TO_REMOVE=${{ steps.sections_to_remove.outputs.result }}

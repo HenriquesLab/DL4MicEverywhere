@@ -115,8 +115,7 @@ if [ $gui_flag -eq 0 ]; then
         echo "GUI is not requested, proceeding without GUI."
     fi
 else
-    # If GUI is requested, initialize GUI and read the arguments
-    notebook_list=$(ls ./notebooks)
+    # If the GUI flag has been specified, run the function to show the GUI and read the arguments
     gui_arguments=$(wish .tools/main_gui.tcl $OSTYPE)
 
     if [ -z "$gui_arguments" ]; then
@@ -333,7 +332,10 @@ fi
 build_flag=0
 
 # In case testing is chossing, the building is forced to be done, without questions
-if [ $test_flag -eq 0 ]; then
+if [ $test_flag -eq 1 ]; then
+# In case of testing, the building is always done
+    build_flag=2
+else
     if docker image inspect $docker_tag >/dev/null 2>&1; then
         if [ $gui_flag -eq 1 ]; then 
             # If the GUI flag has been specified, show a window for ansewring local question
@@ -368,7 +370,7 @@ if [ $test_flag -eq 0 ]; then
                 done
             fi
         fi
-    fi 
+    fi
 fi
 
 # Pull the docker image from docker hub
@@ -378,16 +380,43 @@ if [ "$build_flag" -eq 3 ]; then
 else
     # Build the docker image without GUI
     if [ "$build_flag" -eq 2 ]; then
-        docker build $BASEDIR --no-cache -t $docker_tag \
-            --build-arg BASE_IMAGE="${base_img}" \
-            --build-arg GPU_FLAG="${gpu_flag}" \
-            --build-arg PYTHON_VERSION="${python_version}" \
-            --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
-            --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
-            --build-arg NOTEBOOK_NAME="${notebook_name}" \
-            --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
+        if [ $test_flag -eq 1 ] && [[ "$OSTYPE" != "darwin"* ]]; then
+            # In case test is enabled and that the OS is not MacOS, instead of classic building, buildx will be used
+            # in order to build for both arm64 and amd64
+            # docker buildx create --use --name buildx_instance
 
-        DOCKER_OUT=$? # Gets if the docker image has been built
+
+            # docker buildx build --platform=linux/amd64,linux/arm64 \
+            #     --load $BASEDIR --no-cache -t $docker_tag \
+            #     --build-arg BASE_IMAGE="${base_img}" \
+            #     --build-arg GPU_FLAG="${gpu_flag}" \
+            #     --build-arg PYTHON_VERSION="${python_version}" \
+            #     --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
+            #     --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
+            #     --build-arg NOTEBOOK_NAME="${notebook_name}" \
+            #     --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
+
+            docker build $BASEDIR --no-cache --platform linux/amd64 -t $docker_tag \
+                --build-arg BASE_IMAGE="${base_img}" \
+                --build-arg GPU_FLAG="${gpu_flag}" \
+                --build-arg PYTHON_VERSION="${python_version}" \
+                --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
+                --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
+                --build-arg NOTEBOOK_NAME="${notebook_name}" \
+                --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
+            DOCKER_OUT=$? # Gets if the docker image has been built
+        else
+            docker build $BASEDIR --no-cache -t $docker_tag \
+                --build-arg BASE_IMAGE="${base_img}" \
+                --build-arg GPU_FLAG="${gpu_flag}" \
+                --build-arg PYTHON_VERSION="${python_version}" \
+                --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
+                --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
+                --build-arg NOTEBOOK_NAME="${notebook_name}" \
+                --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
+
+            DOCKER_OUT=$? # Gets if the docker image has been built
+        fi
     else
         if [ "$build_flag" -eq 1 ]; then
             DOCKER_OUT=0 # In case that is already built, it is good to run
