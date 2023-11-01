@@ -396,8 +396,11 @@ else
         if [ $test_flag -eq 1 ] && [[ "$OSTYPE" != "darwin"* ]]; then
             # In case test is enabled and that the OS is not MacOS, instead of classic building, buildx will be used
             # in order to build for both arm64 and amd64
+            docker buildx create --use --name buildx_instance
+            
+
             docker buildx build --platform=linux/amd64,linux/arm64 \
-                $BASEDIR --no-cache -t $docker_tag \
+                --load $BASEDIR --no-cache -t $docker_tag \
                 --build-arg BASE_IMAGE="${base_img}" \
                 --build-arg GPU_FLAG="${gpu_flag}" \
                 --build-arg PYTHON_VERSION="${python_version}" \
