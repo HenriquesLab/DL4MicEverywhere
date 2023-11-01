@@ -123,7 +123,7 @@ else
     fi
 
     IFS=$'\n' read -d '' -r -a strarr <<<"$gui_arguments"
-    
+
     advanced_options=${strarr[0]}
 
     if [ $advanced_options -eq 0 ]; then
@@ -145,14 +145,14 @@ else
         gpu_flag=${strarr[6]}
         tag_aux=${strarr[7]}
 
-        if [ $notebook_aux != "-" ]; then
-            notebook_path="$notebook_aux"
+        if [ "$notebook_aux" != "-" ]; then
+            notebook_path=$notebook_aux
         fi
-        if [ $requirements_aux != "-" ]; then
-            requirements_path="$requirements_aux" 
+        if [ "$requirements_aux" != "-" ]; then
+            requirements_path=$requirements_aux 
         fi
-        if [ $tag_aux != "-" ]; then
-            docker_tag="$tag_aux" 
+        if [ "$tag_aux" != "-" ]; then
+            docker_tag=$tag_aux
         fi
     fi
 fi
@@ -349,7 +349,9 @@ else
                 esac
             done
         fi
-    else
+    fi
+
+    if [ "$build_flag" -eq 1 ]; then
         # In case the image is not locally, check if it is on docker hub
         possible_dockerhub_tag=henriqueslab/dl4miceverywhere:$docker_tag-v$version
         if [ "$gpu_flag" -eq 1 ]; then

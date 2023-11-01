@@ -104,7 +104,7 @@ proc onDone {} {
                         set txt_path "-"
                     }
                     if {"$tag" == ""} {
-                        set txt_path "-"
+                        set tag "-"
                     }
 
                     puts "$advanced_options"
@@ -295,7 +295,7 @@ ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable select
 place .fr.principal.notebooks -relx 0.01 -rely [expr 0.59 / ( 2 - $advanced_options ) ]
 bind .fr.principal.notebooks <<ComboboxSelected>> { parseYaml [%W get]}
 
-text .fr.principal.notebook_description -width [expr 35 + ($is_mac * 15) ] -height [expr 4 + ($is_mac * 2) ] -borderwidth 1 -relief sunken
+text .fr.principal.notebook_description -width [expr 35 + ($is_mac * 15) ] -height [expr 4 + ($is_mac * 2)] -borderwidth 1 -relief sunken
 place .fr.principal.notebook_description -relx 0.365 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
 
 # Define the button and display to load the path to the data folder
@@ -304,7 +304,7 @@ place .fr.principal.notebook_description -relx 0.365 -rely [expr 0.45 / ( 2 - $a
 label .fr.principal.data_label -text "Path to data folder:"
 place .fr.principal.data_label -relx 0.01 -rely [expr 0.67 / ( 2 - $advanced_options ) ]
 
-entry .fr.principal.data_entry -textvariable data_path -width 60
+entry .fr.principal.data_entry -textvariable data_path -width [expr 60 + ($is_mac * -5)]
 place .fr.principal.data_entry -relx 0.01 -rely [expr 0.74 / ( 2 - $advanced_options ) ]
 
 button .fr.principal.data_btn -text "Select" \
@@ -318,7 +318,7 @@ set data_path ""
 label .fr.principal.result_label -text "Path to output folder:"
 place .fr.principal.result_label -relx 0.01 -rely [expr 0.83 / ( 2 - $advanced_options ) ]
 
-entry .fr.principal.result_entry -textvariable result_path -width 60
+entry .fr.principal.result_entry -textvariable result_path -width [expr 60 + ($is_mac * -5)]
 place .fr.principal.result_entry -relx 0.01 -rely [expr 0.89 / ( 2 - $advanced_options ) ]
 
 button .fr.principal.result_btn -text "Select" \
@@ -349,7 +349,7 @@ place .fr.advanced.intro_6 -relx 0.01 -rely 0.30
 label .fr.advanced.yaml_label -text "Path to the configuration.yaml:"
 place .fr.advanced.yaml_label -relx 0.01 -rely 0.37
 
-entry .fr.advanced.yaml_entry -textvariable yaml_path -width 60
+entry .fr.advanced.yaml_entry -textvariable yaml_path -width [expr 60 + ($is_mac * -5)]
 place .fr.advanced.yaml_entry -relx 0.01 -rely 0.44
 
 button .fr.advanced.byp -text "Select" \
@@ -363,7 +363,7 @@ set yaml_path ""
 label .fr.advanced.ipynb_label -text "Path to the local notebook:"
 place .fr.advanced.ipynb_label -relx 0.01 -rely 0.52
 
-entry .fr.advanced.ipynb_entry -textvariable ipynb_path -width 60
+entry .fr.advanced.ipynb_entry -textvariable ipynb_path -width [expr 60 + ($is_mac * -5)]
 place .fr.advanced.ipynb_entry -relx 0.01 -rely 0.59
 
 button .fr.advanced.bnp -text "Select" \
@@ -377,7 +377,7 @@ set ipynb_path ""
 label .fr.advanced.txt_label -text "Path to the requirements.txt:"
 place .fr.advanced.txt_label -relx 0.01 -rely 0.67
 
-entry .fr.advanced.txt_entry -textvariable txt_path -width 60
+entry .fr.advanced.txt_entry -textvariable txt_path -width [expr 60 + ($is_mac * -5)]
 place .fr.advanced.txt_entry -relx 0.01 -rely 0.74
 
 button .fr.advanced.btp -text "Select" \
