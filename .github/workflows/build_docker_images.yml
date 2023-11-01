@@ -97,19 +97,26 @@ jobs:
               with:
                 cmd: yq '.version' '${{ matrix.notebook }}'  
 
+            - name: Get notebook_name
+              id: notebook_name
+              run: |
+                aux_docker_tag="$(basename ${{ steps.notebook_url.outputs.result }} .ipynb)"
+                notebook_name="$(echo $aux_docker_tag | tr '[:upper:]' '[:lower:]')"
+                echo "value=$notebook_name" >> $GITHUB_OUTPUT
+
             - name: Build and push without GPU
               uses: docker/build-push-action@v5
               with:
                 push: true
                 platforms: linux/amd64
-                tags: henriqueslab/dl4miceverywhere:${(echo $(basename ${{ steps.notebook_url.outputs.result }}-v${{ steps.version.outputs.result }} henriqueslab/dl4miceverywhere:${(echo $(basename ${{ steps.notebook_url.outputs.result }}-latest
+                tags: henriqueslab/dl4miceverywhere: ${{ steps.notebook_name.outputs.value }}-v${{ steps.version.outputs.result }} henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-latest
                 build-args: |
                   BASE_IMAGE="ubuntu:${{ steps.ubuntu_version.outputs.result }}"
                   GPU_FLAG=0
                   PYTHON_VERSION="${{ steps.python_version.outputs.result }}"
                   PATH_TO_NOTEBOOK="${{ steps.notebook_url.outputs.result }}"
                   PATH_TO_REQUIREMENTS="${{ steps.requirements_url.outputs.result }}"
-                  NOTEBOOK_NAME="${(echo $(basename ${{ steps.notebook_url.outputs.result }} .ipynb) | tr '[:upper:]' '[:lower:]')}"
+                  NOTEBOOK_NAME="${{ steps.notebook_name.outputs.value }}"
                   SECTIONS_TO_REMOVE="${{ steps.sections_to_remove.outputs.result }}"
 
             - name: Build and push with GPU
@@ -117,12 +124,12 @@ jobs:
               with:
                 push: true
                 platforms: linux/amd64
-                tags: henriqueslab/dl4miceverywhere:${(echo $(basename ${{ steps.notebook_url.outputs.result }}-gpu-v${{ steps.version.outputs.result }} henriqueslab/dl4miceverywhere:${(echo $(basename ${{ steps.notebook_url.outputs.result }}-gpu-latest
+                tags: henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-gpu-v${{ steps.version.outputs.result }} henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-gpu-latest
                 build-args: |
                   BASE_IMAGE="nvidia/cuda:${{ steps.cuda_version.outputs.result }}-base-ubuntu${{ steps.ubuntu_version.outputs.result }}"
                   GPU_FLAG=1
                   PYTHON_VERSION="${{ steps.python_version.outputs.result }}"
                   PATH_TO_NOTEBOOK="${{ steps.notebook_url.outputs.result }}"
                   PATH_TO_REQUIREMENTS="${{ steps.requirements_url.outputs.result }}"
-                  NOTEBOOK_NAME="${(echo $(basename ${{ steps.notebook_url.outputs.result }} .ipynb) | tr '[:upper:]' '[:lower:]')}"
+                  NOTEBOOK_NAME="${{ steps.notebook_name.outputs.value }}"
                   SECTIONS_TO_REMOVE="${{ steps.sections_to_remove.outputs.result }}"
