@@ -102,9 +102,9 @@ jobs:
                   aux_docker_tag="$(basename ${{ steps.notebook_url.outputs.result }} .ipynb)"
                   notebook_name="$(echo $aux_docker_tag | tr '[:upper:]' '[:lower:]')"
 
-                  docker buildx create --name mybuilder
+                  docker buildx create --node --name mybuilder
                   docker buildx use mybuilder
-                  docker buildx build --node --platform linux/amd64,linux/arm64 --push . \
+                  docker buildx build --platform linux/amd64,linux/arm64 --push . \
                          --tag henriqueslab/dl4miceverywhere:$notebook_name-v${{ steps.version.outputs.result }} \
                          --tag henriqueslab/dl4miceverywhere:$notebook_name-latest \
                          --build-arg BASE_IMAGE="ubuntu: ${{ steps.ubuntu_version.outputs.result }}" \
