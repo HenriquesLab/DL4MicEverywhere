@@ -1,4 +1,4 @@
-name: Build Docker Images
+name: Buildx Docker Images
 
 on:
     workflow_dispatch:
