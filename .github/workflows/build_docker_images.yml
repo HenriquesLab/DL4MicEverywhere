@@ -97,39 +97,32 @@ jobs:
               with:
                 cmd: yq '.version' '${{ matrix.notebook }}'  
 
-            - name: Build and push image
-              run: |
-                  aux_docker_tag="$(basename ${{ steps.notebook_url.outputs.result }} .ipynb)"
-                  notebook_name="$(echo $aux_docker_tag | tr '[:upper:]' '[:lower:]')"
+            - name: Build and push without GPU
+              uses: docker/build-push-action@v5
+              with:
+                push: true
+                platforms: linux/amd64
+                tags: henriqueslab/dl4miceverywhere:${(echo $(basename ${{ steps.notebook_url.outputs.result }}-v${{ steps.version.outputs.result }} henriqueslab/dl4miceverywhere:${(echo $(basename ${{ steps.notebook_url.outputs.result }}-latest
+                build-args: |
+                  BASE_IMAGE="ubuntu:${{ steps.ubuntu_version.outputs.result }}"
+                  GPU_FLAG=0
+                  PYTHON_VERSION="${{ steps.python_version.outputs.result }}"
+                  PATH_TO_NOTEBOOK="${{ steps.notebook_url.outputs.result }}"
+                  PATH_TO_REQUIREMENTS="${{ steps.requirements_url.outputs.result }}"
+                  NOTEBOOK_NAME="${(echo $(basename ${{ steps.notebook_url.outputs.result }} .ipynb) | tr '[:upper:]' '[:lower:]')}"
+                  SECTIONS_TO_REMOVE="${{ steps.sections_to_remove.outputs.result }}"
 
-                  docker buildx create --node mybuilder
-                  docker buildx use mybuilder
-                  docker buildx build --platform linux/amd64,linux/arm64 --push . \
-                         --tag henriqueslab/dl4miceverywhere:$notebook_name-v${{ steps.version.outputs.result }} \
-                         --tag henriqueslab/dl4miceverywhere:$notebook_name-latest \
-                         --build-arg BASE_IMAGE="ubuntu:${{ steps.ubuntu_version.outputs.result }}" \
-                         --build-arg GPU_FLAG=0 \
-                         --build-arg PYTHON_VERSION="${{ steps.python_version.outputs.result }}" \
-                         --build-arg PATH_TO_NOTEBOOK="${{ steps.notebook_url.outputs.result }}" \
-                         --build-arg PATH_TO_REQUIREMENTS="${{ steps.requirements_url.outputs.result }}" \
-                         --build-arg NOTEBOOK_NAME="${notebook_name}" \
-                         --build-arg SECTIONS_TO_REMOVE="${{ steps.sections_to_remove.outputs.result }}" \
-                         
-                  docker buildx rmv mybuilder
-                  docker system prune -a
-
-                  docker buildx create --node mybuilder
-                  docker buildx use mybuilder
-                  docker buildx build --platform linux/amd64,linux/arm64 --push . \
-                         --tag henriqueslab/dl4miceverywhere:$notebook_name-gpu-v${{ steps.version.outputs.result }} \
-                         --tag henriqueslab/dl4miceverywhere:$notebook_name-gpu-latest \
-                         --build-arg BASE_IMAGE="nvidia/cuda:${{ steps.cuda_version.outputs.result }}-base-ubuntu${{ steps.ubuntu_version.outputs.result }}" \
-                         --build-arg GPU_FLAG=1 \
-                         --build-arg PYTHON_VERSION="${{ steps.python_version.outputs.result }}" \
-                         --build-arg PATH_TO_NOTEBOOK="${{ steps.notebook_url.outputs.result }}" \
-                         --build-arg PATH_TO_REQUIREMENTS="${{ steps.requirements_url.outputs.result }}" \
-                         --build-arg NOTEBOOK_NAME="${notebook_name}" \
-                         --build-arg SECTIONS_TO_REMOVE="${{ steps.sections_to_remove.outputs.result }}" \
-                         
-                  docker buildx rmv mybuilder
-                  docker system prune -a
+            - name: Build and push with GPU
+              uses: docker/build-push-action@v5
+              with:
+                push: true
+                platforms: linux/amd64
+                tags: henriqueslab/dl4miceverywhere:${(echo $(basename ${{ steps.notebook_url.outputs.result }}-gpu-v${{ steps.version.outputs.result }} henriqueslab/dl4miceverywhere:${(echo $(basename ${{ steps.notebook_url.outputs.result }}-gpu-latest
+                build-args: |
+                  BASE_IMAGE="nvidia/cuda:${{ steps.cuda_version.outputs.result }}-base-ubuntu${{ steps.ubuntu_version.outputs.result }}"
+                  GPU_FLAG=1
+                  PYTHON_VERSION="${{ steps.python_version.outputs.result }}"
+                  PATH_TO_NOTEBOOK="${{ steps.notebook_url.outputs.result }}"
+                  PATH_TO_REQUIREMENTS="${{ steps.requirements_url.outputs.result }}"
+                  NOTEBOOK_NAME="${(echo $(basename ${{ steps.notebook_url.outputs.result }} .ipynb) | tr '[:upper:]' '[:lower:]')}"
+                  SECTIONS_TO_REMOVE="${{ steps.sections_to_remove.outputs.result }}"
