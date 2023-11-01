@@ -107,7 +107,7 @@ jobs:
                   docker buildx build --platform linux/amd64,linux/arm64 --push . \
                          --tag henriqueslab/dl4miceverywhere:$notebook_name-v${{ steps.version.outputs.result }} \
                          --tag henriqueslab/dl4miceverywhere:$notebook_name-latest \
-                         --build-arg BASE_IMAGE="ubuntu: ${{ steps.ubuntu_version.outputs.result }}" \
+                         --build-arg BASE_IMAGE="ubuntu:${{ steps.ubuntu_version.outputs.result }}" \
                          --build-arg GPU_FLAG=0 \
                          --build-arg PYTHON_VERSION="${{ steps.python_version.outputs.result }}" \
                          --build-arg PATH_TO_NOTEBOOK="${{ steps.notebook_url.outputs.result }}" \

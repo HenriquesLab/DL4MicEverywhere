@@ -132,12 +132,42 @@ jobs:
     needs: [check_keys, check_urls]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
             fetch-depth: 0
-      - run: ls
-      - name: Check running the 'docker build command'
-        run: |
-          sudo bash launch.sh -c '${{ inputs.config_file }}' -d . -o . -x
-          exit $?
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3   
+      
+      - name: Build without GPU
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            BASE_IMAGE="ubuntu:${{ steps.ubuntu_version.outputs.result }}"
+            GPU_FLAG=0
+            PYTHON_VERSION="${{ steps.python_version.outputs.result }}"
+            PATH_TO_NOTEBOOK="${{ steps.notebook_url.outputs.result }}"
+            PATH_TO_REQUIREMENTS="${{ steps.requirements_url.outputs.result }}"
+            NOTEBOOK_NAME="${(echo $(basename ${{ steps.notebook_url.outputs.result }} .ipynb) | tr '[:upper:]' '[:lower:]')}"
+            SECTIONS_TO_REMOVE="${{ steps.sections_to_remove.outputs.result }}"
+            
+      - name: Build with GPU
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            BASE_IMAGE="nvidia/cuda:${{ steps.cuda_version.outputs.result }}-base-ubuntu${{ steps.ubuntu_version.outputs.result }}"
+            GPU_FLAG=1
+            PYTHON_VERSION="${{ steps.python_version.outputs.result }}"
+            PATH_TO_NOTEBOOK="${{ steps.notebook_url.outputs.result }}"
+            PATH_TO_REQUIREMENTS="${{ steps.requirements_url.outputs.result }}"
+            NOTEBOOK_NAME="${(echo $(basename ${{ steps.notebook_url.outputs.result }} .ipynb) | tr '[:upper:]' '[:lower:]')}"
+            SECTIONS_TO_REMOVE="${{ steps.sections_to_remove.outputs.result }}"
+        
     
