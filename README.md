@@ -7,12 +7,12 @@
 
 # DL4MicEverywhere
 
-DL4MicEverywhere provides researchers an accessible gateway to state-of-the-art deep learning techniques for bioimage analysis through interactive Jupyter notebooks with intuitive graphical interfaces that require no coding expertise. It expands the capabilities of [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) by enabling users to run the notebooks locally on their own machines or remotely on diverse computing infrastructure including laptops, workstations, high-performance computing (HPC) and cloud infrastructure.
+DL4MicEverywhere provides researchers an accessible gateway to state-of-the-art deep learning techniques for bioimage analysis through interactive Jupyter notebooks with intuitive graphical interfaces that require no coding expertise. It expands the capabilities of [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) by enabling users to run the notebooks locally on their own machines or remotely on diverse computing infrastructure including laptops, workstations, high-performance computing (HPC) and cloud infrastructure. It uses [Docker containers](https://hub.docker.com/repository/docker/henriqueslab/dl4miceverywhere) to maximize portability and reproducibility, ensuring seamless operation across diverse computing environments.
 
 ## Key Features
 
 - 15 Jupyter notebooks with intuitive graphical interface requiring no coding (scaling to 28+ soon) 
-- Docker-based packaging for enhanced portability and reproducibility
+- Docker-based [packaging](https://hub.docker.com/repository/docker/henriqueslab/dl4miceverywhere) for enhanced portability and reproducibility
 - Expanding [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic)'s capabilities for local use
 - Covers a wide range of microscopy analysis tasks, including segmentation, reconstruction, registration, denoising, and more
 - Compatible with various computing environments, including laptops, workstations, HPC, and cloud with Docker
