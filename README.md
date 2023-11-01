@@ -7,7 +7,9 @@
 
 # DL4MicEverywhere
 
-DL4MicEverywhere provides researchers an accessible gateway to state-of-the-art deep learning techniques for bioimage analysis through interactive Jupyter notebooks with intuitive graphical interfaces that require no coding expertise. It expands the capabilities of [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) by enabling users to run the notebooks locally on their own machines or remotely on diverse computing infrastructure including laptops, workstations, high-performance computing (HPC) and cloud infrastructure. It uses [Docker containers](https://hub.docker.com/repository/docker/henriqueslab/dl4miceverywhere) to maximize portability and reproducibility, ensuring seamless operation across diverse computing environments.
+DL4MicEverywhere provides researchers an accessible gateway to state-of-the-art deep learning techniques for bioimage analysis through interactive Jupyter notebooks with intuitive graphical interfaces that require no coding expertise. It expands the capabilities of [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) by enabling users to run the notebooks locally on their own machines or remotely on diverse computing infrastructure including laptops, workstations, high-performance computing (HPC) and cloud infrastructure. 
+
+It uses Docker [containers](https://hub.docker.com/repository/docker/henriqueslab/dl4miceverywhere) to maximize portability and reproducibility, ensuring seamless operation across diverse computing environments.
 
 ## Key Features
 
