@@ -2,7 +2,7 @@
 
 # Define the shape of the window
 set width 600
-set height 700
+set height 750
 set width_offset [expr { ( [winfo vrootwidth  .] - $width  ) / 2 }]
 set height_offset [expr { ( [winfo vrootheight .] - $height ) / 2 }]
 
@@ -58,6 +58,8 @@ proc onDone {} {
 
     global data_path
     global result_path
+    global gpu
+    global tag
 
     if {"$data_path" == ""} {
         tk_messageBox -type ok -icon error -title Error \
@@ -73,6 +75,7 @@ proc onDone {} {
                 # The user has selected the simple mode
                 global selectedFolder
                 global selectedNotebook
+
                 if {"$selectedNotebook" == "-"} {
                     tk_messageBox -type ok -icon error -title Error \
                     -message "SIMPLE MODE: You need to specify a notebook."
@@ -82,6 +85,8 @@ proc onDone {} {
                     puts "$result_path"
                     puts "$selectedFolder"
                     puts "$selectedNotebook"
+                    puts "$gpu"
+                    puts "$tag"
                     
                     exit 0
                 }
@@ -90,8 +95,6 @@ proc onDone {} {
                 global yaml_path
                 global ipynb_path
                 global txt_path
-                global gpu
-                global tag
                 
                 if {"$yaml_path" == ""} {
                     tk_messageBox -type ok -icon error -title Error \
@@ -155,18 +158,22 @@ proc onAdvanced {} {
     place .fr.principal.intro_6 -relx 0.01 -rely [expr 0.30 / ( 2 - $advanced_options ) ]
     place .fr.principal.intro_7 -relx 0.01 -rely [expr 0.36 / ( 2 - $advanced_options ) ]
 
-    place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
-    place .fr.principal.notebooks_folders -relx 0.01 -rely [expr 0.51 / ( 2 - $advanced_options ) ]
-    place .fr.principal.notebooks -relx 0.01 -rely [expr 0.59 / ( 2 - $advanced_options ) ]
-    place .fr.principal.notebook_description -relx 0.365 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.43 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebooks_folders -relx 0.01 -rely [expr 0.49 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebooks -relx 0.01 -rely [expr 0.56 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebook_description -relx 0.365 -rely [expr 0.42 / ( 2 - $advanced_options ) ]
 
-    place .fr.principal.data_label -relx 0.01 -rely [expr 0.67 / ( 2 - $advanced_options ) ]
-    place .fr.principal.data_entry -relx 0.01 -rely [expr 0.74 / ( 2 - $advanced_options ) ]
-    place .fr.principal.data_btn -relx 0.87 -rely [expr 0.735 / ( 2 - $advanced_options ) ]
+    place .fr.principal.data_label -relx 0.01 -rely [expr 0.63 / ( 2 - $advanced_options ) ]
+    place .fr.principal.data_entry -relx 0.01 -rely [expr 0.69 / ( 2 - $advanced_options ) ]
+    place .fr.principal.data_btn -relx 0.87 -rely [expr 0.685 / ( 2 - $advanced_options ) ]
 
-    place .fr.principal.result_label -relx 0.01 -rely [expr 0.83 / ( 2 - $advanced_options ) ]
-    place .fr.principal.result_entry -relx 0.01 -rely [expr 0.89 / ( 2 - $advanced_options ) ]
-    place .fr.principal.result_btn -relx 0.87 -rely [expr 0.885 / ( 2 - $advanced_options ) ]
+    place .fr.principal.result_label -relx 0.01 -rely [expr 0.77 / ( 2 - $advanced_options ) ]
+    place .fr.principal.result_entry -relx 0.01 -rely [expr 0.83 / ( 2 - $advanced_options ) ]
+    place .fr.principal.result_btn -relx 0.87 -rely [expr 0.825 / ( 2 - $advanced_options ) ]
+
+    place .fr.principal.gpu -relx 0.2 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
+    place .fr.principal.tag_label -relx 0.4 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
+    place .fr.principal.tag -relx 0.53 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
 
 }
 
@@ -285,47 +292,62 @@ set selectedNotebook "-"
 font create myFont -family Helvetica -size 10
 
 label .fr.principal.notebook_label -text "List of default notebooks:"
-place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
+place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.43 / ( 2 - $advanced_options ) ]
 
 ttk::combobox .fr.principal.notebooks_folders -values $folderList -textvariable selectedFolder -state readonly
-place .fr.principal.notebooks_folders -relx 0.01 -rely [expr 0.51 / ( 2 - $advanced_options ) ]
+place .fr.principal.notebooks_folders -relx 0.01 -rely [expr 0.49 / ( 2 - $advanced_options ) ]
 bind .fr.principal.notebooks_folders <<ComboboxSelected>> { onComboboxFolder [%W get]}
 
 ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable selectedNotebook -state readonly
-place .fr.principal.notebooks -relx 0.01 -rely [expr 0.59 / ( 2 - $advanced_options ) ]
+place .fr.principal.notebooks -relx 0.01 -rely [expr 0.56 / ( 2 - $advanced_options ) ]
 bind .fr.principal.notebooks <<ComboboxSelected>> { parseYaml [%W get]}
 
 text .fr.principal.notebook_description -width [expr 35 + ($is_mac * 15) ] -height [expr 4 + ($is_mac * 2)] -borderwidth 1 -relief sunken
-place .fr.principal.notebook_description -relx 0.365 -rely [expr 0.45 / ( 2 - $advanced_options ) ]
+place .fr.principal.notebook_description -relx 0.365 -rely [expr 0.42 / ( 2 - $advanced_options ) ]
 
 # Define the button and display to load the path to the data folder
 
 
 label .fr.principal.data_label -text "Path to data folder:"
-place .fr.principal.data_label -relx 0.01 -rely [expr 0.67 / ( 2 - $advanced_options ) ]
+place .fr.principal.data_label -relx 0.01 -rely [expr 0.63 / ( 2 - $advanced_options ) ]
 
 entry .fr.principal.data_entry -textvariable data_path -width [expr 60 + ($is_mac * -5)]
-place .fr.principal.data_entry -relx 0.01 -rely [expr 0.74 / ( 2 - $advanced_options ) ]
+place .fr.principal.data_entry -relx 0.01 -rely [expr 0.69 / ( 2 - $advanced_options ) ]
 
 button .fr.principal.data_btn -text "Select" \
         -command "onSelectData"
-place .fr.principal.data_btn -relx 0.87 -rely [expr 0.735 / ( 2 - $advanced_options ) ]
+place .fr.principal.data_btn -relx 0.87 -rely [expr 0.685 / ( 2 - $advanced_options ) ]
 
 set data_path ""
 
 # Define the button and display to load the path to the result folder
 
 label .fr.principal.result_label -text "Path to output folder:"
-place .fr.principal.result_label -relx 0.01 -rely [expr 0.83 / ( 2 - $advanced_options ) ]
+place .fr.principal.result_label -relx 0.01 -rely [expr 0.77 / ( 2 - $advanced_options ) ]
 
 entry .fr.principal.result_entry -textvariable result_path -width [expr 60 + ($is_mac * -5)]
-place .fr.principal.result_entry -relx 0.01 -rely [expr 0.89 / ( 2 - $advanced_options ) ]
+place .fr.principal.result_entry -relx 0.01 -rely [expr 0.83 / ( 2 - $advanced_options ) ]
 
 button .fr.principal.result_btn -text "Select" \
         -command "onSelectResult"
-place .fr.principal.result_btn -relx 0.87 -rely [expr 0.885 / ( 2 - $advanced_options ) ]
+place .fr.principal.result_btn -relx 0.87 -rely [expr 0.825 / ( 2 - $advanced_options ) ]
 
 set result_path ""
+
+# Define the checkbutton for the GPU usage
+
+checkbutton .fr.principal.gpu -text "Allow GPU" -variable gpu
+place .fr.principal.gpu -relx 0.2 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
+
+# Define the docker tag text entry
+
+label .fr.principal.tag_label -text "Docker tag:"
+place .fr.principal.tag_label -relx 0.4 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
+
+entry .fr.principal.tag -textvariable tag -width 20
+place .fr.principal.tag -relx 0.53 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
+
+set tag ""
 
 ##### Advanced arguments section #####
 
@@ -385,21 +407,6 @@ button .fr.advanced.btp -text "Select" \
 place .fr.advanced.btp -relx 0.87 -rely 0.735
 
 set txt_path ""
-
-# Define the checkbutton for the GPU usage
-
-checkbutton .fr.advanced.gpu -text "Allow GPU" -variable gpu
-place .fr.advanced.gpu -relx 0.2 -rely 0.87
-
-# Define the docker tag text entry
-
-label .fr.advanced.tag_label -text "Docker tag:"
-place .fr.advanced.tag_label -relx 0.4 -rely 0.87
-
-entry .fr.advanced.tag -textvariable tag -width 20
-place .fr.advanced.tag -relx 0.545 -rely 0.865 
-
-set tag ""
 
 ##### Create a window #####
 

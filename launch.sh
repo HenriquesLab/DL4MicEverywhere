@@ -125,11 +125,8 @@ else
         result_path=${strarr[2]}
         selectedFolder=${strarr[3]}
         selectedNotebook=${strarr[4]}
-
-        echo "Path to the data folder: $data_path"
-        echo "Path to the output folder: $result_path"
-        echo "Selected folder: $selectedFolder"
-        echo "Selected notebook: $selectedNotebook"
+        gpu_flag=${strarr[5]}
+        tag_aux=${strarr[6]}
 
         config_path=$BASEDIR/notebooks/$selectedFolder/$selectedNotebook/configuration.yaml
     else
@@ -143,14 +140,6 @@ else
         
         gpu_flag=${strarr[6]}
         tag_aux=${strarr[7]}
-
-        echo "Path to the data folder: $data_path"
-        echo "Path to the output folder: $result_path"
-        echo "Path to the configuration file: $config_path"
-        echo "Notebook path: $notebook_aux"
-        echo "Requirements path: $requirements_aux"
-        echo "GPU flag: $gpu_flag"
-        echo "Tag: $tag_aux"
 
         if [ "$notebook_aux" != "-" ]; then
             notebook_path=$notebook_aux
