@@ -1,4 +1,4 @@
-# Brief overview of Docker 
+# Brief overview of Docker desktop 
 
 Docker containers and images can be managed from the Docker desktop application. It is particularly useful to see how many Docker images are installed in our computer and how many containers are actually running them.
 
