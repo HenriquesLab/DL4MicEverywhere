@@ -123,6 +123,9 @@ While building or pulling the image, your terminal window will look like this:
      width="60%" 
      height="60%" />
 
+     
+Docker images occupy between 3 and 5 GB of memory, so it is convenient to take a look at them from time to time. Check how to do it [here](DOCKER_DESKTOP.md)
+
 ## 4. Run Jupyter Lab
 
 After building the a Docker image and running a container to run the notebooks, DL4MicEverywhere will automatically run Jupyter Lab in the terminal. You need to copy the link and paste it in your favourite browser as follows:
