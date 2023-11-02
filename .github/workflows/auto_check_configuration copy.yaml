@@ -164,7 +164,9 @@ jobs:
       # super important if you want to see all results, even if one fails
       # fail-fast is true by default
       fail-fast: false
-      matrix: ${{ fromJson(needs.list_configs.outputs.matrix) }} 
+      matrix: 
+          architecture: [amd64, arm64]
+          configuration: ${{ fromJson(needs.list_configs.outputs.matrix) }} 
 
     name: Check running 'docker build' for amd64 and arm64 without GPU
     needs: [check_keys, check_urls, list_configs]
@@ -184,42 +186,42 @@ jobs:
         uses: mikefarah/yq@master
         id: notebook_url
         with:
-          cmd: yq '.notebook_url' '${{ matrix.notebook }}' 
+          cmd: yq '.notebook_url' '${{ matrix.configuration.notebook }}' 
       - name: Check requirements_url attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: requirements_url
         with:
-          cmd: yq '.requirements_url' '${{ matrix.notebook }}' 
+          cmd: yq '.requirements_url' '${{ matrix.configuration.notebook }}' 
       - name: Check cuda_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: cuda_version
         with:
-          cmd: yq '.cuda_version' '${{ matrix.notebook }}' 
+          cmd: yq '.cuda_version' '${{ matrix.configuration.notebook }}' 
       - name: Check ubuntu_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: ubuntu_version
         with:
-          cmd: yq '.ubuntu_version' '${{ matrix.notebook }}' 
+          cmd: yq '.ubuntu_version' '${{ matrix.configuration.notebook }}' 
       - name: Check python_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: python_version
         with:
-          cmd: yq '.python_version' '${{ matrix.notebook }}'
+          cmd: yq '.python_version' '${{ matrix.configuration.notebook }}'
       - name: Check sections_to_remove attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: sections_to_remove
         with:
-          cmd: yq '.sections_to_remove' '${{ matrix.notebook }}'  
+          cmd: yq '.sections_to_remove' '${{ matrix.configuration.notebook }}'  
       - name: Check version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: version
         with:
-          cmd: yq '.version' '${{ matrix.notebook }}'  
+          cmd: yq '.version' '${{ matrix.configuration.notebook }}'  
       - name: Check description attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: description
         with:
-          cmd: yq '.description' '${{ matrix.notebook }}'  
+          cmd: yq '.description' '${{ matrix.configuration.notebook }}'  
 
       - name: Get notebook_name
         id: notebook_name
@@ -232,7 +234,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: false
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/${{ matrix.architecture }}
           build-args: |
             BASE_IMAGE=ubuntu:${{ steps.ubuntu_version.outputs.result }}
             GPU_FLAG=0
@@ -249,7 +251,9 @@ jobs:
       # super important if you want to see all results, even if one fails
       # fail-fast is true by default
       fail-fast: false
-      matrix: ${{ fromJson(needs.list_configs.outputs.matrix) }} 
+      matrix: 
+          architecture: [amd64, arm64]
+          configuration: ${{ fromJson(needs.list_configs.outputs.matrix) }} 
 
     name: Check running 'docker build' for amd64 and arm64 without GPU
     needs: [check_keys, check_urls, list_configs]
@@ -269,42 +273,43 @@ jobs:
         uses: mikefarah/yq@master
         id: notebook_url
         with:
-          cmd: yq '.notebook_url' '${{ matrix.notebook }}' 
+          cmd: yq '.notebook_url' '${{ matrix.configuration.notebook }}' 
       - name: Check requirements_url attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: requirements_url
         with:
-          cmd: yq '.requirements_url' '${{ matrix.notebook }}' 
+          cmd: yq '.requirements_url' '${{ matrix.configuration.notebook }}' 
       - name: Check cuda_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: cuda_version
         with:
-          cmd: yq '.cuda_version' '${{ matrix.notebook }}' 
+          cmd: yq '.cuda_version' '${{ matrix.configuration.notebook }}' 
       - name: Check ubuntu_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: ubuntu_version
         with:
-          cmd: yq '.ubuntu_version' '${{ matrix.notebook }}' 
+          cmd: yq '.ubuntu_version' '${{ matrix.configuration.notebook }}' 
       - name: Check python_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: python_version
         with:
-          cmd: yq '.python_version' '${{ matrix.notebook }}'
+          cmd: yq '.python_version' '${{ matrix.configuration.notebook }}'
       - name: Check sections_to_remove attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: sections_to_remove
         with:
-          cmd: yq '.sections_to_remove' '${{ matrix.notebook }}'  
+          cmd: yq '.sections_to_remove' '${{ matrix.configuration.notebook }}'  
       - name: Check version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: version
         with:
-          cmd: yq '.version' '${{ matrix.notebook }}'  
+          cmd: yq '.version' '${{ matrix.configuration.notebook }}'  
       - name: Check description attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: description
         with:
-          cmd: yq '.description' '${{ matrix.notebook }}'  
+          cmd: yq '.description' '${{ matrix.configuration.notebook }}'  
+
 
       - name: Get notebook_name
         id: notebook_name
@@ -317,7 +322,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: false
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/${{ matrix.architecture }}
           build-args: |
             BASE_IMAGE=nvidia/cuda:${{ steps.cuda_version.outputs.result }}-base-ubuntu${{ steps.ubuntu_version.outputs.result }}
             GPU_FLAG=1

@@ -325,12 +325,11 @@ if grep -q credsStore ~/.docker/config.json; then
 fi
 
 # Execute the pre building tests
-/bin/bash .tools/pre_build_test.sh
+/bin/bash .tools/pre_build_test.sh || exit 1
 
 # Check if an image with that tag exists locally and ask if the user whants to replace it.
 build_flag=0
 
-echo "After rebuild: docker image $docker_tag"
 # In case testing is chossing, the building is forced to be done, without questions
 if [ $test_flag -eq 1 ]; then
     # In case of testing, the building is always done
@@ -403,7 +402,7 @@ else
 fi
 
 # Execute the post building tests
-/bin/bash .tools/post_build_test.sh
+/bin/bash .tools/post_build_test.sh || exit 1
 
 # Local files, if included, need to be removed to avoid the overcrowding the folder
 if [ "$local_notebook_flag" -eq 1 ]; then
