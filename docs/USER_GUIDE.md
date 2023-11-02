@@ -104,7 +104,7 @@ Located outside the DL4MicEverywhere folder, so you can right-click it. Among th
 
 
 ### 2.2 - Launch the main program
-Once that you have open the terminal, you will need to use it in order to execute the main program that is on `launch.sh`. To introduce the input argument to the program you have to choose between these two different options:
+DL4MicEverywhere needs to be started from the terminal using `launch.sh`. There are two ways to work with it:
 
 * **Option 1**: [Launch it with the graphical user interface (GUI)](GUI_USER_GUIDE.md)
 * **Option 2**: [Launch it with the command line interface (CLI)](CLI_USER_GUIDE.md)
@@ -130,7 +130,7 @@ After building the a Docker image and running a container to run the notebooks, 
      width="60%" 
      height="60%" />
 
-At the end of this process you should see a window similar to this one in your browser. On the right column you will see a Data and Results folder, as well as the notebook you chose to open.
+At the end of this process, you should see a window similar to this one in your browser. On the right column, you will see a Data and Results folder, as well as the notebook you chose to open.
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/JUPYTERLAB.png" 
      alt="Jupyter Lab in the browser"
@@ -139,16 +139,18 @@ At the end of this process you should see a window similar to this one in your b
 
 ## 5. Work with DL4MicEverywhere notebooks
 
-The notebooks are inspired in ZeroCostDL4Mic and do not require programming skills to run them. When opening the notebook in Jupyter Lab, code cells are hidden with a message `# Run this cell to visualise the parameters and click the button to execute the code ...`. 
+The notebooks are inspired by ZeroCostDL4Mic and do not require programming skills to run them. When opening the notebook in Jupyter Lab, code cells are hidden with a message `# Run this cell to visualise the parameters and click the button to execute the code ...`. 
 
-When running the code cells (either by pressing Ctrl+Enter or clicking on the play symbol on the top bar of the notebook), an interactive menu appears as shown in the image. In this menu you can specify any needed parameter. After specifying all the parameters, click on "Load and run". Note that if you do not click, the code of that cell will not run. Likewise, if you run the cell again, the parameters will need to be specified again. 
-
-IMPORTANT: Docker is running on a virtual machine, so the main path is `/home/` and anything shown on the left directory, is placed inside `/home/`. This means that when we want to provide the path to `data` in the code, we need to indicate it as `"/home/data"`.  (See the screenshots).
+When running the code cells (either by pressing `Ctrl+Enter` or clicking on the play symbol on the top bar of the notebook), an interactive menu appears as shown in the image. In this menu you can specify any needed parameter. After specifying all the parameters, click on "Load and run". Note that if you do not click, the code of that cell will not run. Likewise, if you run the cell again, the parameters will need to be specified again. 
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/NOTEBOOK_PARAMS.png" 
      alt="Notebook parameters"
-     width="60%" 
-     height="60%" />
+     width="100%" 
+     height="100%" />
+
+**IMPORTANT**: 
+- Docker is running on a virtual machine, so the main path is `/home/` and anything shown on the left directory, is placed inside `/home/`. This means that when we want to provide the path to `data` in the code, we need to indicate it as `"/home/data"`.
+- Anything stored out of the `Data` and `Results` folder will disappear when stopping the docker container or closing the terminal. Thus, anything you want to save, including the notebook, needs to be placed in the Results folder. 
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/JUPYTERLAB_DIR.png" 
      alt="Jupyter Lab home directory"
