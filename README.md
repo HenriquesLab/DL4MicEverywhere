@@ -66,6 +66,7 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 - [Data Preparation](docs/DATA.md)
 - [Example Notebooks](examples)
 - [Contributing Guidelines](CONTRIBUTING.md)
+- [Docker desktop](docs/DOCKER_DESKTOP.md)
 - [Technical Design](docs/DESIGN.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Notebook Types](docs/NOTEBOOK_TYPES.md)
