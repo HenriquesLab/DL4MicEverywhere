@@ -8,7 +8,9 @@ To use DL4MicEverywhere, you need:
 
 - Docker installed on your system 
 - For GPU usage - NVIDIA GPU + CUDA drivers
-- If you want to run the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/) has to be installed on your computer. Check further instructions [here](GUI_USER_GUIDE.md).
+- If you want to run the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/) has to be installed on your computer. 
+
+Check detailed installation guidelines [here](INSTALLATION.md).
 
 **Clone the repo:**
 
@@ -48,45 +50,20 @@ This will build a Docker container for the selected notebook and then start it. 
 
 And you're ready to run deep learning workflows through an intuitive UI!
 
-# Step-by-step documentation
 
-## 1. Install the requirements
+# Step-by-step user guide
 
-First of all you will need to install Docker Desktop on your computer. You can follow the official provided guidelines based on your operative system:
+Please, follow the installation guidelines [here](INSTALLATION.md).
 
-* Windows: https://docs.docker.com/desktop/install/windows-install/
-* Linux: https://docs.docker.com/desktop/install/linux-install/
-* Mac: https://docs.docker.com/desktop/install/mac-install/
-
-## 2. Download the DL4MicEverywhere repository
-
-* **Option 1**: Download the ZIP file from GitHub's repository
-
-    1.- Download a ZIP file with the DL4MicEverywhere repository by clicking [here](https://github.com/HenriquesLab/DL4MicEverywhere/archive/refs/heads/main.zip).
-
-    2.- Decompress the downloaded file.
-
-* **Option 2**: Download from the terminal using git
-
-    > ❗**IMPORTANT**:
-    > You need to have `git` installed. If you do not have, follow the [official installation steps](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
-
-    > ℹ️ **NOTE**:
-    > You need to be located in the folder where you want to download the DL4MicEverywhere repository.
-
-    ```
-    git clone https://github.com/HenriquesLab/DL4MicEverywhere.git
-    ```
-
-## 3. Launch the Docker Desktop application
+## 1. Launch the Docker Desktop application
 
 Docker Desktop application needs to be running while using DL4MicEverywhere. For this, open the recently installed Docker Desktop application. After checking on the agreement notes you should see a window like this:
 
 ![Docker desktop application](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/Docker_desktop.png)
 
-## 4. Launch DL4MicEverywhere
+## 2. Launch DL4MicEverywhere
 
-### 4.1 - Open a terminal in the downloaded DL4MicEverywhere folder
+### 2.1 - Open a terminal in the downloaded DL4MicEverywhere folder
 Check the screenshots below to see how to open a terminal in different operating systems.
 
 <details>
@@ -126,7 +103,7 @@ Located outside the DL4MicEverywhere folder, so you can right-click it. Among th
 </details>
 
 
-### 4.2 - Launch the main program
+### 2.2 - Launch the main program
 Once that you have open the terminal, you will need to use it in order to execute the main program that is on `launch.sh`. To introduce the input argument to the program you have to choose between these two different options:
 
 * **Option 1**: [Launch it with the graphical user interface (GUI)](GUI_USER_GUIDE.md)
