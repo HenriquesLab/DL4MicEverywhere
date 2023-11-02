@@ -1,12 +1,6 @@
 name: Checks a modified configuration.yaml
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
-      - '**.txt'
   pull_request:
     types: [opened, reopened]
     branches:
@@ -14,6 +8,7 @@ on:
     paths-ignore:
       - '**.md'
       - '**.txt'
+      
 jobs:
   extract_changed_files:
     
@@ -60,7 +55,7 @@ jobs:
     
   check_keys:
     if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
-    runs-on: [self-hosted, dl4miceverywhere-builder]
+    runs-on: [ubuntu-latest]
     strategy:
       # super important if you want to see all results, even if one fails
       # fail-fast is true by default
@@ -144,7 +139,7 @@ jobs:
           fi
   
   check_urls:  
-    runs-on: [self-hosted, dl4miceverywhere-builder]
+    runs-on: [ubuntu-latest]
     strategy:
       # super important if you want to see all results, even if one fails
       # fail-fast is true by default
@@ -178,7 +173,7 @@ jobs:
           arguments: ${{ steps.extract_rq_url.outputs.result }}
 
   check_docker_build_without_gpu:
-    runs-on: [self-hosted, dl4miceverywhere-builder]
+    runs-on: [ubuntu-latest]
     strategy:
       # super important if you want to see all results, even if one fails
       # fail-fast is true by default
@@ -263,7 +258,7 @@ jobs:
             
           
   check_docker_build_with_gpu:
-    runs-on: [self-hosted, dl4miceverywhere-builder]
+    runs-on: [ubuntu-latest]
     strategy:
       # super important if you want to see all results, even if one fails
       # fail-fast is true by default

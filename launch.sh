@@ -425,8 +425,6 @@ if [ "$local_requirements_flag" -eq 1 ]; then
    rm $BASEDIR/requirements.txt
 fi
 
-echo "DOCKER_OUT: $DOCKER_OUT"
-
 # If it has been built, run the docker
 if [ "$DOCKER_OUT" -eq 0 ]; then
     if [ $test_flag -eq 1 ]; then
@@ -444,8 +442,6 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
             port=8000
         fi
     done
-
-    echo "GASEGA"
 
     if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
