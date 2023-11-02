@@ -355,17 +355,30 @@ else
         # In case the local image option has not been selected
 
         if docker manifest inspect "${docker_tag}" >/dev/null 2>&1; then
-            if [ $gui_flag -eq 1 ]; then 
-                # If the GUI flag has been specified, show a window for ansewring hub question
-                build_flag=$(wish .tools/hub_img_gui.tcl)
+            # In case the image is available on docker hub
+
+            # Get the architecture of the machine
+            local_arch=$(uname -m)
+            # Count the ocurrences of that architecture in the docker manifest of that image
+            arch_count=$(docker manifest inspect "${docker_tag}" -v | grep 'architecture' | grep -c '$local_arch')
+
+            if [ $arch_count -gt 0 ]; then
+                # In case the architecture is available
+                if [ $gui_flag -eq 1 ]; then 
+                    # If the GUI flag has been specified, show a window for ansewring hub question
+                    build_flag=$(wish .tools/hub_img_gui.tcl)
+                else
+                    echo "The image ${docker_tag} is already available on docker hub. Do you preffer to pull it (faster option) instead of building it?"
+                    select yn in "Yes" "No"; do
+                        case $yn in
+                            Yes ) build_flag=3; break;;
+                            No )  build_flag=2; break;;
+                        esac
+                    done
+                fi
             else
-                echo "The image ${docker_tag} is already available on docker hub. Do you preffer to pull it (faster option) instead of building it?"
-                select yn in "Yes" "No"; do
-                    case $yn in
-                        Yes ) build_flag=3; break;;
-                        No )  build_flag=2; break;;
-                    esac
-                done
+                # In case the architecture is not available
+                build_flag=2
             fi
         else
             build_flag=2
