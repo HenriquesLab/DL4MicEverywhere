@@ -80,14 +80,14 @@ First of all you will need to install Docker Desktop on your computer. You can f
 
 ## 3. Launch the Docker Desktop application
 
-Open the application installed on first step, you will be asked different agreements and at the end you should arrive to a window like this:
+Docker Desktop application needs to be running while using DL4MicEverywhere. For this, open the recently installed Docker Desktop application. After checking on the agreement notes you should see a window like this:
 
 ![Docker desktop application](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/Docker_desktop.png)
 
 ## 4. Launch DL4MicEverywhere
 
 ### 4.1 - Open a terminal in the downloaded DL4MicEverywhere folder
-Below there are screenshots in each operative system in case you need a hint to open the terminal.
+Check the screenshots below to see how to open a terminal in different operating systems.
 
 <details>
 <summary>On Windows:</summary>
