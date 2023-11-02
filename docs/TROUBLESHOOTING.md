@@ -86,6 +86,3 @@ This guide contains solutions to common problems when using DL4MicEverywhere.
 ## General
 
 Still having problems? Search GitHub issues or raise a new one with details to reproduce the problem. We'll do our best to help resolve it!
-
-Citations:
-[1] https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/34958/d84cc43a-014e-4ed5-9b79-2c5d28cbf153/output.txt
