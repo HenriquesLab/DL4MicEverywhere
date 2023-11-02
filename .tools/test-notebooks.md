@@ -2,7 +2,7 @@
 |:--------------------------------------|:---------------------|:------------|
 | U-Net (2D)                            |                      |             |
 | U-Net (3D)                            |                      |             |
-| U-Net (2D) multilabel                 |                      |             |
+| U-Net (2D) multilabel                 |         yes          |  Linux / M1 |
 | DenoiSeg                              |                      |             |
 | StarDist (2D)                         |                      |             |
 | StarDist (3D)                         |                      |             |
