@@ -52,7 +52,7 @@ DL4MicEverywhere aims to make deep learning more accessible, transparent, and pa
 
 Docker wraps up all dependencies in a tidy bundle. Simply launch and access deep learning workflows through an intuitive interface!
 
-Refer to the [User Guide](docs/USER_GUIDE.md) for details.
+Refer to the [User Guide](docs/USER_GUIDE.md) and [Installation guidelines](docs/INSTALLATION.md) for details.
 
 
 ## Contributing
@@ -62,6 +62,7 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 ## Documentation
 
 - [User Guide](docs/USER_GUIDE.md)
+- [Installation](docs/INSTALLATION.md)
 - [Data Preparation](docs/DATA.md)
 - [Example Notebooks](examples)
 - [Contributing Guidelines](CONTRIBUTING.md)
