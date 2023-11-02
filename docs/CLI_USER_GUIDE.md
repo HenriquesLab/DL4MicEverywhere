@@ -1,9 +1,9 @@
-In case you just want to execute using the terminal this are the arguments that you can use and the command to execute the bash file. Remember that in case you want to use the graphical user interface (not giving any argument) you would need to follow the steps on the [GUI tutorial](docs/GUI_USER_GUIDE.md).
+In case you just want to execute using the terminal this are the arguments that you can use and the command to execute the bash file. Remember that in case you want to use the graphical user interface (not giving any argument) you would need to follow the steps on the [GUI tutorial](GUI_USER_GUIDE.md).
 
 
 # **Mandatory** arguments
 
-  `-c CONFIG_PATH` : where `CONFIG_PATH` is the path to the `configuration.yaml` file (which follows the [defined structure](docs/FORMAT.md)) you want to use for the container. This can be one from the provided configurations or a configuration file created by the user.
+  `-c CONFIG_PATH` : where `CONFIG_PATH` is the path to the `configuration.yaml` file (which follows the [defined structure](FORMAT.md)) you want to use for the container. This can be one from the provided configurations or a configuration file created by the user.
 
   `-d DATA_PATH` : where `DATA_PATH` is the path to the folder that will be linked to the container, so that you can access training, test and inference data. Relative paths are not supported. Please provide the entire path.
 

@@ -8,7 +8,7 @@ To use DL4MicEverywhere, you need:
 
 - Docker installed on your system 
 - For GPU usage - NVIDIA GPU + CUDA drivers
-- If you want to run the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/) has to be installed on your computer. Check further instructions [here](docs/GUI_USER_GUIDE.md).
+- If you want to run the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/) has to be installed on your computer. Check further instructions [here](GUI_USER_GUIDE.md).
 
 **Clone the repo:**
 
@@ -129,5 +129,5 @@ Located outside the DL4MicEverywhere folder, so you can right-click it. Among th
 ### 4.2 - Launch the main program
 Once that you have open the terminal, you will need to use it in order to execute the main program that is on `launch.sh`. To introduce the input argument to the program you have to choose between these two different options:
 
-* **Option 1**: [Launch it with the graphical user interface (GUI)](docs/GUI_USER_GUIDE.md)
-* **Option 2**: [Launch it with the command line interface (CLI)](docs/CLI_USER_GUIDE.md)
+* **Option 1**: [Launch it with the graphical user interface (GUI)](GUI_USER_GUIDE.md)
+* **Option 2**: [Launch it with the command line interface (CLI)](CLI_USER_GUIDE.md)
