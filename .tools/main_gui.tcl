@@ -63,11 +63,11 @@ proc onDone {} {
 
     if {"$data_path" == ""} {
         tk_messageBox -type ok -icon error -title Error \
-        -message "ADVANCED MODE: You need to specify a data folder."
+        -message "You need to specify a data folder."
     } else {
         if {"$result_path" == ""} {
             tk_messageBox -type ok -icon error -title Error \
-            -message "ADVANCED MODE: You need to specify a result folder."
+            -message "You need to specify a result folder."
         } else {
             global advanced_options
             
