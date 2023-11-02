@@ -10,7 +10,7 @@ The notebooks support uncompressed image formats:
 - PNG (.png)
 - JPEG (.jpg)
 
-Other formats like proprietary microscope files or compressed TIFFs are not directly supported. You will need to convert these to one of the above formats first. 
+Other formats like proprietary microscope files or **compressed TIFFs** are not directly supported. You will need to convert these to one of the above formats first. Fiji/ImageJ could be useful for this. Check the [troubleshoot](TROUBLESHOOT.md) page.
 
 ## Data Organization 
 
