@@ -187,7 +187,7 @@ proc onComboboxFolder {notebook_folder} {
     set notebookList "-"
     # Get notebooks on that folder
     if {"$selectedFolder" != "-"} {
-        catch {exec ls ./notebooks/$selectedFolder} output
+        catch {eval exec ls -d [glob ./notebooks/$selectedFolder/*/] | xargs basename} output
         append notebookList " " $output
     } else {
         set selectedNotebook "-"
@@ -282,7 +282,7 @@ place .fr.principal.intro_7 -relx 0.01 -rely [expr 0.36 / ( 2 - $advanced_option
 
 set folderList "-"
 
-catch {exec ls ./notebooks} aux_notebok_folder_list
+catch {eval exec ls -d [glob ./notebooks/*/] | xargs basename} aux_notebok_folder_list
 append folderList " " $aux_notebok_folder_list
 set selectedFolder "-"
 
