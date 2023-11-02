@@ -26,6 +26,11 @@ This guide contains solutions to common problems when using DL4MicEverywhere.
 - Increase Docker resources in Preferences > Resources. At least 2 CPUs and 4GB memory recommended.
 - On Linux, check other processes consuming resources. Docker may need more RAM/CPUs.
 
+**Docker desktop does not start or crushed after running DL4MicEverywhere in Mac**
+
+- Please, make sure you are not using any Docker container in the terminal. Then, open a terminal and force quit Docker by typing `pkill -SIGHUP -f /Applications/Docker.app 'docker serve'`
+
+
 ## GPU Support
 
 **Notebooks fail with CUDA errors**
@@ -52,6 +57,11 @@ This guide contains solutions to common problems when using DL4MicEverywhere.
 - Check Docker build logs for errors. Debug or raise issue.
 - Try updating Docker engine and Nvidia driver to latest versions.
 
+**Terminal command of DL4MicEverywhere does not find the specified files**
+
+- Please, make sure that all the paths are given with "quotation marks" and remove spaces in the file names. 
+- Check that the paths to the files are actually correct.
+
 **Notebooks run slow** 
 
 - Increase allocated resources for Docker engine (CPUs/RAM).
@@ -68,6 +78,10 @@ This guide contains solutions to common problems when using DL4MicEverywhere.
 - Ensure training data is sufficient and correctly formatted.
 - Try tuning model hyperparameters and architecture.
 - Use more suitable model or training scheme.
+
+**Mounted data and results folder in Jupyter lab are empty**
+
+- Review the permission to the folders you specified. If they are protected, DL4MicEverywhere will not be able to mount them.
 
 ## General
 
