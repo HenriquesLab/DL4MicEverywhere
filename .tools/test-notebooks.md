@@ -17,7 +17,7 @@
 | CARE (3D)                             |                      |             |
 | 3D-RCAN                               |                      |             |
 | DecoNoising (2D)                      |                      |             |
-| Deep-STORM                            |                      |             |
+| Deep-STORM                            |      yes             |    M1       |
 | DFCAN                                 |                      |             |
 | WGAN                                  |                      |             |
 | YOLOv2                                |                      |             |
