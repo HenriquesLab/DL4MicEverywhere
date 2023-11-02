@@ -136,4 +136,21 @@ At the end of this process you should see a window similar to this one in your b
      alt="Jupyter Lab in the browser"
      width="60%" 
      height="60%" />
-	
+
+## 5. Work with DL4MicEverywhere notebooks
+
+The notebooks are inspired in ZeroCostDL4Mic and do not require programming skills to run them. When opening the notebook in Jupyter Lab, code cells are hidden with a message `# Run this cell to visualise the parameters and click the button to execute the code ...`. 
+
+When running the code cells (either by pressing Ctrl+Enter or clicking on the play symbol on the top bar of the notebook), an interactive menu appears as shown in the image. In this menu you can specify any needed parameter. After specifying all the parameters, click on "Load and run". Note that if you do not click, the code of that cell will not run. Likewise, if you run the cell again, the parameters will need to be specified again. 
+
+IMPORTANT: Docker is running on a virtual machine, so the main path is `/home/` and anything shown on the left directory, is placed inside `/home/`. This means that when we want to provide the path to `data` in the code, we need to indicate it as `"/home/data"`.  (See the screenshots).
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/NOTEBOOK_PARAMS.png" 
+     alt="Notebook parameters"
+     width="60%" 
+     height="60%" />
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/JUPYTERLAB_DIR.png" 
+     alt="Jupyter Lab home directory"
+     width="60%" 
+     height="60%" />
