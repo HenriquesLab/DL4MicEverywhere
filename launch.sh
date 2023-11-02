@@ -1,8 +1,8 @@
 #!/bin/bash
-BASEDIR=$(dirname "$0")
+BASEDIR=$(dirname "$(readlink -f "$0")")
 
 # Run pre_launch_test.sh, stop if it fails
-/bin/bash .tools/pre_launch_test.sh || exit 1
+/bin/bash $BASEDIR/.tools/pre_launch_test.sh || exit 1
 
 # Function with the text to describe the usage of the bash script
 usage() {
@@ -111,7 +111,7 @@ if [ $gui_flag -eq 0 ]; then
     fi
 else
     # If the GUI flag has been specified, run the function to show the GUI and read the arguments
-    gui_arguments=$(wish .tools/main_gui.tcl $OSTYPE)
+    gui_arguments=$(wish $BASEDIR/.tools/main_gui.tcl $BASEDIR $OSTYPE)
 
     if [ -z "$gui_arguments" ]; then
         exit 1
@@ -325,7 +325,7 @@ if grep -q credsStore ~/.docker/config.json; then
 fi
 
 # Execute the pre building tests
-/bin/bash .tools/pre_build_test.sh || exit 1
+/bin/bash $BASEDIR/.tools/pre_build_test.sh || exit 1
 
 # Check if an image with that tag exists locally and ask if the user whants to replace it.
 build_flag=0
@@ -338,7 +338,7 @@ else
     if docker image inspect $docker_tag >/dev/null 2>&1; then
         if [ $gui_flag -eq 1 ]; then 
             # If the GUI flag has been specified, show a window for ansewring local question
-            build_flag=$(wish .tools/local_img_gui.tcl)
+            build_flag=$(wish $BASEDIR/.tools/local_img_gui.tcl)
         else
             echo "Image exists locally. Do you want to build and replace the existing one?"
             select yn in "Yes" "No"; do
@@ -366,7 +366,7 @@ else
                 # In case the architecture is available
                 if [ $gui_flag -eq 1 ]; then 
                     # If the GUI flag has been specified, show a window for ansewring hub question
-                    build_flag=$(wish .tools/hub_img_gui.tcl)
+                    build_flag=$(wish $BASEDIR/.tools/hub_img_gui.tcl)
                 else
                     echo "The image ${docker_tag} is already available on docker hub. Do you preffer to pull it (faster option) instead of building it?"
                     select yn in "Yes" "No"; do
@@ -415,7 +415,7 @@ else
 fi
 
 # Execute the post building tests
-/bin/bash .tools/post_build_test.sh || exit 1
+/bin/bash $BASEDIR/.tools/post_build_test.sh || exit 1
 
 # Local files, if included, need to be removed to avoid the overcrowding the folder
 if [ "$local_notebook_flag" -eq 1 ]; then

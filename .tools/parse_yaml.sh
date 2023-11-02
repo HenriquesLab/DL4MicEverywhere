@@ -21,7 +21,7 @@ function get_yaml_args {
 }
 
 # eval $(get_yaml_args "$BASEDIR/notebooks/$1/configuration.yaml")
-eval $(get_yaml_args "./notebooks/$1/configuration.yaml")
+eval $(get_yaml_args "$1/configuration.yaml")
 
 local_version=$version
 local_description=$description

@@ -1,10 +1,12 @@
 #! /usr/local/bin/wish
 
+set basedir [lindex $argv 0]
+
 # Define the shape of the window
 set width 600
 set height 750
 set width_offset [expr { ( [winfo vrootwidth  .] - $width  ) / 2 }]
-set height_offset [expr { ( [winfo vrootheight .] - $height ) / 2 }]
+set height_offset [expr { ( [winfo vrootheigh .] - $height ) / 2 }]
 
 # Define the types for the file searching 
 set yaml_types {
@@ -178,16 +180,19 @@ proc onAdvanced {} {
 }
 
 proc onComboboxFolder {notebook_folder} {
+    global basedir
+
     global selectedFolder
     global selectedNotebook
     global notebookList
 
-    set selectedFolder "$notebook_folder"
+    set selectedFolder ${notebook_folder}
 
     set notebookList "-"
     # Get notebooks on that folder
     if {"$selectedFolder" != "-"} {
-        catch {eval exec ls -d [glob ./notebooks/$selectedFolder/*/] | xargs basename} output
+        catch {eval exec ls -d [glob "$basedir/notebooks/$selectedFolder/*/"] | xargs basename} output
+
         append notebookList " " $output
     } else {
         set selectedNotebook "-"
@@ -198,10 +203,11 @@ proc onComboboxFolder {notebook_folder} {
 }
 
 proc parseYaml {notebook_name} {
+    global basedir
     global selectedFolder
 
     # Read a yaml file
-    catch {exec /bin/bash .tools/parse_yaml.sh "$selectedFolder/$notebook_name"} output
+    catch {exec /bin/bash $basedir/.tools/parse_yaml.sh "$basedir/notebooks/$selectedFolder/$notebook_name"} output
 
     set arguments [split $output \n]
 
@@ -220,8 +226,9 @@ proc parseYaml {notebook_name} {
 set advanced_options 0
 
 # Read the OS of the computer
-set operative_system $argv
+set operative_system [lindex $argv 1]
 set is_mac 0
+
 
 # Check if it is mac to change the display
 if {[string match darwin* $operative_system]} {
@@ -256,8 +263,7 @@ ttk::button .fr.advance -text "Advanced options" -command { onAdvanced }
 pack .fr.advance -padx 5 -side left 
 
 #### Manadatory argument section ######
-
-image create photo img1 -file "docs/logo/dl4miceverywhere-logo-small.png"
+image create photo img1 -file ${basedir}/docs/logo/dl4miceverywhere-logo-small.png
 label .fr.principal.logo -image img1
 place .fr.principal.logo -x 450 -y 5
 
@@ -282,7 +288,8 @@ place .fr.principal.intro_7 -relx 0.01 -rely [expr 0.36 / ( 2 - $advanced_option
 
 set folderList "-"
 
-catch {eval exec ls -d [glob ./notebooks/*/] | xargs basename} aux_notebok_folder_list
+catch {eval exec ls -d [glob "$basedir/notebooks/*/"] | xargs basename} aux_notebok_folder_list
+
 append folderList " " $aux_notebok_folder_list
 set selectedFolder "-"
 
