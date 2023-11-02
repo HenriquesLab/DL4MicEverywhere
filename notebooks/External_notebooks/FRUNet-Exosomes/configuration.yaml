@@ -1,7 +1,7 @@
 notebook_url: https://raw.githubusercontent.com/BSEL-UC3M/FRU-Net-TEM-segmentation/main/FRUnet_TEM_Exosomes_sEV.ipynb
 requirements_url: https://raw.githubusercontent.com/BSEL-UC3M/FRU-Net-TEM-segmentation/main/requirements.txt
-cuda_version: 11.2.0
-ubuntu_version: 22.04
+cuda_version: 11.2.2
+ubuntu_version: 20.04
 python_version: 3.7
 sections_to_remove: 
 version: 0.0.1
