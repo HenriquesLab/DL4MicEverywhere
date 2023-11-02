@@ -363,7 +363,7 @@ else
     fi
 
     
-    if [ "$build_flag" -ne 2 ]; then
+    if [ "$build_flag" -ne 1 ]; then
         # In case the local image option has not been selected
 
         if docker manifest inspect "${docker_tag}" >/dev/null 2>&1; then
@@ -425,6 +425,8 @@ if [ "$local_requirements_flag" -eq 1 ]; then
    rm $BASEDIR/requirements.txt
 fi
 
+echo "DOCKER_OUT: $DOCKER_OUT"
+
 # If it has been built, run the docker
 if [ "$DOCKER_OUT" -eq 0 ]; then
     if [ $test_flag -eq 1 ]; then
@@ -443,12 +445,14 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
         fi
     done
 
+    echo "GASEGA"
+
     if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
-        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag:latest" jupyter lab "${notebook_name}" --ip='0.0.0.0' --port=$port --no-browser --allow-root
+        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" jupyter lab "${notebook_name}" --ip='0.0.0.0' --port=$port --no-browser --allow-root
     else
         # Run the docker image without activating the GPU
-        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag:latest" jupyter lab "${notebook_name}" --ip='0.0.0.0' --port=$port --no-browser --allow-root
+        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" jupyter lab "${notebook_name}" --ip='0.0.0.0' --port=$port --no-browser --allow-root
     fi
 else
     echo "The docker image has not been built."
