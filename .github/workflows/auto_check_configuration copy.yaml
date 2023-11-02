@@ -1,4 +1,4 @@
-name: Checks a modified configuration.yaml
+name: Manually check a modified configuration.yaml
 
 on:
   workflow_dispatch:

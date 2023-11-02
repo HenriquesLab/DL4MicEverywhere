@@ -1,4 +1,4 @@
-name: Checks a modified configuration.yaml
+name: In Pull Request checks a modified configuration.yaml
 
 on:
   pull_request:
