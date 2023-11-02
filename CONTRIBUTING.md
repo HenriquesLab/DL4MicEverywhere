@@ -26,6 +26,7 @@ Ensure your code passes all existing tests and linting checks. Adding new test c
 
 If you wish to contribute a new Jupyter notebook to DL4MicEverywhere, kindly adhere to the following guidelines:
 
+- First have a look at the [Notebook Types](docs/NOTEBOOK_TYPES.md) to understand the different types of notebooks supported.
 - The contribution guidelines for notebooks are similar to those of [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic/wiki/How-to-contribute/)
 - The notebooks should be self-explanatory and do not require end users to have coding expertise to run them. They should include a graphical user interface (GUI) for easy parameter configuration by users. You can refer to the [U-Net 2D](https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/U-Net_2D_ZeroCostDL4Mic.ipynb) notebook as an example.
 - The notebooks should include comprehensive documentation and instructions. They should also acknowledge and cite any related publications.
