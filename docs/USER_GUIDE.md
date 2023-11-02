@@ -111,7 +111,12 @@ DL4MicEverywhere needs to be started from the terminal using `launch.sh`. There 
 
 ## 3. Docker images
 
-DL4MicEverywhere will either pull a container image from Dockerhub or build one for you if there is not anyone suitable for your operating system and configuration. While building or pulling the image, your terminal window will look like this:
+DL4MicEverywhere will either pull a container image from Dockerhub or build one for you if there is not anyone suitable for your operating system and configuration. The interface may ask you 
+
+1. if there is already an image in your machine, would you like to rebuild and replace it?
+2. if there is no image in your machine but there exists one in the docker hub, would you like to build it?
+   
+While building or pulling the image, your terminal window will look like this:
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/IMAGE_BUILD_TERMINAL.png" 
      alt="Terminal after building a docker image"
