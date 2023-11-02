@@ -108,3 +108,32 @@ Once that you have open the terminal, you will need to use it in order to execut
 
 * **Option 1**: [Launch it with the graphical user interface (GUI)](GUI_USER_GUIDE.md)
 * **Option 2**: [Launch it with the command line interface (CLI)](CLI_USER_GUIDE.md)
+
+## 3. Docker images
+
+DL4MicEverywhere will either pull a container image from Dockerhub or build one for you if there is not anyone suitable for your operating system and configuration. While building or pulling the image, your terminal window will look like this:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/IMAGE_BUILD_TERMINAL.png" 
+     alt="Terminal after building a docker image"
+     width="60%" 
+     height="60%" />
+
+## 4. Run Jupyter Lab
+
+After building the a Docker image and running a container to run the notebooks, DL4MicEverywhere will automatically run Jupyter Lab in the terminal. You need to copy the link and paste it in your favourite browser as follows:
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/JUPYTER_TOKEN_TERMINAL.png" 
+     alt="Terminal after running Jupyter Lab"
+     width="60%" 
+     height="60%" />
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/LAUNCH_JUPYTER.png" 
+     alt="Opening Jupyter Lab in the browser"
+     width="60%" 
+     height="60%" />
+
+At the end of this process you should see a window similar to this one in your browser. On the right column you will see a Data and Results folder, as well as the notebook you chose to open.
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/JUPYTERLAB.png" 
+     alt="Jupyter Lab in the browser"
+     width="60%" 
+     height="60%" />
+	
