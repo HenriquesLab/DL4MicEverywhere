@@ -7,9 +7,11 @@
 
 # DL4MicEverywhere
 
-DL4MicEverywhere provides researchers an accessible gateway to state-of-the-art deep learning techniques for bioimage analysis through interactive Jupyter notebooks with intuitive graphical interfaces that require no coding expertise. It expands the capabilities of [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) by enabling users to run the notebooks locally on their own machines or remotely on diverse computing infrastructure including laptops, workstations, high-performance computing (HPC) and cloud infrastructure. 
-
+DL4MicEverywhere provides researchers an accessible gateway to state-of-the-art deep learning techniques for bioimage analysis through interactive Jupyter notebooks with intuitive graphical interfaces that require no coding expertise. 
 It uses Docker [containers](https://hub.docker.com/repository/docker/henriqueslab/dl4miceverywhere) to maximize portability and reproducibility, ensuring seamless operation across diverse computing environments.
+
+DL4MicEverywhere expands the capabilities of [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) by enabling users to run the notebooks locally on their own machines or remotely on diverse computing infrastructure including laptops, workstations, high-performance computing (HPC) and cloud infrastructure. 
+It currently incorporates many existing ZeroCostDL4Mic notebooks for tasks like segmentation, reconstruction, and image translation.
 
 ## Key Features
 
@@ -22,12 +24,24 @@ It uses Docker [containers](https://hub.docker.com/repository/docker/henriquesla
 
 ![Sample Notebook](docs/images/policy.png)
 
+## Key benefits of DL4MicEverywhere
+
+- **Flexibility:** Notebooks can run locally, in the cloud, or on high-performance computing infrastructure. No vendor lock-in.
+- **Reproducibility:** Docker containers encapsulate the full software environment. Explicit versioning maintains stability.
+- **Transparency:** Notebooks and models can be readily shared to enable replication of analyses.
+- **Accessibility:** Interactive widgets and automated build pipelines lower barriers for non-experts.
+- **Interoperability:** Adheres to data standards like BioImage Model Zoo for model sharing.
+- **Extensibility:** Automated testing and Docker building streamlines adding new methods.
+
+DL4MicEverywhere aims to make deep learning more accessible, transparent, and participatory. This enables broader adoption of cutting-edge techniques while enhancing reliability and customization.
+
 ## Getting Started
 
 ### Requirements
 
 - Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop))
 - For GPU acceleration - NVIDIA GPU + CUDA drivers ([setup](https://docs.nvidia.com/cuda/)) 
+- For the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/). ([Instructions](docs/GUI_USER_GUIDE.md)).
 
 ### Quickstart
 
@@ -39,6 +53,7 @@ It uses Docker [containers](https://hub.docker.com/repository/docker/henriquesla
 Docker wraps up all dependencies in a tidy bundle. Simply launch and access deep learning workflows through an intuitive interface!
 
 Refer to the [step-by-step guideline](https://github.com/HenriquesLab/DL4MicEverywhere/wiki/Step%E2%80%90by%E2%80%90step-guideline) for details.
+
 
 ## Contributing
 
