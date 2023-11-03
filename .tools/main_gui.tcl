@@ -186,18 +186,39 @@ proc onComboboxFolder {notebook_folder} {
     global selectedNotebook
     global notebookList
 
+    # Reset selected notebook
+    set selectedNotebook "-"
+    
+    # Always update the selected folder
     set selectedFolder ${notebook_folder}
 
+    # Reset the notebook list
     set notebookList "-"
     # Get notebooks on that folder
     if {"$selectedFolder" != "-"} {
-        catch {eval exec ls -d [glob "$basedir/notebooks/$selectedFolder/*/"] | xargs basename} output
+        
+        # Get the number of subfolders in the selected folder
+        catch {eval exec ls -1 -d [glob -nocomplain "$basedir/notebooks/$selectedFolder/*/"] | wc -l} num_folders
+        
+        set no_folders 0
+        if {"$num_folders" == 1} {
+            # In case only one folder has been found, it may be that there are no folder
+            catch {eval exec ls -1 -d [glob -nocomplain "$basedir/notebooks/$selectedFolder/*/"]} folder_name
+            if {"$folder_name" == "."} {
+                # If the folder is called ".", this means that there are no folders
+                set no_folders 1
+            }
+        }
 
-        append notebookList " " $output
+        if {"$no_folders" != 1} {
+            # Notebook list will only be updated in case there are subfolders
+            catch {eval exec ls -d [glob "$basedir/notebooks/$selectedFolder/*/"] | xargs basename -a} output
+            append notebookList " " $output
+        }
+    
     } else {
         set selectedNotebook "-"
     }
-
 
     .fr.principal.notebooks configure -values $notebookList
 }
@@ -288,9 +309,25 @@ place .fr.principal.intro_7 -relx 0.01 -rely [expr 0.36 / ( 2 - $advanced_option
 
 set folderList "-"
 
-catch {eval exec ls -d [glob "$basedir/notebooks/*/"] | xargs basename} aux_notebok_folder_list
+# Get the number of folders
+catch {eval exec ls -1 -d [glob -nocomplain "$basedir/notebooks/*/"] | wc -l} num_folders
 
-append folderList " " $aux_notebok_folder_list
+set no_folders 0
+if {"$num_folders" != 1} {
+    # In case only one folder has been found, it may be that there are no folder
+    catch {eval exec ls -1 -d [glob -nocomplain "$basedir/notebooks/*/"]} folder_name
+    if {"$folder_name" == "."} {
+        # If the folder is called ".", this means that there are no folders
+        set no_folders 1
+    }
+}
+
+if {"$no_folders" != 1} {
+    # In case no folders are found 
+    catch {eval exec ls -d [glob "$basedir/notebooks/*/"] | xargs basename -a} aux_notebok_folder_list
+    append folderList " " $aux_notebok_folder_list
+}
+
 set selectedFolder "-"
 
 set notebookList "-"
