@@ -5,6 +5,8 @@ if [[ "$OSTYPE" == "linux-gnu"* || "$OSTYPE" == "darwin"* ]]; then
   # Verify if the script is run as root, which is required for Docker to function correctly
   if [ "$EUID" -ne 0 ]; then
     echo "Please run this script as root (by using sudo). Otherwise docker won't work properly."
+    echo "Make sure to use the -E flag to preserve the environment variables when using ssh and X11"
+    echo "E.g. sudo -E bash launch.sh"
     exit 1
   fi
 fi
