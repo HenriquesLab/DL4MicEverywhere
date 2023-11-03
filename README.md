@@ -63,18 +63,19 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 
 ## Documentation
 
-- [User Guide](docs/USER_GUIDE.md)
 - [Installation](docs/INSTALLATION.md)
-- [Data Preparation](docs/DATA.md)
-- [Example Notebooks](examples)
-- [Contributing Guidelines](CONTRIBUTING.md)
+- [User Guide](docs/USER_GUIDE.md)
+  - [Data Preparation](docs/DATA.md)
+  - [Remote connection](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/GUI_USER_GUIDE.md#connection-with-remote-workstations-through-ssh)
+- Notebooks
+  - [Example Notebooks](examples)
+  - [Notebook Types](docs/NOTEBOOK_TYPES.md)
+  - [Notebook List](docs/NOTEBOOKS.md)
 - [Docker desktop](docs/DOCKER_DESKTOP.md)
 - [Technical Design](docs/DESIGN.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
-- [Notebook Types](docs/NOTEBOOK_TYPES.md)
-- [Notebook List](docs/NOTEBOOKS.md)
 - [FAQ](docs/FAQ.md)
-
+- [Contributing Guidelines](CONTRIBUTING.md) 
 
 Let us know if anything needs clarification!
 
