@@ -249,11 +249,16 @@ set advanced_options 0
 # Read the OS of the computer
 set operative_system [lindex $argv 1]
 set is_mac 0
+set is_linux 0
 
 
 # Check if it is mac to change the display
 if {[string match darwin* $operative_system]} {
     set is_mac 1
+}
+# Check if it is linux to change the display
+if {[string match linux-gnu* $operative_system]} {
+    set is_linux 1
 }
 
 ##### Define the frames of the window #####
@@ -346,7 +351,7 @@ ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable select
 place .fr.principal.notebooks -relx 0.01 -rely [expr 0.56 / ( 2 - $advanced_options ) ]
 bind .fr.principal.notebooks <<ComboboxSelected>> { parseYaml [%W get]}
 
-text .fr.principal.notebook_description -width [expr 35 + ($is_mac * 15) ] -height [expr 4 + ($is_mac * 2)] -borderwidth 1 -relief sunken
+text .fr.principal.notebook_description -width [expr 35 + ($is_mac * 15) + ($is_linux * 10) ] -height [expr 4 + ($is_mac * 2)] -borderwidth 1 -relief sunken
 place .fr.principal.notebook_description -relx 0.365 -rely [expr 0.42 / ( 2 - $advanced_options ) ]
 
 # Define the button and display to load the path to the data folder
@@ -355,7 +360,7 @@ place .fr.principal.notebook_description -relx 0.365 -rely [expr 0.42 / ( 2 - $a
 label .fr.principal.data_label -text "Path to data folder:"
 place .fr.principal.data_label -relx 0.01 -rely [expr 0.63 / ( 2 - $advanced_options ) ]
 
-entry .fr.principal.data_entry -textvariable data_path -width [expr 60 + ($is_mac * -5)]
+entry .fr.principal.data_entry -textvariable data_path -width [expr 60 + ($is_mac * -5) + ($is_linux * 2)]
 place .fr.principal.data_entry -relx 0.01 -rely [expr 0.69 / ( 2 - $advanced_options ) ]
 
 button .fr.principal.data_btn -text "Select" \
@@ -369,7 +374,7 @@ set data_path ""
 label .fr.principal.result_label -text "Path to output folder:"
 place .fr.principal.result_label -relx 0.01 -rely [expr 0.77 / ( 2 - $advanced_options ) ]
 
-entry .fr.principal.result_entry -textvariable result_path -width [expr 60 + ($is_mac * -5)]
+entry .fr.principal.result_entry -textvariable result_path -width [expr 60 + ($is_mac * -5) + ($is_linux * 2)]
 place .fr.principal.result_entry -relx 0.01 -rely [expr 0.83 / ( 2 - $advanced_options ) ]
 
 button .fr.principal.result_btn -text "Select" \
@@ -388,7 +393,7 @@ place .fr.principal.gpu -relx 0.2 -rely [expr 0.915 / ( 2 - $advanced_options ) 
 label .fr.principal.tag_label -text "Docker tag:"
 place .fr.principal.tag_label -relx 0.4 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
 
-entry .fr.principal.tag -textvariable tag -width 20
+entry .fr.principal.tag -textvariable tag -width [expr 20  + ($is_linux * 2)]
 place .fr.principal.tag -relx 0.53 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
 
 set tag ""
@@ -415,7 +420,7 @@ place .fr.advanced.intro_6 -relx 0.01 -rely 0.30
 label .fr.advanced.yaml_label -text "Path to the configuration.yaml:"
 place .fr.advanced.yaml_label -relx 0.01 -rely 0.37
 
-entry .fr.advanced.yaml_entry -textvariable yaml_path -width [expr 60 + ($is_mac * -5)]
+entry .fr.advanced.yaml_entry -textvariable yaml_path -width [expr 60 + ($is_mac * -5) + ($is_linux * 2)]
 place .fr.advanced.yaml_entry -relx 0.01 -rely 0.44
 
 button .fr.advanced.byp -text "Select" \
@@ -429,7 +434,7 @@ set yaml_path ""
 label .fr.advanced.ipynb_label -text "Path to the local notebook:"
 place .fr.advanced.ipynb_label -relx 0.01 -rely 0.52
 
-entry .fr.advanced.ipynb_entry -textvariable ipynb_path -width [expr 60 + ($is_mac * -5)]
+entry .fr.advanced.ipynb_entry -textvariable ipynb_path -width [expr 60 + ($is_mac * -5) + ($is_linux * 2)]
 place .fr.advanced.ipynb_entry -relx 0.01 -rely 0.59
 
 button .fr.advanced.bnp -text "Select" \
@@ -443,7 +448,7 @@ set ipynb_path ""
 label .fr.advanced.txt_label -text "Path to the requirements.txt:"
 place .fr.advanced.txt_label -relx 0.01 -rely 0.67
 
-entry .fr.advanced.txt_entry -textvariable txt_path -width [expr 60 + ($is_mac * -5)]
+entry .fr.advanced.txt_entry -textvariable txt_path -width [expr 60 + ($is_mac * -5) + ($is_linux * 2)]
 place .fr.advanced.txt_entry -relx 0.01 -rely 0.74
 
 button .fr.advanced.btp -text "Select" \
