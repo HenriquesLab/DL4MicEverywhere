@@ -38,7 +38,7 @@ Then, you can create an account, or continue to download without an account, to 
      width="80%" 
      height="80%" />
 
-Once you create an account, you will need to download the Windows executable:
+Now you will need to download the Windows executable:
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_04.png" 
      alt="Main window"
@@ -150,14 +150,14 @@ you can install or update the appropriate packages in two different ways:
      width="80%" 
      height="80%" />
 
-   Then, you will need to create an account to be able to download the installation file:
+   Then, you can create an account, or continue to download without an account, to be able to download the installation file:
 
    <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_03.png" 
      alt="Main window"
      width="80%" 
      height="80%" />
 
-   Once you create an account, this window will be shown. Don't worry. Click on **View all Available Builds**:
+   Afterwards this window will be shown. Don't worry. Click on **View all Available Builds**:
 
    <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_04_Mac.png" 
      alt="Main window"
