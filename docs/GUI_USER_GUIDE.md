@@ -134,9 +134,9 @@ Once selected, the window would look like this:
      width="40%" 
      height="40%" />
 
-## Select a local notebook instead of the one provided on the `configuration.yaml`:
+## Select a local notebook:
 
-Similar to the `configuration.yaml` file selection, you can select a `.ipynb` notebook that follows the ZeroCostDL4Mic structure:
+Similar to the `configuration.yaml` file selection, you can select a `.ipynb` notebook instead of the one provided on the `configuration.yaml` that follows the ZeroCostDL4Mic structure:
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/NOTEBOOK.png" 
      alt="Select the local notebook"
@@ -150,9 +150,9 @@ Once selected, the window would look like this:
      width="40%" 
      height="40%" />
 
-### Select a local requirements file instead of the one provided on the `configuration.yaml`:
+### Select a local requirements file:
 
-You can also select a `requirements.txt` file with the Python libraries that you want to be installed in the container:
+You can also select a `requirements.txt` file instead of the one provided on the `configuration.yaml` with the Python libraries that you want to be installed in the container:
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/REQUIREMENTS.png" 
      alt="Select the local requiremnts"
