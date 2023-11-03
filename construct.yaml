@@ -1,6 +1,13 @@
-name: your_project_name
-version: 0.0.1
+name: "dl4miceverywhere"
+version: "0.0.1"
 channels:
-  - defaults
-dependencies:
-  - python
+- "http://repo.continuum.io/pkgs/main/"
+environment_file: environment.yml
+license_file: EULA.txt
+# welcome_image: photo.png  # [win]
+# Pip dependencies are NOT recommended. If you do need them
+# uncomment the line below and edit `pip-dependencies.sh`.
+
+# do not edit below this line
+# ---------------------------
+installer_type: all
