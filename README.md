@@ -49,7 +49,7 @@ DL4MicEverywhere aims to make deep learning more accessible, transparent, and pa
 
 1. Clone this repo: `git clone https://github.com/HenriquesLab/DL4MicEverywhere.git`
 2. Navigate to the repo directory 
-3. Run `sudo bash launch.sh` to launch the notebook selection GUI
+3. Run `sudo -E bash launch.sh` to launch the notebook selection GUI
 4. Choose a notebook and run!
 
 Docker wraps up all dependencies in a tidy bundle. Simply launch and access deep learning workflows through an intuitive interface!
