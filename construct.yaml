@@ -1,0 +1,6 @@
+name: your_project_name
+version: 0.0.1
+channels:
+  - defaults
+dependencies:
+  - python

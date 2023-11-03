@@ -1,0 +1,25 @@
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - constructor
+  - gcc
+  - make
+  - freetype
+  - libsm-cos6-x86_64
+  - curl
+  - wget
+  - unzip
+  - git
+  - ffmpeg
+  - pkg-config
+  - nodejs
+  - cudatoolkit=11.0 # Adjust the version number as needed
+  - pip:
+      - pip
+      - nvidia-cudnn-cu11==8.6.0.163 # if GPU_FLAG==1
+      - -r file:requirements.txt
+      - nbformat
+      - jupyterlab
+      - ipywidgets
+      - -e . # Install the current directory as an editable package
