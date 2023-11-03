@@ -165,3 +165,50 @@ Once selected, the window would look like this:
      alt="Select the local requiremnts result"
      width="40%" 
      height="40%" />
+
+# Connection with remote workstations through SSH
+
+It is possible to get the GUI working even with remote workstations when a SSH connection is established. 
+
+**iOS / Mac**
+If you are using an iOS system to connect through SSH, you need [Xquartz](https://www.xquartz.org/) to be installed. With Homebrew it can be easily done using the following command in the terminal:
+```
+brew install --cask xquartz
+```
+You need to restart the system after the installation. 
+
+**Launching the remote SSH connection**
+
+Try one of these: 
+```
+ssh -Y ocb@XXX.XX.XX.XXX
+```
+or 
+```
+ssh -L -Y ocb@XXX.XX.XX.XXX
+```
+or
+```
+ssh -X ocb@XXX.XX.XX.XXX
+```
+or 
+```
+ssh -L -X ocb@XXX.XX.XX.XXX
+```
+**Run DL4MicEverywhere**
+```
+cd DL4MicEverywhere
+sudo -E bash launch.sh
+```
+**Launch Jupyter lab with the remote port**
+After the docker image is built and Jupyter lab is launched remotely, you need to connect with SSH also to the port given to Jupyter. For this, check in the new window what's the port. E.g., in the image below it is `8888`
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/JUPYTER_TOKEN_TERMINAL.png" 
+     alt="Terminal after running Jupyter Lab"
+     width="60%" 
+     height="60%" />
+
+To establish the connection, open a new window in the Terminal and type:
+```
+ssh -L 8888:localhost:8888 ocb@172.22.50.188
+```
+Copy the path given by the terminal in a browser (the one highlighted in the screenshot above).
