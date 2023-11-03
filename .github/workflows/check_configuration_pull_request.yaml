@@ -139,6 +139,7 @@ jobs:
           fi
   
   check_urls:  
+    if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
     runs-on: [ubuntu-latest]
     strategy:
       # super important if you want to see all results, even if one fails
@@ -172,7 +173,8 @@ jobs:
         with:
           arguments: ${{ steps.extract_rq_url.outputs.result }}
 
-  check_docker_build_without_gpu:
+  check_docker_build_without_gpu:  
+    if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
     runs-on: [ubuntu-latest]
     strategy:
       # super important if you want to see all results, even if one fails
@@ -257,7 +259,8 @@ jobs:
             SECTIONS_TO_REMOVE=${{ steps.sections_to_remove.outputs.result }}
             
           
-  check_docker_build_with_gpu:
+  check_docker_build_with_gpu:  
+    if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
     runs-on: [ubuntu-latest]
     strategy:
       # super important if you want to see all results, even if one fails
