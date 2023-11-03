@@ -62,7 +62,6 @@ Once you have selected the path to the folder, the main window should look like 
      width="40%" 
      height="40%" />
 
-
 ### Choose the output folder
 
 On the **Path to the output folder** section you can directly paste the path to the file or click on the **Select** button. 
