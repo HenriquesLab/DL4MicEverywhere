@@ -37,6 +37,8 @@ DL4MicEverywhere aims to make deep learning more accessible, transparent, and pa
 
 ## Getting Started
 
+[![alt text](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/ezgif.com-video-to-gif.gif)](https://youtu.be/d1FB_zc5gVc)
+
 ### Requirements
 
 - Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop))
