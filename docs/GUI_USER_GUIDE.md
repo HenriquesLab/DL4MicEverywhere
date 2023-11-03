@@ -4,7 +4,7 @@
 Once the requirements have been installed, to launch the GUI, you should execute the following command on the terminal:
 
 ```
-sudo bash launch.sh
+sudo -E bash launch.sh
 ```
 
 After running the previous command, the following window will pop up:

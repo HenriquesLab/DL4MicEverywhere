@@ -26,13 +26,13 @@ In case you just want to execute using the terminal this are the arguments that 
 This would be a simple usage case, where one of the provided `configuration.yaml` files is used:
 
 ```
-sudo bash launch.sh -c ./notebooks/CARE_2D_DL4Mic/configuration.yaml -d ./data_folder -o ./results_folder
+sudo -E bash launch.sh -c ./notebooks/CARE_2D_DL4Mic/configuration.yaml -d ./data_folder -o ./results_folder
 ```
 
 A more complex example would be:
 
 ```
-sudo bash launch.sh -c ./my_notebooks/CARE_2D_DL4Mic/configuration.yaml -d /home/user/Documents/data_folder -o /home/user/Documents/results_folder -g -n /home/user/Desktop/MyFancyZeroCostDL4MicNotebook.ipynb -r ./modified_requirements.txt -t MyNewContainer
+sudo -E bash launch.sh -c ./my_notebooks/CARE_2D_DL4Mic/configuration.yaml -d /home/user/Documents/data_folder -o /home/user/Documents/results_folder -g -n /home/user/Desktop/MyFancyZeroCostDL4MicNotebook.ipynb -r ./modified_requirements.txt -t MyNewContainer
 ```
 
 where you use your own `configuration.yaml` file, your ZeroCost4Mic style notebook and your `requirements.txt`file; also allowing the container to use GPUs and giving the tag `MyNewContainer`to the docker image that will be created.
