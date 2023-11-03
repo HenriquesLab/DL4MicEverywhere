@@ -19,6 +19,19 @@ Then go to Images and remove the images that will not be used.
      width="50%" 
      height="50%" />
 
+To list all the container images that currently occupy space on your computer:
+
+`sudo docker images`
+
+to clear all unused images:
+
+`docker image prune -a`
+
+to clear all unused containers, networks, images:
+
+`docker system prune -a`
+
+
 ## Pause, restart or kill Docker
 
 To pause, restart or close Docker you can always click on the shortcut symbol of docker: 
