@@ -7,81 +7,161 @@ Once the requirements have been installed, to launch the GUI, you should execute
 sudo bash launch.sh
 ```
 
-> :information_source: **NOTE:**
-> Be sure that the terminal is located in the same folder has `launch.sh` file is.
-
 After running the previous command, the following window will pop up:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_01.png" 
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI.png" 
      alt="Main window"
-     width="60%" 
-     height="60%" />
+     width="40%" 
+     height="40%" />
 
-## Mandatory arguments
+## Simple usage
 
-There there are only two arguments that are really mandatory: **Configuration file** and **Data folder**. 
+The previous image shows how the simple usage looks like. There a default list of notebooks is given, first you will need to chose the folder you want to take the model from:
 
-### Choose the configuration file
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/DEFAULT_1.png" 
+     alt="Main window"
+     width="40%" 
+     height="40%" />
 
-On the **Path to the configuration.yaml** section you can directly paste the path to the file or click on the **Select** button and it will open a window with your file system:
+The folders that will appear are: 
+ - [Bespoke_notebooks](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/Bespoke_notebooks/README.md)
+ - [External_notebooks](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/External_notebooks/README.md)
+ - [ZeroCostDL4Mic_notebooks](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/ZeroCostDL4Mic_notebooks/README.md)
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_02.png" 
-     alt="Select configuration file"
-     width="60%" 
-     height="60%" />
- 
-there you need to select the `configuration.yaml` file you want to use (be sure that follows the [defined structure](https://github.com/HenriquesLab/DL4MicEverywhere/wiki/Configuration-structure)). Once you select the configuration file, your selection will appear in the main window:
+Once you have selected the folder, you will need to select the notebook that you want to use from the second list:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_03.png" 
-     alt="Main window with after configuration file"
-     width="60%" 
-     height="60%" />
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/DEFAULT_2.png" 
+     alt="Main window"
+     width="40%" 
+     height="40%" />
+
+In this case we have selected the pix2pix notebook from ZeroCost folder:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/DEFAULT_RESULT.png" 
+     alt="Main window"
+     width="40%" 
+     height="40%" />
+
+Once the notebook has been selected the are only two arguments that are really mandatory: **Data folder** and **Output folder**. 
 
 ### Choose the data folder
 
-You will need to do similarly in the **Path to the folder** section. In this case you need to select the folder that will be linked to the container. That is why, in order to access the data, you will need to have your data on it. Also the results that you want to change need to be saved here. Once the folder has been selected, the main window would look like this:
+On the **Path to the data folder** section you can directly paste the path to the file or click on the **Select** button. 
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_04.png" 
-     alt="Main window after data folder"
+The path you select here needs to be to the folder that allocates the data you want to use in your model: the images for training, the weights of a pretrained model, etc. By cliking **Select** button, a window with your file system will open:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/DATA.png" 
+     alt="Window to choose the data folder"
      width="60%" 
      height="60%" />
 
-With these arguments, you will be ready to click **Done** and execute the program. 
+Once you have selected the path to the folder, the main window should look like this:
 
-## Optional arguments
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/DATA_RESULT.png" 
+     alt="Main window after data folder"
+     width="40%" 
+     height="40%" />
 
-All these arguments are optional, therefore you can click **Done** and execute the program at any moment.
+
+### Choose the output folder
+
+On the **Path to the output folder** section you can directly paste the path to the file or click on the **Select** button. 
+
+
+> ⚠️: **IMPORTANT:**
+> Only the files you store in this folder will be saved once you close the program, the rest will be lost.
+
+The path you select here needs to be to the folder where you are going to save and store the results of the notebook. By cliking **Select** button, a window with your file system will open:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/OUTPUT.png" 
+     alt="Window to choose the output folder"
+     width="60%" 
+     height="60%" />
+
+Once you have selected the path to the folder, the main window should look like this:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/OUTPUT_RESULT.png" 
+     alt="Main window after output folder"
+     width="40%" 
+     height="40%" />
+
+With these arguments, you will be ready to click **Done** and execute the program. Additionally, you can select to use GPU (if you have GPU in the device you are runing this program) and you can give a custom tag to the Docker image that is going to be built.
 
 ### Activate/Deactivate the GPU
 
 The **Allow GPU** checkbox will indicate if you want to use the GPU (by default is unchecked). Once selected, the main window will like:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_07.png" 
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GPU.png" 
      alt="Main window after GPU"
+     width="40%" 
+     height="40%" />
+
+### Give custom tag to the Docker image
+
+You can write the tag you want in the **Tag** textbox. In the next example we would give the tag 'MyTag' to the Docker image:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TAG.png" 
+     alt="Main window after Tag"
+     width="40%" 
+     height="40%" />
+
+## Advanced usage
+
+You can also click on the **Advanced options** button at the button and a new section will be shown:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/ADVANCED.png" 
+     alt="Advanced options"
+     width="40%" 
+     height="40%" />
+
+By chosing this options, the **default notebooks** section will be disabled, not taking into account the information you provide there. The rest of the arguments you provided will remain intact. In these advanced options we will be able to give paths to local files like the `configuration.yaml`, `notebook.ipynb` and `requirements.txt`.
+
+## Select a local `configuration.yaml`:
+
+On the **Path to the configuration.yaml** section you can directly paste the path to the file or click on the **Select** button. 
+
+You need to select the path to the configuration.yaml file you want to use (be sure that follows the [defined structure](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/FORMAT.md)). By cliking **Select** button, a window with your file system will open:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/CONFIG.png" 
+     alt="Select the local configuration"
      width="60%" 
      height="60%" />
 
-### Select a local notebook instead of the one provided on the `configuration.yaml`:
+Once selected, the window would look like this:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/CONFIG_RESULT.png" 
+     alt="Select the local configuration result"
+     width="40%" 
+     height="40%" />
+
+## Select a local notebook instead of the one provided on the `configuration.yaml`:
 
 Similar to the `configuration.yaml` file selection, you can select a `.ipynb` notebook that follows the ZeroCostDL4Mic structure:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_05.png" 
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/NOTEBOOK.png" 
      alt="Select the local notebook"
      width="60%" 
      height="60%" />
+
+Once selected, the window would look like this:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/NOTEBOOK_RESULT.png" 
+     alt="Select the local notebook result"
+     width="40%" 
+     height="40%" />
 
 ### Select a local requirements file instead of the one provided on the `configuration.yaml`:
 
 You can also select a `requirements.txt` file with the Python libraries that you want to be installed in the container:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_06.png" 
-     alt="Select the local requirements file"
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/REQUIREMENTS.png" 
+     alt="Select the local requiremnts"
      width="60%" 
      height="60%" />
 
-In case you have selected all the optional arguments the main window would look like this:
+Once selected, the window would look like this:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_08.png" 
-     alt="Main window after local requirements"
-     width="60%" 
-     height="60%" />
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/REQUIREMENTS_RESULT.png" 
+     alt="Select the local requiremnts result"
+     width="40%" 
+     height="40%" />
