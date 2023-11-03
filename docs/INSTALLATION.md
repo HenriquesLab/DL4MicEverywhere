@@ -31,7 +31,7 @@ In this case, as you are using Windows, click on the Windows option:
      width="80%" 
      height="80%" />
 
-Then, you will need to create an account to be able to download the installation file:
+Then, you can create an account, or continue to download without an account, to be able to download the installation file:
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_03.png" 
      alt="Main window"
