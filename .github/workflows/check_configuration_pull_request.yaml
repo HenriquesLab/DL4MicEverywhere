@@ -182,7 +182,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
 
-    name: Check running 'docker build' for amd64 and arm64 without GPU
+    name: Check running 'docker build' for amd64 and arm64 WITHOUT GPU
     needs: [check_keys, check_urls, extract_changed_files]
     steps:
       - name: Checkout
@@ -268,7 +268,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
 
-    name: Check running 'docker build' for amd64 and arm64 without GPU
+    name: Check running 'docker build' for amd64 WITH GPU
     needs: [check_keys, check_urls, extract_changed_files]
     steps:
       - name: Checkout
@@ -334,7 +334,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: false
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           build-args: |
             BASE_IMAGE=nvidia/cuda:${{ steps.cuda_version.outputs.result }}-base-ubuntu${{ steps.ubuntu_version.outputs.result }}
             GPU_FLAG=1
