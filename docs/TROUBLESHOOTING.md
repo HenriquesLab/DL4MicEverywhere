@@ -30,6 +30,9 @@ This guide contains solutions to common problems when using DL4MicEverywhere.
 
 - Please, make sure you are not using any Docker container in the terminal. Then, open a terminal and force quit Docker by typing `pkill -SIGHUP -f /Applications/Docker.app 'docker serve'`
 
+**Docker cannot build image**
+- Your docker client might be out of space. [Read here how to clear space.](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/DOCKER_DESKTOP.md)
+
 
 ## GPU Support
 
