@@ -18,7 +18,6 @@ dependencies:
   - pip:
       - pip
       - nvidia-cudnn-cu11==8.6.0.163 # if GPU_FLAG==1
-      - -r file:requirements.txt
       - nbformat
       - jupyterlab
       - ipywidgets
