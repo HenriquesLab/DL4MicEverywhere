@@ -33,10 +33,10 @@ jobs:
           miniforge-version: latest
           mamba-version: "*"
           use-mamba: true
-      - name: constructor build
-        run: constructor
+      - name: constructor 
+        run: constructor --output-folder ./dist/main --platform ${{ matrix.os }} --python ${{ matrix.python-version }} --dependencies mamba
       - name: Upload Installer
         uses: actions/upload-artifact@v2
         with:
-          name: installer-${{ matrix.python-version }}
-          path: Install_*.sh
+          name: installer-${{ matrix.python-version }}-${{ matrix.os }}
+          path: dist/main/**/*
