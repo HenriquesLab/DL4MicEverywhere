@@ -1,24 +1,24 @@
-# Notebook Types in DL4MicEverywhere
+# Types of Notebooks in DL4MicEverywhere
 
-DL4MicEverywhere supports 3 categories of notebooks:
+DL4MicEverywhere provides support for three distinct categories of notebooks:
 
 ## ZeroCostDL4Mic Notebooks
 
-These are notebooks converted from [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic). They cover common deep learning workflows for bioimage analysis.
+These notebooks are adaptations from the [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) project. They encompass a variety of common deep learning workflows for bioimage analysis.
 
-The notebooks are located under `notebooks/ZeroCostDL4Mic_notebooks/`.
+You can find these notebooks in the `notebooks/ZeroCostDL4Mic_notebooks/` directory.
 
-Examples include U-Net 2D, StarDist 3D, CycleGAN etc.
+Examples of these notebooks include U-Net 2D, StarDist 3D, CycleGAN, and more.
 
 ## Bespoke Notebooks 
 
-These are custom notebooks developed specifically for DL4MicEverywhere. 
+These notebooks are specifically developed for DL4MicEverywhere and offer unique functionalities. 
 
 They are located under `notebooks/Bespoke_notebooks/`.
 
 ## External Notebooks
 
-These are notebooks contributed by external collaborators/groups.
+These notebooks are contributions from external collaborators or groups.
 
 They are located under `notebooks/External_notebooks/`.
 

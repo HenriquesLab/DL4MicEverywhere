@@ -1,40 +1,39 @@
-# Brief overview of Docker desktop 
+# Docker Desktop Overview
 
-Docker containers and images can be managed from the Docker desktop application. It is particularly useful to see how many Docker images are installed in our computer and how many containers are actually running them.
+Docker Desktop is a tool for managing Docker containers and images. It provides a visual interface for monitoring the Docker images installed on your computer and the containers currently running.
 
-## Clean Docker containers and images
+## Cleaning Docker Containers and Images
 
-Note that Docker images occupy in memory between 3 - 5 GB, so it is recommendable to check it from time to time and remove the unnecessary ones. For this, first check if there is any container using the image. If so, stop and remove it by clicking n the bin symbol. 
+Docker images typically occupy between 3 - 5 GB of memory. Therefore, it's advisable to periodically review and remove any unnecessary images. To do this, first check if any container is using the image. If so, stop and remove it by clicking on the bin symbol. 
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/DOCKER_DESKTOP_CONTAINER.png" 
      alt="Docker desktop container"
      width="50%" 
      height="50%" />
 
-
-Then go to Images and remove the images that will not be used.
+Next, navigate to Images and remove any images that are no longer needed.
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/DOCKER_DESKTOP_IMAGE.png" 
      alt="Docker desktop images"
      width="50%" 
      height="50%" />
 
-To list all the container images that currently occupy space on your computer:
+To display all the container images currently occupying space on your computer, use:
 
 `sudo docker images`
 
-to clear all unused images:
+To remove all unused images, use:
 
 `docker image prune -a`
 
-to clear all unused containers, networks, images:
+To remove all unused containers, networks, and images, use:
 
 `docker system prune -a`
 
 
-## Pause, restart or kill Docker
+## Managing Docker
 
-To pause, restart or close Docker you can always click on the shortcut symbol of docker: 
+You can pause, restart, or close Docker by clicking on the Docker shortcut symbol: 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/STOP_DOCKER.png" 
      alt="Docker desktop images"
      width="50%" 

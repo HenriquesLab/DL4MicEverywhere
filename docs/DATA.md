@@ -1,53 +1,53 @@
 # Preparing Data 
 
-The DL4MicEverywhere notebooks are designed to work with common microscopy image formats and require your data to be structured in a specific way. Here are some tips for preparing your data to use with the notebooks:
+The DL4MicEverywhere notebooks are generally compatible with standard microscopy image formats and necessitate a specific data structure. Here are some guidelines for preparing your data for use with the notebooks:
 
 ## Supported Image Formats
 
-The notebooks support uncompressed image formats:
+The notebooks are compatible with uncompressed image formats:
 
 - TIFF (.tif)
 - PNG (.png)
 - JPEG (.jpg)
 
-Other formats like proprietary microscope files or **compressed TIFFs** are not directly supported. You will need to convert these to one of the above formats first. Fiji/ImageJ could be useful for this. Check the [troubleshooting](TROUBLESHOOTING.md) page.
+Proprietary microscope files or **compressed TIFFs** are not directly supported. These need to be converted to one of the supported formats. Fiji/ImageJ can be used for this purpose. Refer to the [troubleshooting](TROUBLESHOOTING.md) page for more information.
 
 ## Data Organization 
 
-Organize your image data into separate folders:
+Your image data should be organized into separate folders:
 
-- `raw` - Contains the raw input images 
-- `labels` - Contains any ground truth labels
-- `train` - Training images (can symlink from raw)
-- `test` - Test images (can symlink from raw)
+- `raw` - This folder should contain the raw input images 
+- `labels` - This folder should contain any ground truth labels
+- `train` - This folder should contain the training images (can symlink from raw)
+- `test` - This folder should contain the test images (can symlink from raw)
 
 This folder structure is expected by many of the notebooks. 
 
 ## Ground Truth
 
-For supervised learning notebooks, you need ground truth labels, such as:
+For supervised learning notebooks, ground truth labels are required, such as:
 
 - Segmentation masks 
 - Landmarks or contours
 - Class labels
 
-Store labels in common formats like PNG masks or CSV files. Ensure labels correspond to the right input images.
+Store labels in common formats like PNG masks or CSV files. Ensure labels correspond to the correct input images.
 
 ## Training vs Test Split 
 
-Split your data into separate training and test sets. A common split is 80% training, 20% test.
+Your data should be split into separate training and test sets. A common split is 80% for training and 20% for testing.
 
-Use symlinking to avoid duplicating data between the `train` and `test` folders.
+Symlinking can be used to avoid duplicating data between the `train` and `test` folders.
 
 ## Resizing
 
-Many notebooks require a consistent image size, typically 512x512 or 256x256 pixels. Resize your images to match the expected notebook input shape.
+Many notebooks require images of a consistent size, typically 512x512 or 256x256 pixels. Resize your images to match the expected notebook input shape.
 
-Use a Lanczos or cubic interpolation method for best results when downsizing.
+When downsizing, use a Lanczos or cubic interpolation method for optimal results.
 
 ## Normalization 
 
-Normalize pixel values to the 0-1 range. This improves training stability.
+Normalize pixel values to the 0-1 range to enhance training stability.
 
 In Python:
 
@@ -57,12 +57,12 @@ img = img / 255.0
 
 ## Data Augmentation
 
-Applying data augmentation (rotations, flips, zooms, etc) to your training data can help improve model robustness and prevent overfitting.
+Data augmentation (rotations, flips, zooms, etc) can be applied to your training data to improve model robustness and prevent overfitting.
 
-Use the Albumentations library to augment microscopy data.
+The Albumentations library is recommended for augmenting microscopy data.
 
 ## Review Data
 
-Spot check images after preparation to ensure proper formats, clean labels, and no corruption or artifacts.
+After preparation, spot check images to ensure they are in the correct formats, have clean labels, and are free from corruption or artifacts.
 
-Fix any issues before starting training to avoid errors or poor results.
+Any issues should be fixed before starting training to avoid errors or suboptimal results.
