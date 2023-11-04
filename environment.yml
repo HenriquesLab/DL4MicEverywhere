@@ -1,5 +1,6 @@
 channels:
 - conda-forge
+- anaconda
 - defaults
 dependencies:
 - constructor
