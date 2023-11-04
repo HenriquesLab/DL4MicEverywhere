@@ -5,6 +5,11 @@ on:
       - main
 jobs:
   build:
+    defaults:
+      # run:
+        # shell: cmd /C call {0}
+      run:
+        shell: bash -l {0}
     strategy:
       matrix:
         python-version: ["3.10"]
