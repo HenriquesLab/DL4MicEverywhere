@@ -17,7 +17,11 @@ jobs:
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
           # condarc-file: etc/example-condarc.yml
-          # auto-activate-base: false
+          # auto-activate-base: true
+          miniforge-version: latest
+          miniforge-variant: Mambaforge
+          mamba-version: "*"
+          use-mamba: true
       - name: Build Installer
         run: constructor .
       - name: Upload Installer
