@@ -1,8 +1,8 @@
-# DL4MicEverywhere installation guidelines
+# DL4MicEverywhere Installation Guide
 
-## 1. Install Docker
+## 1. Docker Installation
 
-First of all, you need to install Docker Desktop on your computer. You can follow the officially provided guidelines based on your operative system:
+Firstly, Docker Desktop needs to be installed on your computer. Follow the official guidelines based on your operating system:
 
 * Windows: https://docs.docker.com/desktop/install/windows-install/
 * Linux: https://docs.docker.com/desktop/install/linux-install/
@@ -15,7 +15,7 @@ The only requirement to use the graphical user interface (GUI) is to have [Tcl/T
 <details>
 <summary>On Windows:</summary>
 
-To install Tcl/Tk on your Windows computer, follow these steps:
+To install Tcl/Tk on Windows, follow these steps:
 
 First of all, got to https://www.tcl.tk/software/tcltk/ and click on the Active Tcl [link](https://www.activestate.com/products/tcl/): 
 
@@ -99,12 +99,10 @@ The installation has been completed. Click on **Finish** and everything should b
 <details>
 <summary>On Linux:</summary>
 
-Most Unix / Linux operating system distributions include Tcl and Tk. If they are not already installed, you can use your system's package manager to install the appropriate packages. For instance, in Ubuntu, you can use the following commands:
+Most Unix / Linux operating system distributions include Tcl and Tk. If not already installed, use your system's package manager to install the appropriate packages. For Ubuntu, use the following commands:
 
 ```
 sudo apt-get install tcl
-```
-```
 sudo apt-get install tk
 ```
 
@@ -113,28 +111,26 @@ sudo apt-get install tk
 <details>
 <summary>On Mac:</summary>
 
-Most Mac OS X operating system distributions include Tcl/Tk. 
-
-If not already installed, you will get an error similar to the following one:
+Most Mac OS X operating system distributions include Tcl/Tk. If not already installed, you will receive an error similar to the following:
 
 ```
 DEPRECATION WARNING: The system version of Tk is deprecated and may be removed in a future release. Please don't rely on it. Set TK_SILENCE_DEPRECATION=1 to suppress this warning.
 ```
 you can install or update the appropriate packages in two different ways:
 
- * Option 1: using homebrew:
-   Reinstall you tcl-tk packages
+ * Option 1: Using Homebrew:
+   Reinstall your tcl-tk packages
    ```
    brew uninstall tcl-tk
    brew install tcl-tk
    ```
 
-   **Note**: If you don't have the `brew` command, you must install [Homebrew](https://brew.sh/). You can do this by running the following command in your terminal:
+   **Note**: If you don't have the `brew` command, install [Homebrew](https://brew.sh/) by running the following command in your terminal:
    ```
    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
    ```
 
- * Option 2: using a package installation:
+ * Option 2: Using a package installation:
    
    Go to https://www.tcl.tk/software/tcltk/ and click on the Active Tcl [link](https://www.activestate.com/products/tcl/): 
 
@@ -213,21 +209,21 @@ you can install or update the appropriate packages in two different ways:
      width="60%" 
      height="60%" />
 
-   </details>
+</details>
 
 
-## 3. Download the DL4MicEverywhere repository
+## 3. DL4MicEverywhere Repository Download
 
 * **Option 1**: Download the ZIP file from GitHub's repository
 
-    1.- Download a ZIP file with the DL4MicEverywhere repository by clicking [here](https://github.com/HenriquesLab/DL4MicEverywhere/archive/refs/heads/main.zip).
+    1. Download a ZIP file of the DL4MicEverywhere repository by clicking [here](https://github.com/HenriquesLab/DL4MicEverywhere/archive/refs/heads/main.zip).
 
-    2.- Decompress the downloaded file.
+    2. Decompress the downloaded file.
 
 * **Option 2**: Download from the terminal using git
 
     > ❗**IMPORTANT**:
-    > You need to have `git` installed. If not, follow the [official installation steps](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+    > `git` must be installed. If not, follow the [official installation steps](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 
     > ℹ️ **NOTE**:
     > You need to be located in the folder where you want to download the DL4MicEverywhere repository.
@@ -236,3 +232,4 @@ you can install or update the appropriate packages in two different ways:
     git clone https://github.com/HenriquesLab/DL4MicEverywhere.git
     ```
 
+This will create a folder called `DL4MicEverywhere` with all the files inside. You're now ready to run it - see the [User Guide](USER_GUIDE.md) for details.

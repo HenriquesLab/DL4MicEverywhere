@@ -1,53 +1,50 @@
 # DL4MicEverywhere Design
 
-## Overview
+## Introduction
 
-DL4MicEverywhere is a project that aims to make deep learning for microscopy more flexible, shareable and reproducible. It builds on [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) by providing a standalone Docker-based backend that allows users to run the ZeroCostDL4Mic notebooks locally or on remote infrastructure instead of relying on Google Colab.
+DL4MicEverywhere is an initiative designed to enhance the flexibility, shareability, and reproducibility of deep learning for microscopy. It extends the capabilities of [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) by offering a Docker-based backend that enables users to execute ZeroCostDL4Mic notebooks either locally or on remote infrastructure, eliminating the dependency on Google Colab.
 
-The key components of the system are:
+The system comprises the following key components:
 
-- Docker containers for each ZeroCostDL4Mic notebook 
-- Launch script and GUI to build and run containers
-- Automated testing and building using GitHub Actions
-- Configuration files to specify notebook details
-- Jupyter Notebooks with ipywidgets for interactivity 
+- Individual Docker containers for each ZeroCostDL4Mic notebook 
+- A launch script and GUI for building and executing containers
+- GitHub Actions for automated testing and building
+- Configuration files detailing notebook specifics
+- Interactive Jupyter Notebooks with ipywidgets 
 
 ## Docker Containers
 
-The core of DL4MicEverywhere is a Docker container for each existing ZeroCostDL4Mic notebook. These containers encapsulate all the dependencies and configurations required to run the notebooks properly. This encapsulation enhances reproducibility by eliminating inconsistencies due to software environment differences.
+At the heart of DL4MicEverywhere are Docker containers, each corresponding to a notebook (see [notebook types](NOTEBOOK_TYPES.md)). These containers package all the necessary dependencies and configurations required for the smooth operation of the notebooks, thereby enhancing reproducibility by mitigating software environment discrepancies.
 
-The `Dockerfile` specifies the base image, installs dependencies, copies the notebook and requirements files, and sets up commands to run the notebook. Build arguments populate dynamic values based on the notebook configuration.
+The `Dockerfile` outlines the base image, installs dependencies, duplicates the notebook and requirements files, and sets up commands to execute the notebook. Build arguments are used to populate dynamic values based on the notebook configuration.
 
-GitHub Actions automatically builds and publishes these containers to DockerHub on changes.
+GitHub Actions are set up to automatically build and publish these containers to DockerHub whenever changes are made.
 
 ## Launch Script and GUI
 
-The `launch.sh` script provides a simple interface to build and run the Docker containers. It handles parsing arguments, reading the configuration file, executing pre-build tests, building the image, and running the container.
+The `launch.sh` script offers a straightforward interface for building and running the Docker containers. It manages argument parsing, configuration file reading, pre-build testing, image building, and container execution.
 
-The GUI implemented in `gui.tcl` gives an interactive way to select notebooks and parameters. It provides options for basic or advanced configuration. The GUI calls the `launch.sh` script under the hood to handle the build/run process.
+The GUI, implemented in `gui.tcl`, provides an interactive method for selecting notebooks and parameters. It offers options for basic or advanced configuration. The GUI utilizes the `launch.sh` script to manage the build/run process.
 
 ## Configuration Files
 
-Each notebook has a `configuration.yaml` file that specifies:
+Each notebook is associated with a `configuration.yaml` file that specifies:
 
-- Notebook URL
-- Requirements URL
+- The Notebook URL
+- The Requirements URL
 - Software versions (CUDA, Ubuntu, Python)
-- Sections to remove during Colab -> Jupyter conversion
-- Metadata like name, version, description
+- Sections to be removed during the Colab -> Jupyter conversion
+- Metadata such as name, version, description
+See [configuration file format](FORMAT.md) for details.
 
-The launch scripts read these configurations to determine how to build the containers.
+The launch scripts utilize these configurations to determine the build process for the containers.
 
 ## Automated Building 
 
-GitHub Actions workflows defined in `.github/workflows/` handle automatically building and testing containers on changes.
+GitHub Actions workflows, defined in `.github/workflows/`, manage the automatic building and testing of containers upon changes.
 
-The `build-and-deploy.yml` workflow builds containers and pushes them to DockerHub on changes to configurations or the core build scripts.
-
-The `NotebookUpdateChecker.yml` workflow runs daily to check for notebook updates and trigger rebuilds if new versions are found.
-
-Unit tests in `tests/` validate build scripts are functioning properly.
+The `build_docker_images_.yml` workflow builds containers and pushes them to DockerHub when changes are made to configurations or the core build scripts.
 
 ## Jupyter Notebooks
 
-The ZeroCostDL4Mic notebooks are converted from Colab to Jupyter format using a custom script. Jupyter notebooks retain the original interactivity through ipywidgets. This provides a consistent and familiar interface for users.
+The ZeroCostDL4Mic notebooks are converted from Colab to Jupyter format using a custom script. Jupyter notebooks maintain the original interactivity through the use of ipywidgets, providing a consistent and user-friendly interface.
