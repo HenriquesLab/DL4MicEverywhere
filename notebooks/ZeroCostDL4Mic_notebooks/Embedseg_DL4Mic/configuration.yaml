@@ -1,0 +1,8 @@
+notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/EmbedSeg_2D_ZeroCostDL4Mic.ipynb
+requirements_url: /home/ocb/Documents/EGM/ZeroCostDL4Mic/master/requirements_files/CARE_2D_requirements_simple.txt
+cuda_version: 11.7.1
+ubuntu_version: 22.04
+python_version: 3.10
+sections_to_remove: 1.0. 1.1. 2.
+version: 0.1.0
+description: "EmbedSeg_2D_DL4Mic is the conversion of the 2D EmbedSeg from ZeroCostDL4Mic."
