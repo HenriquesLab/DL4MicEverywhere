@@ -118,6 +118,7 @@ else
     fi
 
     IFS=$'\n' read -d '' -r -a strarr <<<"$gui_arguments"
+
     advanced_options=${strarr[0]}
 
     if [ $advanced_options -eq 0 ]; then

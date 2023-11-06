@@ -1,6 +1,4 @@
-
 #!/bin/bash
-# BASEDIR=$(dirname "$0")
 
 # Function to parse and read the configuration yaml file
 function get_yaml_args {
@@ -20,21 +18,27 @@ function get_yaml_args {
    }'
 }
 
-# eval $(get_yaml_args "$BASEDIR/notebooks/$1/configuration.yaml")
-eval $(get_yaml_args "$1/configuration.yaml")
+# $1 = $basedir
+# $2 = $selectedFolder
+# $3 = $notebook_name
 
+# Get the local version on the configuration.yaml
+eval $(get_yaml_args "$1/notebooks/$2/$3/configuration.yaml")
 local_version=$version
+
+# Also get the desctiption of the model
 local_description=$description
 
-wget -q https://raw.githubusercontent.com/IvanHCenalmor/playground/main/notebooks/CARE_2D_DL4Mic/configuration.yaml
-# wget -q https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/tree/main/notebooks/$1/configuration.yaml
+# Get the remote version on the configuration.yaml (on DL4MicEverywhere repository)
+wget -q https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/$2/$3/configuration.yaml
 eval $(get_yaml_args "./configuration.yaml")
 rm ./configuration.yaml
 
+# Compare the local and remote versions to check if there is an update
 if [ $version == $local_version ]; then
-   echo 1
-else
    echo 0
+else
+   echo 1
 fi
 
 echo $local_description
