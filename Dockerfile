@@ -56,7 +56,7 @@ ADD $PATH_TO_REQUIREMENTS ./requirements.txt
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt && \
     rm requirements.txt && \
-    git clone https://github.com/DL4MicEverywhere.git && \
+    git clone https://github.com/HenriquesLab/DL4MicEverywhere.git && \
     pip install nbformat jupyterlab ipywidgets && \
     python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py -p . -n ${NOTEBOOK_NAME} -s ${SECTIONS_TO_REMOVE} && \ 
     mv colabless_${NOTEBOOK_NAME} ${NOTEBOOK_NAME} && \ 
