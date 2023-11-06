@@ -70,9 +70,17 @@ def update_cell_sections(cells, section_localizer, section_to_rmv, next_section)
             acual_section_part = acual_section.split('.')
             if acual_section_part[0] >= since_section_part[0]:
                 cell_id = updated_section_localizer.pop(section)
-                updated_section = matching_section + '.'.join([str(int(acual_section_part[0])-1)] + acual_section_part[1:])
-                updated_section_localizer[updated_section] = cell_id - num_removed_cells
-                updated_cells[cell_id - num_removed_cells].source = updated_cells[cell_id - num_removed_cells].source.replace(section, updated_section, 1)
+                
+                if len(section_to_rmv) == len(next_section):
+                    updated_section = matching_section + '.'.join([str(int(acual_section_part[0])-1)] + acual_section_part[1:])
+                    updated_section_localizer[updated_section] = cell_id - num_removed_cells
+                    updated_cells[cell_id - num_removed_cells].source = updated_cells[cell_id - num_removed_cells].source.replace(section, updated_section, 1)
+                else:
+                    # When last subsection is removed (e.g. section_to_rmv = 1.1. & next_section = 2.)
+                    # In this case the section is not updates
+                    updated_section = matching_section + '.'.join([str(int(acual_section_part[0]))] + acual_section_part[1:])
+                    # The only thing that is updated is the section localizer
+                    updated_section_localizer[updated_section] = cell_id - num_removed_cells
 
 
     return updated_cells, updated_section_localizer
