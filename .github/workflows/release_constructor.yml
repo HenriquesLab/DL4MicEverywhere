@@ -40,3 +40,9 @@ jobs:
         with:
           name: installer-${{ matrix.python-version }}-${{ matrix.os }}
           path: dist/main/**/*
+      - uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          files: dist/main/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is  
