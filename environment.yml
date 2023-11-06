@@ -22,4 +22,3 @@ dependencies:
   - nbformat
   - jupyterlab
   - ipywidgets
-  # - -e . # Install the current directory as an editable package
