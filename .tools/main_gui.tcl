@@ -57,7 +57,6 @@ proc onSelectResult {} {
 }
 
 proc onDone {} {
-
     global data_path
     global result_path
     global gpu
@@ -228,7 +227,7 @@ proc parseYaml {notebook_name} {
     global selectedFolder
 
     # Read a yaml file
-    catch {exec /bin/bash $basedir/.tools/parse_yaml.sh "$basedir/notebooks/$selectedFolder/$notebook_name"} output
+    catch {exec /bin/bash $basedir/.tools/parse_yaml.sh "$basedir" "$selectedFolder" "$notebook_name"} output
 
     set arguments [split $output \n]
 
