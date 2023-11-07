@@ -47,8 +47,10 @@ ADD $PATH_TO_NOTEBOOK ./${NOTEBOOK_NAME}
 ADD $PATH_TO_REQUIREMENTS ./requirements.txt
 
 ARG PYTHON_VERSION=""
-RUN conda create -y --name aux_env python=${PYTHON_VERSION} --file ./requirements.txt && \
+RUN conda create -y --name aux_env python=${PYTHON_VERSION} && \
     conda activate aux_env && \
+    conda install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0 && \
+    conda install -c conda-forge --file requirements.txt && \
     rm requirements.txt && \
     git clone https://github.com/HenriquesLab/DL4MicEverywhere.git && \
     pip install nbformat jupyterlab ipywidgets && \
