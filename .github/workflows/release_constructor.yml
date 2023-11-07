@@ -34,8 +34,7 @@ jobs:
           mamba-version: "*"
           use-mamba: true
       - name: constructor 
-        run: constructor --output-dir dist/main --installer_filename ${{ matrix.python-version }}-${{ matrix.os }}
-
+        run: constructor --output-dir dist/main 
       # - name: Upload Installer
         # uses: actions/upload-artifact@v2
         # with:
