@@ -6,7 +6,7 @@
 | DenoiSeg                              |                      |             |
 | StarDist (2D)                         |         yes          |  Linux      |
 | StarDist (3D)                         |                      |             |
-| Cellpose (2D and 3D)                  |                      |             |
+| Cellpose (2D and 3D)                  |      yes             |  Linux / M1 |
 | SplineDist (2D)                       |                      |             |
 | EmbedSeg (2D)                         |                      |             |
 | MaskRCNN (2D)                         |                      |             |
