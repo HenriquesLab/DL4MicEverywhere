@@ -46,7 +46,7 @@ function parse_yaml {
    local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
    sed -ne "s|^\($s\):|\1|" \
         -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
-        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
+        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  "$1" |
    awk -F$fs '{
       indent = length($1)/2;
       vname[indent] = $2;
@@ -164,7 +164,7 @@ else
         if [ "$test_flag" -eq 1 ]; then
             echo "Path to the configuration folder: $config_path"
         fi
-        config_path=$config_path+"/configuration.yaml"
+        config_path="$config_path/configuration.yaml"
     elif [[ -f $config_path ]]; then
         if [ "$test_flag" -eq 1 ]; then
             echo "Path to the configuration folder: $config_path"
@@ -217,7 +217,7 @@ if [ "$test_flag" -eq 1 ]; then
 fi
 
 # Read the variables from the yaml file
-eval $(parse_yaml $config_path)
+eval $(parse_yaml "$config_path")
 
 # Base image is selected based on the GPU selection
 if [ "$gpu_flag" -eq 1 ]; then
