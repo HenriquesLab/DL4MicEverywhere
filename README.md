@@ -39,13 +39,15 @@ DL4MicEverywhere is designed to make deep learning more accessible, transparent,
 
 [![alt text](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/ezgif.com-video-to-gif.gif)](https://youtu.be/d1FB_zc5gVc)
 
+Refer to the [User Guide](docs/USER_GUIDE.md) and [Installation guidelines](docs/INSTALLATION.md). Windows users should follow the dedicated [Windows installation guide](docs/WINDOWS_INSTALLATION.md).
+
 ### Requirements
 
 - Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop))
 - For GPU acceleration - NVIDIA GPU + CUDA drivers ([setup](https://docs.nvidia.com/cuda/)) 
-- For the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/). ([Instructions](docs/GUI_USER_GUIDE.md)).
+- For the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/).
 
-### Quickstart
+### Quickstart MacOS/Linux
 
 1. Clone this repo: `git clone https://github.com/HenriquesLab/DL4MicEverywhere.git`
 2. Navigate to the repo directory 
@@ -54,7 +56,7 @@ DL4MicEverywhere is designed to make deep learning more accessible, transparent,
 
 With Docker, all dependencies are neatly bundled. Just launch and access deep learning workflows through an intuitive interface!
 
-For more details, refer to the [User Guide](docs/USER_GUIDE.md) and [Installation guidelines](docs/INSTALLATION.md).
+
 
 
 ## Contributing
@@ -64,6 +66,7 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 ## Documentation
 
 - [Installation](docs/INSTALLATION.md)
+- [WindowsOS Installation](docs/WINDOWS_INSTALLATION.md)
 - [User Guide](docs/USER_GUIDE.md)
   - [Data Preparation](docs/DATA.md)
   - [Remote connection](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/GUI_USER_GUIDE.md#connection-with-remote-workstations-through-ssh)
