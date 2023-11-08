@@ -308,12 +308,12 @@ notebook_name="$(basename "$notebook_path")"
 # Local files, if included, need to be remocreated in same folder as the dockerfile,
 # then they will be deleted
 if [ "$local_notebook_flag" -eq 1 ]; then
-    cp $notebook_path $BASEDIR/notebook.ipynb
+    cp "$notebook_path" "$BASEDIR/notebook.ipynb"
     notebook_path=./notebook.ipynb
 fi
 
 if [ "$local_requirements_flag" -eq 1 ]; then
-   cp $requirements_path $BASEDIR/requirements.txt
+   cp "$requirements_path" "$BASEDIR/requirements.txt"
    requirements_path=./requirements.txt
 fi
 
@@ -394,7 +394,7 @@ if [ "$build_flag" -eq 3 ]; then
 else
     # Build the docker image without GUI
     if [ "$build_flag" -eq 2 ]; then
-        docker build $BASEDIR --no-cache -t $docker_tag \
+        docker build $BASEDIR -t $docker_tag \
             --build-arg BASE_IMAGE="${base_img}" \
             --build-arg GPU_FLAG="${gpu_flag}" \
             --build-arg PYTHON_VERSION="${python_version}" \
