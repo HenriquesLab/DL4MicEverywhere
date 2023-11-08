@@ -52,13 +52,11 @@ jobs:
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v2
-        with:
-          path: dist
       - name: Create Draft Release
         uses: softprops/action-gh-release@v1
         with:
           draft: true
-          files: dist/*
+          files: ./**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
