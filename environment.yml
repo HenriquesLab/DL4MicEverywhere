@@ -15,10 +15,12 @@ dependencies:
 - ffmpeg
 - pkg-config
 - nodejs
-- cudatoolkit=11.0 # Adjust the version number as needed
+- cudatoolkit=11.2
+- cudnn=8.1.0
+- pip
 - pip:
-  - pip
   - nvidia-cudnn-cu11==8.6.0.163 # if GPU_FLAG==1
   - nbformat
   - jupyterlab
   - ipywidgets
+  - -r requirements.txt
