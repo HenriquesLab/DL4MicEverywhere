@@ -20,7 +20,7 @@ jobs:
           - os: windows
             shell: cmd /C call {0}
           - os: macos
-            shell:  bash -l {0}
+            shell: bash -l {0}
     runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout code
