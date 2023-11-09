@@ -167,7 +167,8 @@ jobs:
       matrix: ${{ fromJson(needs.list_configs.outputs.matrix) }} 
 
     name: Check running 'docker build' for AMD64 WITHOUT GPU
-    needs: [check_keys, check_urls, list_configs]
+    # needs: [check_keys, check_urls, list_configs]
+    needs: [check_keys, list_configs]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -251,7 +252,8 @@ jobs:
       matrix: ${{ fromJson(needs.list_configs.outputs.matrix) }} 
 
     name: Check running 'docker build' for ARM64 WITHOUT GPU
-    needs: [check_keys, check_urls, list_configs]
+    # needs: [check_keys, check_urls, list_configs]
+    needs: [check_keys, list_configs]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -336,7 +338,8 @@ jobs:
       matrix: ${{ fromJson(needs.list_configs.outputs.matrix) }} 
 
     name: Check running 'docker build' for AMD64 WITH GPU
-    needs: [check_keys, check_urls, list_configs]
+    # needs: [check_keys, check_urls, list_configs]
+    needs: [check_keys, list_configs]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
