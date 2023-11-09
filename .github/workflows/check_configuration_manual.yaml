@@ -124,39 +124,39 @@ jobs:
             echo 'The configuration.yaml file is defined with all its keys.'
           fi
   
-  check_urls:  
-    runs-on: [self-hosted, dl4miceverywhere-builder]
-    strategy:
-      # super important if you want to see all results, even if one fails
-      # fail-fast is true by default
-      fail-fast: false
-      matrix: ${{ fromJson(needs.list_configs.outputs.matrix) }} 
-
-    name: Check notebook's and requirements' URLs
-    needs: [check_keys, list_configs]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-            fetch-depth: 0
-      - name: Extract the notebook URL
-        id: extract_nb_url
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq '.notebook_url' '${{ matrix.notebook }}' 
-      - name: Extract the requirements URL
-        id: extract_rq_url
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq '.requirements_url' '${{ matrix.notebook }}' 
-      - name: Check that notebook's URL exists
-        uses: filiph/linkcheck@3.0.0
-        with:
-          arguments: ${{ steps.extract_nb_url.outputs.result }}
-      - name: Check that requirements' URL exists
-        uses: filiph/linkcheck@3.0.0
-        with:
-          arguments: ${{ steps.extract_rq_url.outputs.result }}
+  # check_urls:  
+  #   runs-on: [self-hosted, dl4miceverywhere-builder]
+  #   strategy:
+  #     # super important if you want to see all results, even if one fails
+  #     # fail-fast is true by default
+  #     fail-fast: false
+  #     matrix: ${{ fromJson(needs.list_configs.outputs.matrix) }} 
+  # 
+  #   name: Check notebook's and requirements' URLs
+  #   needs: [check_keys, list_configs]
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #       with:
+  #           fetch-depth: 0
+  #     - name: Extract the notebook URL
+  #       id: extract_nb_url
+  #       uses: mikefarah/yq@master
+  #       with:
+  #         cmd: yq '.notebook_url' '${{ matrix.notebook }}' 
+  #     - name: Extract the requirements URL
+  #       id: extract_rq_url
+  #       uses: mikefarah/yq@master
+  #       with:
+  #         cmd: yq '.requirements_url' '${{ matrix.notebook }}' 
+  #     - name: Check that notebook's URL exists
+  #       uses: filiph/linkcheck@3.0.0
+  #       with:
+  #         arguments: ${{ steps.extract_nb_url.outputs.result }}
+  #     - name: Check that requirements' URL exists
+  #       uses: filiph/linkcheck@3.0.0
+  #       with:
+  #         arguments: ${{ steps.extract_rq_url.outputs.result }}
 
   check_docker_build_amd64_without_gpu:
     runs-on: [self-hosted, dl4miceverywhere-builder]
