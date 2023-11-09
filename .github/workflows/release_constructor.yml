@@ -6,13 +6,12 @@ on:
 jobs:
   build:
     defaults:
-      # run:
-        # shell: cmd /C call {0}
       run:
         shell: bash -l {0}
     strategy:
       matrix:
-        os: [ubuntu]
+       os: [ubuntu]
+      #  os: [ubuntu, windows, macos]
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
         include:
           - os: ubuntu
@@ -52,12 +51,17 @@ jobs:
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v2
-      - name: Create Draft Release
-        uses: softprops/action-gh-release@v1
+      # - name: Create Draft Release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     draft: true
+      #     files: ./**/*
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release
+        uses: ncipollo/release-action@v1
         with:
-          draft: true
-          files: ./**/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
+          artifacts: "dist/main/*"  # Replace with your actual artifacts path
+          # bodyFile: "path/to/release-notes.md"   # Replace with your actual release notes file
+                
         
