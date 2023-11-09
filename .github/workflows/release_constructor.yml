@@ -12,14 +12,14 @@ jobs:
         shell: bash -l {0}
     strategy:
       matrix:
-        # os: [ubuntu, windows]
+        os: [ubuntu, windows]
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
         include:
-          - os: ubuntu-latest
+          - os: ubuntu
             shell: bash -l {0}
-          - os: windows-latest
+          - os: windows
             shell: cmd /C call {0}
-          - os: macos-latest
+          - os: macos
             shell: bash -l {0}
     runs-on: ${{ matrix.os }}-latest
     steps:
