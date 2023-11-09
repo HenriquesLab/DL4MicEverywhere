@@ -15,11 +15,11 @@ jobs:
         os: [ubuntu, windows, macos]
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
         include:
-          - os: ubuntu
+          - os: ubuntu-latest
             shell: bash -l {0}
-          - os: windows
+          - os: windows-latest
             shell: cmd /C call {0}
-          - os: macos
+          - os: macos-latest
             shell: bash -l {0}
     runs-on: ${{ matrix.os }}-latest
     steps:
