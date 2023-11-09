@@ -150,11 +150,11 @@ jobs:
         with:
           cmd: yq '.requirements_url' '${{ matrix.notebook }}' 
       - name: Check that notebook's URL exists
-        uses: filiph/linkcheck@2.0.23
+        uses: filiph/linkcheck@3.0.0
         with:
           arguments: ${{ steps.extract_nb_url.outputs.result }}
       - name: Check that requirements' URL exists
-        uses: filiph/linkcheck@2.0.23
+        uses: filiph/linkcheck@3.0.0
         with:
           arguments: ${{ steps.extract_rq_url.outputs.result }}
 
