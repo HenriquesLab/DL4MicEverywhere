@@ -1,5 +1,5 @@
-notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/3D-RCAN_ZeroCostDL4Mic.ipynb
-requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/3D-RCAN_requirements_simple.txt
+notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/3D_RCAN_ZeroCostDL4Mic.ipynb
+requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/3D_RCAN_requirements_simple.txt
 cuda_version: 11.8.0
 ubuntu_version: 22.04
 python_version: 3.9
