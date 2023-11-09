@@ -3,6 +3,10 @@ FROM ${BASE_IMAGE}
 
 ARG GPU_FLAG=""
 
+# Set timezone for Python installation
+ENV TZ=Europe/Lisbon
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Install common packages and nvidia-cuda-toolkit
 RUN apt-get update && \
     apt-get install -y build-essential \
@@ -20,10 +24,6 @@ RUN apt-get update && \
     if [ "$GPU_FLAG" -eq "1" ] ; then apt-get install -y nvidia-cuda-toolkit ; fi && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-# Set timezone for Python installation
-ENV TZ=Europe/Lisbon
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Instal Python 
 ARG PYTHON_VERSION=""
