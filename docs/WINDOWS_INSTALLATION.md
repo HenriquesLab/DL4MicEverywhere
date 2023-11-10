@@ -8,14 +8,16 @@ Windows operating systems require a slightly more complicated installation proce
 
 ## Requirements
 - WSL (Windows Subsystem for Linux) - Pre-installed on most Windows 10/11 systems, otherwise it is available on the Microsoft store.
-- Install and/or update all the GPU [NVIDIA drivers](https://www.nvidia.com/download/index.aspx), [cudatoolkit](https://developer.nvidia.com/cuda-toolkit), and [cuDNN](https://developer.nvidia.com/cudnn) necessary for your GPU.
+- Install and/or update all the GPU [NVIDIA drivers](https://www.nvidia.com/download/index.aspx), [cudatoolkit](https://developer.nvidia.com/cuda-toolkit), and [cuDNN](https://developer.nvidia.com/cudnn) necessary for your GPU.  
 
-
+&nbsp;
 
 ## 1. Docker Desktop installation
 Download and install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/):
  - During installation tick the recommended **WLS2** option.
  - To finalize the installation **Restart** the computer.
+
+ &nbsp;
 
 ## 2. Setup the WSL (Windows Subsystem for Linux)
 
@@ -29,13 +31,17 @@ This will install Ubuntu inside WSL.
 
 Once the installation ends it will ask for a username and a password. This is not necessary, exit the installation by using **Ctrl+C** or by closing the window.
 
-Then re-open the Command Line or PowerShell window and run the same command **again**, to ensure the installation was correct.
+Re-open the Command Line or PowerShell window and run the command **again**, if the installation was sucessfull you should see the following message:
+
+![Ubuntu is sucessfully installed](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/WSL_UBUNTU_IS_INSTALLED.png)
+
+&nbsp;
 
 ### 2.2. Make Ubuntu the default configuration
 
 Run the following command in the Command Line or PowerShell window to check what is the current default configuration.
 ```
-wsl --list -verbose
+wsl --list --verbose
 ```
 
 The one with * is the default configuration. 
@@ -47,6 +53,8 @@ If it is not Ubuntu, it can be changed by using the command:
 wsl --set-default Ubuntu
 ```
 
+&nbsp;
+
 ### 2.3. TCL/TK installation 
 
 TCL/TK is required for the graphical user interface (GUI) of DL4MicEverywhere, and it must be installed inside WSL's Ubuntu.
@@ -54,11 +62,20 @@ TCL/TK is required for the graphical user interface (GUI) of DL4MicEverywhere, a
 This requires running the following commands in the Command Line or PowerShell window:
 ```
 wsl apt-get update
+```
+```
 wsl apt-get install tk
 ```
 
 Now TCL/TK should be installed inside WSL's Ubuntu.
 
+To check if TCL/TK is correctly installed run:
+```
+wsl wish
+```
+This should open a new window named Wish. If it fails repeat the previous steps again.
+
+&nbsp;
 
 ## 3. DL4MicEverywhere Repository Download
 
