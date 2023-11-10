@@ -2,7 +2,7 @@ import re
 import nbformat
 
 # Usefull regular expressions 
-installation_regex = r'(pip|conda) install'
+installation_regex = r'(pip|conda) install (\w+)'
 float_regex = r"[-+]?\d*\.\d+|[-+]?\d+"
 ipywidget_style = "{'description_width': 'initial'}"
 param_regex = r"(\w+)\s*=\s*([\S\s]+?)\s*#@param\s*(.+)"
@@ -233,35 +233,38 @@ def code_to_cell(code, ipywidget_imported, function_name):
     # We are going line by line analyzing them
     lines = code.split('\n')  
     for line in lines:
-        if re.search(installation_regex, line):
-            # The installation lines are removed
-            pass
-        elif re.search(param_regex, line):
-            # The lines with #@param are replaced with ipywidgets based on the parameters
-            new_line, var_name, needs_to_be_evaluated = param_to_widget(line)
-            if var_name != "" and var_name not in widget_var_list:
-                widget_var_list.append(var_name)
-            widget_code += new_line + '\n'
+        installation_match = re.search(installation_regex, line)
+        if installation_match:
+            library_name = installation_match.group(2)
+            if library_name != '.':
+                # The installation lines of an external library are removed
+                pass
+            elif re.search(param_regex, line):
+                # The lines with #@param are replaced with ipywidgets based on the parameters
+                new_line, var_name, needs_to_be_evaluated = param_to_widget(line)
+                if var_name != "" and var_name not in widget_var_list:
+                    widget_var_list.append(var_name)
+                widget_code += new_line + '\n'
 
-            if needs_to_be_evaluated:
-                # It needs to be evaluated
-                non_widget_code += ' ' * count_spaces(line) + f"{var_name} = eval(widget_{var_name}.value)\n"
+                if needs_to_be_evaluated:
+                    # It needs to be evaluated
+                    non_widget_code += ' ' * count_spaces(line) + f"{var_name} = eval(widget_{var_name}.value)\n"
+                else:
+                    non_widget_code += ' '*count_spaces(line) + f"{var_name} = widget_{var_name}.value\n"
             else:
-                non_widget_code += ' '*count_spaces(line) + f"{var_name} = widget_{var_name}.value\n"
-        else:
-            # In the other the variable and function names are extracted
-            assign_match = re.match(assignation_regex, line)
-            if assign_match:
-                possible_variables = assign_match.group(1).split(',')
-                for var in possible_variables:
-                    var_list.append(var)
-            
-            function_match = re.match(function_regex, line)
-            if function_match:
-                func_list.append(function_match.group(1))
+                # In the other the variable and function names are extracted
+                assign_match = re.match(assignation_regex, line)
+                if assign_match:
+                    possible_variables = assign_match.group(1).split(',')
+                    for var in possible_variables:
+                        var_list.append(var)
+                
+                function_match = re.match(function_regex, line)
+                if function_match:
+                    func_list.append(function_match.group(1))
 
-            # And the line is added as it is
-            non_widget_code += line + '\n'
+                # And the line is added as it is
+                non_widget_code += line + '\n'
 
     new_cells = []
 
