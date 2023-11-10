@@ -4,7 +4,7 @@ cuda_version: 11.2.2
 ubuntu_version: 20.04
 python_version: 3.7
 sections_to_remove: 
-version: 0.0.1
+version: 0.1.0
 description: "Ready to use notebook for the segmentation of small extrcaellular vesicles in transmission electron microscopy (TEM) images. The notebook will download the original code and dataset, and make the inference with a trained model."
 cite:
 - doi: https://doi.org/10.1038/s41598-019-49431-3
