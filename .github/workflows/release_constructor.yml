@@ -62,7 +62,7 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "*"  # Replace with your actual artifacts path
+          artifacts: "**/*"  # Replace with your actual artifacts path
           # bodyFile: "path/to/release-notes.md"   # Replace with your actual release notes file
                 
         
