@@ -10,16 +10,16 @@ jobs:
         shell: ${{ matrix.shell }}
     strategy:
       matrix:
-        os: [ubuntu]
+        os: [ubuntu-latest]
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
         include:
-          - os: ubuntu
+          - os: ubuntu-latest
             shell: bash -l {0}
           # - os: windows
           #   shell: cmd /C call {0}
           # - os: macos
           #   shell: bash -l {0}
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
