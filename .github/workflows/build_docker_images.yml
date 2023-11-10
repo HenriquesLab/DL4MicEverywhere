@@ -104,7 +104,7 @@ jobs:
                 username: ${{ secrets.DOCKERHUB_USERNAME }}
                 password: ${{ secrets.DOCKERHUB_TOKEN }}
                   
-            - name: Build and push without GPU
+            - name: Build and push without GPU AMD64
               uses: docker/build-push-action@v5
               with:
                 push: true
@@ -119,22 +119,22 @@ jobs:
                   NOTEBOOK_NAME=${{ steps.notebook_name.outputs.value }}
                   SECTIONS_TO_REMOVE=${{ steps.sections_to_remove.outputs.result }}
 
-            - name: Build and push without GPU
-              uses: docker/build-push-action@v5
-              with:
-                push: true
-                platforms: linux/arm64
-                tags: henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-v${{ steps.version.outputs.result }}, henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-latest
-                build-args: |
-                  BASE_IMAGE=ubuntu:${{ steps.ubuntu_version.outputs.result }}
-                  GPU_FLAG=0
-                  PYTHON_VERSION=${{ steps.python_version.outputs.result }}
-                  PATH_TO_NOTEBOOK=${{ steps.notebook_url.outputs.result }}
-                  PATH_TO_REQUIREMENTS=${{ steps.requirements_url.outputs.result }}
-                  NOTEBOOK_NAME=${{ steps.notebook_name.outputs.value }}
-                  SECTIONS_TO_REMOVE=${{ steps.sections_to_remove.outputs.result }}
+            # - name: Build and push without GPU ARM64
+            #   uses: docker/build-push-action@v5
+            #   with:
+            #     push: true
+            #     platforms: linux/arm64
+            #     tags: henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-v${{ steps.version.outputs.result }}, henriqueslab/dl4miceverywhere:${{ steps.notebook_name.outputs.value }}-latest
+            #     build-args: |
+            #       BASE_IMAGE=ubuntu:${{ steps.ubuntu_version.outputs.result }}
+            #       GPU_FLAG=0
+            #       PYTHON_VERSION=${{ steps.python_version.outputs.result }}
+            #       PATH_TO_NOTEBOOK=${{ steps.notebook_url.outputs.result }}
+            #       PATH_TO_REQUIREMENTS=${{ steps.requirements_url.outputs.result }}
+            #       NOTEBOOK_NAME=${{ steps.notebook_name.outputs.value }}
+            #       SECTIONS_TO_REMOVE=${{ steps.sections_to_remove.outputs.result }}
 
-            - name: Build and push with GPU
+            - name: Build and push with GPU AMD64
               uses: docker/build-push-action@v5
               with:
                 push: true
