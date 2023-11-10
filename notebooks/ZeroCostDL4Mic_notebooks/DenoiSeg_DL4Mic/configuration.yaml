@@ -1,5 +1,5 @@
 notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/DenoiSeg_ZeroCostDL4Mic.ipynb
-requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/DenoiSeg_requirements_simple.txt
+requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/Denoiseg_requirements_simple.txt
 cuda_version: 11.8.0
 ubuntu_version: 22.04
 python_version: 3.9
