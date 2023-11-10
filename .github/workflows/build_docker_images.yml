@@ -44,13 +44,7 @@ jobs:
         needs: list_configs
         strategy:
             fail-fast: false
-            matrix: 
-              config: ${{ fromJson(needs.list_configs.outputs.matrix) }} 
-              platform:
-                - linux/amd64
-                - linux/arm/v6
-                - linux/arm/v7
-                - linux/arm64
+            matrix:  ${{ fromJson(needs.list_configs.outputs.matrix) }} 
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -59,37 +53,37 @@ jobs:
               uses: mikefarah/yq@master
               id: notebook_url
               with:
-                cmd: yq '.notebook_url' '${{ matrix.config.notebook }}' 
+                cmd: yq '.notebook_url' '${{ matrix.notebook }}' 
             - name: Check requirements_url attribute on configuration.yaml
               uses: mikefarah/yq@master
               id: requirements_url
               with:
-                cmd: yq '.requirements_url' '${{ matrix.config.notebook }}' 
+                cmd: yq '.requirements_url' '${{ matrix.notebook }}' 
             - name: Check cuda_version attribute on configuration.yaml
               uses: mikefarah/yq@master
               id: cuda_version
               with:
-                cmd: yq '.cuda_version' '${{ matrix.config.notebook }}' 
+                cmd: yq '.cuda_version' '${{ matrix.notebook }}' 
             - name: Check ubuntu_version attribute on configuration.yaml
               uses: mikefarah/yq@master
               id: ubuntu_version
               with:
-                cmd: yq '.ubuntu_version' '${{ matrix.config.notebook }}' 
+                cmd: yq '.ubuntu_version' '${{ matrix.notebook }}' 
             - name: Check python_version attribute on configuration.yaml
               uses: mikefarah/yq@master
               id: python_version
               with:
-                cmd: yq '.python_version' '${{ matrix.config.notebook }}'
+                cmd: yq '.python_version' '${{ matrix.notebook }}'
             - name: Check sections_to_remove attribute on configuration.yaml
               uses: mikefarah/yq@master
               id: sections_to_remove
               with:
-                cmd: yq '.sections_to_remove' '${{ matrix.config.notebook }}'  
+                cmd: yq '.sections_to_remove' '${{ matrix.notebook }}'  
             - name: Check version attribute on configuration.yaml
               uses: mikefarah/yq@master
               id: version
               with:
-                cmd: yq '.version' '${{ matrix.config.notebook }}'  
+                cmd: yq '.version' '${{ matrix.notebook }}'  
 
             - name: Get notebook_name
               id: notebook_name
