@@ -62,4 +62,6 @@ RUN pip install --upgrade pip && \
     mv colabless_${NOTEBOOK_NAME} ${NOTEBOOK_NAME} && \ 
     rm -r DL4MicEverywhere
 
+ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/lib/cuda
+
 CMD bash
