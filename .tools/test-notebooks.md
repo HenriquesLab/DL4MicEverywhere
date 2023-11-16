@@ -6,6 +6,8 @@
 
 :small_orange_diamond: : Needs to be tested
 
+:large_blue_circle: : Needs data
+
 **The :x: with an *, have a deeper explanation of the error below.**
 
 |    | Network                         | configuration.yaml   | Building AMD64     | Building ARM64     | Working AMD64          | Working GPU            | Working ARM64          |
@@ -16,7 +18,7 @@
 |  3 | Cellpose (2D and 3D)            | :white_check_mark:   | :white_check_mark: | :apple:            | :white_check_mark:     | :white_check_mark:     | :apple:                |
 |  4 | CycleGAN                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :x:                    |
 |  5 | DFCAN                           | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :x:*                   | :small_orange_diamond: |
-|  6 | DRMIME                          | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
+|  6 | DRMIME                          | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
 |  7 | DecoNoising (2D)                | :white_check_mark:   | :white_check_mark: | :x:                | :x:* 			 | :x:* 		  | :x:* 		   |
 |  8 | Deep-STORM                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :white_check_mark:     |
 |  9 | DenoiSeg                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
