@@ -21,13 +21,13 @@
 |  6 | DRMIME                          | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
 |  7 | DecoNoising (2D)                | :white_check_mark:   | :white_check_mark: | :x:                | :x:* 			 | :x:* 		  | :x:* 		   |
 |  8 | Deep-STORM                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :white_check_mark:     |
-|  9 | DenoiSeg                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
+|  9 | DenoiSeg                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
 | 10 | Detectron2                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 11 | EmbedSeg (2D)                   | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 12 | FRUNet                          | :white_check_mark:   | :white_check_mark: | :x:                | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 13 | Label-free prediction (fnet) 2D | :white_check_mark:   | :white_check_mark: | :apple:            | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 14 | Label-free prediction (fnet) 3D | :white_check_mark:   | :white_check_mark: | :apple:            | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
-| 15 | MaskRCNN (2D)                   | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
+| 15 | MaskRCNN (2D)                   | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
 | 16 | Noise2Void (2D)                 | :white_check_mark:   | :white_check_mark: | :x:                | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 17 | Noise2Void (3D)                 | :white_check_mark:   | :white_check_mark: | :x:                | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 18 | RetinaNet                       | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
