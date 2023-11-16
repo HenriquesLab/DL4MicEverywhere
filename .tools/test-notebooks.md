@@ -1,3 +1,13 @@
+:white_check_mark: : Works
+
+:x: : Doesn't work
+
+:apple: : Only works building it on ARM64(Mac) computers (not simulated ARM64 on AMD64 computers)
+
+:small_orange_diamond: : Needs to be tested
+
+**The :x: with an *, have a deeper explanation of the error below.**
+
 |    | Network                         | configuration.yaml   | Building AMD64     | Building ARM64     | Working AMD64          | Working GPU            | Working ARM64          |
 |---:|:--------------------------------|:---------------------|:-------------------|:-------------------|:-----------------------|:-----------------------|:-----------------------|
 |  0 | 3D-RCAN                         | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
@@ -7,7 +17,7 @@
 |  4 | CycleGAN                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :x:                    |
 |  5 | DFCAN                           | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :x:*                   | :small_orange_diamond: |
 |  6 | DRMIME                          | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
-|  7 | DecoNoising (2D)                | :white_check_mark:   | :white_check_mark: | :x:                | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
+|  7 | DecoNoising (2D)                | :white_check_mark:   | :white_check_mark: | :x:                | :x:* 			 | :x:* 		  | :x:* 		   |
 |  8 | Deep-STORM                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :white_check_mark:     |
 |  9 | DenoiSeg                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 10 | Detectron2                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
@@ -30,6 +40,10 @@
 | 27 | pix2pix                         | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
 
 
+<details>
+<summary>*DFCAN error:</summary>
+	Problems with the GitHub repository pn2v (https://github.com/juglab/pn2v). Due to a change in the code, the **pn2v** folder is now in a **src**, breaking all the imports that are **from pn2v**, even the ones that *deconosing** has.
+</details>
 
 <details>
 <summary>*DFCAN error:</summary>
