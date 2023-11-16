@@ -120,7 +120,7 @@ jobs:
 
   build_arm64:
     name: Build Docker image on ARM64
-    runs-on: [self-hosted, dl4miceverywhere-builder]
+    runs-on: [self-hosted, macOS, ARM64]
     needs: get_arguments
     steps:
       - name: Checkout
@@ -160,7 +160,7 @@ jobs:
       - get_arguments
       - build_amd64
       - build_arm64
-    runs-on:  [self-hosted, macOS, ARM64]
+    runs-on:  [self-hosted, dl4miceverywhere-builder]
     permissions:
       id-token: write
       contents: read
@@ -195,14 +195,6 @@ jobs:
             images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest-arm64
             push: true
             amend: true
-
-      # - uses: int128/docker-manifest-create-action@v1
-      #   with:
-      #     tags: |
-      #       henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-v${{ needs.get_arguments.outputs.version }}
-      #       henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest
-      #     suffixes: |
-      #       -arm64
             
   build-only-amd64:
     if: ${{ always() && contains(needs.build_arm64.result, 'failure') }}
