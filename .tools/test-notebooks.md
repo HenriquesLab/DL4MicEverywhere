@@ -20,7 +20,7 @@
 |  5 | DFCAN                           | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :x:*                   | :small_orange_diamond: |
 |  6 | DRMIME                          | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
 |  7 | DecoNoising (2D)                | :white_check_mark:   | :white_check_mark: | :x:                | :x:* 			 | :x:* 		  | :x:* 		   |
-|  8 | Deep-STORM                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :white_check_mark:     |
+|  8 | Deep-STORM                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
 |  9 | DenoiSeg                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
 | 10 | Detectron2                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 11 | EmbedSeg (2D)                   | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
@@ -43,7 +43,7 @@
 
 
 <details>
-<summary>*DFCAN error:</summary>
+<summary>*DecoNoising error:</summary>
 	Problems with the GitHub repository pn2v (https://github.com/juglab/pn2v). Due to a change in the code, the **pn2v** folder is now in a **src**, breaking all the imports that are **from pn2v**, even the ones that *deconosing** has.
 </details>
 
