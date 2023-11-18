@@ -1,0 +1,24 @@
+channels:
+- conda-forge
+- anaconda
+- defaults
+dependencies:
+- constructor
+- gcc
+- make
+- freetype
+- libsm-cos6-x86_64
+- curl
+- wget
+- unzip
+- git
+- ffmpeg
+- pkg-config
+- nodejs
+- cudatoolkit=11.0 # Adjust the version number as needed
+- pip:
+  - pip
+  - nvidia-cudnn-cu11==8.6.0.163 # if GPU_FLAG==1
+  - nbformat
+  - jupyterlab
+  - ipywidgets
