@@ -11,9 +11,12 @@
 ![Static Badge](https://img.shields.io/badge/superresolution-3-blue?labelColor=white&color=gray)
 ![Static Badge](https://img.shields.io/badge/artificial_labelling-4-blue?labelColor=white&color=gray)
 ![Static Badge](https://img.shields.io/badge/registration-1-blue?labelColor=white&color=gray)
+
+<!--
 ![Static Badge](https://img.shields.io/badge/macOS-9-blue?labelColor=white&color=orangered)
 ![Static Badge](https://img.shields.io/badge/Linux_&_Windows-5-blue?labelColor=white&color=orangered)
 ![Static Badge](https://img.shields.io/badge/GPU_connection-5-blue?labelColor=white&color=yellow)
+-->
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/logo/dl4miceverywhere-logo.png" align="right" width="200"/>
 
