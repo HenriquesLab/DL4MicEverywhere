@@ -36,7 +36,7 @@
 | 21 | StarDist (3D)                   | :white_check_mark:   | :white_check_mark: | :x:                | :small_orange_diamond: | :small_orange_diamond: | :x:                    |
 | 22 | U-Net (2D)                      | :white_check_mark:   | :white_check_mark: | :apple:            | :small_orange_diamond: | :small_orange_diamond: | :white_check_mark:     |
 | 23 | U-Net (2D) Multilabel           | :white_check_mark:   | :white_check_mark: | :apple:            | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
-| 24 | U-Net (3D)                      | :white_check_mark:   | :white_check_mark: | :apple:            | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
+| 24 | U-Net (3D)                      | :white_check_mark:   | :white_check_mark: | :apple:            | :white_check_mark:     | :white_check_mark:     | :small_orange_diamond: |
 | 25 | WGAN                            | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 26 | YOLOv2                          | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 27 | pix2pix                         | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
