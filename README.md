@@ -30,7 +30,7 @@ It currently incorporates numerous pre-existing ZeroCostDL4Mic notebooks for tas
 
 ## Key Features
 
-- 15+ Jupyter notebooks with a user-friendly graphical interface that requires no coding (scaling to 28+ soon) 
+- 25+ Jupyter notebooks with a user-friendly graphical interface that requires no coding (scaling to 28+ soon) 
 - Docker-based [packaging](https://hub.docker.com/repository/docker/henriqueslab/dl4miceverywhere) for enhanced portability and reproducibility
 - Deploys the [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) user experience into local use
 - Supports a wide array of microscopy analysis tasks, including segmentation, reconstruction, registration, denoising, and more
