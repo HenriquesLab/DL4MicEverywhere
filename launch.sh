@@ -360,15 +360,13 @@ else
 
             # Get the architecture of the machine
             local_arch=$(uname -m)
-            echo $local_arch
+
             if [ $local_arch == "x86_64" ]; then
                 local_arch="amd64"
             fi
-            echo $local_arch
+
             # Count the ocurrences of that architecture in the docker manifest of that image
             arch_count=$(docker manifest inspect "${docker_tag}" -v | grep 'architecture' | grep -c $local_arch)
-
-            echo $arch_count
 
             if [ $arch_count -gt 0 ]; then
                 # In case the architecture is available
