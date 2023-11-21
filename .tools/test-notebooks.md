@@ -11,9 +11,9 @@
 |    | Network                         | configuration.yaml   | Building AMD64     | Building ARM64     | Working AMD64          | Working GPU            | Working ARM64          |
 |---:|:--------------------------------|:---------------------|:-------------------|:-------------------|:-----------------------|:-----------------------|:-----------------------|
 |  0 | 3D-RCAN                         | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
-|  1 | CARE (2D)                       | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
+|  1 | CARE (2D)                       | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :small_orange_diamond: |
 |  2 | CARE (3D)                       | :white_check_mark:   | :white_check_mark: | :x:                | :white_check_mark:     | :white_check_mark:     | :x:                    |
-|  3 | Cellpose (2D and 3D)            | :white_check_mark:   | :white_check_mark: | :apple:            | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
+|  3 | Cellpose (2D and 3D)            | :white_check_mark:   | :white_check_mark: | :x:            	| :white_check_mark:     | :white_check_mark:     | :x:     		   |
 |  4 | CycleGAN                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :x:                    |
 |  5 | DFCAN                           | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :x: <sup>1</sup>       | :small_orange_diamond: |
 |  6 | DRMIME                          | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
