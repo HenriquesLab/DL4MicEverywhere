@@ -1,14 +1,12 @@
 :white_check_mark: : Works
 
-:x: : Doesn't work
+:x: : Doesn't work (with an * , have a deeper explanation of the error below)
 
 :apple: : Only works building it on ARM64(Mac) computers (not simulated ARM64 on AMD64 computers)
 
 :small_orange_diamond: : Needs to be tested
 
 :large_blue_circle: : Needs data
-
-**The :x: with an *, have a deeper explanation of the error below.**
 
 |    | Network                         | configuration.yaml   | Building AMD64     | Building ARM64     | Working AMD64          | Working GPU            | Working ARM64          |
 |---:|:--------------------------------|:---------------------|:-------------------|:-------------------|:-----------------------|:-----------------------|:-----------------------|
@@ -17,9 +15,9 @@
 |  2 | CARE (3D)                       | :white_check_mark:   | :white_check_mark: | :x:                | :white_check_mark:     | :white_check_mark:     | :x:                    |
 |  3 | Cellpose (2D and 3D)            | :white_check_mark:   | :white_check_mark: | :apple:            | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
 |  4 | CycleGAN                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :x:                    |
-|  5 | DFCAN                           | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :x:*                   | :small_orange_diamond: |
+|  5 | DFCAN                           | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :x: <sup>1</sup>       | :small_orange_diamond: |
 |  6 | DRMIME                          | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
-|  7 | DecoNoising (2D)                | :white_check_mark:   | :white_check_mark: | :x:                | :x:* 			 | :x:* 		  | :x: 		   |
+|  7 | DecoNoising (2D)                | :white_check_mark:   | :white_check_mark: | :x:                | :x: <sup>2</sup> 	 | :x: <sup>2</sup> 	  | :x: 		   |
 |  8 | Deep-STORM                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
 |  9 | DenoiSeg                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
 | 10 | Detectron2                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
@@ -43,12 +41,12 @@
 
 
 <details>
-<summary>*DecoNoising error:</summary>
+<summary> <sup>2</sup> DecoNoising error:</summary>
 	Problems with the GitHub repository pn2v (https://github.com/juglab/pn2v). Due to a change in the code, the **pn2v** folder is now in a **src**, breaking all the imports that are **from pn2v**, even the ones that *deconosing** has.
 </details>
 
 <details>
-<summary>*DFCAN error:</summary>
+<summary> <sup>1</sup> DFCAN error:</summary>
 
 
 ```
