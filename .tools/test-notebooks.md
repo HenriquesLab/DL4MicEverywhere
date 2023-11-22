@@ -11,7 +11,7 @@
 |    | Network                         | configuration.yaml   | Building AMD64     | Building ARM64     | Working AMD64          | Working GPU            | Working ARM64          |
 |---:|:--------------------------------|:---------------------|:-------------------|:-------------------|:-----------------------|:-----------------------|:-----------------------|
 |  0 | 3D-RCAN                         | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
-|  1 | CARE (2D)                       | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :small_orange_diamond: |
+|  1 | CARE (2D)                       | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
 |  2 | CARE (3D)                       | :white_check_mark:   | :white_check_mark: | :x:                | :white_check_mark:     | :white_check_mark:     | :x:                    |
 |  3 | Cellpose (2D and 3D)            | :white_check_mark:   | :white_check_mark: | :x:            	| :white_check_mark:     | :white_check_mark:     | :x:     		   |
 |  4 | CycleGAN                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :x:                    |
