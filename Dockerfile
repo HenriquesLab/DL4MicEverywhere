@@ -48,7 +48,7 @@ SHELL ["conda", "run", "-n", "dl4miceverywhere", "/bin/bash", "-c"]
 
 RUN python -m ipykernel install --name kernel_one --display-name "Display Name One"
 # Install the requirements and convert the notebook
-RUN pip install -r requirements.
+RUN pip install -r requirements.txt
 
 RUN rm requirements.txt
 RUN git clone https://github.com/HenriquesLab/DL4MicEverywhere.git
