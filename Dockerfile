@@ -46,7 +46,8 @@ RUN conda create -n dl4miceverywhere python=3.10
 # Make RUN commands use the new environment:
 SHELL ["conda", "run", "-n", "dl4miceverywhere", "/bin/bash", "-c"]
 
-RUN python -m ipykernel install --name kernel_one --display-name "Display Name One"
+# RUN python -m ipykernel install --name kernel_one --display-name "Display Name One"
+
 # Install the requirements and convert the notebook
 RUN pip install -r requirements.txt
 
@@ -59,17 +60,17 @@ RUN rm -r DL4MicEverywhere
 
 ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/lib/cuda
 
-ENV NB_USER feynman
-ENV NB_UID 1000
+# ENV NB_USER feynman
+# ENV NB_UID 1000
 
-RUN useradd -m -s /bin/bash -N -u $NB_UID $NB_USER
+# RUN useradd -m -s /bin/bash -N -u $NB_UID $NB_USER
 
-WORKDIR /home/${NB_USER}
-USER $NB_USER
+# WORKDIR /home/${NB_USER}
+# USER $NB_USER
 
-SHELL ["/bin/bash","-c"]
-RUN conda init
-RUN echo 'conda activate dl4miceverywhere' >> ~/.bashrc
+# SHELL ["/bin/bash","-c"]
+# RUN conda init
+# RUN echo 'conda activate dl4miceverywhere' >> ~/.bashrc
 
 
 # ENTRYPOINT ["conda", "run", "-n", "dl4miceverywhere"]
