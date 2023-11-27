@@ -104,7 +104,7 @@ if [ "$test_flag" -eq 1 ]; then
     echo 'Test mode is enabled.'
 fi
 
-if [ $gui_flag -eq 0 ]; then 
+if [ "$gui_flag" -eq 0 ]; then 
     # If GUI is not requested
     if [ "$test_flag" -eq 1 ]; then
         echo "GUI is not requested, proceeding without GUI."
@@ -160,12 +160,12 @@ if [ -z "$config_path" ]; then
     exit 1
 else
     # If a configuration path has been specified, check if it is valid
-    if [[ -d $config_path ]]; then
+    if [[ -d "$config_path" ]]; then
         if [ "$test_flag" -eq 1 ]; then
             echo "Path to the configuration folder: $config_path"
         fi
         config_path=$config_path+"/configuration.yaml"
-    elif [[ -f $config_path ]]; then
+    elif [[ -f "$config_path" ]]; then
         if [ "$test_flag" -eq 1 ]; then
             echo "Path to the configuration folder: $config_path"
         fi
@@ -181,7 +181,7 @@ if [ -z "$data_path" ]; then
     exit 1
 else
     # Validate the specified data path
-    if [[ -d $data_path ]]; then
+    if [[ -d "$data_path" ]]; then
         if [ "$test_flag" -eq 1 ]; then
             echo "Data path: $data_path"
         fi
@@ -197,7 +197,7 @@ if [ -z "$result_path" ]; then
     exit 1
 else
     # Validate the specified result path
-    if [[ -d $result_path ]]; then
+    if [[ -d "$result_path" ]]; then
         if [ "$test_flag" -eq 1 ]; then
             echo "Result path: $result_path"
         fi
@@ -394,14 +394,16 @@ if [ "$build_flag" -eq 3 ]; then
 else
     # Build the docker image without GUI
     if [ "$build_flag" -eq 2 ]; then
-        docker build $BASEDIR --no-cache -t $docker_tag \
+        docker build $BASEDIR  --no-cache -t $docker_tag \
             --build-arg BASE_IMAGE="${base_img}" \
+            --build-arg CUDA_VERSION="${cuda_version}" \
             --build-arg GPU_FLAG="${gpu_flag}" \
             --build-arg PYTHON_VERSION="${python_version}" \
             --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
             --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
             --build-arg NOTEBOOK_NAME="${notebook_name}" \
-            --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
+            --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" \
+            --build-arg ARCH="${local_arch}"
 
         DOCKER_OUT=$? # Gets if the docker image has been built
     else
@@ -447,10 +449,10 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
 
     if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
-        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" jupyter lab "${notebook_name}" --ip='0.0.0.0' --port=$port --no-browser --allow-root
+        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" "--port=$port" # "jupyter lab ${notebook_name} --ip='0.0.0.0' --port=$port --no-browser --allow-root"
     else
         # Run the docker image without activating the GPU
-        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" jupyter lab "${notebook_name}" --ip='0.0.0.0' --port=$port --no-browser --allow-root
+        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" "--port=$port" # "jupyter lab ${notebook_name} --ip='0.0.0.0' --port=$port --no-browser --allow-root"
     fi
 else
     echo "The docker image has not been built."
