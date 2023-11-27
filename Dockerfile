@@ -54,12 +54,11 @@ ENV PATH /opt/conda/envs/dl4miceverywhere/bin:$PATH
 
 # Install cudatoolkit in case GPU has selected
 # Clone the repository and execute the notebook conversion
-RUN if [ "$GPU_FLAG" -eq "1" ] ; then conda install -c "nvidia/label/cuda-${CUDA_VERSION}" cuda-toolkit ; fi \
-    && pip install -r requirements.txt \
+RUN if [ "$GPU_FLAG" -eq "1" ] ; then conda install -y -c conda-forge cudatoolkit=${CUDA_VERSION} cudnn=8.1.0 ; fi \
+    && pip install --no-cache-dir -r requirements.txt \
     && rm requirements.txt \
+    && pip install --no-cache-dir nbformat ipywidgets \
     && git clone https://github.com/HenriquesLab/DL4MicEverywhere.git \
-    && pip install nbformat ipywidgets \
-    && conda install -y -c conda-forge jupyterlab \
     && python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py -p . -n ${NOTEBOOK_NAME} -s ${SECTIONS_TO_REMOVE} \
     && mv colabless_${NOTEBOOK_NAME} ${NOTEBOOK_NAME} \
     && rm -r DL4MicEverywhere
@@ -67,5 +66,7 @@ RUN if [ "$GPU_FLAG" -eq "1" ] ; then conda install -c "nvidia/label/cuda-${CUDA
 # Add the environment variable XLA_FLAGS
 ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/lib/cuda
 
+# Install jupyterlab
+RUN pip install jupyterlab
 # Create  a entrypoint that will be executed when running the docker
 ENTRYPOINT jupyter lab ${NOTEBOOK_NAME} --ip='0.0.0.0' --no-browser --allow-root

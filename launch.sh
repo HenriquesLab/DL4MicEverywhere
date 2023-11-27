@@ -331,6 +331,9 @@ fi
 # Check if an image with that tag exists locally and ask if the user whants to replace it.
 build_flag=0
 
+# Get the architecture of the machine
+local_arch=$(uname -m)
+
 # In case testing is chossing, the building is forced to be done, without questions
 if [ $test_flag -eq 1 ]; then
     # In case of testing, the building is always done
@@ -358,8 +361,6 @@ else
         if docker manifest inspect "${docker_tag}" >/dev/null 2>&1; then
             # In case the image is available on docker hub
 
-            # Get the architecture of the machine
-            local_arch=$(uname -m)
             # Count the ocurrences of that architecture in the docker manifest of that image
             arch_count=$(docker manifest inspect "${docker_tag}" -v | grep 'architecture' | grep -c '$local_arch')
 
@@ -394,7 +395,7 @@ if [ "$build_flag" -eq 3 ]; then
 else
     # Build the docker image without GUI
     if [ "$build_flag" -eq 2 ]; then
-        docker build $BASEDIR  --no-cache -t $docker_tag \
+        docker build $BASEDIR -t $docker_tag \
             --build-arg BASE_IMAGE="${base_img}" \
             --build-arg CUDA_VERSION="${cuda_version}" \
             --build-arg GPU_FLAG="${gpu_flag}" \
