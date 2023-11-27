@@ -1,7 +1,9 @@
 name: Build and push Docker Images
 
 on:
-    workflow_dispatch:
+  release:
+    types: [published]
+  workflow_dispatch:
                   
 env:
   REGISTRY_IMAGE: henriqueslab/dl4miceverywhere
