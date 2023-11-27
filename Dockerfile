@@ -58,9 +58,8 @@ ENV PATH /opt/conda/envs/dl4miceverywhere/bin:$PATH
 
 # Install cudatoolkit in case GPU has selected
 # Clone the repository and execute the notebook conversion
-RUN if [ "$GPU_FLAG" -eq "1" ] ; then conda install -y -c conda-forge cudatoolkit=${CUDA_VERSION} cudnn=8.1.0; fi
-
-RUN pip install --no-cache-dir -r requirements.txt \
+RUN if [ "$GPU_FLAG" -eq "1" ] ; then conda install -y -c conda-forge cudatoolkit=${CUDA_VERSION} cudnn=8.1.0; fi \
+    && pip install --no-cache-dir -r requirements.txt \
     && rm requirements.txt \
     && pip install --no-cache-dir nbformat ipywidgets \
     && git clone https://github.com/HenriquesLab/DL4MicEverywhere.git \
