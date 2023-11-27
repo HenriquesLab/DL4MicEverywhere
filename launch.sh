@@ -395,7 +395,7 @@ if [ "$build_flag" -eq 3 ]; then
 else
     # Build the docker image without GUI
     if [ "$build_flag" -eq 2 ]; then
-        docker build $BASEDIR -t $docker_tag \
+        docker build $BASEDIR --no-cache -t $docker_tag \
             --build-arg BASE_IMAGE="${base_img}" \
             --build-arg CUDA_VERSION="${cuda_version}" \
             --build-arg GPU_FLAG="${gpu_flag}" \
