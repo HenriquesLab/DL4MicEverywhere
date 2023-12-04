@@ -116,4 +116,14 @@ _Iván Hidalgo-Cenalmor, Joanna W Pylvänäinen, Mariana G Ferreira, Craig T Rus
 **DL4MicEverywhere: Deep learning for microscopy made flexible, shareable, and reproducible. bioRxiv 2023**
 DOI: [https://doi.org/10.1101/2023.11.19.567606](https://www.biorxiv.org/content/10.1101/2023.11.19.567606v1)_
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/Preprint.png"/>
+[![alt text](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/Preprint.png)](https://doi.org/10.1101/2023.11.19.567606)
+```
+@article{hidalgo2023dl4miceverywhere,
+  title={{DL4MicEverywhere}: {Deep} learning for microscopy made flexible, shareable, and reproducible},
+  author={Hidalgo-Cenalmor, Iv{\'a}n and Pylv{\"a}n{\"a}inen, Joanna W and Ferreira, Mariana G and Russell, Craig T and Arganda-Carreras, Ignacio and AI4Life Consortium and Jacquemet, Guillaume and Henriques, Ricardo and G{\'o}mez-de-Mariscal, Estibaliz},
+  journal={bioRxiv},
+  pages={2023--11},
+  year={2023},
+  publisher={Cold Spring Harbor Laboratory}
+}
+```
