@@ -53,12 +53,12 @@ DL4MicEverywhere is designed to make deep learning more accessible, transparent,
 
 ## What is a DL4MicEverywhere notebook?
 
-- A docker container:
-  - With a fully controlled and versioned snapshot of the dependencies needed for each notebook.
-  - The versions of required libraries are controlled upstream and downstream the docker container.
-  - Validated using continuous integration (CI) workflows to run on MacOS, Windows and Linux.
-- A user-friendly notebook with a ZeroCostDL4Mic-lkike interface to leverage a specific deep learning model for image processing (train the model, perform a quality check and run inference on new data).
-- Traceable and open source.
+- A DL4MicEverywhere notebook is designed to assist researchers in utilizing deep learning models for image processing.
+- It is fully encapsulated within a Docker container, providing a controlled and versioned snapshot of the dependencies required for the notebook.
+- The versions of the required libraries are controlled upstream and downstream of the Docker container.
+- The notebook is validated using continuous integration (CI) workflows to ensure compatibility with MacOS, Windows, and Linux.
+- It features a user-friendly interface similar to ZeroCostDL4Mic, allowing users to train the model, perform quality checks, and run inference on new data.
+- The notebook is fully traceable and open source.
 
 ## Getting Started
 
