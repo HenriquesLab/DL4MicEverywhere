@@ -36,6 +36,7 @@ It currently incorporates numerous pre-existing ZeroCostDL4Mic notebooks for tas
 - Supports a wide array of microscopy analysis tasks, including segmentation, reconstruction, registration, denoising, and more
 - Compatible with various computing environments, including laptops, workstations, HPC, and cloud with Docker
 - Automated build testing and versioning for improved reliability
+- [Watch a short description](https://www.youtube.com/watch?v=kRIAls6oT4k)
 
 ![Sample Notebook](docs/images/policy.png)
 
@@ -49,6 +50,15 @@ It currently incorporates numerous pre-existing ZeroCostDL4Mic notebooks for tas
 - **Extensibility:** Automated testing and Docker building streamline the addition of new methods.
 
 DL4MicEverywhere is designed to make deep learning more accessible, transparent, and participatory. This enables broader adoption of advanced techniques while enhancing reliability and customization.
+
+## What is a DL4MicEverywhere notebook?
+
+- A docker container:
+  - With a fully controlled and versioned snapshot of the dependencies needed for each notebook.
+  - The versions of required libraries are controlled upstream and downstream the docker container.
+  - Validated using continuous integration (CI) workflows to run on MacOS, Windows and Linux.
+- A user-friendly notebook with a ZeroCostDL4Mic-lkike interface to leverage a specific deep learning model for image processing (train the model, perform a quality check and run inference on new data).
+- Traceable and open source.
 
 ## Getting Started
 
