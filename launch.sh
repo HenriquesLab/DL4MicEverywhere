@@ -285,10 +285,11 @@ fi
 
 # Set the docker's tag
 docker_tag=$(echo $docker_tag | tr '[:upper:]' '[:lower:]')
-docker_tag=henriqueslab/dl4miceverywhere:$docker_tag-v$version
+docker_tag=henriqueslab/dl4miceverywhere:$docker_tag
 if [ "$gpu_flag" -eq 1 ]; then
     docker_tag=$docker_tag-gpu
 fi
+docker_tag=$docker_tag-v$version
 
 if [ "$test_flag" -eq 1 ]; then
     echo ""
