@@ -17,6 +17,7 @@ jobs:
       notebook_url: ${{ steps.notebook_url.outputs.result }}
       requirements_url: ${{ steps.requirements_url.outputs.result }}
       notebook_name: ${{ steps.notebook_name.outputs.value }}
+      docker_tag: ${{ steps.docker_tag.outputs.value }}
       sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}
       version: ${{ steps.version.outputs.result }}
     steps:
@@ -62,9 +63,14 @@ jobs:
       - name: Get notebook_name
         id: notebook_name
         run: |
-          aux_docker_tag="$(basename ${{ steps.notebook_url.outputs.result }} .ipynb)"
-          notebook_name="$(echo $aux_docker_tag | tr '[:upper:]' '[:lower:]')"
+          notebook_name="$(basename ${{ steps.notebook_url.outputs.result }})"
           echo "value=$notebook_name" >> $GITHUB_OUTPUT
+      - name: Get docker_tag
+        id: docker_tag
+        run: |
+          aux_docker_tag="$(basename ${{ steps.notebook_url.outputs.result }} .ipynb)"
+          final_docker_tag="$(echo $aux_docker_tag | tr '[:upper:]' '[:lower:]')"
+          echo "value=$final_docker_tag" >> $GITHUB_OUTPUT
 
   build_amd64:
     name: Build Docker image on AMD64
@@ -92,7 +98,7 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-v${{ needs.get_arguments.outputs.version }}-amd64, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest-amd64
+          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-amd64, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest-amd64
           build-args: |
             BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
             GPU_FLAG=0
@@ -108,7 +114,7 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-gpu-v${{ needs.get_arguments.outputs.version }}, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-gpu-latest
+          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu-v${{ needs.get_arguments.outputs.version }}, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-gpu-latest
           build-args: |
             BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
             GPU_FLAG=1
@@ -144,7 +150,7 @@ jobs:
           context: .
           platforms: linux/arm64
           push: true
-          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-v${{ needs.get_arguments.outputs.version }}-arm64, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest-arm64
+          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-arm64, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest-arm64
           build-args: |
               BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
               GPU_FLAG=0
@@ -183,16 +189,16 @@ jobs:
       - name: Create and push manifest images
         uses: Noelware/docker-manifest-action@master # or use a pinned version in the Releases tab
         with:
-            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-v${{ needs.get_arguments.outputs.version }}
-            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-v${{ needs.get_arguments.outputs.version }}-arm64
+            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}
+            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-arm64
             push: true
             amend: true
       
       - name: Create and push manifest images with latest
         uses: Noelware/docker-manifest-action@master # or use a pinned version in the Releases tab
         with:
-            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest
-            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest-arm64
+            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest
+            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-arm64
             push: true
             amend: true
             
@@ -225,16 +231,16 @@ jobs:
       - name: Create and push manifest images
         uses: Noelware/docker-manifest-action@master # or use a pinned version in the Releases tab
         with:
-            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-v${{ needs.get_arguments.outputs.version }}
-            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-v${{ needs.get_arguments.outputs.version }}-amd64
+            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}
+            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-amd64
             push: true
             amend: true
       
       - name: Create and push manifest images with latest
         uses: Noelware/docker-manifest-action@master # or use a pinned version in the Releases tab
         with:
-            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest
-            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest-amd64
+            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest
+            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-amd64
             push: true
             amend: true
 
@@ -266,15 +272,15 @@ jobs:
       - name: Create and push manifest images
         uses: Noelware/docker-manifest-action@master # or use a pinned version in the Releases tab
         with:
-            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-v${{ needs.get_arguments.outputs.version }}
-            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-v${{ needs.get_arguments.outputs.version }}-amd64,henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-v${{ needs.get_arguments.outputs.version }}-arm64
+            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}
+            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-amd64,henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-v${{ needs.get_arguments.outputs.version }}-arm64
             push: true
             amend: true
       
       - name: Create and push manifest images with latest
         uses: Noelware/docker-manifest-action@master # or use a pinned version in the Releases tab
         with:
-            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest
-            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest-amd64,henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest-arm64
+            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest
+            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-amd64,henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest-arm64
             push: true
             amend: true
