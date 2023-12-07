@@ -187,20 +187,14 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Create and push manifest images
-        uses: Noelware/docker-manifest-action@master # or use a pinned version in the Releases tab
-        with:
-            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}
-            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-arm64
-            push: true
-            amend: true
+        run: |
+          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }} \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-arm64
       
       - name: Create and push manifest images with latest
-        uses: Noelware/docker-manifest-action@master # or use a pinned version in the Releases tab
-        with:
-            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest
-            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-arm64
-            push: true
-            amend: true
+        run: |
+          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-arm64
             
   build-only-amd64:
     if: ${{ always() && contains(needs.build_arm64.result, 'failure') }}
@@ -229,21 +223,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Create and push manifest images
-        uses: Noelware/docker-manifest-action@master # or use a pinned version in the Releases tab
-        with:
-            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}
-            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-amd64
-            push: true
-            amend: true
-      
+        run: |
+          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }} \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-amd64      
       - name: Create and push manifest images with latest
-        uses: Noelware/docker-manifest-action@master # or use a pinned version in the Releases tab
-        with:
-            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest
-            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-amd64
-            push: true
-            amend: true
-
+        run: |
+          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-amd64 
   build-multi-architecture:
     needs:
       - get_arguments
@@ -270,17 +256,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Create and push manifest images
-        uses: Noelware/docker-manifest-action@master # or use a pinned version in the Releases tab
-        with:
-            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}
-            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-amd64,henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-arm64
-            push: true
-            amend: true
+        run: |
+          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }} \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-amd64 \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-arm64
       
       - name: Create and push manifest images with latest
-        uses: Noelware/docker-manifest-action@master # or use a pinned version in the Releases tab
-        with:
-            inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest
-            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-amd64,henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-arm64
-            push: true
-            amend: true
+        run: |
+          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-amd64 \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-arm64
