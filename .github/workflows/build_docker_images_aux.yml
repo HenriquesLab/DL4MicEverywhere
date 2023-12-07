@@ -98,7 +98,7 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-amd64, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest-amd64
+          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-amd64, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-amd64
           build-args: |
             BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
             GPU_FLAG=0
@@ -114,7 +114,7 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu-v${{ needs.get_arguments.outputs.version }}, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-gpu-latest
+          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu-v${{ needs.get_arguments.outputs.version }}, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu-latest
           build-args: |
             BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
             GPU_FLAG=1
@@ -150,7 +150,7 @@ jobs:
           context: .
           platforms: linux/arm64
           push: true
-          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-arm64, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest-arm64
+          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-arm64, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-arm64
           build-args: |
               BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
               GPU_FLAG=0
@@ -273,7 +273,7 @@ jobs:
         uses: Noelware/docker-manifest-action@master # or use a pinned version in the Releases tab
         with:
             inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}
-            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-amd64,henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-v${{ needs.get_arguments.outputs.version }}-arm64
+            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-amd64,henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-arm64
             push: true
             amend: true
       
@@ -281,6 +281,6 @@ jobs:
         uses: Noelware/docker-manifest-action@master # or use a pinned version in the Releases tab
         with:
             inputs: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest
-            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-amd64,henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.notebook_name }}-latest-arm64
+            images: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-amd64,henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-arm64
             push: true
             amend: true
