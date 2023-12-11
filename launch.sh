@@ -122,34 +122,34 @@ else
     advanced_options=${strarr[0]}
 
     if [ $advanced_options -eq 0 ]; then
-        data_path=${strarr[1]}
-        result_path=${strarr[2]}
-        selectedFolder=${strarr[3]}
-        selectedNotebook=${strarr[4]}
-        gpu_flag=${strarr[5]}
-        tag_aux=${strarr[6]}
+        data_path="${strarr[1]}"
+        result_path="${strarr[2]}"
+        selectedFolder="${strarr[3]}"
+        selectedNotebook="${strarr[4]}"
+        gpu_flag="${strarr[5]}"
+        tag_aux="${strarr[6]}"
 
         config_path=$BASEDIR/notebooks/$selectedFolder/$selectedNotebook/configuration.yaml
     else
-        data_path=${strarr[1]}
-        result_path=${strarr[2]}
+        data_path="${strarr[1]}"
+        result_path="${strarr[2]}"
 
-        config_path=${strarr[3]}
+        config_path="${strarr[3]}"
 
-        notebook_aux=${strarr[4]}
-        requirements_aux=${strarr[5]}
+        notebook_aux="${strarr[4]}"
+        requirements_aux="${strarr[5]}"
         
-        gpu_flag=${strarr[6]}
-        tag_aux=${strarr[7]}
+        gpu_flag="${strarr[6]}"
+        tag_aux="${strarr[7]}"
 
         if [ "$notebook_aux" != "-" ]; then
-            notebook_path=$notebook_aux
+            notebook_path="$notebook_aux"
         fi
         if [ "$requirements_aux" != "-" ]; then
-            requirements_path=$requirements_aux 
+            requirements_path="$requirements_aux"
         fi
         if [ "$tag_aux" != "-" ]; then
-            docker_tag=$tag_aux
+            docker_tag="$tag_aux"
         fi
     fi
 fi
@@ -160,12 +160,12 @@ if [ -z "$config_path" ]; then
     exit 1
 else
     # If a configuration path has been specified, check if it is valid
-    if [[ -d $config_path ]]; then
+    if [[ -d "$config_path" ]]; then
         if [ "$test_flag" -eq 1 ]; then
             echo "Path to the configuration folder: $config_path"
         fi
         config_path="$config_path/configuration.yaml"
-    elif [[ -f $config_path ]]; then
+    elif [[ -f "$config_path" ]]; then
         if [ "$test_flag" -eq 1 ]; then
             echo "Path to the configuration folder: $config_path"
         fi
@@ -181,7 +181,7 @@ if [ -z "$data_path" ]; then
     exit 1
 else
     # Validate the specified data path
-    if [[ -d $data_path ]]; then
+    if [[ -d "$data_path" ]]; then
         if [ "$test_flag" -eq 1 ]; then
             echo "Data path: $data_path"
         fi
@@ -197,7 +197,7 @@ if [ -z "$result_path" ]; then
     exit 1
 else
     # Validate the specified result path
-    if [[ -d $result_path ]]; then
+    if [[ -d "$result_path" ]]; then
         if [ "$test_flag" -eq 1 ]; then
             echo "Result path: $result_path"
         fi
@@ -230,7 +230,7 @@ if [ -z "$notebook_path" ]; then
     # Use the URL from the configuration file if no local notebook path is specified
     notebook_path="${notebook_url}"
     # Set the docker's tag if not specified
-    aux_docker_tag="$(basename $notebook_path .ipynb)"
+    aux_docker_tag="$(basename "$notebook_path" .ipynb)"
 
     if [ "$test_flag" -eq 1 ]; then
         echo "Since no notebook was specified, the notebook URL from 'configuration.yaml' will be used."
@@ -238,7 +238,7 @@ if [ -z "$notebook_path" ]; then
 else
     # Otherwise check if the path is valid
     # For the docker's tag if not specified
-    aux_docker_tag="$(basename $notebook_path .ipynb)"
+    aux_docker_tag="$(basename "$notebook_path" .ipynb)"
     if [ -f "$notebook_path" ]; then
     
         if [ "$test_flag" -eq 1 ]; then
@@ -338,7 +338,7 @@ if [ $test_flag -eq 1 ]; then
     build_flag=2
 else
     if docker image inspect $docker_tag >/dev/null 2>&1; then
-        if [ $gui_flag -eq 1 ]; then 
+        if [ "$gui_flag" -eq 1 ]; then 
             # If the GUI flag has been specified, show a window for ansewring local question
             build_flag=$(wish $BASEDIR/.tools/local_img_gui.tcl)
         else
@@ -362,16 +362,16 @@ else
             # Get the architecture of the machine
             local_arch=$(uname -m)
 
-            if [ $local_arch == "x86_64" ]; then
+            if [ "$local_arch" == "x86_64" ]; then
                 local_arch="amd64"
             fi
 
             # Count the ocurrences of that architecture in the docker manifest of that image
             arch_count=$(docker manifest inspect "${docker_tag}" -v | grep 'architecture' | grep -c $local_arch)
 
-            if [ $arch_count -gt 0 ]; then
+            if [ "$arch_count" -gt 0 ]; then
                 # In case the architecture is available
-                if [ $gui_flag -eq 1 ]; then 
+                if [ "$gui_flag" -eq 1 ]; then 
                     # If the GUI flag has been specified, show a window for ansewring hub question
                     build_flag=$(wish $BASEDIR/.tools/hub_img_gui.tcl)
                 else
