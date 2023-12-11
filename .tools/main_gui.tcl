@@ -236,7 +236,17 @@ proc parseYaml {notebook_name} {
 
     if {[lindex $arguments 0] == 1} {
         .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
+        .fr.principal.notebook_description insert end "There is an updated version of DL4MicEverywhere.\n\n" highlight
+    }
+    if {[lindex $arguments 0] == 2} {
+        .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
         .fr.principal.notebook_description insert end "There is an updated version of this notebook.\n\n" highlight
+    }
+    if {[lindex $arguments 0] == 3} {
+        .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
+        .fr.principal.notebook_description insert end "There is an updated version of this notebook.\n\n" highlight
+        .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
+        .fr.principal.notebook_description insert end "There is an updated version of DL4MicEverywhere.\n\n" highlight
     }
     .fr.principal.notebook_description insert end [lindex $arguments 1]
 

@@ -252,7 +252,8 @@ check_parsed_argument cuda_version
 check_parsed_argument ubuntu_version
 check_parsed_argument python_version
 check_parsed_argument sections_to_remove
-check_parsed_argument version
+check_parsed_argument notebook_version
+check_parsed_argument dl4miceverywhere_version
 check_parsed_argument description
 
 # Base image is selected based on the GPU selection
@@ -325,7 +326,7 @@ docker_tag=henriqueslab/dl4miceverywhere:$docker_tag
 if [ "$gpu_flag" -eq 1 ]; then
     docker_tag=$docker_tag-gpu
 fi
-docker_tag=$docker_tag-v$version
+docker_tag=$docker_tag-n$notebook_version-d$dl4miceverywhere_version
 
 if [ "$test_flag" -eq 1 ]; then
     echo ""
@@ -334,7 +335,8 @@ if [ "$test_flag" -eq 1 ]; then
     echo "notebook_path: $notebook_path"
     echo "requirements_path: $requirements_path"
     echo "sections_to_remove: $sections_to_remove"
-    echo "version: $version"
+    echo "version: $notebook_version"
+    echo "dl4miceverywhere_version: $dl4miceverywhere_version"
     echo "description: $description"
     echo "docker_tag: $docker_tag"
     echo ""
