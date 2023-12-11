@@ -1,8 +1,40 @@
-notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/U-Net_2D_Multilabel_ZeroCostDL4Mic.ipynb
-requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/2D_UNet_multilabel_requirements_simple.txt
-cuda_version: 11.8.0
-ubuntu_version: 22.04
-python_version: 3.10
-sections_to_remove: 1.1. 1.2. 2. 6.2. 
-version: 0.1.0
+type: application
+id: Notebook_U-Net_2D_multilabel_ZeroCostDL4Mic
+name: U-Net (2D) multilabel segmentation - ZeroCostDL4Mic
 description: "U-Net_2D_Multilabel_DL4Mic is the conversion of the 2D U-Net Multilabel from ZeroCostDL4Mic."
+format_version: 0.2.3 # <-------------added format version from bioimageio
+version: 2.1.2  # <-- notebook + requirements version
+cite:
+  - text: "von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0"
+    doi: https://doi.org/10.1038/s41467-021-22518-0
+  - text: "Olaf Ronneberger, Philipp Fischer, Thomas Brox. U-Net: Convolutional Networks for Biomedical Image Segmentation. arXiv:1505.04597. https://arxiv.org/abs/1505.04597"
+    url: https://arxiv.org/abs/1505.04597
+authors:
+  - name: ZeroCostDL4Mic team
+  - affiliation: Universidad Carlos III de Madrid
+    name: Estibaliz Gómez-de-Mariscal
+covers:
+  - https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Wiki_files/UNet_Multilabel_example.png
+  - https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Wiki_files/UNet-multilabel-example-zoom.png
+badges:
+  - label: Open in Colab
+    icon: https://colab.research.google.com/assets/colab-badge.svg
+    url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/U-Net_2D_Multilabel_ZeroCostDL4Mic.ipynb
+documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/README.md # <------------- the readme file created inside the docker image and pulled somewhere in the repo, (e.g., inside the notebook folder)?
+tags: [colab, notebook, u-net, segmentation, semantic-segmentation, multilabel, ZeroCostDL4Mic, 2D, DL4MicEverywhere]
+download_url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/U-Net_2D_Multilabel_ZeroCostDL4Mic.ipynb
+git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
+links:
+  - Notebook Preview
+  - Dataset_U-Net_2D_multilabel_DeepBacs
+config:
+  dl4miceverywhere:
+    cuda_version: 11.8.0
+    python_version: 3.10
+    sections_to_remove: 1.1. 1.2. 2. 6.2.
+    ubuntu_version: 22.04
+    # Notebook url could be the same as the download url
+    notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/U-Net_2D_Multilabel_ZeroCostDL4Mic.ipynb
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/2D_UNet_multilabel_requirements_simple.txt
+    version: z2.1.2-d1.0.0 # The version of the docker image created for this particular notebook??
+    docker_hub_image: "u-net_2d_multilabel_zerocostdl4mic-z16.1.0-d1.0.0"
