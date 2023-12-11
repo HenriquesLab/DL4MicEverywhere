@@ -40,6 +40,25 @@ EOF
   exit
 }
 
+# Function to check if a given argument exists or to rename it in case is needed
+check_parsed_argument() {
+    variable_name="$1"
+    config_variable_name="config_dl4miceverywhere_$1"
+    
+    if [ -z "${!config_variable_name}" ]; then
+        # If no config:dl4miceverywhere:$variable_name is on the configuration yaml
+        # check if there is the old version with only $variable_name
+        # in case that is neither there, raise an error
+        if [ -z "${!variable_name}" ]; then
+            echo "$variable_name parameter is not specified on the configuration yaml."
+            exit 1
+        fi
+    else
+        eval "$variable_name=\$$config_variable_name"
+    fi
+
+}
+
 # Function to parse and read the configuration yaml file
 function parse_yaml {
    local prefix=$2
@@ -50,10 +69,15 @@ function parse_yaml {
    awk -F$fs '{
       indent = length($1)/2;
       vname[indent] = $2;
+      value = $3;
+
+      # Remove inline comments only if they are at the beginning of a line or after whitespace
+      gsub(/[[:space:]]#.*/, "", value);
+      
       for (i in vname) {if (i > indent) {delete vname[i]}}
       if (length($3) > 0) {
          vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
-         printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
+         printf("%s%s%s=\"%s\"\n", "'$prefix'", vn, $2, value);
       }
    }'
 }
@@ -216,8 +240,20 @@ if [ "$test_flag" -eq 1 ]; then
     fi
 fi
 
+echo "$config_path"
+
 # Read the variables from the yaml file
 eval $(parse_yaml "$config_path")
+
+# Check the parsed variables
+check_parsed_argument notebook_url
+check_parsed_argument requirements_url
+check_parsed_argument cuda_version
+check_parsed_argument ubuntu_version
+check_parsed_argument python_version
+check_parsed_argument sections_to_remove
+check_parsed_argument version
+check_parsed_argument description
 
 # Base image is selected based on the GPU selection
 if [ "$gpu_flag" -eq 1 ]; then
@@ -392,6 +428,8 @@ else
         fi
     fi
 fi
+
+echo $docker_tag
 
 # Pull the docker image from docker hub
 if [ "$build_flag" -eq 3 ]; then
