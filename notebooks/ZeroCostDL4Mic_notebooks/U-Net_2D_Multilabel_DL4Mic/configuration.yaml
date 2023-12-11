@@ -36,5 +36,6 @@ config:
     # Notebook url could be the same as the download url
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/U-Net_2D_Multilabel_ZeroCostDL4Mic.ipynb
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/2D_UNet_multilabel_requirements_simple.txt
-    version: z2.1.2-d1.0.0 # The version of the docker image created for this particular notebook??
-    docker_hub_image: "u-net_2d_multilabel_zerocostdl4mic-z16.1.0-d1.0.0"
+    notebook_version: 2.1.2
+    dl4miceverywhere_version: 1.0.0 
+    docker_hub_image: "u-net_2d_multilabel_zerocostdl4mic-z2.1.2-d1.0.0"
