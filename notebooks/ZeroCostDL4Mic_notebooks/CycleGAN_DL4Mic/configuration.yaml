@@ -1,8 +1,10 @@
-notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/CycleGAN_ZeroCostDL4Mic.ipynb
-requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/CycleGAN_requirements_simple.txt
-cuda_version: 11.8.0
-ubuntu_version: 22.04
-python_version: 3.8
-sections_to_remove: 2. 6.3. 
-version: 0.1.0
-description: "CycleGAN_DL4Mic is the conversion of the CycleGAN from ZeroCostDL4Mic."
+config:
+  dl4miceverywhere:
+    notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/CycleGAN_ZeroCostDL4Mic.ipynb
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/CycleGAN_requirements_simple.txt
+    cuda_version: 11.8.0
+    ubuntu_version: 22.04
+    python_version: 3.8
+    sections_to_remove: 2. 6.3. 
+    notebook_version: 1.13.2
+    description: "CycleGAN_DL4Mic is the conversion of the CycleGAN from ZeroCostDL4Mic."

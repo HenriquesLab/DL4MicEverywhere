@@ -1,8 +1,10 @@
-notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/Detectron2_2D_ZeroCostDL4Mic.ipynb
-requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/Detectron2_2D_requirements_simple.txt
-cuda_version: 11.8.0
-ubuntu_version: 22.04
-python_version: 3.9
-sections_to_remove: 1.2. 2. 6.2.
-version: 0.1.0
-description: "Detectron2_2D_DL4Mic is the conversion of the CellPose 2D notebook from ZeroCostDL4Mic."
+config:
+  dl4miceverywhere:
+    notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/Detectron2_2D_ZeroCostDL4Mic.ipynb
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/Detectron2_2D_requirements_simple.txt
+    cuda_version: 11.8.0
+    ubuntu_version: 22.04
+    python_version: 3.9
+    sections_to_remove: 1.2. 2. 6.2.
+    notebook_version: 1.14.1
+    description: "Detectron2_2D_DL4Mic is the conversion of the CellPose 2D notebook from ZeroCostDL4Mic."
