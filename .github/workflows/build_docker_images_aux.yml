@@ -28,49 +28,42 @@ jobs:
         uses: mikefarah/yq@master
         id: notebook_url
         with:
-          cmd: yq '.notebook_url' '${{ inputs.config_file }}' 
+          cmd: yq '.config.dl4miceverywhere.notebook_url' '${{ inputs.config_file }}' 
       - name: Check requirements_url attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: requirements_url
         with:
-          cmd: yq '.requirements_url' '${{ inputs.config_file }}' 
+          cmd: yq '.config.dl4miceverywhere.requirements_url' '${{ inputs.config_file }}' 
       - name: Check cuda_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: cuda_version
         with:
-          cmd: yq '.cuda_version' '${{ inputs.config_file }}' 
+          cmd: yq '.config.dl4miceverywhere.cuda_version' '${{ inputs.config_file }}' 
       - name: Check ubuntu_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: ubuntu_version
         with:
-          cmd: yq '.ubuntu_version' '${{ inputs.config_file }}' 
+          cmd: yq '.config.dl4miceverywhere.ubuntu_version' '${{ inputs.config_file }}' 
       - name: Check python_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: python_version
         with:
-          cmd: yq '.python_version' '${{ inputs.config_file }}'
+          cmd: yq '.config.dl4miceverywhere.python_version' '${{ inputs.config_file }}'
       - name: Check sections_to_remove attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: sections_to_remove
         with:
-          cmd: yq '.sections_to_remove' '${{ inputs.config_file }}'  
+          cmd: yq '.config.dl4miceverywhere.sections_to_remove' '${{ inputs.config_file }}'  
       - name: Check version attribute on configuration.yaml
         uses: mikefarah/yq@master
-        id: version
+        id: docker_tag
         with:
-          cmd: yq '.version' '${{ inputs.config_file }}'  
-
+          cmd: yq '.config.dl4miceverywhere.docker_hub_image' '${{ inputs.config_file }}'  
       - name: Get notebook_name
         id: notebook_name
         run: |
           notebook_name="$(basename ${{ steps.notebook_url.outputs.result }})"
           echo "value=$notebook_name" >> $GITHUB_OUTPUT
-      - name: Get docker_tag
-        id: docker_tag
-        run: |
-          aux_docker_tag="$(basename ${{ steps.notebook_url.outputs.result }} .ipynb)"
-          final_docker_tag="$(echo $aux_docker_tag | tr '[:upper:]' '[:lower:]')"
-          echo "value=$final_docker_tag" >> $GITHUB_OUTPUT
 
   build_amd64:
     name: Build Docker image on AMD64
@@ -116,7 +109,7 @@ jobs:
           push: true
           tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu-v${{ needs.get_arguments.outputs.version }}, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu-latest
           build-args: |
-            BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
+            BASE_IMAGE=nvidia/cuda:${{ steps.cuda_version.outputs.result }}-base-ubuntu${{ steps.ubuntu_version.outputs.result }}
             GPU_FLAG=1
             PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
             PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}

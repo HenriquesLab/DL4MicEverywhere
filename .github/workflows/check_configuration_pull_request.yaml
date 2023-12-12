@@ -63,52 +63,60 @@ jobs:
       matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
     name: Check attributes/keys on modified configuration.yaml
     needs: extract_changed_files
-
+    
+    outputs:
+      ubuntu_version: ${{ steps.ubuntu_version.outputs.result }}
+      python_version: ${{ steps.python_version.outputs.result }}
+      notebook_url: ${{ steps.notebook_url.outputs.result }}
+      requirements_url: ${{ steps.requirements_url.outputs.result }}
+      notebook_name: ${{ steps.notebook_name.outputs.value }}
+      docker_tag: ${{ steps.docker_tag.outputs.value }}
+      sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}
+      
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-        with:
-            fetch-depth: 0
+        uses: actions/checkout@v4
       - name: Check notebook_url attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: notebook_url
         with:
-          cmd: yq '.notebook_url' '${{ matrix.notebook }}' 
+          cmd: yq '.config.dl4miceverywhere.notebook_url' '${{ inputs.config_file }}' 
       - name: Check requirements_url attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: requirements_url
         with:
-          cmd: yq '.requirements_url' '${{ matrix.notebook }}' 
+          cmd: yq '.config.dl4miceverywhere.requirements_url' '${{ inputs.config_file }}' 
       - name: Check cuda_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: cuda_version
         with:
-          cmd: yq '.cuda_version' '${{ matrix.notebook }}' 
+          cmd: yq '.config.dl4miceverywhere.cuda_version' '${{ inputs.config_file }}' 
       - name: Check ubuntu_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: ubuntu_version
         with:
-          cmd: yq '.ubuntu_version' '${{ matrix.notebook }}' 
+          cmd: yq '.config.dl4miceverywhere.ubuntu_version' '${{ inputs.config_file }}' 
       - name: Check python_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: python_version
         with:
-          cmd: yq '.python_version' '${{ matrix.notebook }}'
+          cmd: yq '.config.dl4miceverywhere.python_version' '${{ inputs.config_file }}'
       - name: Check sections_to_remove attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: sections_to_remove
         with:
-          cmd: yq '.sections_to_remove' '${{ matrix.notebook }}'  
+          cmd: yq '.config.dl4miceverywhere.sections_to_remove' '${{ inputs.config_file }}'  
       - name: Check version attribute on configuration.yaml
         uses: mikefarah/yq@master
-        id: version
+        id: docker_tag
         with:
-          cmd: yq '.version' '${{ matrix.notebook }}'  
-      - name: Check description attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: description
-        with:
-          cmd: yq '.description' '${{ matrix.notebook }}'  
+          cmd: yq '.config.dl4miceverywhere.docker_hub_image' '${{ inputs.config_file }}' 
+      - name: Get notebook_name
+        id: notebook_name
+        run: |
+          notebook_name="$(basename ${{ steps.notebook_url.outputs.result }})"
+          echo "value=$notebook_name" >> $GITHUB_OUTPUT
+
       - run: |
           if [[ 'null' = '${{ steps.notebook_url.outputs.result }}' ]] ; then 
             echo 'The key notebook_url is not in the configuration.yaml file.' 
@@ -128,8 +136,8 @@ jobs:
           elif [[ 'null' = '${{ steps.sections_to_remove.outputs.result }}' ]] ; then 
             echo 'The key sections_to_remove is not in the configuration.yaml file.' 
             exit 1
-          elif [[ 'null' = '${{ steps.version.outputs.result }}' ]] ; then 
-            echo 'The key version is not in the configuration.yaml file.' 
+          elif [[ 'null' = '${{ steps.docker_tag.outputs.result }}' ]] ; then 
+            echo 'The key docker_hub_image is not in the configuration.yaml file.' 
             exit 1
           elif [[ 'null' = '${{ steps.description.outputs.result }}' ]] ; then 
             echo 'The key description is not in the configuration.yaml file.' 
@@ -154,24 +162,14 @@ jobs:
         uses: actions/checkout@v3
         with:
             fetch-depth: 0
-      - name: Extract the notebook URL
-        id: extract_nb_url
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq '.notebook_url' '${{ matrix.notebook }}' 
-      - name: Extract the requirements URL
-        id: extract_rq_url
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq '.requirements_url' '${{ matrix.notebook }}' 
       - name: Check that notebook's URL exists
         uses: filiph/linkcheck@2.0.23
         with:
-          arguments: ${{ steps.extract_nb_url.outputs.result }}
+          arguments: ${{ needs.get_arguments.outputs.notebook_url }}
       - name: Check that requirements' URL exists
         uses: filiph/linkcheck@2.0.23
         with:
-          arguments: ${{ steps.extract_rq_url.outputs.result }}
+          arguments: ${{ needs.get_arguments.outputs.requirements_url }}
 
   check_docker_build_without_gpu:  
     if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
@@ -196,47 +194,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3   
 
-      - name: Check notebook_url attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: notebook_url
-        with:
-          cmd: yq '.notebook_url' '${{ matrix.notebook }}' 
-      - name: Check requirements_url attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: requirements_url
-        with:
-          cmd: yq '.requirements_url' '${{ matrix.notebook }}' 
-      - name: Check cuda_version attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: cuda_version
-        with:
-          cmd: yq '.cuda_version' '${{ matrix.notebook }}' 
-      - name: Check ubuntu_version attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: ubuntu_version
-        with:
-          cmd: yq '.ubuntu_version' '${{ matrix.notebook }}' 
-      - name: Check python_version attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: python_version
-        with:
-          cmd: yq '.python_version' '${{ matrix.notebook }}'
-      - name: Check sections_to_remove attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: sections_to_remove
-        with:
-          cmd: yq '.sections_to_remove' '${{ matrix.notebook }}'  
-      - name: Check version attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: version
-        with:
-          cmd: yq '.version' '${{ matrix.notebook }}'  
-      - name: Check description attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: description
-        with:
-          cmd: yq '.description' '${{ matrix.notebook }}'  
-
       - name: Get notebook_name
         id: notebook_name
         run: |
@@ -250,13 +207,13 @@ jobs:
           push: false
           platforms: linux/amd64,linux/arm64
           build-args: |
-            BASE_IMAGE=ubuntu:${{ steps.ubuntu_version.outputs.result }}
-            GPU_FLAG=0
-            PYTHON_VERSION=${{ steps.python_version.outputs.result }}
-            PATH_TO_NOTEBOOK=${{ steps.notebook_url.outputs.result }}
-            PATH_TO_REQUIREMENTS=${{ steps.requirements_url.outputs.result }}
-            NOTEBOOK_NAME=${{ steps.notebook_name.outputs.value }}}
-            SECTIONS_TO_REMOVE=${{ steps.sections_to_remove.outputs.result }}
+              BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
+              GPU_FLAG=0
+              PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
+              PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
+              PATH_TO_REQUIREMENTS=${{ needs.get_arguments.outputs.requirements_url }}
+              NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
+              SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
             
           
   check_docker_build_with_gpu:  
@@ -282,54 +239,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3   
 
-      - name: Check notebook_url attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: notebook_url
-        with:
-          cmd: yq '.notebook_url' '${{ matrix.notebook }}' 
-      - name: Check requirements_url attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: requirements_url
-        with:
-          cmd: yq '.requirements_url' '${{ matrix.notebook }}' 
-      - name: Check cuda_version attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: cuda_version
-        with:
-          cmd: yq '.cuda_version' '${{ matrix.notebook }}' 
-      - name: Check ubuntu_version attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: ubuntu_version
-        with:
-          cmd: yq '.ubuntu_version' '${{ matrix.notebook }}' 
-      - name: Check python_version attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: python_version
-        with:
-          cmd: yq '.python_version' '${{ matrix.notebook }}'
-      - name: Check sections_to_remove attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: sections_to_remove
-        with:
-          cmd: yq '.sections_to_remove' '${{ matrix.notebook }}'  
-      - name: Check version attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: version
-        with:
-          cmd: yq '.version' '${{ matrix.notebook }}'  
-      - name: Check description attribute on configuration.yaml
-        uses: mikefarah/yq@master
-        id: description
-        with:
-          cmd: yq '.description' '${{ matrix.notebook }}'  
-
-      - name: Get notebook_name
-        id: notebook_name
-        run: |
-          aux_docker_tag="$(basename ${{ steps.notebook_url.outputs.result }} .ipynb)"
-          notebook_name="$(echo $aux_docker_tag | tr '[:upper:]' '[:lower:]')"
-          echo "value=$notebook_name" >> $GITHUB_OUTPUT
-
       - name: Build with GPU
         uses: docker/build-push-action@v5
         with:
@@ -338,10 +247,9 @@ jobs:
           build-args: |
             BASE_IMAGE=nvidia/cuda:${{ steps.cuda_version.outputs.result }}-base-ubuntu${{ steps.ubuntu_version.outputs.result }}
             GPU_FLAG=1
-            PYTHON_VERSION=${{ steps.python_version.outputs.result }}
-            PATH_TO_NOTEBOOK=${{ steps.notebook_url.outputs.result }}
-            PATH_TO_REQUIREMENTS=${{ steps.requirements_url.outputs.result }}
-            NOTEBOOK_NAME=${{ steps.notebook_name.outputs.value }}
-            SECTIONS_TO_REMOVE=${{ steps.sections_to_remove.outputs.result }}
-        
+            PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
+            PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
+            PATH_TO_REQUIREMENTS=${{ needs.get_arguments.outputs.requirements_url }}
+            NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
+            SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
     
