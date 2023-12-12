@@ -399,6 +399,7 @@ set result_path ""
 checkbutton .fr.principal.gpu -text "Allow GPU" -variable gpu
 place .fr.principal.gpu -relx 0.2 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
 
+# Disable the GPU option in case 'nvidia-smi' command is not found
 if { [catch { exec nvidia-smi } msg] } {
     .fr.principal.gpu configure -state disable
 }
