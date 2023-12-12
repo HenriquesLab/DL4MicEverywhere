@@ -317,7 +317,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
         
         # Print finnished and final time
         code_cell += ("print('-------------------------------------------------------')\n"
-                      "print(' ^ Introduce the arguments and click the button above ^ ')\n") 
+                      "print('^ Introduce the arguments and click the button above ^')\n") 
 
     else:
         # Otherwise, just add the code
