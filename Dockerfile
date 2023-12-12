@@ -64,7 +64,7 @@ ADD $PATH_TO_REQUIREMENTS ./requirements.txt
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt && \
     rm requirements.txt && \
-    git clone -b improve_notebook https://github.com/HenriquesLab/DL4MicEverywhere.git && \
+    git clone https://github.com/HenriquesLab/DL4MicEverywhere.git && \
     if [  "$(printf '%s\n' "3.8" "${PYTHON_VERSION}" | sort -V | head -n1)" = "3.8" ] ; then \
         # For Python between 3.8 and 3.11
         pip install nbformat==5.9.2 ; \ 
