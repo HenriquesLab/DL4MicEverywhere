@@ -1,0 +1,19 @@
+name: Update Documentation
+on:
+  release:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  update-documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install requirements
+        run: pip install -r .tools/requirements.txt
+      - name: generate notebooks list
+        run: python3 .tools/update_configuration.py
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: boot - update configuration version tag
