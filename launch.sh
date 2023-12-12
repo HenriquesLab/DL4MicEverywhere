@@ -371,7 +371,7 @@ fi
 build_flag=0
 
 # In case testing is chossing, the building is forced to be done, without questions
-if [ $test_flag -eq 1 ]; then
+if [ "$test_flag" -eq 1 ]; then
     # In case of testing, the building is always done
     build_flag=2
 else
