@@ -292,9 +292,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
             code_cell += ("from datetime import datetime\n")       
             time_imported = True
         # Print running and store the initial_time
-        code_cell += ("internal_aux_initial_time=datetime.now()\n" 
-                      "print('Runnning...')\n"
-                      "print('--------------------------------------')\n")  
+        code_cell += ("internal_aux_initial_time=datetime.now()\n")  
                     
         if not ipywidget_imported:
             # In case the ipywidgets library have not been imported yet
@@ -318,8 +316,8 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                     )
         
         # Print finnished and final time
-        code_cell += ("print('--------------------------------------')\n"
-                      "print(f'Finnished. Duration: {datetime.now() - internal_aux_initial_time}')\n") 
+        code_cell += ("print('-------------------------------------------------------')\n"
+                      "print(' ^ Introduce the arguments and click the button above ^ ')\n") 
 
     else:
         # Otherwise, just add the code
