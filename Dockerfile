@@ -85,7 +85,6 @@ RUN pip install --upgrade pip && \
         pip install ipywidgets==8.0.0a0 && \ 
         pip install jupyterlab==2.3.2 ; \ 
     fi && \
-    pip install nbformat jupyterlab ipywidgets && \
     python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py -p . -n ${NOTEBOOK_NAME} -s ${SECTIONS_TO_REMOVE} && \ 
     mv colabless_${NOTEBOOK_NAME} ${NOTEBOOK_NAME} && \ 
     rm -r DL4MicEverywhere
