@@ -25,6 +25,7 @@ def transform_nb(path_original_nb, path_new_nb, remove_sections=[]):
     # Initialize variables
     section_localizer = {}
     cell_idx = 0
+    time_imported = False
     ipywidget_imported = False
 
     # Create a new notebook to remove the sections
@@ -38,7 +39,7 @@ def transform_nb(path_original_nb, path_new_nb, remove_sections=[]):
         if cell.cell_type == "code":
             code = cell.source
             # Convert code to cells and track if ipywidgets is imported
-            new_cells, ipywidget_imported = code_to_cell(code, ipywidget_imported, function_name='function')
+            new_cells, time_imported, ipywidget_imported = code_to_cell(code, time_imported=time_imported, ipywidget_imported=ipywidget_imported, function_name='function')
 
         # If the cell is a markdown cell
         elif cell.cell_type == "markdown":
@@ -60,6 +61,7 @@ def transform_nb(path_original_nb, path_new_nb, remove_sections=[]):
 
     section_localizer = {}
     cell_idx = 0
+    time_imported = False
     ipywidget_imported = False
 
     # Iterate over each cell in the original notebook
@@ -70,7 +72,7 @@ def transform_nb(path_original_nb, path_new_nb, remove_sections=[]):
         if cell.cell_type == "code":
             code = cell.source
             # Convert code to cells and track if ipywidgets is imported
-            new_cells, ipywidget_imported = code_to_cell(code, ipywidget_imported, function_name='function')
+            new_cells, time_imported, ipywidget_imported = code_to_cell(code, time_imported=time_imported, ipywidget_imported=ipywidget_imported, function_name='function')
 
         # If the cell is a markdown cell
         elif cell.cell_type == "markdown":
