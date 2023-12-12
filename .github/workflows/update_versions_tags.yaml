@@ -1,4 +1,4 @@
-name: Update Documentation
+name: Update versioning on the configuration files
 on:
   release:
     branches: [ master ]
