@@ -293,7 +293,8 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
             time_imported = True
         # Print running and store the initial_time
         code_cell += ("internal_aux_initial_time=datetime.now()\n" 
-                      "print('Runnning...')\n")  
+                      "print('Runnning...')\n"
+                      "print('--------------------------------------')\n")  
                     
         if not ipywidget_imported:
             # In case the ipywidgets library have not been imported yet
@@ -317,7 +318,9 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                     )
         
         # Print finnished and final time
-        code_cell += ("print(f'Finnished. Duration: {datetime.now() - internal_aux_initial_time}')\n") 
+        code_cell += ("print('--------------------------------------')\n"
+                      "print(f'Finnished. Duration: {datetime.now() - internal_aux_initial_time}')\n") 
+
     else:
         # Otherwise, just add the code
         code_cell = "# Run this cell to execute the code\n" 
@@ -327,9 +330,12 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
             time_imported = True
         # Print running and store the initial_time
         code_cell += ("internal_aux_initial_time=datetime.now()\n" 
-                      "print('Runnning...')\n")
+                      "print('Runnning...')\n"
+                      "print('--------------------------------------')\n")
         code_cell +=  non_widget_code
-        code_cell += ("print(f'Finnished. Duration: {datetime.now() - internal_aux_initial_time}')\n") 
+        
+        code_cell += ("print('--------------------------------------')\n"
+                      "print(f'Finnished. Duration: {datetime.now() - internal_aux_initial_time}')\n") 
 
     #Create the code cell
     aux_cell = nbformat.v4.new_code_cell(clear_excesive_empty_lines(code_cell))
