@@ -322,10 +322,18 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
     else:
         # Otherwise, just add the code
         code_cell = "# Run this cell to execute the code\n" 
+        
+        # We want the imports to be in the first cell, even if it does not have ipywidgets
         if not time_imported:
             # In case the time library have not been imported yet
             code_cell += ("from datetime import datetime\n")       
             time_imported = True
+        if not ipywidget_imported:
+            # In case the ipywidgets library have not been imported yet
+            code_cell += ("import ipywidgets as widgets\n" 
+                          "from IPython.display import display, clear_output\n")       
+            ipywidget_imported = True
+            
         # Print running and store the initial_time
         code_cell += ("internal_aux_initial_time=datetime.now()\n" 
                       "print('Runnning...')\n"
