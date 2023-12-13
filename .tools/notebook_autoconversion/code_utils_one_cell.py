@@ -208,7 +208,7 @@ def count_spaces(sentence):
     else:
         return 0
 
-def code_to_cell(code, ipywidget_imported, function_name):
+def code_to_cell(code, time_imported, ipywidget_imported, function_name):
     """
     Generates a list of code cells for a Jupyter notebook based on the given code.
     Parameters:
@@ -287,6 +287,13 @@ def code_to_cell(code, ipywidget_imported, function_name):
 
         # All the new lines of code are ensambled
         code_cell = "# Run this cell to visualize the parameters and click the button to execute the code\n"
+        if not time_imported:
+            # In case the time library have not been imported yet
+            code_cell += ("from datetime import datetime\n")       
+            time_imported = True
+        # Print running and store the initial_time
+        code_cell += ("internal_aux_initial_time=datetime.now()\n")  
+                    
         if not ipywidget_imported:
             # In case the ipywidgets library have not been imported yet
             code_cell += ("import ipywidgets as widgets\n" 
@@ -307,17 +314,42 @@ def code_to_cell(code, ipywidget_imported, function_name):
                     f"  return {function_name}(output)\n\n"
                     f"button.on_click(aux_{function_name})\n"
                     )
+        
+        # Print finnished and final time
+        code_cell += ("print('-------------------------------------------------------')\n"
+                      "print('^ Introduce the arguments and click \'Load and run\' ^')\n") 
+
     else:
         # Otherwise, just add the code
-        code_cell = "# Run this cell to execute the code\n" +  non_widget_code
+        code_cell = "# Run this cell to execute the code\n" 
+        
+        # We want the imports to be in the first cell, even if it does not have ipywidgets
+        if not time_imported:
+            # In case the time library have not been imported yet
+            code_cell += ("from datetime import datetime\n")       
+            time_imported = True
+        if not ipywidget_imported:
+            # In case the ipywidgets library have not been imported yet
+            code_cell += ("import ipywidgets as widgets\n" 
+                          "from IPython.display import display, clear_output\n")       
+            ipywidget_imported = True
+            
+        # Print running and store the initial_time
+        code_cell += ("internal_aux_initial_time=datetime.now()\n" 
+                      "print('Runnning...')\n"
+                      "print('--------------------------------------')\n")
+        code_cell +=  non_widget_code
+        
+        code_cell += ("print('--------------------------------------')\n"
+                      "print(f'Finnished. Duration: {datetime.now() - internal_aux_initial_time}')\n") 
 
     #Create the code cell
     aux_cell = nbformat.v4.new_code_cell(clear_excesive_empty_lines(code_cell))
     # Hides the content in the code cells
     aux_cell.metadata["cellView"] = "form"
-    aux_cell.metadata["collapsed"] = True
+    aux_cell.metadata["collapsed"] = False
     aux_cell.metadata["jupyter"] = {"source_hidden": True}
             
     new_cells.append(aux_cell)
     
-    return new_cells, ipywidget_imported
+    return new_cells, time_imported, ipywidget_imported
