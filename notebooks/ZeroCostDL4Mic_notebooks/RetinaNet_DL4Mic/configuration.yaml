@@ -6,7 +6,7 @@ config:
     docker_hub_image: retinanet_zerocostdl4mic-z1.14.1-d1.0.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/RetinaNet_ZeroCostDL4Mic.ipynb
     notebook_version: 1.14.1
-    python_version: 3.9
+    python_version: '3.9'
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/RetinaNet_requirements_simple.txt
     sections_to_remove: 2. 6.3.
-    ubuntu_version: 22.04
+    ubuntu_version: '22.04'

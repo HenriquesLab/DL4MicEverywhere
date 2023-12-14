@@ -13,16 +13,16 @@ cite:
   url: https://arxiv.org/abs/1505.04597
 config:
   dl4miceverywhere:
-    cuda_version: 11.8.0
+    cuda_version: '11.8.0'
     description: U-Net_2D_Multilabel_DL4Mic is the conversion of the 2D U-Net Multilabel from ZeroCostDL4Mic.
-    dl4miceverywhere_version: 1.0.0
+    dl4miceverywhere_version: '1.0.0'
     docker_hub_image: u-net_2d_multilabel_zerocostdl4mic-z2.1.2-d1.0.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/U-Net_2D_Multilabel_ZeroCostDL4Mic.ipynb
-    notebook_version: 2.1.2
-    python_version: 3.1
+    notebook_version: '2.1.2'
+    python_version: '3.10'
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/2D_UNet_multilabel_requirements_simple.txt
     sections_to_remove: 1.1. 1.2. 2. 6.2.
-    ubuntu_version: 22.04
+    ubuntu_version: '22.04'
 covers:
 - https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Wiki_files/UNet_Multilabel_example.png
 - https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Wiki_files/UNet-multilabel-example-zoom.png
