@@ -255,6 +255,7 @@ check_parsed_argument sections_to_remove
 check_parsed_argument notebook_version
 check_parsed_argument dl4miceverywhere_version
 check_parsed_argument description
+check_parsed_argument docker_hub_image
 
 # Base image is selected based on the GPU selection
 if [ "$gpu_flag" -eq 1 ]; then
@@ -267,7 +268,11 @@ if [ -z "$notebook_path" ]; then
     # Use the URL from the configuration file if no local notebook path is specified
     notebook_path="${notebook_url}"
     # Set the docker's tag if not specified
-    aux_docker_tag="$(basename "$notebook_path" .ipynb)"
+    if [ -z "$docker_hub_image" ]; then
+        aux_docker_tag="$(basename "$notebook_path" .ipynb)"
+    else
+        aux_docker_tag="${docker_hub_image}"
+    fi
 
     if [ "$test_flag" -eq 1 ]; then
         echo "Since no notebook was specified, the notebook URL from 'configuration.yaml' will be used."
@@ -275,7 +280,12 @@ if [ -z "$notebook_path" ]; then
 else
     # Otherwise check if the path is valid
     # For the docker's tag if not specified
-    aux_docker_tag="$(basename "$notebook_path" .ipynb)"
+    if [ -z "$docker_hub_image" ]; then
+        aux_docker_tag="$(basename "$notebook_path" .ipynb)"
+    else
+        aux_docker_tag="${docker_hub_image}"
+    fi
+
     if [ -f "$notebook_path" ]; then
     
         if [ "$test_flag" -eq 1 ]; then
@@ -318,15 +328,27 @@ if [ -z "$docker_tag" ]; then
     if [ "$test_flag" -eq 1 ]; then 
         echo "No tag has been specified for the docker image, therefore the default tag $docker_tag will be used."
     fi
+
+    if [ -z "$docker_hub_image" ]; then
+        # In case the configuration file does not has a docker_hub_image attribute
+        docker_tag=$(echo $docker_tag | tr '[:upper:]' '[:lower:]')
+        docker_tag=henriqueslab/dl4miceverywhere:$docker_tag
+        docker_tag=$docker_tag-n$notebook_version-d$dl4miceverywhere_version
+        if [ "$gpu_flag" -eq 1 ]; then
+            docker_tag=$docker_tag-gpu
+        fi
+    else
+        # In case the configuration file already has a docker_hub_image attribute
+        docker_tag=henriqueslab/dl4miceverywhere:$docker_tag
+        if [ "$gpu_flag" -eq 1 ]; then
+            docker_tag=$docker_tag-gpu
+        fi
+    fi
+
 fi
 
+
 # Set the docker's tag
-docker_tag=$(echo $docker_tag | tr '[:upper:]' '[:lower:]')
-docker_tag=henriqueslab/dl4miceverywhere:$docker_tag
-if [ "$gpu_flag" -eq 1 ]; then
-    docker_tag=$docker_tag-gpu
-fi
-docker_tag=$docker_tag-n$notebook_version-d$dl4miceverywhere_version
 
 if [ "$test_flag" -eq 1 ]; then
     echo ""
