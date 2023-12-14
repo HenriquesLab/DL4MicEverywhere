@@ -2,8 +2,8 @@ config:
   dl4miceverywhere:
     cuda_version: 11.8.0
     description: CycleGAN_DL4Mic is the conversion of the CycleGAN from ZeroCostDL4Mic.
-    dl4miceverywhere_version: 0.0.1
-    docker_hub_image: CycleGAN_ZeroCostDL4Mic-z1.13.2-d0.0.1
+    dl4miceverywhere_version: 1.0.0
+    docker_hub_image: cyclegan_zerocostdl4mic-z1.13.2-d1.0.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/CycleGAN_ZeroCostDL4Mic.ipynb
     notebook_version: 1.13.2
     python_version: 3.8
