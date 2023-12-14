@@ -19,7 +19,8 @@ def update_config(config_path):
     notebook_version = config_data['config']['dl4miceverywhere']['notebook_version']
     notebook_url = config_data['config']['dl4miceverywhere']['notebook_url']
 
-    notebook_name = os.path.splitext(os.path.basename(notebook_url))[0]
+    notebook_name = os.path.splitext(os.path.basename(notebook_url))[0].lower()
+    notebook_type = config_path.splir('/')[-3]
     docker_hub_image = f'{notebook_name}-{notebook_vocals[notebook_type]}{notebook_version}-d{dl4miceverywhere_version}'
 
     # Read the information from configuration file and modify values
