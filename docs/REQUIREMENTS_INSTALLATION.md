@@ -1,4 +1,4 @@
-# DL4MicEverywhere Requirements Installation Guide
+# DL4MicEverywhere Requirements Installation Guidelines
 
 The installation guideline will be different depending on your operative system. Select the operative system on you computer and follow the indicated steps:
 
@@ -7,9 +7,9 @@ The installation guideline will be different depending on your operative system.
 
 ## Intro
 Windows operating systems require a slightly more complicated installation process. Also, beware there might be differences between Windows 10 and 11.
-- Install Docker Desktop
-- Install Ubuntu inside WSL 
-- Install TCL/TK in WSL's Ubuntu
+- Install Docker Desktop.
+- Install Ubuntu inside WSL. 
+- Install TCL/TK in WSL's Ubuntu.
 
 ## Requirements
 - WSL (Windows Subsystem for Linux) - Pre-installed on most Windows 10/11 systems, otherwise it is available on the Microsoft store.

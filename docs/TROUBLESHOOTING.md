@@ -6,15 +6,15 @@ This guide provides solutions to common issues encountered when using DL4MicEver
 
 **Docker daemon fails to start**
 
-- Ensure your OS meets the requirements for Docker Desktop. Docker requires Windows 10 Pro/Enterprise x64 or macOS 10.13+ 
-- On Linux, ensure Docker engine is installed and the service is running. Check status with `systemctl status docker`
+- Ensure your OS meets the requirements for Docker Desktop. Docker requires Windows 10 Pro/Enterprise x64 or macOS 10.13+ .
+- On Linux, ensure Docker engine is installed and the service is running. Check status with: `systemctl status docker`
 - Confirm your user is in the `docker` group to avoid permission errors.
 
 **Cannot pull Docker images** 
 
 - Verify internet connection and proxy settings. Docker needs access to Docker Hub.
 - If authentication errors occur, re-enter Docker Hub credentials in Docker Desktop settings or `~/.docker/config.json`.
-- For GitHub Package Registry images, ensure you are logged in with `docker login docker.pkg.github.com`
+- For GitHub Package Registry images, ensure you are logged in with: `docker login docker.pkg.github.com`
 
 **Docker command not found**
 
@@ -28,10 +28,10 @@ This guide provides solutions to common issues encountered when using DL4MicEver
 
 **Docker desktop does not start or crashes after running DL4MicEverywhere on Mac**
 
-- Ensure you are not using any Docker container in the terminal. Then, open a terminal and force quit Docker by typing `pkill -SIGHUP -f /Applications/Docker.app 'docker serve'`
+- Ensure you are not using any Docker container in the terminal. Then, open a terminal and force quit Docker by typing: `pkill -SIGHUP -f /Applications/Docker.app 'docker serve'`
 
 **Docker cannot build image**
-- Your docker client might be out of space. [Read here how to clear space.](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/DOCKER_DESKTOP.md)
+- Your docker client might be out of space. [Read here how to clear space](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/DOCKER_DESKTOP.md).
 
 
 ## GPU Support

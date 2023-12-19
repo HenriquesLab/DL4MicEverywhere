@@ -8,8 +8,8 @@ DL4MicEverywhere is a user-friendly platform that allows you to run deep learnin
 
 Before you can use DL4MicEverywhere, ensure you have the following:
 
-- Docker installed on your system 
-- For GPU usage - NVIDIA GPU + CUDA drivers
+- Docker installed on your system.
+- For GPU usage - NVIDIA GPU + CUDA drivers.
 - If you want to run the graphical user interface (GUI), [Tcl/Tk](https://www.tcl.tk/) must be installed on your computer. 
 
 In case you miss some of the requirements, follow the steps descibed on the [REQUIREMENTS INSTALLATION](REQUIREMENTS_INSTALLATION.md).

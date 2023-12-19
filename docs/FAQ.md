@@ -12,14 +12,14 @@ DL4MicEverywhere allows you to utilize the pre-packaged Jupyter notebooks for a 
 
 **What are the prerequisites to run DL4MicEverywhere?**
 
-- Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop))
-- For GPU acceleration - NVIDIA GPU + CUDA drivers ([setup](https://docs.nvidia.com/cuda/))
+- Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop)).
+- For GPU acceleration - NVIDIA GPU + CUDA drivers ([setup](https://docs.nvidia.com/cuda/)).
 
 **How do I get started with DL4MicEverywhere?**
 
 1. Clone the repository: `git clone https://github.com/HenriquesLab/DL4MicEverywhere.git`
-2. Navigate to the repository directory 
-3. Execute `sudo -E bash ./launch.sh` to initiate the notebook selection GUI
+2. Navigate to the repository directory.
+3. Execute `sudo -E bash ./launch.sh` to initiate the notebook selection GUI.
 4. Select a notebook and execute!
 
 For more detailed instructions, refer to the [step-by-step guideline](https://github.com/HenriquesLab/DL4MicEverywhere/wiki/Step%E2%80%90by%E2%80%90step-guideline).
@@ -60,11 +60,11 @@ Yes, you can specify the path to a local notebook file when launching via the `-
 
 We welcome contributions! Please refer to the [contributing guidelines](CONTRIBUTING.md) to get started. Some areas for contribution include:
 
-- Reporting bugs and issues
-- Proposing new features and enhancements 
-- Enhancing documentation
-- Adding new notebooks
-- Resolving bugs
+- Reporting bugs and issues.
+- Proposing new features and enhancements. 
+- Enhancing documentation.
+- Adding new notebooks.
+- Resolving bugs.
 
 
 
