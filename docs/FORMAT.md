@@ -13,6 +13,7 @@ The containerization of a ZeroCostDL4Mic notebook in a static environment is fac
 
 For instance, here is the provided `configuration.yaml` file for the CARE 2D notebook:
 
+
 ```
 notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/pix2pix_ZeroCostDL4Mic.ipynb
 requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/pix2pix_requirements_simple.txt

@@ -19,7 +19,7 @@ DL4MicEverywhere allows you to utilize the pre-packaged Jupyter notebooks for a 
 
 1. Clone the repository: `git clone https://github.com/HenriquesLab/DL4MicEverywhere.git`
 2. Navigate to the repository directory 
-3. Execute `./launch.sh` to initiate the notebook selection GUI
+3. Execute `sudo -E bash ./launch.sh` to initiate the notebook selection GUI
 4. Select a notebook and execute!
 
 For more detailed instructions, refer to the [step-by-step guideline](https://github.com/HenriquesLab/DL4MicEverywhere/wiki/Step%E2%80%90by%E2%80%90step-guideline).

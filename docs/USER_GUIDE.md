@@ -1,24 +1,40 @@
 # DL4MicEverywhere User Guide
 
-DL4MicEverywhere is a user-friendly platform that allows you to run deep learning notebooks for microscopy analysis on your local machine or remote infrastructure. This guide will walk you through the steps to get started.
+DL4MicEverywhere is a user-friendly platform that allows you to run deep learning notebooks for microscopy imaging analysis on your local machine or remote infrastructure. This guide will walk you through the steps to get started.
 
 ## Installation
+
+### Requirements
 
 Before you can use DL4MicEverywhere, ensure you have the following:
 
 - Docker installed on your system 
 - For GPU usage - NVIDIA GPU + CUDA drivers
-- If you want to run the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/) must be installed on your computer. 
+- If you want to run the graphical user interface (GUI), [Tcl/Tk](https://www.tcl.tk/) must be installed on your computer. 
 
-For detailed installation guidelines, click [here](INSTALLATION.md).
+In case you miss some of the requirements, follow the steps descibed on the [REQUIREMENTS INSTALLATION](REQUIREMENTS_INSTALLATION.md).
 
-**Clone the repository:**
+### Download DL4MicEverywhere Repository:
 
-```
-git clone https://github.com/HenriquesLab/DL4MicEverywhere.git
-```
+* **Option 1**: Download the ZIP file from GitHub's repository
 
-**Navigate to the repository directory:**
+    1. Download a ZIP file of the DL4MicEverywhere repository by clicking [here](https://github.com/HenriquesLab/DL4MicEverywhere/archive/refs/heads/main.zip).
+
+    2. Decompress the downloaded file.
+
+* **Option 2**: Download from the terminal using git
+
+    > ⚠️: **IMPORTANT**:
+    > `git` must be installed. If not, follow the [official installation steps](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+
+    > ℹ️ **NOTE**:
+    > You need to be located in the folder where you want to download the DL4MicEverywhere repository.
+
+    ```
+    git clone https://github.com/HenriquesLab/DL4MicEverywhere.git
+    ```
+
+### Navigate to the repository directory:
 
 ```
 cd DL4MicEverywhere
@@ -28,10 +44,16 @@ That's it for installation! Docker wraps up all the dependencies needed to run t
 
 ## Quickstart 
 
+> ⚠️: **IMPORTANT:**
+> The GPU usage on Windows machines is not working at this moment due to some TensorFlow and NVIDIA compatibility issues. This issue is under development (alternatives like conda are considered [here](https://github.com/HenriquesLab/DL4MicEverywhere/tree/Pass-to-conda)) and discussed [here](https://github.com/HenriquesLab/DL4MicEverywhere/issues/24). 
+
 **Launch the notebook selection GUI:**
 
+> ℹ️ **NOTE**:
+    > You need to be located in the DL4MicEverywhere folder, where the file launch.sh is in.
+
 ```
-./launch.sh
+sudo -E bash ./launch.sh
 ```
 
 This command will open a GUI window where you can choose a notebook. 
@@ -53,7 +75,7 @@ Now, you're ready to run deep learning workflows through an intuitive UI!
 
 # Step-by-step user guide
 
-For a more detailed guide, please follow the installation guidelines [here](INSTALLATION.md).
+For a more detailed guide, please follow the installation guidelines [here](REQUIREMENTS_INSTALLATION.md).
 
 ## 1. Launch the Docker Desktop application
 

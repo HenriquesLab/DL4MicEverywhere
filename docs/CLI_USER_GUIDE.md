@@ -26,12 +26,17 @@ If you prefer to execute using the terminal, the following are the arguments you
 
 Here is a simple usage case, where one of the provided `configuration.yaml` files is used:
 
+
+> ℹ️ **NOTE**:
+    > You need to be located in the DL4MicEverywhere folder, where the file launch.sh is in.
 ```
 sudo -E bash launch.sh -c ./notebooks/CARE_2D_DL4Mic/configuration.yaml -d ./data_folder -o ./results_folder
 ```
 
 A more complex example would be:
 
+> ℹ️ **NOTE**:
+    > You need to be located in the DL4MicEverywhere folder, where the file launch.sh is in.
 ```
 sudo -E bash launch.sh -c ./my_notebooks/CARE_2D_DL4Mic/configuration.yaml -d /home/user/Documents/data_folder -o /home/user/Documents/results_folder -g -n /home/user/Desktop/MyFancyZeroCostDL4MicNotebook.ipynb -r ./modified_requirements.txt -t MyNewContainer
 ```

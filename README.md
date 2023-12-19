@@ -66,8 +66,7 @@ DL4MicEverywhere is designed to make deep learning more accessible, transparent,
 
 Reproduce the demo in the video with the `U-Net (2D) multilabel` notebook and [Bacillus subtilis segmentation data from DeepBacs](https://zenodo.org/records/5639253). Note that run time will vary from minutes to hours depending on the GPU availability and computing resources. 
 
-Refer to the [User Guide](docs/USER_GUIDE.md) and [Installation guidelines](docs/INSTALLATION.md) for further details. Windows users should follow the dedicated [Windows installation guide](docs/WINDOWS_INSTALLATION.md).
-
+Refer to the [User Guide](docs/USER_GUIDE.md) and [Requirements installation guidelines](docs/REQUIREMENTS_INSTALLATION.md) for further details.
 ### Requirements
 
 - Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop))
@@ -92,8 +91,7 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 
 ## Documentation
 
-- [Installation](docs/INSTALLATION.md)
-  - [WindowsOS Installation](docs/WINDOWS_INSTALLATION.md)
+- [Requirements installation](docs/REQUIREMENTS_INSTALLATION.md)
 - [User Guide](docs/USER_GUIDE.md)
   - [Data Preparation](docs/DATA.md)
   - [Remote connection](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/GUI_USER_GUIDE.md#connection-with-remote-workstations-through-ssh)
