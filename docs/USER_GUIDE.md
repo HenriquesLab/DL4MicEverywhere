@@ -52,8 +52,13 @@ That's it for installation! Docker wraps up all the dependencies needed to run t
 > ℹ️ **NOTE**:
     > You need to be located in the DL4MicEverywhere folder, where the file launch.sh is in.
 
+**On MacOS/Linux:**
 ```
-sudo -E bash ./launch.sh
+sudo -E bash launch.sh
+```
+**On Windows:**
+```
+wsl bash launch.sh
 ```
 
 This command will open a GUI window where you can choose a notebook. 

@@ -4,8 +4,14 @@ After installing the necessary requirements (follow the [Requirements Installati
 
 > ℹ️ **NOTE**:
     > You need to be located in the DL4MicEverywhere folder, where the file launch.sh is in.
+
+**On MacOS/Linux:**
 ```
 sudo -E bash launch.sh
+```
+**On Windows:**
+```
+wsl bash launch.sh
 ```
 
 Executing this command will open the following window:
