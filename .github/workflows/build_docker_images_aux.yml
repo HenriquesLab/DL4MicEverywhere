@@ -67,14 +67,23 @@ jobs:
       
       - name: Print attributes
         run: |
-          echo 'Ubunutu version: ${{ steps.ubuntu_version.outputs.result }}'
-          echo 'cuda_version: ${{ steps.cuda_version.outputs.result }}'
-          echo 'python_version: ${{ steps.python_version.outputs.result }}'
           echo 'notebook_url: ${{ steps.notebook_url.outputs.result }}'
           echo 'requirements_url: ${{ steps.requirements_url.outputs.result }}'
-          echo 'notebook_name: ${{ steps.notebook_name.outputs.value }}'
-          echo 'docker_tag: ${{ steps.docker_tag.outputs.value }}'
+          echo 'cuda_version: ${{ steps.cuda_version.outputs.result }}'
+          echo 'ubuntu version: ${{ steps.ubuntu_version.outputs.result }}'
+          echo 'python_version: ${{ steps.python_version.outputs.result }}'
           echo 'sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}'
+          echo 'docker_tag: ${{ steps.docker_tag.outputs.result }}'
+          echo 'notebook_name: ${{ steps.notebook_name.outputs.value }}'
+
+      notebook_url: ${{ steps.notebook_url.outputs.result }}
+      requirements_url: ${{ steps.requirements_url.outputs.result }}
+      cuda_version: ${{ steps.cuda_version.outputs.result }}
+      ubuntu_version: ${{ steps.ubuntu_version.outputs.result }}
+      python_version: ${{ steps.python_version.outputs.result }}
+      sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}
+      docker_tag: ${{ steps.docker_tag.outputs.result }}
+      notebook_name: ${{ steps.notebook_name.outputs.value }}
 
   build_amd64:
     name: Build Docker image on AMD64
