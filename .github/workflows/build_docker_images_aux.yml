@@ -13,6 +13,7 @@ jobs:
     runs-on: [self-hosted, dl4miceverywhere-builder]
     outputs:
       ubuntu_version: ${{ steps.ubuntu_version.outputs.result }}
+      cuda_version: ${{ steps.cuda_version.outputs.result }}
       python_version: ${{ steps.python_version.outputs.result }}
       notebook_url: ${{ steps.notebook_url.outputs.result }}
       requirements_url: ${{ steps.requirements_url.outputs.result }}
@@ -53,7 +54,7 @@ jobs:
         id: sections_to_remove
         with:
           cmd: yq '.config.dl4miceverywhere.sections_to_remove' '${{ inputs.config_file }}'  
-      - name: Check version attribute on configuration.yaml
+      - name: Check docker_tag attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: docker_tag
         with:
@@ -108,7 +109,7 @@ jobs:
           push: true
           tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu
           build-args: |
-            BASE_IMAGE=nvidia/cuda:${{ steps.cuda_version.outputs.result }}-base-ubuntu${{ steps.ubuntu_version.outputs.result }}
+            BASE_IMAGE=nvidia/cuda:${{ needs.get_arguments.outputs.cuda_version }}-base-ubuntu${{ needs.get_arguments.outputs.ubuntu_version }}
             GPU_FLAG=1
             PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
             PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
@@ -240,6 +241,6 @@ jobs:
 
       - name: Create and push manifest images
         run: |
-          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }} \
+          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64 \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
