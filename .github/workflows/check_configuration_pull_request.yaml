@@ -27,7 +27,7 @@ jobs:
           fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
       - name: Get changed configuration.yaml on the commint
         id: changed-files
-        uses: tj-actions/changed-files@v38
+        uses: tj-actions/changed-files@v41
         with:
          files: '**/configuration.yaml'
       - if: ${{ steps.changed-files.outputs.all_changed_files != '' }}
