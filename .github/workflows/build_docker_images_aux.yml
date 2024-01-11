@@ -12,14 +12,14 @@ jobs:
     name: Extract arguments on each configuration
     runs-on: [self-hosted, dl4miceverywhere-builder]
     outputs:
-      ubuntu_version: ${{ steps.ubuntu_version.outputs.result }}
-      cuda_version: ${{ steps.cuda_version.outputs.result }}
-      python_version: ${{ steps.python_version.outputs.result }}
       notebook_url: ${{ steps.notebook_url.outputs.result }}
       requirements_url: ${{ steps.requirements_url.outputs.result }}
-      notebook_name: ${{ steps.notebook_name.outputs.value }}
-      docker_tag: ${{ steps.docker_tag.outputs.value }}
+      cuda_version: ${{ steps.cuda_version.outputs.result }}
+      ubuntu_version: ${{ steps.ubuntu_version.outputs.result }}
+      python_version: ${{ steps.python_version.outputs.result }}
       sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}
+      docker_tag: ${{ steps.docker_tag.outputs.result }}
+      notebook_name: ${{ steps.notebook_name.outputs.value }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
