@@ -3,12 +3,12 @@ cite:
   text: "G\xF3mez-de-Mariscal, E. et al., Deep-Learning-Based Segmentation of SmallExtracellular Vesicles in Transmission Electron Microscopy Images Scientific Reports, (2019)"
 config:
   dl4miceverywhere:
-    cuda_version: '11.2.2'
+    cuda_version: 11.2.2
     description: Ready to use notebook for the segmentation of small extrcaellular vesicles in transmission electron microscopy (TEM) images. The notebook will download the original code and dataset, and make the inference with a trained model.
-    dl4miceverywhere_version: '1.0.0'
+    dl4miceverywhere_version: 1.0.0
     docker_hub_image: frunet_tem_exosomes_sev-e1.0.0-d1.0.0
     notebook_url: https://raw.githubusercontent.com/BSEL-UC3M/FRU-Net-TEM-segmentation/main/FRUnet_TEM_Exosomes_sEV.ipynb
-    notebook_version: '1.0.0'
+    notebook_version: 1.0.0
     python_version: '3.6'
     requirements_url: https://raw.githubusercontent.com/BSEL-UC3M/FRU-Net-TEM-segmentation/main/requirements.txt
     sections_to_remove:
