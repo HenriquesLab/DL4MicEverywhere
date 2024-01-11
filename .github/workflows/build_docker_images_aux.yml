@@ -64,6 +64,17 @@ jobs:
         run: |
           notebook_name="$(basename ${{ steps.notebook_url.outputs.result }})"
           echo "value=$notebook_name" >> $GITHUB_OUTPUT
+      
+      - name: Print attributes
+        run: |
+          echo 'Ubunutu version: ${{ steps.ubuntu_version.outputs.result }}'
+          echo 'cuda_version: ${{ steps.cuda_version.outputs.result }}'
+          echo 'python_version: ${{ steps.python_version.outputs.result }}'
+          echo 'notebook_url: ${{ steps.notebook_url.outputs.result }}'
+          echo 'requirements_url: ${{ steps.requirements_url.outputs.result }}'
+          echo 'notebook_name: ${{ steps.notebook_name.outputs.value }}'
+          echo 'docker_tag: ${{ steps.docker_tag.outputs.value }}'
+          echo 'sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}'
 
   build_amd64:
     name: Build Docker image on AMD64
