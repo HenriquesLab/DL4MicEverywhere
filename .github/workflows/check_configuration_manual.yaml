@@ -5,7 +5,7 @@ on:
       
 jobs:
 
-  list_configs:
+  extract_changed_files:
     name: Get the list of configuration files on the repository
     runs-on: [self-hosted, dl4miceverywhere-builder]
     outputs: 
@@ -43,7 +43,7 @@ jobs:
     if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
     runs-on: [ubuntu-latest]
     strategy:
-      # super important if you want to see all results, even if one fails
+      # put fail-fast as false if you want to see all results even if one fails,
       # fail-fast is true by default
       fail-fast: false
       matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
@@ -52,12 +52,14 @@ jobs:
     
     outputs:
       ubuntu_version: ${{ steps.ubuntu_version.outputs.result }}
+      cuda_version: ${{ steps.cuda_version.outputs.result }}
       python_version: ${{ steps.python_version.outputs.result }}
       notebook_url: ${{ steps.notebook_url.outputs.result }}
       requirements_url: ${{ steps.requirements_url.outputs.result }}
       notebook_name: ${{ steps.notebook_name.outputs.value }}
       docker_tag: ${{ steps.docker_tag.outputs.value }}
       sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}
+      description: ${{ steps.description.outputs.result }}
       
     steps:
       - name: Checkout
@@ -66,37 +68,42 @@ jobs:
         uses: mikefarah/yq@master
         id: notebook_url
         with:
-          cmd: yq '.config.dl4miceverywhere.notebook_url' '${{ inputs.config_file }}' 
+          cmd: yq '.config.dl4miceverywhere.notebook_url' '${{ matrix.notebook }}' 
       - name: Check requirements_url attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: requirements_url
         with:
-          cmd: yq '.config.dl4miceverywhere.requirements_url' '${{ inputs.config_file }}' 
+          cmd: yq '.config.dl4miceverywhere.requirements_url' '${{ matrix.notebook }}' 
       - name: Check cuda_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: cuda_version
         with:
-          cmd: yq '.config.dl4miceverywhere.cuda_version' '${{ inputs.config_file }}' 
+          cmd: yq '.config.dl4miceverywhere.cuda_version' '${{ matrix.notebook }}' 
       - name: Check ubuntu_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: ubuntu_version
         with:
-          cmd: yq '.config.dl4miceverywhere.ubuntu_version' '${{ inputs.config_file }}' 
+          cmd: yq '.config.dl4miceverywhere.ubuntu_version' '${{ matrix.notebook }}' 
       - name: Check python_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: python_version
         with:
-          cmd: yq '.config.dl4miceverywhere.python_version' '${{ inputs.config_file }}'
+          cmd: yq '.config.dl4miceverywhere.python_version' '${{ matrix.notebook }}'
       - name: Check sections_to_remove attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: sections_to_remove
         with:
-          cmd: yq '.config.dl4miceverywhere.sections_to_remove' '${{ inputs.config_file }}'  
-      - name: Check version attribute on configuration.yaml
+          cmd: yq '.config.dl4miceverywhere.sections_to_remove' '${{ matrix.notebook }}'  
+      - name: Check docker_tag attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: docker_tag
         with:
-          cmd: yq '.config.dl4miceverywhere.docker_hub_image' '${{ inputs.config_file }}' 
+          cmd: yq '.config.dl4miceverywhere.docker_hub_image' '${{ matrix.notebook }}' 
+      - name: Check description attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: description
+        with:
+          cmd: yq '.config.dl4miceverywhere.description' '${{ matrix.notebook }}' 
       - name: Get notebook_name
         id: notebook_name
         run: |
@@ -142,7 +149,7 @@ jobs:
       matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
 
     name: Check running 'docker build' for amd64 and arm64 WITHOUT GPU
-    needs: [check_keys, check_urls, extract_changed_files]
+    needs: [check_keys, extract_changed_files]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -158,7 +165,7 @@ jobs:
       - name: Get notebook_name
         id: notebook_name
         run: |
-          aux_docker_tag="$(basename ${{ steps.notebook_url.outputs.result }} .ipynb)"
+          aux_docker_tag="$(basename ${{ needs.check_keys.outputs.notebook_url }} .ipynb)"
           notebook_name="$(echo $aux_docker_tag | tr '[:upper:]' '[:lower:]')"
           echo "value=$notebook_name" >> $GITHUB_OUTPUT
       
@@ -168,13 +175,13 @@ jobs:
           push: false
           platforms: linux/amd64,linux/arm64
           build-args: |
-              BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
+              BASE_IMAGE=ubuntu:${{ needs.check_keys.outputs.ubuntu_version }}
               GPU_FLAG=0
-              PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
-              PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
-              PATH_TO_REQUIREMENTS=${{ needs.get_arguments.outputs.requirements_url }}
-              NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
-              SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
+              PYTHON_VERSION=${{ needs.check_keys.outputs.python_version }}
+              PATH_TO_NOTEBOOK=${{ needs.check_keys.outputs.notebook_url }}
+              PATH_TO_REQUIREMENTS=${{ needs.check_keys.outputs.requirements_url }}
+              NOTEBOOK_NAME=${{ needs.check_keys.outputs.notebook_name }}
+              SECTIONS_TO_REMOVE=${{ needs.check_keys.outputs.sections_to_remove }}
             
           
   check_docker_build_with_gpu:  
@@ -187,7 +194,7 @@ jobs:
       matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
 
     name: Check running 'docker build' for amd64 WITH GPU
-    needs: [check_keys, check_urls, extract_changed_files]
+    needs: [check_keys, extract_changed_files]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -206,11 +213,11 @@ jobs:
           push: false
           platforms: linux/amd64
           build-args: |
-            BASE_IMAGE=nvidia/cuda:${{ steps.cuda_version.outputs.result }}-base-ubuntu${{ steps.ubuntu_version.outputs.result }}
+            BASE_IMAGE=nvidia/cuda:${{ needs.check_keys.outputs.cuda_version }}-base-ubuntu${{ needs.check_keys.outputs.ubuntu_version }}
             GPU_FLAG=1
-            PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
-            PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
-            PATH_TO_REQUIREMENTS=${{ needs.get_arguments.outputs.requirements_url }}
-            NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
-            SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
+            PYTHON_VERSION=${{ needs.check_keys.outputs.python_version }}
+            PATH_TO_NOTEBOOK=${{ needs.check_keys.outputs.notebook_url }}
+            PATH_TO_REQUIREMENTS=${{ needs.check_keys.outputs.requirements_url }}
+            NOTEBOOK_NAME=${{ needs.check_keys.outputs.notebook_name }}
+            SECTIONS_TO_REMOVE=${{ needs.check_keys.outputs.sections_to_remove }}
     
