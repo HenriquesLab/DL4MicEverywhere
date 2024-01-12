@@ -64,16 +64,15 @@ jobs:
         id: notebook_name
         run: |
           notebook_name="$(basename ${{ steps.notebook_url.outputs.result }})"
-          echo "value=$notebook_name" >> $GITHUB_OUTPUT
+          echo "value=$notebook_name" >> "$GITHUB_OUTPUT"
       - name: Create_latest_tag
         id: latest_tag
         run: |
           IFS='-'
           read -a strarr <<< "${{ steps.docker_tag.outputs.result }}"
-          echo "${strarr[0]}"
-          echo "$strarr[0]"
-          echo "$strarr"
-          echo "value=${strarr[0]}-latest" >> $GITHUB_OUTPUT
+          latest_tag="${strarr[0]}-latest"
+          echo "$latest_tag"
+          echo "value=$latest_tag" >> "$GITHUB_OUTPUT"
       - name: Print attributes
         run: |
           echo 'notebook_url: ${{ steps.notebook_url.outputs.result }}'
