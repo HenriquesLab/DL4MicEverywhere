@@ -1,10 +1,17 @@
-# Requirements
 # Launch the GUI
 
-After installing the necessary requirements, you can launch the GUI by executing the following command in the terminal:
+After installing the necessary requirements (follow the [Requirements Installation]() in case you have not done it yet), you can launch the GUI by executing the following command in the terminal:
 
+> ℹ️ **NOTE**:
+    > You need to be located in the DL4MicEverywhere folder, where the file launch.sh is in.
+
+**On MacOS/Linux:**
 ```
 sudo -E bash launch.sh
+```
+**On Windows:**
+```
+wsl bash launch.sh
 ```
 
 Executing this command will open the following window:
@@ -116,7 +123,7 @@ You can also click on the **Advanced options** button at the bottom to display a
 
 When you choose this option, the **default notebooks** section will be disabled and will not consider the information you provide there. The rest of the arguments you provided will remain intact. In these advanced options, you can provide paths to local files like the `configuration.yaml`, `notebook.ipynb`, and `requirements.txt`.
 
-## Select a local `configuration.yaml`:
+### Select a local `configuration.yaml`:
 
 In the **Path to the configuration.yaml** section, you can either paste the path to the file directly or click on the **Select** button. 
 
@@ -134,7 +141,7 @@ After selecting the file, the window should look like this:
      width="40%" 
      height="40%" />
 
-## Select a local notebook:
+### Select a local notebook:
 
 Just like the `configuration.yaml` file selection, you can select a `.ipynb` notebook instead of the one provided in the `configuration.yaml` that follows the ZeroCostDL4Mic structure:
 

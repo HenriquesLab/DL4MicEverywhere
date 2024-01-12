@@ -16,10 +16,10 @@ Proprietary microscope files or **compressed TIFFs** are not directly supported.
 
 Your image data should be organized into separate folders:
 
-- `raw` - This folder should contain the raw input images 
-- `labels` - This folder should contain any ground truth labels
-- `train` - This folder should contain the training images (can symlink from raw)
-- `test` - This folder should contain the test images (can symlink from raw)
+- `raw` - This folder should contain the raw input images.
+- `labels` - This folder should contain any ground truth labels.
+- `train` - This folder should contain the training images (can symlink from raw).
+- `test` - This folder should contain the test images (can symlink from raw).
 
 This folder structure is expected by many of the notebooks. 
 
@@ -49,10 +49,10 @@ When downsizing, use a Lanczos or cubic interpolation method for optimal results
 
 Normalize pixel values to the 0-1 range to enhance training stability.
 
-In Python:
+In Python (being the image a NumPy array):
 
 ```python
-img = img / 255.0
+img = (img - img.min()) / (img.max() - img.min() + 1e-10)
 ```
 
 ## Data Augmentation

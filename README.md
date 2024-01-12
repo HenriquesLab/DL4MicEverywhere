@@ -30,13 +30,13 @@ It currently incorporates numerous pre-existing ZeroCostDL4Mic notebooks for tas
 
 ## Key Features
 
-- 25+ Jupyter notebooks with a user-friendly graphical interface that requires no coding (scaling to 28+ soon) 
-- Docker-based [packaging](https://hub.docker.com/repository/docker/henriqueslab/dl4miceverywhere) for enhanced portability and reproducibility
-- Deploys the [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) user experience into local use
-- Supports a wide array of microscopy analysis tasks, including segmentation, reconstruction, registration, denoising, and more
-- Compatible with various computing environments, including laptops, workstations, HPC, and cloud with Docker
-- Automated build testing and versioning for improved reliability
-- [Watch a short description](https://www.youtube.com/watch?v=kRIAls6oT4k)
+- 25+ Jupyter notebooks with a user-friendly graphical interface that requires no coding (scaling to 28+ soon).
+- Docker-based [packaging](https://hub.docker.com/repository/docker/henriqueslab/dl4miceverywhere) for enhanced portability and reproducibility.
+- Deploys the [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) user experience into local use.
+- Supports a wide array of microscopy analysis tasks, including segmentation, reconstruction, registration, denoising, and more.
+- Compatible with various computing environments, including laptops, workstations, HPC, and cloud with Docker.
+- Automated build testing and versioning for improved reliability.
+- [Watch a short description](https://www.youtube.com/watch?v=kRIAls6oT4k).
 
 ![Sample Notebook](docs/images/policy.png)
 
@@ -66,24 +66,31 @@ DL4MicEverywhere is designed to make deep learning more accessible, transparent,
 
 Reproduce the demo in the video with the `U-Net (2D) multilabel` notebook and [Bacillus subtilis segmentation data from DeepBacs](https://zenodo.org/records/5639253). Note that run time will vary from minutes to hours depending on the GPU availability and computing resources. 
 
-Refer to the [User Guide](docs/USER_GUIDE.md) and [Installation guidelines](docs/INSTALLATION.md) for further details. Windows users should follow the dedicated [Windows installation guide](docs/WINDOWS_INSTALLATION.md).
-
+Refer to the [User Guide](docs/USER_GUIDE.md) and [Requirements Installation Guidelines](docs/REQUIREMENTS_INSTALLATION.md) for further details.
 ### Requirements
 
-- Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop))
-- For GPU acceleration - NVIDIA GPU + CUDA drivers ([setup](https://docs.nvidia.com/cuda/)) 
+- Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop)).
+- For GPU acceleration - NVIDIA GPU + CUDA drivers ([setup](https://docs.nvidia.com/cuda/)).
 - For the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/).
 
 ### Quickstart MacOS/Linux
 
 1. Clone this repo: `git clone https://github.com/HenriquesLab/DL4MicEverywhere.git`
-2. Navigate to the repo directory 
-3. Run `sudo -E bash launch.sh` to launch the notebook selection GUI
+2. Navigate to the repo directory.
+3. Run `sudo -E bash launch.sh` to launch the notebook selection GUI.
+4. Choose a notebook and run!
+
+### Quickstart Windows
+
+> ⚠️: **IMPORTANT:**
+> The GPU usage on Windows machines is not working at this moment due to some TensorFlow and NVIDIA compatibility issues. This issue is under development (alternatives like conda are considered [here](https://github.com/HenriquesLab/DL4MicEverywhere/tree/Pass-to-conda)) and discussed [here](https://github.com/HenriquesLab/DL4MicEverywhere/issues/24). 
+
+1. Clone this repo: `git clone https://github.com/HenriquesLab/DL4MicEverywhere.git`
+2. Navigate to the repo directory.
+3. Run `wsl bash launch.sh` to launch the notebook selection GUI.
 4. Choose a notebook and run!
 
 With Docker, all dependencies are neatly bundled. Just launch and access deep learning workflows through an intuitive interface!
-
-
 
 
 ## Contributing
@@ -92,15 +99,14 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 
 ## Documentation
 
-- [Installation](docs/INSTALLATION.md)
-  - [WindowsOS Installation](docs/WINDOWS_INSTALLATION.md)
+- [Requirements Installation Guidelines](docs/REQUIREMENTS_INSTALLATION.md)
 - [User Guide](docs/USER_GUIDE.md)
   - [Data Preparation](docs/DATA.md)
-  - [Remote connection](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/GUI_USER_GUIDE.md#connection-with-remote-workstations-through-ssh)
+  - [Remote Connection](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/GUI_USER_GUIDE.md#connection-with-remote-workstations-through-ssh)
 - [Notebooks](https://github.com/HenriquesLab/DL4MicEverywhere/tree/main/notebooks)
   - [Notebook Types](docs/NOTEBOOK_TYPES.md)
   - [Notebook List](docs/NOTEBOOKS.md)
-- [Docker desktop](docs/DOCKER_DESKTOP.md)
+- [Docker Desktop](docs/DOCKER_DESKTOP.md)
 - [Technical Design](docs/DESIGN.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [FAQ](docs/FAQ.md)

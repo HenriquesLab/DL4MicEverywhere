@@ -19,6 +19,7 @@ The structure that these YAML files need to follow to properly work is:
 
 For instance, here is the provided `configuration.yaml` file for the CARE 2D notebook:
 
+
 ```
 config:
   dl4miceverywhere:

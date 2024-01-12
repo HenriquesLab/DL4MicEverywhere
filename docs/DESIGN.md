@@ -6,11 +6,11 @@ DL4MicEverywhere is an initiative designed to enhance the flexibility, shareabil
 
 The system comprises the following key components:
 
-- Individual Docker containers for each ZeroCostDL4Mic notebook 
-- A launch script and GUI for building and executing containers
-- GitHub Actions for automated testing and building
-- Configuration files detailing notebook specifics
-- Interactive Jupyter Notebooks with ipywidgets 
+- Individual Docker containers for each ZeroCostDL4Mic notebook.
+- A launch script and GUI for building and executing containers.
+- GitHub Actions for automated testing and building.
+- Configuration files detailing notebook specifics.
+- Interactive Jupyter Notebooks with ipywidgets.
 
 ## Docker Containers
 
@@ -30,11 +30,11 @@ The GUI, implemented in `gui.tcl`, provides an interactive method for selecting 
 
 Each notebook is associated with a `configuration.yaml` file that specifies:
 
-- The Notebook URL
-- The Requirements URL
-- Software versions (CUDA, Ubuntu, Python)
-- Sections to be removed during the Colab -> Jupyter conversion
-- Metadata such as name, version, description
+- The Notebook URL.
+- The Requirements URL.
+- Software versions (CUDA, Ubuntu, Python).
+- Sections to be removed during the Colab -> Jupyter conversion.
+- Metadata such as name, version, description.
 See [configuration file format](FORMAT.md) for details.
 
 The launch scripts utilize these configurations to determine the build process for the containers.

@@ -24,11 +24,11 @@ To display all the container images currently occupying space on your computer, 
 
 To remove all unused images, use:
 
-`docker image prune -a`
+`sudo docker image prune -a`
 
 To remove all unused containers, networks, and images, use:
 
-`docker system prune -a`
+`sudo docker system prune -a`
 
 
 ## Managing Docker

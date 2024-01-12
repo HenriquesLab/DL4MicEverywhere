@@ -319,6 +319,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
         code_cell += ("print('-------------------------------------------------------')\n"
                       "print('^ Introduce the arguments and click \"Load and run\" ^')\n") 
 
+
     else:
         # Otherwise, just add the code
         code_cell = "# Run this cell to execute the code\n" 
