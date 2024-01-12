@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - versioning
     paths-ignore:
       - '**.md'
       - '**.txt'
