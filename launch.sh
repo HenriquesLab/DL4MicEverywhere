@@ -257,8 +257,8 @@ check_parsed_argument ubuntu_version
 check_parsed_argument python_version
 check_parsed_argument sections_to_remove
 check_parsed_argument notebook_version
-check_parsed_argument dl4miceverywhere_version
 check_parsed_argument description
+# check_parsed_argument dl4miceverywhere_version # Not required to be present
 # check_parsed_argument docker_hub_image # Not required to be present
 
 # Base image is selected based on the GPU selection
@@ -350,7 +350,11 @@ if [ -z "$docker_tag" ]; then
         # In case the configuration file does not have a docker_hub_image attribute
         docker_tag=$(echo $docker_tag | tr '[:upper:]' '[:lower:]')
         docker_tag=henriqueslab/dl4miceverywhere:$docker_tag
-        docker_tag=$docker_tag-$notebook_type$notebook_version-d$dl4miceverywhere_version
+        if [ -z "$dl4miceverywhere_version" ]; then
+            docker_tag=$docker_tag-$notebook_type$notebook_version-d___
+        else
+            docker_tag=$docker_tag-$notebook_type$notebook_version-d$dl4miceverywhere_version
+        fi
         if [ "$gpu_flag" -eq 1 ]; then
             docker_tag=$docker_tag-gpu
         fi
@@ -374,8 +378,7 @@ if [ "$test_flag" -eq 1 ]; then
     echo "notebook_path: $notebook_path"
     echo "requirements_path: $requirements_path"
     echo "sections_to_remove: $sections_to_remove"
-    echo "version: $notebook_version"
-    echo "dl4miceverywhere_version: $dl4miceverywhere_version"
+    echo "notebook_version: $notebook_version"
     echo "description: $description"
     echo "docker_tag: $docker_tag"
     echo ""
