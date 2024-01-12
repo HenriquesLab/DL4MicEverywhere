@@ -1,4 +1,4 @@
-name: In Pull Request checks a modified configuration.yaml
+name: Build and push Docker Images from modified configuration.yaml
 
 on:
   push:
