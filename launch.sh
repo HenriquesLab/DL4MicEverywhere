@@ -153,6 +153,10 @@ else
         gpu_flag="${strarr[5]}"
         tag_aux="${strarr[6]}"
 
+        if [ "$tag_aux" != "-" ]; then
+            docker_tag="$tag_aux"
+        fi
+
         config_path=$BASEDIR/notebooks/$selectedFolder/$selectedNotebook/configuration.yaml
     else
         data_path="${strarr[1]}"
@@ -255,7 +259,7 @@ check_parsed_argument sections_to_remove
 check_parsed_argument notebook_version
 check_parsed_argument dl4miceverywhere_version
 check_parsed_argument description
-check_parsed_argument docker_hub_image
+# check_parsed_argument docker_hub_image # Not required to be present
 
 # Base image is selected based on the GPU selection
 if [ "$gpu_flag" -eq 1 ]; then
@@ -330,10 +334,23 @@ if [ -z "$docker_tag" ]; then
     fi
 
     if [ -z "$docker_hub_image" ]; then
-        # In case the configuration file does not has a docker_hub_image attribute
+        # Get the notebook type of the configuration file
+        if [[ "$config_path" = *'ZeroCostDL4Mic_notebooks'* ]]; then
+            notebook_type='z'
+        elif [[ "$config_path" = *'External_notebooks'* ]]; then
+            notebook_type='e'
+        elif [[ "$config_path" = *'Bespoke_notebooks'* ]]; then
+            notebook_type='b'
+        else
+            # Is a custom configuration that is not in any of these notebook types
+            # therefore the notebook type will be 'n'
+            notebook_type='n'
+        fi
+
+        # In case the configuration file does not have a docker_hub_image attribute
         docker_tag=$(echo $docker_tag | tr '[:upper:]' '[:lower:]')
         docker_tag=henriqueslab/dl4miceverywhere:$docker_tag
-        docker_tag=$docker_tag-n$notebook_version-d$dl4miceverywhere_version
+        docker_tag=$docker_tag-$notebook_type$notebook_version-d$dl4miceverywhere_version
         if [ "$gpu_flag" -eq 1 ]; then
             docker_tag=$docker_tag-gpu
         fi
