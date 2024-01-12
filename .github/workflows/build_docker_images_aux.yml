@@ -69,8 +69,8 @@ jobs:
         id: latest_tag
         run: |
           IFS='-'
-          read -a strarr <<< "${{ steps.docker_tag.outputs.result }})"
-          echo "value=${strarr[0]}-latest" >> $GITHUB_OUTPUT
+          read -a strarr <<< "${{ steps.docker_tag.outputs.result }}"
+          echo "value=$strarr[0]-latest" >> $GITHUB_OUTPUT
       - name: Print attributes
         run: |
           echo 'notebook_url: ${{ steps.notebook_url.outputs.result }}'
