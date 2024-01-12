@@ -8,8 +8,8 @@ The structure that these YAML files need to follow in order to properly work is:
     * **`dl4miceveryhwere`**:
         * **`notebook_url`**: The URL to download the Jupyter notebook that will be stored inside the docker image.
         * **`requirements_url`**: The URL to download the file specifying the Python librarie and the versions that will be included in the docker image.
-        * **`cuda_version`**: The CUDA version to be included in the docker image.
-        * **`ubuntu_version`**: The Ubuntu version to be used as the operating system in the docker image.
+        * **`cuda_version`**: The CUDA version to be included in the docker image. The provided CUDA version will be used to pull the ubuntu image from Docker Hub (from [nvidia](https://hub.docker.com/r/nvidia/dcgm-exporter) if GPU is selected), therefore its version (and the `ubuntu_version`) should be one from the following [list](https://gitlab.com/nvidia/container-images/cuda/blob/master/doc/supported-tags.md).
+        * **`ubuntu_version`**: The Ubuntu version to be used as the operating system in the docker image. Similarly, the Ubuntu version will be used to pull the base image from Docker Hub (from [nvidia](https://hub.docker.com/r/nvidia/dcgm-exporter) if GPU is selected and from [ubuntu](https://hub.docker.com/_/ubuntu) otherwise), therefore the selected Ubuntu version must be between the supported tags.
         * **`python_version`**: The Python version to be installed in the docker image.
         * **`sections_to_remove`**: The sections to be removed from the ZeroCost style notebook (must be separated by spaces and follow the X.X. format). In case you want to keep all the sections, you can left this argument empty, but you still need to define it.
         * **description`**: A brief description of the notebook specified in the `notebook_url`. This description needs to be in a single line in order to be shown by the GUI. You can also leave this argument empty, but is recommended to give even a small description.
