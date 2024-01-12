@@ -70,6 +70,9 @@ jobs:
         run: |
           IFS='-'
           read -a strarr <<< "${{ steps.docker_tag.outputs.result }}"
+          echo "${strarr[0]}"
+          echo "$strarr[0]"
+          echo "strarr"
           echo "value=$strarr[0]-latest" >> $GITHUB_OUTPUT
       - name: Print attributes
         run: |
