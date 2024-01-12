@@ -41,22 +41,24 @@ EOF
 }
 
 # Function to check if a given argument exists or to rename it in case is needed
+rename_parsed_argument() {
+    variable_name="$1"
+    config_variable_name="config_dl4miceverywhere_$1"
+    eval "$variable_name=\$$config_variable_name"
+}
+
 check_parsed_argument() {
     variable_name="$1"
     config_variable_name="config_dl4miceverywhere_$1"
     
     if [ -z "${!config_variable_name}" ]; then
-        # If no config:dl4miceverywhere:$variable_name is on the configuration yaml
-        # check if there is the old version with only $variable_name
-        # in case that is neither there, raise an error
         if [ -z "${!variable_name}" ]; then
             echo "$variable_name parameter is not specified on the configuration yaml."
             exit 1
         fi
     else
-        eval "$variable_name=\$$config_variable_name"
+        rename_parsed_argument $variable_name
     fi
-
 }
 
 # Function to parse and read the configuration yaml file
@@ -258,8 +260,8 @@ check_parsed_argument python_version
 check_parsed_argument sections_to_remove
 check_parsed_argument notebook_version
 check_parsed_argument description
-# check_parsed_argument dl4miceverywhere_version # Not required to be present
-# check_parsed_argument docker_hub_image # Not required to be present
+rename_parsed_argument dl4miceverywhere_version # Not required to be present and therefore the cheking is skipped
+rename_parsed_argument docker_hub_image # Not required to be present and therefore the cheking is skipped
 
 # Base image is selected based on the GPU selection
 if [ "$gpu_flag" -eq 1 ]; then
@@ -360,7 +362,7 @@ if [ -z "$docker_tag" ]; then
         fi
     else
         # In case the configuration file already has a docker_hub_image attribute
-        docker_tag=henriqueslab/dl4miceverywhere:$docker_tag
+        docker_tag=henriqueslab/dl4miceverywhere:$docker_hub_image
         if [ "$gpu_flag" -eq 1 ]; then
             docker_tag=$docker_tag-gpu
         fi
