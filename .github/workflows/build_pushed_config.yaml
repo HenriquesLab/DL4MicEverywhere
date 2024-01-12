@@ -11,7 +11,6 @@ on:
       
 jobs:
   extract_changed_files:
-    
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -53,6 +52,27 @@ jobs:
           echo "matrix=$files_json" >> $GITHUB_OUTPUT
           echo "END"
     
+  update_configuration:
+    if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
+    runs-on: [ubuntu-latest]
+    strategy:
+      # put fail-fast as false if you want to see all results even if one fails,
+      # fail-fast is true by default
+      fail-fast: false
+      matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
+    name: Updates the docker tag in configuration.yaml
+    needs: extract_changed_files
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install requirements
+        run: pip install -r .tools/requirements.txt
+      - name: update all the configurations
+        run: python3 .tools/update_configuration.py '${{ matrix.notebook }}' 
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: boot - update configuration version tag
+
   check_keys:
     if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
     runs-on: [ubuntu-latest]
@@ -62,7 +82,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
     name: Check attributes/keys on modified configuration.yaml
-    needs: extract_changed_files
+    needs: [extract_changed_files, update_configuration]
     
     outputs:
       ubuntu_version: ${{ steps.ubuntu_version.outputs.result }}

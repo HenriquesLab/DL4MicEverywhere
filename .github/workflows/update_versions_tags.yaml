@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  update-documentation:
+  update_configuration:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
