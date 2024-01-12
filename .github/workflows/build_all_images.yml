@@ -52,7 +52,7 @@ jobs:
     name: Call the building and pushing
     needs: list_configs
     strategy:
-      # super important if you want to see all results, even if one fails
+      # put fail-fast as false if you want to see all results even if one fails,
       # fail-fast is true by default
       fail-fast: false
       matrix: ${{ fromJson(needs.list_configs.outputs.matrix) }} 

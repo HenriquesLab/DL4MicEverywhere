@@ -1,10 +1,9 @@
 name: In Pull Request checks a modified configuration.yaml
 
 on:
-  pull_request:
-    types: [opened, reopened]
+  push:
     branches:
-      - main
+      - master
     paths-ignore:
       - '**.md'
       - '**.txt'
@@ -178,85 +177,16 @@ jobs:
         with:
           arguments: ${{ needs.check_keys.outputs.requirements_url }}
 
-  check_docker_build_without_gpu:  
+  check_docker:  
     if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
-    runs-on: [ubuntu-latest]
+    needs: extract_changed_files
     strategy:
       # super important if you want to see all results, even if one fails
       # fail-fast is true by default
       fail-fast: false
       matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
-
-    name: Check running 'docker build' for amd64 and arm64 WITHOUT GPU
-    needs: [check_keys, check_urls, extract_changed_files]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-            fetch-depth: 0
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3   
-
-      - name: Get notebook_name
-        id: notebook_name
-        run: |
-          aux_docker_tag="$(basename ${{ needs.check_keys.outputs.notebook_url }} .ipynb)"
-          notebook_name="$(echo $aux_docker_tag | tr '[:upper:]' '[:lower:]')"
-          echo "value=$notebook_name" >> $GITHUB_OUTPUT
-      
-      - name: Build without GPU
-        uses: docker/build-push-action@v5
-        with:
-          push: false
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-              BASE_IMAGE=ubuntu:${{ needs.check_keys.outputs.ubuntu_version }}
-              GPU_FLAG=0
-              PYTHON_VERSION=${{ needs.check_keys.outputs.python_version }}
-              PATH_TO_NOTEBOOK=${{ needs.check_keys.outputs.notebook_url }}
-              PATH_TO_REQUIREMENTS=${{ needs.check_keys.outputs.requirements_url }}
-              NOTEBOOK_NAME=${{ needs.check_keys.outputs.notebook_name }}
-              SECTIONS_TO_REMOVE=${{ needs.check_keys.outputs.sections_to_remove }}
-            
-          
-  check_docker_build_with_gpu:  
-    if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
-    runs-on: [ubuntu-latest]
-    strategy:
-      # super important if you want to see all results, even if one fails
-      # fail-fast is true by default
-      fail-fast: false
-      matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
-
-    name: Check running 'docker build' for amd64 WITH GPU
-    needs: [check_keys, check_urls, extract_changed_files]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-            fetch-depth: 0
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3   
-
-      - name: Build with GPU
-        uses: docker/build-push-action@v5
-        with:
-          push: false
-          platforms: linux/amd64
-          build-args: |
-            BASE_IMAGE=nvidia/cuda:${{ needs.check_keys.outputs.cuda_version }}-base-ubuntu${{ needs.check_keys.outputs.ubuntu_version }}
-            GPU_FLAG=1
-            PYTHON_VERSION=${{ needs.check_keys.outputs.python_version }}
-            PATH_TO_NOTEBOOK=${{ needs.check_keys.outputs.notebook_url }}
-            PATH_TO_REQUIREMENTS=${{ needs.check_keys.outputs.requirements_url }}
-            NOTEBOOK_NAME=${{ needs.check_keys.outputs.notebook_name }}
-            SECTIONS_TO_REMOVE=${{ needs.check_keys.outputs.sections_to_remove }}
-    
+    uses: ./.github/workflows/build_docker_images_aux.yml # calls the one above ^
+    with:
+      config_file: ${{ matrix.notebook }}
+    secrets: inherit
+  
