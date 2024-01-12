@@ -1,0 +1,19 @@
+name: Update versioning on the configuration files
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  update_configuration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install requirements
+        run: pip install -r .tools/requirements.txt
+      - name: update all the configurations
+        run: python3 .tools/update_configuration.py
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Bot - update configuration version tag

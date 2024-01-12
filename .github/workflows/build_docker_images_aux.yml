@@ -12,14 +12,15 @@ jobs:
     name: Extract arguments on each configuration
     runs-on: [self-hosted, dl4miceverywhere-builder]
     outputs:
-      ubuntu_version: ${{ steps.ubuntu_version.outputs.result }}
-      python_version: ${{ steps.python_version.outputs.result }}
       notebook_url: ${{ steps.notebook_url.outputs.result }}
       requirements_url: ${{ steps.requirements_url.outputs.result }}
-      notebook_name: ${{ steps.notebook_name.outputs.value }}
-      docker_tag: ${{ steps.docker_tag.outputs.value }}
+      cuda_version: ${{ steps.cuda_version.outputs.result }}
+      ubuntu_version: ${{ steps.ubuntu_version.outputs.result }}
+      python_version: ${{ steps.python_version.outputs.result }}
       sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}
-      version: ${{ steps.version.outputs.result }}
+      docker_tag: ${{ steps.docker_tag.outputs.result }}
+      notebook_name: ${{ steps.notebook_name.outputs.value }}
+      latest_tag: ${{ steps.latest_tag.outputs.value }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,49 +29,61 @@ jobs:
         uses: mikefarah/yq@master
         id: notebook_url
         with:
-          cmd: yq '.notebook_url' '${{ inputs.config_file }}' 
+          cmd: yq '.config.dl4miceverywhere.notebook_url' '${{ inputs.config_file }}' 
       - name: Check requirements_url attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: requirements_url
         with:
-          cmd: yq '.requirements_url' '${{ inputs.config_file }}' 
+          cmd: yq '.config.dl4miceverywhere.requirements_url' '${{ inputs.config_file }}' 
       - name: Check cuda_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: cuda_version
         with:
-          cmd: yq '.cuda_version' '${{ inputs.config_file }}' 
+          cmd: yq '.config.dl4miceverywhere.cuda_version' '${{ inputs.config_file }}' 
       - name: Check ubuntu_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: ubuntu_version
         with:
-          cmd: yq '.ubuntu_version' '${{ inputs.config_file }}' 
+          cmd: yq '.config.dl4miceverywhere.ubuntu_version' '${{ inputs.config_file }}' 
       - name: Check python_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: python_version
         with:
-          cmd: yq '.python_version' '${{ inputs.config_file }}'
+          cmd: yq '.config.dl4miceverywhere.python_version' '${{ inputs.config_file }}'
       - name: Check sections_to_remove attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: sections_to_remove
         with:
-          cmd: yq '.sections_to_remove' '${{ inputs.config_file }}'  
-      - name: Check version attribute on configuration.yaml
+          cmd: yq '.config.dl4miceverywhere.sections_to_remove' '${{ inputs.config_file }}'  
+      - name: Check docker_tag attribute on configuration.yaml
         uses: mikefarah/yq@master
-        id: version
+        id: docker_tag
         with:
-          cmd: yq '.version' '${{ inputs.config_file }}'  
-
+          cmd: yq '.config.dl4miceverywhere.docker_hub_image' '${{ inputs.config_file }}'  
       - name: Get notebook_name
         id: notebook_name
         run: |
           notebook_name="$(basename ${{ steps.notebook_url.outputs.result }})"
-          echo "value=$notebook_name" >> $GITHUB_OUTPUT
-      - name: Get docker_tag
-        id: docker_tag
+          echo "value=$notebook_name" >> "$GITHUB_OUTPUT"
+      - name: Create_latest_tag
+        id: latest_tag
         run: |
-          aux_docker_tag="$(basename ${{ steps.notebook_url.outputs.result }} .ipynb)"
-          final_docker_tag="$(echo $aux_docker_tag | tr '[:upper:]' '[:lower:]')"
-          echo "value=$final_docker_tag" >> $GITHUB_OUTPUT
+          IFS='-'
+          read -a strarr <<< "${{ steps.docker_tag.outputs.result }}"
+          latest_tag="${strarr[0]}-latest"
+          echo "$latest_tag"
+          echo "value=$latest_tag" >> "$GITHUB_OUTPUT"
+      - name: Print attributes
+        run: |
+          echo 'notebook_url: ${{ steps.notebook_url.outputs.result }}'
+          echo 'requirements_url: ${{ steps.requirements_url.outputs.result }}'
+          echo 'cuda_version: ${{ steps.cuda_version.outputs.result }}'
+          echo 'ubuntu version: ${{ steps.ubuntu_version.outputs.result }}'
+          echo 'python_version: ${{ steps.python_version.outputs.result }}'
+          echo 'sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}'
+          echo 'docker_tag: ${{ steps.docker_tag.outputs.result }}'
+          echo 'notebook_name: ${{ steps.notebook_name.outputs.value }}'
+          echo 'latest_tag: ${{ steps.latest_tag.outputs.value }}'
 
   build_amd64:
     name: Build Docker image on AMD64
@@ -98,7 +111,7 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-amd64, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-amd64
+          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64
           build-args: |
             BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
             GPU_FLAG=0
@@ -114,9 +127,9 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu-v${{ needs.get_arguments.outputs.version }}, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu-latest
+          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu
           build-args: |
-            BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
+            BASE_IMAGE=nvidia/cuda:${{ needs.get_arguments.outputs.cuda_version }}-base-ubuntu${{ needs.get_arguments.outputs.ubuntu_version }}
             GPU_FLAG=1
             PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
             PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
@@ -150,7 +163,7 @@ jobs:
           context: .
           platforms: linux/arm64
           push: true
-          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-arm64, henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-arm64
+          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
           build-args: |
               BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
               GPU_FLAG=0
@@ -188,13 +201,10 @@ jobs:
 
       - name: Create and push manifest images
         run: |
-          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }} \
-          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-arm64
-      
-      - name: Create and push manifest images with latest
-        run: |
-          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest \
-          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-arm64
+          docker buildx imagetools create \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
             
   build-only-amd64:
     if: ${{ always() && contains(needs.build_arm64.result, 'failure') }}
@@ -224,12 +234,10 @@ jobs:
 
       - name: Create and push manifest images
         run: |
-          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }} \
-          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-amd64      
-      - name: Create and push manifest images with latest
-        run: |
-          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest \
-          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-amd64 
+          docker buildx imagetools create \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64
   build-multi-architecture:
     needs:
       - get_arguments
@@ -257,12 +265,8 @@ jobs:
 
       - name: Create and push manifest images
         run: |
-          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }} \
-          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-amd64 \
-          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-v${{ needs.get_arguments.outputs.version }}-arm64
-      
-      - name: Create and push manifest images with latest
-        run: |
-          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest \
-          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-amd64 \
-          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-latest-arm64
+          docker buildx imagetools create \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64 \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64

@@ -40,6 +40,27 @@ EOF
   exit
 }
 
+# Function to check if a given argument exists or to rename it in case is needed
+rename_parsed_argument() {
+    variable_name="$1"
+    config_variable_name="config_dl4miceverywhere_$1"
+    eval "$variable_name=\$$config_variable_name"
+}
+
+check_parsed_argument() {
+    variable_name="$1"
+    config_variable_name="config_dl4miceverywhere_$1"
+    
+    if [ -z "${!config_variable_name}" ]; then
+        if [ -z "${!variable_name}" ]; then
+            echo "$variable_name parameter is not specified on the configuration yaml."
+            exit 1
+        fi
+    else
+        rename_parsed_argument $variable_name
+    fi
+}
+
 # Function to parse and read the configuration yaml file
 function parse_yaml {
    local prefix=$2
@@ -50,10 +71,15 @@ function parse_yaml {
    awk -F$fs '{
       indent = length($1)/2;
       vname[indent] = $2;
+      value = $3;
+
+      # Remove inline comments only if they are at the beginning of a line or after whitespace
+      gsub(/[[:space:]]#.*/, "", value);
+      
       for (i in vname) {if (i > indent) {delete vname[i]}}
       if (length($3) > 0) {
          vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
-         printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
+         printf("%s%s%s=\"%s\"\n", "'$prefix'", vn, $2, value);
       }
    }'
 }
@@ -128,6 +154,10 @@ else
         selectedNotebook="${strarr[4]}"
         gpu_flag="${strarr[5]}"
         tag_aux="${strarr[6]}"
+
+        if [ "$tag_aux" != "-" ]; then
+            docker_tag="$tag_aux"
+        fi
 
         config_path=$BASEDIR/notebooks/$selectedFolder/$selectedNotebook/configuration.yaml
     else
@@ -216,8 +246,22 @@ if [ "$test_flag" -eq 1 ]; then
     fi
 fi
 
+echo "$config_path"
+
 # Read the variables from the yaml file
 eval $(parse_yaml "$config_path")
+
+# Check the parsed variables
+check_parsed_argument notebook_url
+check_parsed_argument requirements_url
+check_parsed_argument cuda_version
+check_parsed_argument ubuntu_version
+check_parsed_argument python_version
+check_parsed_argument sections_to_remove
+check_parsed_argument notebook_version
+check_parsed_argument description
+rename_parsed_argument dl4miceverywhere_version # Not required to be present and therefore the cheking is skipped
+rename_parsed_argument docker_hub_image # Not required to be present and therefore the cheking is skipped
 
 # Base image is selected based on the GPU selection
 if [ "$gpu_flag" -eq 1 ]; then
@@ -230,7 +274,11 @@ if [ -z "$notebook_path" ]; then
     # Use the URL from the configuration file if no local notebook path is specified
     notebook_path="${notebook_url}"
     # Set the docker's tag if not specified
-    aux_docker_tag="$(basename "$notebook_path" .ipynb)"
+    if [ -z "$docker_hub_image" ]; then
+        aux_docker_tag="$(basename "$notebook_path" .ipynb)"
+    else
+        aux_docker_tag="${docker_hub_image}"
+    fi
 
     if [ "$test_flag" -eq 1 ]; then
         echo "Since no notebook was specified, the notebook URL from 'configuration.yaml' will be used."
@@ -238,7 +286,12 @@ if [ -z "$notebook_path" ]; then
 else
     # Otherwise check if the path is valid
     # For the docker's tag if not specified
-    aux_docker_tag="$(basename "$notebook_path" .ipynb)"
+    if [ -z "$docker_hub_image" ]; then
+        aux_docker_tag="$(basename "$notebook_path" .ipynb)"
+    else
+        aux_docker_tag="${docker_hub_image}"
+    fi
+
     if [ -f "$notebook_path" ]; then
     
         if [ "$test_flag" -eq 1 ]; then
@@ -281,15 +334,44 @@ if [ -z "$docker_tag" ]; then
     if [ "$test_flag" -eq 1 ]; then 
         echo "No tag has been specified for the docker image, therefore the default tag $docker_tag will be used."
     fi
+
+    if [ -z "$docker_hub_image" ]; then
+        # Get the notebook type of the configuration file
+        if [[ "$config_path" = *'ZeroCostDL4Mic_notebooks'* ]]; then
+            notebook_type='z'
+        elif [[ "$config_path" = *'External_notebooks'* ]]; then
+            notebook_type='e'
+        elif [[ "$config_path" = *'Bespoke_notebooks'* ]]; then
+            notebook_type='b'
+        else
+            # Is a custom configuration that is not in any of these notebook types
+            # therefore the notebook type will be 'n'
+            notebook_type='n'
+        fi
+
+        # In case the configuration file does not have a docker_hub_image attribute
+        docker_tag=$(echo $docker_tag | tr '[:upper:]' '[:lower:]')
+        docker_tag=henriqueslab/dl4miceverywhere:$docker_tag
+        if [ -z "$dl4miceverywhere_version" ]; then
+            docker_tag=$docker_tag-$notebook_type$notebook_version-d___
+        else
+            docker_tag=$docker_tag-$notebook_type$notebook_version-d$dl4miceverywhere_version
+        fi
+        if [ "$gpu_flag" -eq 1 ]; then
+            docker_tag=$docker_tag-gpu
+        fi
+    else
+        # In case the configuration file already has a docker_hub_image attribute
+        docker_tag=henriqueslab/dl4miceverywhere:$docker_hub_image
+        if [ "$gpu_flag" -eq 1 ]; then
+            docker_tag=$docker_tag-gpu
+        fi
+    fi
+
 fi
 
+
 # Set the docker's tag
-docker_tag=$(echo $docker_tag | tr '[:upper:]' '[:lower:]')
-docker_tag=henriqueslab/dl4miceverywhere:$docker_tag
-if [ "$gpu_flag" -eq 1 ]; then
-    docker_tag=$docker_tag-gpu
-fi
-docker_tag=$docker_tag-v$version
 
 if [ "$test_flag" -eq 1 ]; then
     echo ""
@@ -298,7 +380,7 @@ if [ "$test_flag" -eq 1 ]; then
     echo "notebook_path: $notebook_path"
     echo "requirements_path: $requirements_path"
     echo "sections_to_remove: $sections_to_remove"
-    echo "version: $version"
+    echo "notebook_version: $notebook_version"
     echo "description: $description"
     echo "docker_tag: $docker_tag"
     echo ""
@@ -333,7 +415,7 @@ fi
 build_flag=0
 
 # In case testing is chossing, the building is forced to be done, without questions
-if [ $test_flag -eq 1 ]; then
+if [ "$test_flag" -eq 1 ]; then
     # In case of testing, the building is always done
     build_flag=2
 else
@@ -392,6 +474,8 @@ else
         fi
     fi
 fi
+
+echo $docker_tag
 
 # Pull the docker image from docker hub
 if [ "$build_flag" -eq 3 ]; then

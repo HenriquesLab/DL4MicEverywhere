@@ -1,5 +1,5 @@
 name: "dl4miceverywhere"
-version: "0.0.1"
+version: "1.0.0"
 channels:
 - "http://repo.continuum.io/pkgs/main/"
 environment_file: environment.yml

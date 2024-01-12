@@ -130,21 +130,54 @@ proc onDone {} {
 
 proc onAdvanced {} {
     global advanced_options
+    global is_mac
+
     if {"$advanced_options" == 0} {
         set advanced_options 1
-        pack .fr.advanced -fill both -expand 1
+        pack .fr.advanced -fill both -expand 1 
+        
         .fr.principal.notebooks configure -state disable
         .fr.principal.notebooks_folders configure -state disable
 
+        place .fr.principal.notebooks_folders -relx 0.02 -rely [expr 0.55 / ( 2 - $advanced_options ) ]
+        place .fr.principal.notebooks -relx 0.02 -rely [expr 0.55 / ( 2 - $advanced_options ) ]
+
+        place .fr.principal.data_label -relx 0.02 -rely [expr 0.63 / ( 2 - $advanced_options ) ]
+        place .fr.principal.data_entry -relx 0.02 -rely [expr 0.69 / ( 2 - $advanced_options ) ]
+        place .fr.principal.data_btn -relx 0.85 -rely [expr 0.685 / ( 2 - $advanced_options ) ]
+
+        place .fr.principal.result_label -relx 0.02 -rely [expr 0.76 / ( 2 - $advanced_options ) ]
+        place .fr.principal.result_entry -relx 0.02 -rely [expr 0.82 / ( 2 - $advanced_options ) ]
+        place .fr.principal.result_btn -relx 0.85 -rely [expr 0.825 / ( 2 - $advanced_options ) ]
+
+        place .fr.principal.gpu -relx 0.05 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
+
+        .fr.principal.notebook_description configure -height [expr 1 + ($is_mac * 2)] 
         .fr.principal.notebook_description delete 0.0 end
         .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
         .fr.principal.notebook_description insert end "On advanced mode, default notebooks are disabled." highlight
+
     } else {
         set advanced_options 0
         pack .fr.advanced -fill both -expand 0
+        
         .fr.principal.notebooks configure -state normal
         .fr.principal.notebooks_folders configure -state normal
 
+        place .fr.principal.notebooks_folders -relx 0.02 -rely [expr 0.55 / ( 2 - $advanced_options ) ]
+        place .fr.principal.notebooks -relx 0.02 -rely [expr 0.63 / ( 2 - $advanced_options ) ]
+
+        place .fr.principal.data_label -relx 0.02 -rely [expr 0.71 / ( 2 - $advanced_options ) ]
+        place .fr.principal.data_entry -relx 0.02 -rely [expr 0.77 / ( 2 - $advanced_options ) ]
+        place .fr.principal.data_btn -relx 0.85 -rely [expr 0.765 / ( 2 - $advanced_options ) ]
+
+        place .fr.principal.result_label -relx 0.02 -rely [expr 0.85 / ( 2 - $advanced_options ) ]
+        place .fr.principal.result_entry -relx 0.02 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
+        place .fr.principal.result_btn -relx 0.85 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
+
+        place .fr.principal.gpu -relx 0.05 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+
+        .fr.principal.notebook_description configure -height [expr 4 + ($is_mac * 2)] 
         .fr.principal.notebook_description delete 0.0 end
         global selectedNotebook
         if {"$selectedNotebook" != "-"} {
@@ -152,29 +185,16 @@ proc onAdvanced {} {
         }
     }
 
-    place .fr.principal.intro_2 -relx 0.01 -rely [expr 0.06 / ( 2 - $advanced_options ) ]
-    place .fr.principal.intro_3 -relx 0.01 -rely [expr 0.12 / ( 2 - $advanced_options ) ]
-    place .fr.principal.intro_4 -relx 0.01 -rely [expr 0.18 / ( 2 - $advanced_options ) ]
-    place .fr.principal.intro_5 -relx 0.01 -rely [expr 0.24 / ( 2 - $advanced_options ) ]
-    place .fr.principal.intro_6 -relx 0.01 -rely [expr 0.30 / ( 2 - $advanced_options ) ]
-    place .fr.principal.intro_7 -relx 0.01 -rely [expr 0.36 / ( 2 - $advanced_options ) ]
+    place .fr.principal.intro_2 -relx 0.02 -rely [expr 0.06 / ( 2 - $advanced_options ) ]
+    place .fr.principal.intro_3 -relx 0.02 -rely [expr 0.12 / ( 2 - $advanced_options ) ]
+    place .fr.principal.intro_4 -relx 0.02 -rely [expr 0.18 / ( 2 - $advanced_options ) ]
+    place .fr.principal.intro_5 -relx 0.02 -rely [expr 0.24 / ( 2 - $advanced_options ) ]
+    place .fr.principal.intro_6 -relx 0.02 -rely [expr 0.30 / ( 2 - $advanced_options ) ]
+    place .fr.principal.intro_7 -relx 0.02 -rely [expr 0.36 / ( 2 - $advanced_options ) ]
+    place .fr.principal.intro_8 -relx 0.02 -rely [expr 0.42 / ( 2 - $advanced_options ) ]
 
-    place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.43 / ( 2 - $advanced_options ) ]
-    place .fr.principal.notebooks_folders -relx 0.01 -rely [expr 0.49 / ( 2 - $advanced_options ) ]
-    place .fr.principal.notebooks -relx 0.01 -rely [expr 0.56 / ( 2 - $advanced_options ) ]
-    place .fr.principal.notebook_description -relx 0.365 -rely [expr 0.42 / ( 2 - $advanced_options ) ]
-
-    place .fr.principal.data_label -relx 0.01 -rely [expr 0.63 / ( 2 - $advanced_options ) ]
-    place .fr.principal.data_entry -relx 0.01 -rely [expr 0.69 / ( 2 - $advanced_options ) ]
-    place .fr.principal.data_btn -relx 0.87 -rely [expr 0.685 / ( 2 - $advanced_options ) ]
-
-    place .fr.principal.result_label -relx 0.01 -rely [expr 0.77 / ( 2 - $advanced_options ) ]
-    place .fr.principal.result_entry -relx 0.01 -rely [expr 0.83 / ( 2 - $advanced_options ) ]
-    place .fr.principal.result_btn -relx 0.87 -rely [expr 0.825 / ( 2 - $advanced_options ) ]
-
-    place .fr.principal.gpu -relx 0.2 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
-    place .fr.principal.tag_label -relx 0.4 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
-    place .fr.principal.tag -relx 0.53 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebook_label -relx 0.02 -rely [expr 0.49 / ( 2 - $advanced_options ) ]
+    place .fr.principal.notebook_description -relx 0.375 -rely [expr 0.495 / ( 2 - $advanced_options ) ]
 
 }
 
@@ -238,7 +258,19 @@ proc parseYaml {notebook_name} {
         .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
         .fr.principal.notebook_description insert end "There is an updated version of this notebook.\n\n" highlight
     }
-    .fr.principal.notebook_description insert end [lindex $arguments 1]
+    if {[lindex $arguments 1] == 1} {
+        .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
+        .fr.principal.notebook_description insert end "There is an updated version of DL4MicEverywhere.\n\n" highlight
+    }
+    if {[lindex $arguments 1] == 2} {
+        .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
+        .fr.principal.notebook_description insert end "Local configuration file does not have dl4miceverywhere version.\n\n" highlight
+    }
+    if {[lindex $arguments 1] == 3} {
+        .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
+        .fr.principal.notebook_description insert end "Online configuration file does not have dl4miceverywhere version.\n\n" highlight
+    }
+    .fr.principal.notebook_description insert end [lindex $arguments 2]
 
 }
 
@@ -295,19 +327,21 @@ place .fr.principal.logo -x 450 -y 5
 # Define the text that will be the introduction to the window
 
 label .fr.principal.intro_1 -text "Welcome to DL4MicEverywhere!"
-place .fr.principal.intro_1 -relx 0.01 -rely 0.0
+place .fr.principal.intro_1 -relx 0.02 -rely 0.0
 label .fr.principal.intro_2 -text "Providing an easy way to apply deep learning to microscopy"
-place .fr.principal.intro_2 -relx 0.01 -rely [expr 0.06 / ( 2 - $advanced_options ) ]
+place .fr.principal.intro_2 -relx 0.02 -rely [expr 0.06 / ( 2 - $advanced_options ) ]
 label .fr.principal.intro_3 -text "using interactive Jupyter notebooks."
-place .fr.principal.intro_3 -relx 0.01 -rely [expr 0.12 / ( 2 - $advanced_options ) ]
+place .fr.principal.intro_3 -relx 0.02 -rely [expr 0.12 / ( 2 - $advanced_options ) ]
 label .fr.principal.intro_4 -text "To get started, specify:"
-place .fr.principal.intro_4 -relx 0.01 -rely [expr 0.18 / ( 2 - $advanced_options ) ]
+place .fr.principal.intro_4 -relx 0.02 -rely [expr 0.18 / ( 2 - $advanced_options ) ]
 label .fr.principal.intro_5 -text "    - Notebook: Select from the available deep learning workflows"
-place .fr.principal.intro_5 -relx 0.01 -rely [expr 0.24 / ( 2 - $advanced_options ) ]
+place .fr.principal.intro_5 -relx 0.02 -rely [expr 0.24 / ( 2 - $advanced_options ) ]
 label .fr.principal.intro_6 -text "    - Data folder: Location of your input microscopy images"
-place .fr.principal.intro_6 -relx 0.01 -rely [expr 0.30 / ( 2 - $advanced_options ) ]
+place .fr.principal.intro_6 -relx 0.02 -rely [expr 0.30 / ( 2 - $advanced_options ) ]
 label .fr.principal.intro_7 -text "    - Output folder: Where to save your results"
-place .fr.principal.intro_7 -relx 0.01 -rely [expr 0.36 / ( 2 - $advanced_options ) ]
+place .fr.principal.intro_7 -relx 0.02 -rely [expr 0.36 / ( 2 - $advanced_options ) ]
+label .fr.principal.intro_8 -text "    - Checkbox for setting up a GPU-enabled Docker container image"
+place .fr.principal.intro_8 -relx 0.02 -rely [expr 0.42 / ( 2 - $advanced_options ) ]
 
 # Define the list with possible default notebooks
 
@@ -340,121 +374,125 @@ set selectedNotebook "-"
 font create myFont -family Helvetica -size 10
 
 label .fr.principal.notebook_label -text "List of default notebooks:"
-place .fr.principal.notebook_label -relx 0.01 -rely [expr 0.43 / ( 2 - $advanced_options ) ]
+place .fr.principal.notebook_label -relx 0.02 -rely [expr 0.49 / ( 2 - $advanced_options ) ]
 
 ttk::combobox .fr.principal.notebooks_folders -values $folderList -textvariable selectedFolder -state readonly
-place .fr.principal.notebooks_folders -relx 0.01 -rely [expr 0.49 / ( 2 - $advanced_options ) ]
+place .fr.principal.notebooks_folders -relx 0.02 -rely [expr 0.55 / ( 2 - $advanced_options ) ]
 bind .fr.principal.notebooks_folders <<ComboboxSelected>> { onComboboxFolder [%W get]}
 
 ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable selectedNotebook -state readonly
-place .fr.principal.notebooks -relx 0.01 -rely [expr 0.56 / ( 2 - $advanced_options ) ]
+place .fr.principal.notebooks -relx 0.02 -rely [expr 0.63 / ( 2 - $advanced_options ) ]
 bind .fr.principal.notebooks <<ComboboxSelected>> { parseYaml [%W get]}
 
 text .fr.principal.notebook_description -width [expr 35 + ($is_mac * 15) + ($is_linux * 10) ] -height [expr 4 + ($is_mac * 2)] -borderwidth 1 -relief sunken
-place .fr.principal.notebook_description -relx 0.365 -rely [expr 0.42 / ( 2 - $advanced_options ) ]
+place .fr.principal.notebook_description -relx 0.375 -rely [expr 0.495 / ( 2 - $advanced_options ) ]
 
 # Define the button and display to load the path to the data folder
 
 
 label .fr.principal.data_label -text "Path to data folder:"
-place .fr.principal.data_label -relx 0.01 -rely [expr 0.63 / ( 2 - $advanced_options ) ]
+place .fr.principal.data_label -relx 0.02 -rely [expr 0.71 / ( 2 - $advanced_options ) ]
 
-entry .fr.principal.data_entry -textvariable data_path -width [expr 60 + ($is_mac * -5) + ($is_linux * 2)]
-place .fr.principal.data_entry -relx 0.01 -rely [expr 0.69 / ( 2 - $advanced_options ) ]
+entry .fr.principal.data_entry -textvariable data_path -width [expr 58 + ($is_mac * -5) + ($is_linux * 2)]
+place .fr.principal.data_entry -relx 0.02 -rely [expr 0.77 / ( 2 - $advanced_options ) ]
 
 button .fr.principal.data_btn -text "Select" \
         -command "onSelectData"
-place .fr.principal.data_btn -relx 0.87 -rely [expr 0.685 / ( 2 - $advanced_options ) ]
+place .fr.principal.data_btn -relx 0.85 -rely [expr 0.765 / ( 2 - $advanced_options ) ]
 
 set data_path ""
 
 # Define the button and display to load the path to the result folder
 
 label .fr.principal.result_label -text "Path to output folder:"
-place .fr.principal.result_label -relx 0.01 -rely [expr 0.77 / ( 2 - $advanced_options ) ]
+place .fr.principal.result_label -relx 0.02 -rely [expr 0.85 / ( 2 - $advanced_options ) ]
 
-entry .fr.principal.result_entry -textvariable result_path -width [expr 60 + ($is_mac * -5) + ($is_linux * 2)]
-place .fr.principal.result_entry -relx 0.01 -rely [expr 0.83 / ( 2 - $advanced_options ) ]
+entry .fr.principal.result_entry -textvariable result_path -width [expr 58 + ($is_mac * -5) + ($is_linux * 2)]
+place .fr.principal.result_entry -relx 0.02 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
 
 button .fr.principal.result_btn -text "Select" \
         -command "onSelectResult"
-place .fr.principal.result_btn -relx 0.87 -rely [expr 0.825 / ( 2 - $advanced_options ) ]
+place .fr.principal.result_btn -relx 0.85 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
 
 set result_path ""
 
 # Define the checkbutton for the GPU usage
 
 checkbutton .fr.principal.gpu -text "Allow GPU" -variable gpu
-place .fr.principal.gpu -relx 0.2 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
+place .fr.principal.gpu -relx 0.05 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
 
-# Define the docker tag text entry
+# Disable the GPU option in case 'nvidia-smi' command is not found
+if { [catch { exec nvidia-smi } msg] } {
+    .fr.principal.gpu configure -state disable
+}
 
-label .fr.principal.tag_label -text "Docker tag:"
-place .fr.principal.tag_label -relx 0.4 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
-
-entry .fr.principal.tag -textvariable tag -width [expr 20  + ($is_linux * 2)]
-place .fr.principal.tag -relx 0.53 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
-
-set tag ""
 
 ##### Advanced arguments section #####
 
 # Define the text of the advanced option
 
 label .fr.advanced.intro_1 -text "Advanced options allow you to specify:"
-place .fr.advanced.intro_1 -relx 0.01 -rely 0.0
+place .fr.advanced.intro_1 -relx 0.02 -rely 0.0
 label .fr.advanced.intro_2 -text "    - Path to a local 'configuration.yaml' file for Docker container image construction"
-place .fr.advanced.intro_2 -relx 0.01 -rely 0.06
+place .fr.advanced.intro_2 -relx 0.02 -rely 0.06
 label .fr.advanced.intro_3 -text "    - Path to a local notebook file to be loaded into the Docker container"
-place .fr.advanced.intro_3 -relx 0.01 -rely 0.12
+place .fr.advanced.intro_3 -relx 0.02 -rely 0.12
 label .fr.advanced.intro_4 -text "    - Path to the local 'requirements.txt' file for Docker container image setup"
-place .fr.advanced.intro_4 -relx 0.01 -rely 0.18
-label .fr.advanced.intro_5 -text "    - Checkbox for setting up a GPU-enabled Docker container image"
-place .fr.advanced.intro_5 -relx 0.01 -rely 0.24
+place .fr.advanced.intro_4 -relx 0.02 -rely 0.18
 label .fr.advanced.intro_6 -text "    - Tag for naming the generated Docker image"
-place .fr.advanced.intro_6 -relx 0.01 -rely 0.30
+place .fr.advanced.intro_6 -relx 0.02 -rely 0.24
 
 # Define the button and display to load the path to the 'configuration.yaml' file
 
 label .fr.advanced.yaml_label -text "Path to the configuration.yaml:"
-place .fr.advanced.yaml_label -relx 0.01 -rely 0.37
+place .fr.advanced.yaml_label -relx 0.02 -rely 0.32
 
-entry .fr.advanced.yaml_entry -textvariable yaml_path -width [expr 60 + ($is_mac * -5) + ($is_linux * 2)]
-place .fr.advanced.yaml_entry -relx 0.01 -rely 0.44
+entry .fr.advanced.yaml_entry -textvariable yaml_path -width [expr 58 + ($is_mac * -5) + ($is_linux * 2)]
+place .fr.advanced.yaml_entry -relx 0.02 -rely 0.39
 
 button .fr.advanced.byp -text "Select" \
         -command "onSelectYaml"
-place .fr.advanced.byp -relx 0.87 -rely 0.435
+place .fr.advanced.byp -relx 0.85 -rely 0.385
 
 set yaml_path ""
 
 # Define the button and display to load the path to the local notebook
 
 label .fr.advanced.ipynb_label -text "Path to the local notebook:"
-place .fr.advanced.ipynb_label -relx 0.01 -rely 0.52
+place .fr.advanced.ipynb_label -relx 0.02 -rely 0.47
 
-entry .fr.advanced.ipynb_entry -textvariable ipynb_path -width [expr 60 + ($is_mac * -5) + ($is_linux * 2)]
-place .fr.advanced.ipynb_entry -relx 0.01 -rely 0.59
+entry .fr.advanced.ipynb_entry -textvariable ipynb_path -width [expr 58 + ($is_mac * -5) + ($is_linux * 2)]
+place .fr.advanced.ipynb_entry -relx 0.02 -rely 0.54
 
 button .fr.advanced.bnp -text "Select" \
         -command "onSelectIpynb"
-place .fr.advanced.bnp -relx 0.87 -rely 0.585
+place .fr.advanced.bnp -relx 0.85 -rely 0.535
 
 set ipynb_path ""
 
 # Define the button and display to load the path to the data folder
 
 label .fr.advanced.txt_label -text "Path to the requirements.txt:"
-place .fr.advanced.txt_label -relx 0.01 -rely 0.67
+place .fr.advanced.txt_label -relx 0.02 -rely 0.62
 
-entry .fr.advanced.txt_entry -textvariable txt_path -width [expr 60 + ($is_mac * -5) + ($is_linux * 2)]
-place .fr.advanced.txt_entry -relx 0.01 -rely 0.74
+entry .fr.advanced.txt_entry -textvariable txt_path -width [expr 58 + ($is_mac * -5) + ($is_linux * 2)]
+place .fr.advanced.txt_entry -relx 0.02 -rely 0.69
 
 button .fr.advanced.btp -text "Select" \
         -command "onSelectTxt"
-place .fr.advanced.btp -relx 0.87 -rely 0.735
+place .fr.advanced.btp -relx 0.85 -rely 0.685
 
 set txt_path ""
+
+# Define the docker tag text entry
+
+label .fr.advanced.tag_label -text "Docker tag:"
+place .fr.advanced.tag_label -relx 0.02 -rely 0.77
+
+entry .fr.advanced.tag -textvariable tag -width [expr 40  + ($is_linux * 2)]
+place .fr.advanced.tag -relx 0.02 -rely 0.84
+
+set tag ""
 
 ##### Create a window #####
 
