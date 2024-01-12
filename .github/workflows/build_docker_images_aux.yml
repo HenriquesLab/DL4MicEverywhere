@@ -20,6 +20,7 @@ jobs:
       sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}
       docker_tag: ${{ steps.docker_tag.outputs.result }}
       notebook_name: ${{ steps.notebook_name.outputs.value }}
+      latest_tag: ${{ steps.latest_tag.outputs.value }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -64,7 +65,12 @@ jobs:
         run: |
           notebook_name="$(basename ${{ steps.notebook_url.outputs.result }})"
           echo "value=$notebook_name" >> $GITHUB_OUTPUT
-      
+      - name: Create_latest_tag
+        id: latest_tag
+        run: |
+          IFS='-'
+          read -a strarr <<< "${{ steps.docker_tag.outputs.result }})"
+          echo "value=${strarr[0]}-latest" >> $GITHUB_OUTPUT
       - name: Print attributes
         run: |
           echo 'notebook_url: ${{ steps.notebook_url.outputs.result }}'
@@ -75,6 +81,7 @@ jobs:
           echo 'sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}'
           echo 'docker_tag: ${{ steps.docker_tag.outputs.result }}'
           echo 'notebook_name: ${{ steps.notebook_name.outputs.value }}'
+          echo 'latest_tag: ${{ steps.latest_tag.outputs.value }}'
 
   build_amd64:
     name: Build Docker image on AMD64
@@ -192,7 +199,9 @@ jobs:
 
       - name: Create and push manifest images
         run: |
-          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+          docker buildx imagetools create \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
             
   build-only-amd64:
@@ -223,7 +232,9 @@ jobs:
 
       - name: Create and push manifest images
         run: |
-          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+          docker buildx imagetools create \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64
   build-multi-architecture:
     needs:
@@ -252,6 +263,8 @@ jobs:
 
       - name: Create and push manifest images
         run: |
-          docker buildx imagetools create -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+          docker buildx imagetools create \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64 \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
