@@ -283,11 +283,11 @@ jobs:
 
   update-config:
     runs-on:  [self-hosted, dl4miceverywhere-builder]
-    if: ${{ always() && contains(join(needs.*.result, ','), 'success') }}
+    if: ${{ always() && ( contains(needs.build-multi-architecture.result, 'success')  || contains(needs.build-only-arm64.result, 'success') || contains(needs.build-only-amd64.result, 'success') ) }}
     needs:
       - build-multi-architecture
-      - build_amd64
-      - build_arm64
+      - build-only-arm64
+      - build-only-amd64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
