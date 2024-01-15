@@ -24,12 +24,11 @@ jobs:
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
-
         # First udpate the configuration file
       - name: Install requirements
         run: pip install -r .tools/requirements.txt
       - name: Update the version of the notebook on the configuration
-        run: python3 .tools/update_zerocost_version.py
+        run: python3 .tools/update_zerocost_version.py '${{ inputs.config_file }}' 
       - name: Update the docker_tag on the configuration
         run: python3 .tools/update_configuration.py
 
