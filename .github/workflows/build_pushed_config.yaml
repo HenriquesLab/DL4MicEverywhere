@@ -3,8 +3,7 @@ name: Build and push Docker Images from modified configuration.yaml
 on:
   push:
     branches:
-      - master
-      - versioning
+      - main
     paths-ignore:
       - '**.md'
       - '**.txt'
