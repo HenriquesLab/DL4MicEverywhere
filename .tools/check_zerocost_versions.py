@@ -11,10 +11,10 @@ def main():
     updated_notebooks = []
 
     # Read the versions of the notebooks
-    all_notebook_versions = pd.read_csv('../ZeroCostDL4Mic/Colab_notebooks/Latest_Notebook_versions.csv', dtype=str)
+    all_notebook_versions = pd.read_csv('ZeroCostDL4Mic/Colab_notebooks/Latest_Notebook_versions.csv', dtype=str)
 
     # Go through all the notebooks and check if the version is the same
-    dl4miceverywhere_notebooks_path = './notebooks/ZeroCostDL4Mic_notebooks'
+    dl4miceverywhere_notebooks_path = 'DL4MicEverywhere/notebooks/ZeroCostDL4Mic_notebooks'
     for notebook in dict_dl4miceverywhere_to_version.keys():
         configuration_path = os.path.join(dl4miceverywhere_notebooks_path, notebook, 'configuration.yaml')
 
