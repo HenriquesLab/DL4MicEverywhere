@@ -27,7 +27,9 @@ def main():
         if config_version != zerocost_version:
             updated_notebooks.append(notebook)
 
-    print(' '.join(updated_notebooks))
+    if len(updated_notebooks) == 0:
+        print('')
+        print(' '.join(updated_notebooks))
 
 if __name__ == '__main__':
     if len(sys.argv) <= 1:

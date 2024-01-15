@@ -291,6 +291,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Update the repository with git pull
+        run: git pull
       - name: Install requirements
         run: pip install -r .tools/requirements.txt
       - name: Update the version of the notebook on the configuration
