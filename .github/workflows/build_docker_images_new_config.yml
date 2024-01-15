@@ -215,17 +215,6 @@ jobs:
           -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
 
-      # As the image has correctly been pushed, we can now update the version on the configuration file
-      - name: Install requirements
-        run: pip install -r .tools/requirements.txt
-      - name: Update the version of the notebook on the configuration
-        run: python3 .tools/update_zerocost_version.py '${{ inputs.config_file }}' 
-      - name: Update the docker_tag on the configuration
-        run: python3 .tools/update_configuration.py
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: GitHub Action - Update the notebook version on the configuration
-            
   build-only-amd64:
     if: ${{ always() && contains(needs.build_arm64.result, 'failure') }}
     needs:
@@ -258,17 +247,6 @@ jobs:
           -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
           -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64
-
-      # As the image has correctly been pushed, we can now update the version on the configuration file
-      - name: Install requirements
-        run: pip install -r .tools/requirements.txt
-      - name: Update the version of the notebook on the configuration
-        run: python3 .tools/update_zerocost_version.py '${{ inputs.config_file }}' 
-      - name: Update the docker_tag on the configuration
-        run: python3 .tools/update_configuration.py
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: GitHub Action - Update the notebook version on the configuration
 
   build-multi-architecture:
     needs:
@@ -303,7 +281,16 @@ jobs:
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64 \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
 
-      # As the image has correctly been pushed, we can now update the version on the configuration file
+  update-config:
+    runs-on:  [self-hosted, dl4miceverywhere-builder]
+    if: ${{ always() && contains(join(needs.*.result, ','), 'success') }}
+    needs:
+      - build-multi-architecture
+      - build_amd64
+      - build_arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Install requirements
         run: pip install -r .tools/requirements.txt
       - name: Update the version of the notebook on the configuration
