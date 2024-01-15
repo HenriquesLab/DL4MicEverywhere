@@ -1,0 +1,51 @@
+name: Check if any notebook from ZeroCostDL4Mic has been updated
+on:
+  workflow_dispatch:
+
+jobs:
+  update-manifest:
+    outputs:
+      matrix: ${{ steps.create_json.outputs.matrix }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+        with:
+            path: DL4MicEverywhere
+      - name: Clone ZeroCostDL4Mic repository
+        uses: actions/checkout@v4
+        with:
+            repository: HenriquesLab/ZeroCostDL4Mic
+            path: ZeroCostDL4Mic
+      - name: Install requirements
+        working-directory: ./DL4MicEverywhere
+        run: pip install -r .tools/requirements.txt
+      - name: Check for updates on the notebooks
+        id: updated_notebooks
+        working-directory: ./DL4MicEverywhere
+        run: |
+          output=$(python python3 .tools/check_zerocost_versions.py)
+          echo "value=$output" >> $GITHUB_OUTPUT
+      - if: ${{ steps.updated_notebooks.outputs.value != '' }}
+        name: List and extract all notebook with new version
+        id: create_json
+        run: |
+          echo "Start"
+          files_json="{\"include\":[{\"notebook\":\""
+          echo "$files_json"
+          first=true
+          for file in ${{ steps.updated_notebooks.outputs.value }}; do
+            echo "$file was changed"
+            if [ "$first" = true ]; then
+              files_json+=$file
+              first=false
+            else
+              files_json+="\"},{\"notebook\":\""$file
+            fi
+            echo "$files_json"
+          done
+          files_json+="\"}]}"
+          echo "$files_json"
+          echo "matrix=$files_json" >> $GITHUB_OUTPUT
+          echo "END"
+        
