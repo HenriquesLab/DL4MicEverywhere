@@ -22,14 +22,12 @@ jobs:
         run: pip install -r .tools/requirements.txt
       - name: Check for updates on the notebooks
         id: updated_notebooks
-        working-directory: ./DL4MicEverywhere
         run: |
-          output=$(python python3 .tools/check_zerocost_versions.py)
+          output=$(python3 .tools/check_zerocost_versions.py)
           echo "value=$output" >> $GITHUB_OUTPUT
       - if: ${{ steps.updated_notebooks.outputs.value != '' }}
         name: List and extract all notebook with new version
         id: create_json
-        working-directory: ./DL4MicEverywhere
         run: |
           echo "Start"
           files_json="{\"include\":[{\"notebook\":\""
