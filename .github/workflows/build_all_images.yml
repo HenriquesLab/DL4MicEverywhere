@@ -5,9 +5,6 @@ on:
     types: [published]
   workflow_dispatch:
                   
-env:
-  REGISTRY_IMAGE: henriqueslab/dl4miceverywhere
-
 jobs:
   list_configs:
     name: Get the list of configuration files on the repository

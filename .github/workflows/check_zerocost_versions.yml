@@ -1,4 +1,5 @@
-name: Check if any notebook from ZeroCostDL4Mic has been updated
+name: Check and build updated ZeroCostDL4Mic notebook
+
 on:
   workflow_dispatch:
 

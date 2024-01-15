@@ -1,20 +1,22 @@
-name: Update repository version and docker tag on configuration files
+name: Update documentation
 on:
-  release:
-    types: [published]
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  update_configuration:
+  update-documentation:
     runs-on: ubuntu-latest
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
       - name: Install requirements
         run: pip install -r .tools/requirements.txt
-      - name: Update all the configurations
-        run: python3 .tools/update_configuration.py
+      - name: Generate notebooks list
+        run: python3 .tools/list_of_notebooks.py
       - name: Commit the changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: GitHub Action - Update repository version and docker tag on configuration
+          commit_message: GitHub Action - Update notebook list

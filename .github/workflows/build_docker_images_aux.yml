@@ -6,7 +6,7 @@ on:
       config_file: # the variable you can use in place of a matrix
         required: true
         type: string
-
+        
 jobs:
   get_arguments:
     name: Extract arguments on each configuration

@@ -1,10 +1,9 @@
-name: Manually check a modified configuration.yaml
+name: Check a modified configuration.yaml
 
 on:
   workflow_dispatch:
       
 jobs:
-
   extract_changed_files:
     name: Get the list of configuration files on the repository
     runs-on: [self-hosted, dl4miceverywhere-builder]

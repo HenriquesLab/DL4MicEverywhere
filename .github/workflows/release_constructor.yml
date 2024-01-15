@@ -1,8 +1,10 @@
 name: Build Installer
+
 on: 
   push:
     tags:
     - '*'
+
 jobs:
   build:
     defaults:
