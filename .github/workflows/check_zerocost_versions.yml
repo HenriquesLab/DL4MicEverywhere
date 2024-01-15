@@ -22,7 +22,7 @@ jobs:
       - name: Check for updates on the notebooks
         id: updated_notebooks
         run: |
-          output=$(python3 DL4MicEverywhere/.tools/check_zerocost_versions.py
+          output=$(python3 DL4MicEverywhere/.tools/check_zerocost_versions.py)
           echo "$output"
           echo "value=$output" >> $GITHUB_OUTPUT
       - if: ${{ steps.updated_notebooks.outputs.value != '' }}
