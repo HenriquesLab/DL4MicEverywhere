@@ -10,8 +10,6 @@ jobs:
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
-        with:
-            path: DL4MicEverywhere
       - name: Clone ZeroCostDL4Mic repository
         uses: actions/checkout@v4
         with:
