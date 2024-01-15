@@ -1,0 +1,281 @@
+name: Build Docker images for single configuration
+
+on:
+  workflow_call:
+    inputs:
+      config_file: # the variable you can use in place of a matrix
+        required: true
+        type: string
+
+jobs:
+  get_arguments:
+    name: Extract arguments on each configuration
+    runs-on: [self-hosted, dl4miceverywhere-builder]
+    outputs:
+      notebook_url: ${{ steps.notebook_url.outputs.result }}
+      requirements_url: ${{ steps.requirements_url.outputs.result }}
+      cuda_version: ${{ steps.cuda_version.outputs.result }}
+      ubuntu_version: ${{ steps.ubuntu_version.outputs.result }}
+      python_version: ${{ steps.python_version.outputs.result }}
+      sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}
+      docker_tag: ${{ steps.docker_tag.outputs.result }}
+      notebook_name: ${{ steps.notebook_name.outputs.value }}
+      latest_tag: ${{ steps.latest_tag.outputs.value }}
+    steps:
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+
+        # First udpate the configuration file
+      - name: Install requirements
+        run: pip install -r .tools/requirements.txt
+      - name: Update the version of the notebook on the configuration
+        run: python3 .tools/update_zerocost_version.py
+      - name: Update the docker_tag on the configuration
+        run: python3 .tools/update_configuration.py
+
+      # Now that the configuration is updated, we can extract the arguments
+      - name: Check notebook_url attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: notebook_url
+        with:
+          cmd: yq '.config.dl4miceverywhere.notebook_url' '${{ inputs.config_file }}' 
+      - name: Check requirements_url attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: requirements_url
+        with:
+          cmd: yq '.config.dl4miceverywhere.requirements_url' '${{ inputs.config_file }}' 
+      - name: Check cuda_version attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: cuda_version
+        with:
+          cmd: yq '.config.dl4miceverywhere.cuda_version' '${{ inputs.config_file }}' 
+      - name: Check ubuntu_version attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: ubuntu_version
+        with:
+          cmd: yq '.config.dl4miceverywhere.ubuntu_version' '${{ inputs.config_file }}' 
+      - name: Check python_version attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: python_version
+        with:
+          cmd: yq '.config.dl4miceverywhere.python_version' '${{ inputs.config_file }}'
+      - name: Check sections_to_remove attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: sections_to_remove
+        with:
+          cmd: yq '.config.dl4miceverywhere.sections_to_remove' '${{ inputs.config_file }}'  
+      - name: Check docker_tag attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: docker_tag
+        with:
+          cmd: yq '.config.dl4miceverywhere.docker_hub_image' '${{ inputs.config_file }}'  
+      - name: Get notebook_name
+        id: notebook_name
+        run: |
+          notebook_name="$(basename ${{ steps.notebook_url.outputs.result }})"
+          echo "value=$notebook_name" >> "$GITHUB_OUTPUT"
+      - name: Create_latest_tag
+        id: latest_tag
+        run: |
+          IFS='-'
+          read -a strarr <<< "${{ steps.docker_tag.outputs.result }}"
+          latest_tag="${strarr[0]}-latest"
+          echo "$latest_tag"
+          echo "value=$latest_tag" >> "$GITHUB_OUTPUT"
+      - name: Print attributes
+        run: |
+          echo 'notebook_url: ${{ steps.notebook_url.outputs.result }}'
+          echo 'requirements_url: ${{ steps.requirements_url.outputs.result }}'
+          echo 'cuda_version: ${{ steps.cuda_version.outputs.result }}'
+          echo 'ubuntu version: ${{ steps.ubuntu_version.outputs.result }}'
+          echo 'python_version: ${{ steps.python_version.outputs.result }}'
+          echo 'sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}'
+          echo 'docker_tag: ${{ steps.docker_tag.outputs.result }}'
+          echo 'notebook_name: ${{ steps.notebook_name.outputs.value }}'
+          echo 'latest_tag: ${{ steps.latest_tag.outputs.value }}'
+
+  # build_amd64:
+  #   name: Build Docker image on AMD64
+  #   runs-on: [self-hosted, dl4miceverywhere-builder]
+  #   needs: get_arguments
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
+
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v3
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  #     - name: Build and push Ubuntu-Runner
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: .
+  #         platforms: linux/amd64
+  #         push: true
+  #         tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64
+  #         build-args: |
+  #           BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
+  #           GPU_FLAG=0
+  #           PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
+  #           PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
+  #           PATH_TO_REQUIREMENTS=${{ needs.get_arguments.outputs.requirements_url }}
+  #           NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
+  #           SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
+      
+  #     - name: Build and push Ubuntu-Runner
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: .
+  #         platforms: linux/amd64
+  #         push: true
+  #         tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu
+  #         build-args: |
+  #           BASE_IMAGE=nvidia/cuda:${{ needs.get_arguments.outputs.cuda_version }}-base-ubuntu${{ needs.get_arguments.outputs.ubuntu_version }}
+  #           GPU_FLAG=1
+  #           PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
+  #           PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
+  #           PATH_TO_REQUIREMENTS=${{ needs.get_arguments.outputs.requirements_url }}
+  #           NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
+  #           SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
+
+  # build_arm64:
+  #   name: Build Docker image on ARM64
+  #   runs-on: [self-hosted, macOS, ARM64]
+  #   needs: get_arguments
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
+
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v3
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  #     - name: Build and push Ubuntu-Runner
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: .
+  #         platforms: linux/arm64
+  #         push: true
+  #         tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
+  #         build-args: |
+  #             BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
+  #             GPU_FLAG=0
+  #             PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
+  #             PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
+  #             PATH_TO_REQUIREMENTS=${{ needs.get_arguments.outputs.requirements_url }}
+  #             NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
+  #             SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
+
+  # build-only-arm64:
+  #   if: ${{ always() && contains(needs.build_amd64.result, 'failure') }}
+  #   needs:
+  #     - get_arguments
+  #     - build_amd64
+  #     - build_arm64
+  #   runs-on:  [self-hosted, dl4miceverywhere-builder]
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
+
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v3
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  #     - name: Create and push manifest images
+  #       run: |
+  #         docker buildx imagetools create \
+  #         -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+  #         -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
+  #         henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
+            
+  # build-only-amd64:
+  #   if: ${{ always() && contains(needs.build_arm64.result, 'failure') }}
+  #   needs:
+  #     - get_arguments
+  #     - build_amd64
+  #     - build_arm64
+  #   runs-on:  [self-hosted, dl4miceverywhere-builder]
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
+
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v3
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  #     - name: Create and push manifest images
+  #       run: |
+  #         docker buildx imagetools create \
+  #         -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+  #         -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
+  #         henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64
+  # build-multi-architecture:
+  #   needs:
+  #     - get_arguments
+  #     - build_amd64
+  #     - build_arm64
+  #   runs-on:  [self-hosted, dl4miceverywhere-builder]
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
+
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v3
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  #     - name: Create and push manifest images
+  #       run: |
+  #         docker buildx imagetools create \
+  #         -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+  #         -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
+  #         henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64 \
+  #         henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
