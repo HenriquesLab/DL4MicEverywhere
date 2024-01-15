@@ -18,8 +18,7 @@ jobs:
             repository: HenriquesLab/ZeroCostDL4Mic
             path: ZeroCostDL4Mic
       - name: Install requirements
-        working-directory: ./DL4MicEverywhere
-        run: pip install -r .tools/requirements.txt
+        run: pip install -r DL4MicEverywhere.tools/requirements.txt
       - name: Check for updates on the notebooks
         id: updated_notebooks
         run: |
