@@ -1,3 +1,14 @@
+authors:
+- Ainhoa Serrano, Ignacio Arganda-Carreras and the ZeroCostDL4Mic Team
+badges:
+- icon: https://colab.research.google.com/assets/colab-badge.svg
+  label: Open in Colab
+  url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/DFCAN_ZeroCostDL4Mic.ipynb
+cite:
+- doi: https://doi.org/10.1038/s41467-021-22518-0
+  text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
+- doi: https://doi.org/10.1038/s41592-020-01048-5
+  text: 'Qiao C, Li D, Guo Y, Liu C, Jiang T, Dai Q, Li D. Evaluation and development of deep neural networks for image super-resolution in optical microscopy. Nat Methods. 2021 Feb;18(2):194-202. doi: 10.1038/s41592-020-01048-5. Epub 2021 Jan 21. PMID: 33479522. '
 config:
   dl4miceverywhere:
     cuda_version: 11.8.0
@@ -10,3 +21,22 @@ config:
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/DFCAN_requirements_simple.txt
     sections_to_remove: 2. 6.3.
     ubuntu_version: '22.04'
+covers:
+- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/DFCAN_notebook.png
+description: Super-resolution via super-pixelisation. Deep Fourier channel attention network (DFCAN) is a network created to transform low-resolution (LR) images to super-resolved (SR) images, published by Qiao, Chang and Li, Di and Guo, Yuting and Liu, Chong and Jiang, Tao and Dai, Qionghai and Li, Dong. The training is done using LR-SR image pairs, taking the LR images as input and obtaining an output as close to SR as posible.
+documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/README.md
+download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/DFCAN_ZeroCostDL4Mic.ipynb
+git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
+id: Notebook_DFCAN_ZeroCostDL4Mic
+links:
+- Notebook Preview
+name: DFCAN - ZeroCostDL4Mic
+tags:
+- colab
+- notebook
+- DFCAN
+- Super Resolution
+- ZeroCostDL4Mic
+- dl4miceverywhere
+type: application
+version: 1.14.1

@@ -1,3 +1,14 @@
+authors:
+- Romain F. Laine and the ZeroCostDL4Mic Team
+badges:
+- icon: https://colab.research.google.com/assets/colab-badge.svg
+  label: Open in Colab
+  url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/SplineDist_2D_ZeroCostDL4Mic.ipynb
+cite:
+- doi: https://doi.org/10.1038/s41467-021-22518-0
+  text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
+- doi: https://doi.org/10.1101/2020.10.27.357640
+  text: 'Soham Mandal, Virginie Uhlmann. SplineDist: Automated Cell Segmentation With Spline Curves. bioRxiv 2020.10.27.357640; doi: https://doi.org/10.1101/2020.10.27.357640'
 config:
   dl4miceverywhere:
     cuda_version: 11.8.0
@@ -10,3 +21,29 @@ config:
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/SplineDist_2D_requirements_simple.txt
     sections_to_remove: 1.1. 1.2. 2. 6.2.
     ubuntu_version: '22.04'
+covers:
+- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Wiki_files/SplineDist_overlay_cropped.png
+description: Instance segmentation of 2D images. SplineDist is a neural network inspired by StarDist, capable of performing image instance segmentation. Unlike StarDist, SplineDist uses cubic splines to describe the contour of each object and therefore can potentially segment objects of any shapes. This version is only for 2D dataset. Note - visit the ZeroCostDL4Mic wiki to check the original publications this network is based on and make sure you cite these.
+documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/README.md
+download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/SplineDist_2D_ZeroCostDL4Mic.ipynb
+git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
+id: Notebook_SplineDist_2D_ZeroCostDL4Mic
+links:
+- Notebook Preview
+- Dataset_StarDist_2D_ZeroCostDL4Mic_2D
+- Dataset_StarDist_Fluo_ZeroCostDL4Mic
+- Dataset_StarDist_brightfield_ZeroCostDL4Mic
+- Dataset_StarDist_brightfield2_ZeroCostDL4Mic
+- Dataset_StarDist_fluo2_ZeroCostDL4Mic
+- Dataset_StarDist_2D_DeepBacs
+- Dataset_SplineDist_2D_DeepBacs
+name: SplineDist (2D) - ZeroCostDL4Mic
+tags:
+- colab
+- notebook
+- SplineDist
+- segmentation
+- ZeroCostDL4Mic
+- dl4miceverywhere
+type: application
+version: 1.14.1

@@ -1,3 +1,14 @@
+authors:
+- Guillaume Jacquemet and the ZeroCostDL4Mic Team
+badges:
+- icon: https://colab.research.google.com/assets/colab-badge.svg
+  label: Open in Colab
+  url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/3D_RCAN_ZeroCostDL4Mic.ipynb
+cite:
+- doi: https://doi.org/10.1038/s41467-021-22518-0
+  text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
+- doi: https://doi.org/10.1038/s41592-021-01155-x
+  text: "Chen, J., Sasaki, H., Lai, H. et al. Three-dimensional residual channel attention networks denoise and sharpen fluorescence microscopy image volumes. Nat Methods 18, 678\u2013687 (2021). https://doi.org/10.1038/s41592-021-01155-x"
 config:
   dl4miceverywhere:
     cuda_version: 11.8.0
@@ -10,3 +21,24 @@ config:
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/3D_RCAN_requirements_simple.txt
     sections_to_remove: 1.2. 2. 6.2.
     ubuntu_version: '22.04'
+covers:
+- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/3D_CARE_notebook.png
+description: Supervised restoration of 3D images. RCAN is a neural network capable of image restoration from corrupted bio-images. The network allows image denoising and resolution improvement in 3D images, in a supervised training manner. The function of the network is essentially determined by the set of images provided in the training dataset. For instance, if noisy images are provided as input and high signal-to-noise ratio images are provided as targets, the network will perform denoising. Note - visit the ZeroCostDL4Mic wiki to check the original publications this network is based on and make sure you cite these.
+documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/README.md
+download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/3D_RCAN_ZeroCostDL4Mic.ipynb
+git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
+id: Notebook_RCAN_3D_ZeroCostDL4Mic
+links:
+- Notebook Preview
+- Dataset_CARE_3D_ZeroCostDL4Mic
+name: RCAN (3D) - ZeroCostDL4Mic
+tags:
+- colab
+- notebook
+- 3D-RCAN
+- denoising
+- ZeroCostDL4Mic
+- 3D
+- dl4miceverywhere
+type: application
+version: 1.14.1

@@ -1,3 +1,14 @@
+authors:
+- Guillaume Jacquemet and the ZeroCostDL4Mic Team
+badges:
+- icon: https://colab.research.google.com/assets/colab-badge.svg
+  label: Open in Colab
+  url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/StarDist_2D_ZeroCostDL4Mic.ipynb
+cite:
+- doi: https://doi.org/10.1038/s41467-021-22518-0
+  text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
+- doi: https://doi.org/10.1007/978-3-030-00934-2_30
+  text: Uwe Schmidt, Martin Weigert, Coleman Broaddus, Gene Myers. Cell Detection with Star-Convex Polygons. MICCAI 2018 (2018). https://doi.org/10.1007/978-3-030-00934-2_30
 config:
   dl4miceverywhere:
     cuda_version: 11.8.0
@@ -10,3 +21,32 @@ config:
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/StarDist_2D_requirements_simple.txt
     sections_to_remove: 1.1. 1.2. 2. 6.3.
     ubuntu_version: '22.04'
+covers:
+- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/2D_Stardist_notebook.png
+- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Wiki_files/StarDist_trainingTcells_trackmate.png
+- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Wiki_files/StarDist_trainingflo_trackmate.png
+- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Wiki_files/StarDist_trainingfluo_trackmate.png
+description: 2D instance segmentation of oval objects (ie nuclei). StarDist is a deep-learning method that can be used to segment cell nuclei in 2D (xy) single images or in stacks (xyz). Note - visit the ZeroCostDL4Mic wiki to check the original publications this network is based on and make sure you cite these.
+documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/README.md
+download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/StarDist_2D_ZeroCostDL4Mic.ipynb
+git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
+id: Notebook_StarDist_2D_ZeroCostDL4Mic
+links:
+- Notebook Preview
+- Dataset_StarDist_2D_ZeroCostDL4Mic_2D
+- Dataset_StarDist_Fluo_ZeroCostDL4Mic
+- Dataset_StarDist_brightfield_ZeroCostDL4Mic
+- Dataset_StarDist_brightfield2_ZeroCostDL4Mic
+- Dataset_StarDist_fluo2_ZeroCostDL4Mic
+- Dataset_StarDist_2D_DeepBacs
+name: StarDist (2D) - ZeroCostDL4Mic
+tags:
+- colab
+- notebook
+- StarDist
+- segmentation
+- ZeroCostDL4Mic
+- 2D
+- dl4miceverywhere
+type: application
+version: 1.19.1
