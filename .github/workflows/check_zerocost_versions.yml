@@ -1,9 +1,9 @@
 name: Check and build updated ZeroCostDL4Mic notebook
 
 on:
-  # At the end of every day
+  # At 01:30 AM of every day
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "30 1 * * *"
   workflow_dispatch:
 
 jobs:
