@@ -1,4 +1,4 @@
-name: Update versioning on the configuration files
+name: Update repository version and docker tag on configuration files
 on:
   release:
     types: [published]
@@ -6,14 +6,16 @@ on:
 
 jobs:
   update_configuration:
+    name: Update repository version and docker tag on configuration
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
-      - name: install requirements
+      - name: Install requirements
         run: pip install -r .tools/requirements.txt
-      - name: update all the configurations
+      - name: Update all the configurations
         run: python3 .tools/update_configuration.py
-      - uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Commit the changes
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: Bot - update configuration version tag
+          commit_message: GitHub Action - Update repository version and docker tag on configuration

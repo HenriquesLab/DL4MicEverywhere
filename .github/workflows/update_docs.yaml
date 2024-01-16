@@ -1,0 +1,23 @@
+name: Update documentation on docs folder
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  update_documentation:
+    name: Update the documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+      - name: Install requirements
+        run: pip install -r .tools/requirements.txt
+      - name: Generate notebooks list
+        run: python3 .tools/list_of_notebooks.py
+      - name: Commit the changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: GitHub Action - Update notebook list
