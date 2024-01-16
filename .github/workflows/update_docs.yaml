@@ -1,4 +1,4 @@
-name: Update documentation
+name: Update documentation on docs folder
 on:
   push:
     branches: [ main ]
@@ -7,7 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  update-documentation:
+  update_documentation:
+    name: Update the documentation
     runs-on: ubuntu-latest
     steps:
       - name: Clone DL4MicEverywhere repository

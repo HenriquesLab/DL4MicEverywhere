@@ -9,7 +9,7 @@ on:
         
 jobs:
   get_arguments:
-    name: Extract arguments on each configuration
+    name: Extract arguments from configuration
     runs-on: [self-hosted, dl4miceverywhere-builder]
     outputs:
       notebook_url: ${{ steps.notebook_url.outputs.result }}
@@ -22,7 +22,7 @@ jobs:
       notebook_name: ${{ steps.notebook_name.outputs.value }}
       latest_tag: ${{ steps.latest_tag.outputs.value }}
     steps:
-      - name: Checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
 
       - name: Check notebook_url attribute on configuration.yaml
@@ -67,10 +67,15 @@ jobs:
           echo "value=$notebook_name" >> "$GITHUB_OUTPUT"
       - name: Create_latest_tag
         id: latest_tag
-        run: |
+        run: | 
           IFS='-'
           read -a strarr <<< "${{ steps.docker_tag.outputs.result }}"
-          latest_tag="${strarr[0]}-latest"
+          IFS=''
+          latest_tag="${strarr[0]}"
+          for i in ${strarr[@]:1:${#strarr[@]}-3}; do
+            latest_tag+="-$i"
+          done
+          latest_tag+="-latest"
           echo "$latest_tag"
           echo "value=$latest_tag" >> "$GITHUB_OUTPUT"
       - name: Print attributes
@@ -90,7 +95,7 @@ jobs:
     runs-on: [self-hosted, dl4miceverywhere-builder]
     needs: get_arguments
     steps:
-      - name: Checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
 
       - name: Set up QEMU
@@ -142,7 +147,7 @@ jobs:
     runs-on: [self-hosted, macOS, ARM64]
     needs: get_arguments
     steps:
-      - name: Checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
 
       - name: Set up QEMU
@@ -174,6 +179,7 @@ jobs:
               SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
 
   build-only-arm64:
+    name: Only push ARM64 to Docker Hub
     if: ${{ always() && contains(needs.build_amd64.result, 'failure') }}
     needs:
       - get_arguments
@@ -184,7 +190,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
 
       - name: Set up QEMU
@@ -207,6 +213,7 @@ jobs:
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
             
   build-only-amd64:
+    name: Only push AMD64 to Docker Hub
     if: ${{ always() && contains(needs.build_arm64.result, 'failure') }}
     needs:
       - get_arguments
@@ -217,7 +224,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
 
       - name: Set up QEMU
@@ -239,6 +246,7 @@ jobs:
           -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64
   build-multi-architecture:
+    name: Both push AMD64 and ARM64 to Docker Hub
     needs:
       - get_arguments
       - build_amd64
@@ -248,7 +256,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
 
       - name: Set up QEMU

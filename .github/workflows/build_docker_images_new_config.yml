@@ -9,7 +9,7 @@ on:
 
 jobs:
   get_arguments:
-    name: Extract arguments on each configuration
+    name: Extract arguments from configuration
     runs-on: [self-hosted, dl4miceverywhere-builder]
     outputs:
       notebook_url: ${{ steps.notebook_url.outputs.result }}
@@ -31,7 +31,7 @@ jobs:
       - name: Update the version of the notebook on the configuration
         run: python3 .tools/update_zerocost_version.py '${{ inputs.config_file }}' 
       - name: Update the docker_tag on the configuration
-        run: python3 .tools/update_configuration.py
+        run: python3 .tools/update_configuration.py '${{ inputs.config_file }}' 
 
       # Now that the configuration is updated, we can extract the arguments
       - name: Check notebook_url attribute on configuration.yaml
@@ -99,7 +99,7 @@ jobs:
     runs-on: [self-hosted, dl4miceverywhere-builder]
     needs: get_arguments
     steps:
-      - name: Checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
 
       - name: Set up QEMU
@@ -151,7 +151,7 @@ jobs:
     runs-on: [self-hosted, macOS, ARM64]
     needs: get_arguments
     steps:
-      - name: Checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
 
       - name: Set up QEMU
@@ -182,7 +182,8 @@ jobs:
               NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
               SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
 
-  build-only-arm64:
+  build_only_arm64:
+    name: Only push ARM64 to Docker Hub 
     if: ${{ always() && contains(needs.build_amd64.result, 'failure') }}
     needs:
       - get_arguments
@@ -193,7 +194,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
 
       - name: Set up QEMU
@@ -215,7 +216,8 @@ jobs:
           -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
 
-  build-only-amd64:
+  build_only_amd64:
+    name: Only push AMD64 to Docker Hub
     if: ${{ always() && contains(needs.build_arm64.result, 'failure') }}
     needs:
       - get_arguments
@@ -226,7 +228,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
 
       - name: Set up QEMU
@@ -248,7 +250,8 @@ jobs:
           -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64
 
-  build-multi-architecture:
+  build_multi_architecture:
+    name: Both push AMD64 and ARM64 to Docker Hub
     needs:
       - get_arguments
       - build_amd64
@@ -258,7 +261,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
 
       - name: Set up QEMU
@@ -281,15 +284,16 @@ jobs:
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64 \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
 
-  update-config:
+  update_config:
+    name: Update the versions on configurations
     runs-on:  [self-hosted, dl4miceverywhere-builder]
-    if: ${{ always() && ( contains(needs.build-multi-architecture.result, 'success')  || contains(needs.build-only-arm64.result, 'success') || contains(needs.build-only-amd64.result, 'success') ) }}
+    if: ${{ always() && ( contains(needs.build_multi_architecture.result, 'success')  || contains(needs.build_only_arm64.result, 'success') || contains(needs.build_only_amd64.result, 'success') ) }}
     needs:
-      - build-multi-architecture
-      - build-only-arm64
-      - build-only-amd64
+      - build_multi_architecture
+      - build_only_arm64
+      - build_only_amd64
     steps:
-      - name: Checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
       - name: Update the repository with git pull
         run: git pull
@@ -298,7 +302,7 @@ jobs:
       - name: Update the version of the notebook on the configuration
         run: python3 .tools/update_zerocost_version.py '${{ inputs.config_file }}' 
       - name: Update the docker_tag on the configuration
-        run: python3 .tools/update_configuration.py
+        run: python3 .tools/update_configuration.py '${{ inputs.config_file }}' 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: GitHub Action - Update the notebook version on the configuration

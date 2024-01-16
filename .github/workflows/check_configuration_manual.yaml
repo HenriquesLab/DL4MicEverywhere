@@ -39,6 +39,7 @@ jobs:
             echo ${{ steps.list_configs.outputs.matrix }}
     
   check_keys:
+    name: Check attributes/keys on modified configuration.yaml
     if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
     runs-on: [ubuntu-latest]
     strategy:
@@ -46,7 +47,6 @@ jobs:
       # fail-fast is true by default
       fail-fast: false
       matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
-    name: Check attributes/keys on modified configuration.yaml
     needs: extract_changed_files
     
     outputs:
@@ -61,7 +61,7 @@ jobs:
       description: ${{ steps.description.outputs.result }}
       
     steps:
-      - name: Checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
       - name: Check notebook_url attribute on configuration.yaml
         uses: mikefarah/yq@master
@@ -139,15 +139,15 @@ jobs:
           fi
 
   check_docker_build_without_gpu:  
+    name: Check running 'docker build' for amd64 and arm64 WITHOUT GPU
     if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
-    runs-on: [ubuntu-latest]
+    runs-on: [self-hosted, dl4miceverywhere-builder]
     strategy:
       # super important if you want to see all results, even if one fails
       # fail-fast is true by default
       fail-fast: false
       matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
-
-    name: Check running 'docker build' for amd64 and arm64 WITHOUT GPU
+    
     needs: [check_keys, extract_changed_files]
     steps:
       - name: Checkout
@@ -184,22 +184,21 @@ jobs:
             
           
   check_docker_build_with_gpu:  
+    name: Check running 'docker build' for amd64 WITH GPU
     if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
-    runs-on: [ubuntu-latest]
+    runs-on: [self-hosted, dl4miceverywhere-builder]
     strategy:
       # super important if you want to see all results, even if one fails
       # fail-fast is true by default
       fail-fast: false
       matrix: ${{ fromJson(needs.extract_changed_files.outputs.matrix) }} 
 
-    name: Check running 'docker build' for amd64 WITH GPU
     needs: [check_keys, extract_changed_files]
     steps:
-      - name: Checkout
+      - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
         with:
             fetch-depth: 0
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
