@@ -1,0 +1,31 @@
+name: Update configuration files with the manifest information from ZeroCostDL4Mic
+on:
+  # At 06:00 AM of every day
+  schedule:
+      - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  update_configuration:
+    name: Update configuration files with the manifest information from ZeroCostDL4Mic
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+        with:
+            path: DL4MicEverywhere 
+      - name: Clone ZeroCostDL4Mic repository
+        uses: actions/checkout@v4
+        with:
+            repository: HenriquesLab/ZeroCostDL4Mic
+            path: ZeroCostDL4Mic
+      - name: Install requirements
+        working-directory: ./DL4MicEverywhere
+        run: pip install -r .tools/requirements.txt
+      - name: Update all the configurations
+        working-directory: ./DL4MicEverywhere
+        run: python3 .tools/update_with_zc_manifest.py
+      - name: Commit the changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: GitHub Action - Update configurations with manifest from ZeroCostDL4Mic
