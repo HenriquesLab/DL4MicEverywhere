@@ -32,11 +32,12 @@ jobs:
           echo "$files_json"
           first=true
           for file in ${{ steps.updated_notebooks.outputs.value }}; do
+            echo "$file was changed"
             if [ "$first" = true ]; then
-              files_json+=./notebooks/ZeroCostDL4Mic_notebooks/$file/configuration.yaml
+              files_json+=$file
               first=false
             else
-              files_json+="\"},{\"notebook\":\""./notebooks/ZeroCostDL4Mic_notebooks/$file/configuration.yaml
+              files_json+="\"},{\"notebook\":\""$file
             fi
             echo "$files_json"
           done
