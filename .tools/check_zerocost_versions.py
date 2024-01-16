@@ -29,6 +29,7 @@ def main():
 
     if len(updated_notebooks) == 0:
         print('')
+    else:
         print(' '.join(updated_notebooks))
 
 if __name__ == '__main__':
