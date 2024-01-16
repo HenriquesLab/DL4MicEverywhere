@@ -28,4 +28,5 @@ jobs:
       - name: Commit the changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
+          repository: ./DL4MicEverywhere
           commit_message: GitHub Action - Update configurations with manifest from ZeroCostDL4Mic
