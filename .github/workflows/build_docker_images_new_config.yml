@@ -79,7 +79,12 @@ jobs:
         run: |
           IFS='-'
           read -a strarr <<< "${{ steps.docker_tag.outputs.result }}"
-          latest_tag="${strarr[0]}-latest"
+          IFS=''
+          latest_tag="${strarr[0]}"
+          for i in ${strarr[@]:1:${#strarr[@]}-3}; do
+            latest_tag+="-$i"
+          done
+          latest_tag+="-latest"
           echo "$latest_tag"
           echo "value=$latest_tag" >> "$GITHUB_OUTPUT"
       - name: Print attributes
@@ -286,13 +291,15 @@ jobs:
 
   update_config:
     name: Update the versions on configurations
-    runs-on:  [self-hosted, dl4miceverywhere-builder]
+    runs-on: [ubuntu-latest]
     if: ${{ always() && ( contains(needs.build_multi_architecture.result, 'success')  || contains(needs.build_only_arm64.result, 'success') || contains(needs.build_only_amd64.result, 'success') ) }}
     needs:
       - build_multi_architecture
       - build_only_arm64
       - build_only_amd64
     steps:
+      - name: Wait a minute
+        run: sleep 60
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
       - name: Update the repository with git pull
