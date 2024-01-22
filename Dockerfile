@@ -35,6 +35,7 @@ RUN apt-get update && \
                        ffmpeg \
                        libsm6 \
                        libxext6 \
+                       libopenmpi-dev \
                        pkg-config && \
     if [ "$GPU_FLAG" -eq "1" ] ; then apt-get install -y nvidia-cuda-toolkit ; fi && \
     apt-get clean && \
