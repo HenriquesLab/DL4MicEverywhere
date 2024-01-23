@@ -11,6 +11,13 @@
 #   fi
 # fi
 
+# Verify if tcl/tk is installed on the system
+if ! command -v wish &> /dev/null; then
+  echo "Please install tcl/tk."
+else
+  echo "tcl/tk installed."
+fi 
+
 # Verify if Docker is installed on the system
 if ! command -v docker &> /dev/null; then
   echo "Docker could not be found. Please install Docker."

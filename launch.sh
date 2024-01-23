@@ -1,6 +1,6 @@
 #!/bin/bash
 BASEDIR=$(dirname "$(readlink -f "$0")")
-
+            
 # Run pre_launch_test.sh, stop if it fails
 /bin/bash $BASEDIR/.tools/pre_launch_test.sh || exit 1
 
@@ -54,6 +54,7 @@ check_parsed_argument() {
     if [ -z "${!config_variable_name}" ]; then
         if [ -z "${!variable_name}" ]; then
             echo "$variable_name parameter is not specified on the configuration yaml."
+            # Close the terminal
             exit 1
         fi
     else
@@ -114,6 +115,7 @@ while getopts :hc:d:o:gn:r:t:x flag;do
         \?)
             echo "Invalid option: -$OPTARG"
             echo "Try bash ./launch.sh -h for more information."
+            # Close the terminal
             exit 1 ;;
     esac
 done
@@ -140,6 +142,7 @@ else
     gui_arguments=$(wish $BASEDIR/.tools/main_gui.tcl $BASEDIR $OSTYPE)
 
     if [ -z "$gui_arguments" ]; then
+        # Close the terminal
         exit 1
     fi
 
@@ -187,6 +190,8 @@ fi
 if [ -z "$config_path" ]; then 
     # If no configuration path has been specified, then exit with the error
     echo "No path to the configuration.yaml file has been specified, please make sure to use -c argument and give a value to it."
+    
+    # Close the terminal
     exit 1
 else
     # If a configuration path has been specified, check if it is valid
@@ -201,6 +206,8 @@ else
         fi
     else
         echo "$config_path is not valid."
+        
+        # Close the terminal
         exit 1
     fi
 fi 
@@ -208,7 +215,9 @@ fi
 if [ -z "$data_path" ]; then 
     # Exit with an error if no data path is specified
     echo "Please specify a path to the data folder using the -d argument."
-    exit 1
+    
+        # Close the terminal
+        exit 1
 else
     # Validate the specified data path
     if [[ -d "$data_path" ]]; then
@@ -217,6 +226,8 @@ else
         fi
     else
         echo "The specified data path $data_path is not valid."
+        
+        # Close the terminal
         exit 1
     fi
 fi 
@@ -224,6 +235,8 @@ fi
 if [ -z "$result_path" ]; then 
     # Exit with an error if no result path is specified
     echo "Please specify a path to the output folder using the -o argument."
+    
+    # Close the terminal
     exit 1
 else
     # Validate the specified result path
@@ -233,6 +246,8 @@ else
         fi
     else
         echo "The specified result path $result_path is not valid."
+        
+        # Close the terminal
         exit 1
     fi
 fi 
@@ -245,8 +260,6 @@ if [ "$test_flag" -eq 1 ]; then
         echo 'GPU usage is disabled.'
     fi
 fi
-
-echo "$config_path"
 
 # Read the variables from the yaml file
 eval $(parse_yaml "$config_path")
@@ -302,6 +315,8 @@ else
         local_notebook_flag=1
     else
         echo "$notebook_path does not exist."
+        
+        # Close the terminal
         exit 1
     fi
 fi
@@ -323,6 +338,8 @@ else
         local_requirements_flag=1
     else
         echo "$requirements_path does not exist."
+        
+        # Close the terminal
         exit 1
     fi
 fi
@@ -372,7 +389,6 @@ fi
 
 
 # Set the docker's tag
-
 if [ "$test_flag" -eq 1 ]; then
     echo ""
     echo "base_img: $base_img"
@@ -475,7 +491,6 @@ else
     fi
 fi
 
-echo $docker_tag
 
 # Pull the docker image from docker hub
 if [ "$build_flag" -eq 3 ]; then
@@ -500,6 +515,8 @@ else
         else
             # build flag is still 0, an error ocurred
             echo "Error building the docker image"
+            
+            # Close the terminal
             exit 1
         fi
     fi
@@ -535,16 +552,26 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
         fi
     done
 
+    # TODO: Automatic token generation or ask to the user
+    notebook_token="1234567890"
+
+    # Launch a subprocess to open the browser with the port in 10 seconds
+    /bin/bash $BASEDIR/.tools/open_browser.sh http://localhost:$port/lab/tree/$notebook_name/?token=$notebook_token &
+
     if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
-        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" jupyter lab "${notebook_name}" --ip='0.0.0.0' --port=$port --no-browser --allow-root
+        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token 
     else
         # Run the docker image without activating the GPU
-        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" jupyter lab "${notebook_name}" --ip='0.0.0.0' --port=$port --no-browser --allow-root
+        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token
     fi
 else
     echo "The docker image has not been built."
     if [ "$test_flag" -eq 1 ]; then
+        # Close the terminal
         exit 1
     fi
 fi
+
+# Close the terminal
+exit 1
