@@ -558,12 +558,15 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     # Launch a subprocess to open the browser with the port in 10 seconds
     /bin/bash $BASEDIR/.tools/open_browser.sh http://localhost:$port/lab/tree/$notebook_name/?token=$notebook_token &
 
+    # Define the command that will be run when the docker image is launched
+    docker_command="jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token; cp /home/$notebook_name /home/results/$notebook_name;" 
+
     if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
-        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token 
+        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag"  /bin/bash -c "$docker_command"
     else
         # Run the docker image without activating the GPU
-        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token
+        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag"  /bin/bash -c "$docker_command"
     fi
 else
     echo "The docker image has not been built."

@@ -88,6 +88,8 @@ RUN pip install --upgrade pip && \
     fi && \
     python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py -p . -n ${NOTEBOOK_NAME} -s ${SECTIONS_TO_REMOVE} && \ 
     mv colabless_${NOTEBOOK_NAME} ${NOTEBOOK_NAME} && \ 
+    python DL4MicEverywhere/.tools/create_docker_info.py /home/docker_info.txt ${BASE_IMAGE} ${PATH_TO_NOTEBOOK} ${PATH_TO_REQUIREMENTS} \
+        ${SECTIONS_TO_REMOVE}  ${NOTEBOOK_NAME} ${GPU_FLAG} ${PYTHON_VERSION} && \
     rm -r DL4MicEverywhere
 
 ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/lib/cuda
