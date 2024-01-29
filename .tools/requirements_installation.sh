@@ -70,23 +70,28 @@ if ! command -v docker &> /dev/null; then
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         # Mac OSX
 
-        # Check if is an Apple Silicon chip
-        if [[ $(uname -m) == 'arm64' ]]; then
-            # Docker official website, to get the best experience, still recommends to install Rosetta
-            # To install Rosetta 2 manually from the command line, run the following command:
-            softwareupdate --install-rosetta --agree-to-license
+        # Install podman
+        brew install podman
+        podman machine init
+        podman machine start
 
-            # Download the latest ARM64 Docker installer
-            curl https://desktop.docker.com/mac/main/arm64/Docker.dmg -o /tmp/Docker.dmg
-        else
-            # Download the latest AMD64 Docker installer
-            curl https://desktop.docker.com/mac/main/amd64/Docker.dmg -o /tmp/Docker.dmg
-        fi
+        # # Check if is an Apple Silicon chip
+        # if [[ $(uname -m) == 'arm64' ]]; then
+        #     # Docker official website, to get the best experience, still recommends to install Rosetta
+        #     # To install Rosetta 2 manually from the command line, run the following command:
+        #     softwareupdate --install-rosetta --agree-to-license
 
-        # Install Docker
-        hdiutil attach /tmp/Docker.dmg
-        /Volumes/Docker/Docker.app/Contents/MacOS/install
-        hdiutil detach /Volumes/Docker
+        #     # Download the latest ARM64 Docker installer
+        #     curl https://desktop.docker.com/mac/main/arm64/Docker.dmg -o /tmp/Docker.dmg
+        # else
+        #     # Download the latest AMD64 Docker installer
+        #     curl https://desktop.docker.com/mac/main/amd64/Docker.dmg -o /tmp/Docker.dmg
+        # fi
+
+        # # Install Docker
+        # hdiutil attach /tmp/Docker.dmg
+        # /Volumes/Docker/Docker.app/Contents/MacOS/install
+        # hdiutil detach /Volumes/Docker
 
         # # Install Docker using Homebrew
         # brew install docker --cask
