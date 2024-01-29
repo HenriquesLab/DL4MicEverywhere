@@ -93,6 +93,10 @@ if ! command -v docker &> /dev/null; then
         /Volumes/Docker/Docker.app/Contents/MacOS/install
         hdiutil detach /Volumes/Docker
 
+        # Add Docker Desktop (docker) to the environment variable PATH
+        export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"
+
+        # Launch Docker Desktop
         launchctl start docker
         # open -a Docker
 
