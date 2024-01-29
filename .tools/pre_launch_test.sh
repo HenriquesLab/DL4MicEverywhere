@@ -1,5 +1,7 @@
 #!/bin/bash
 
+BASEDIR=$(dirname "$(readlink -f "$0")")
+
 # # This script checks for root access and Docker installation on Unix-like systems
 # if [[ "$OSTYPE" == "linux-gnu"* || "$OSTYPE" == "darwin"* ]]; then
 #   # Verify if the script is run as root, which is required for Docker to function correctly
@@ -11,26 +13,10 @@
 #   fi
 # fi
 
-# Verify if tcl/tk is installed on the system
-if ! command -v wish &> /dev/null; then
-  echo "Please install tcl/tk."
-else
-  echo "tcl/tk installed."
-fi 
-
-# Verify if Docker is installed on the system
-if ! command -v docker &> /dev/null; then
-  echo "Docker could not be found. Please install Docker."
-
-  # Provide Docker installation instructions
-  echo "Please follow the instructions at https://docs.docker.com/install/ to install Docker."
-  
-  # Terminate the script with a non-zero exit code
-  exit 1 
-fi
+/bin/bash $BASEDIR/requirements_installation.sh || exit 1
 
 # Check if the Docker daemon is running
 if ! docker info &> /dev/null; then
-  echo "Error: Docker daemon is not running"
-  exit 1 
+    echo "Error: Docker daemon is not running"
+    exit 1 
 fi

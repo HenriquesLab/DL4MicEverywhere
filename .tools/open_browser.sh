@@ -3,8 +3,6 @@
 # Get the url to launch.sh from the first argument
 url=$1
 
-echo "open_browser.sh: $url"
-
 # Wait 10 seconds to launch the browser
 sleep 5
 
