@@ -6,7 +6,14 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
         echo "Installing Homebrew..."
     
+        # Export non interactive variable to avoid asking for input
+        exportNONINTERACTIVE=1 
+
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+        (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >>  ~/.zprofile
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+
     fi
 fi
 
@@ -67,11 +74,11 @@ if ! command -v docker &> /dev/null; then
         if [[ $(uname -m) == 'arm64' ]]; then
             # Docker official website, to get the best experience, still recommends to install Rosetta
             # To install Rosetta 2 manually from the command line, run the following command:
-            softwareupdate --install-rosetta
+            softwareupdate --install-rosetta --agree-to-license
         fi
 
         # Install Docker using Homebrew
-        brew install docker
+        brew install docker --cask
         # Start Docker engine
         systemctl start docker
 
