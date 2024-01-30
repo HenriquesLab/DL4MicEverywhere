@@ -351,7 +351,6 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                     f"cache_button_{function_name} = widgets.Button(description='Load cache')\n" # Add the button that calls the cache function
                     f"output_{function_name} = widgets.Output()\n"
                     f"display(button_{function_name}, output_{function_name})\n"
-                    f"display(cache_button_{function_name}, output_{function_name})\n\n"
                     f"def aux_{function_name}(_):\n" 
                     f"  return {function_name}(output_{function_name})\n\n"
                     f"def aux_{function_name}_cache(_):\n" 
