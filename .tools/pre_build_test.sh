@@ -32,9 +32,9 @@
 #     exit 1
 # fi
 
-docker_owner=$(ls -ld ~/.docker | grep $(whoami))
+# docker_owner=$(ls -ld ~/.docker | grep $(whoami))
 
-if [ "$docker_owner" == "" ]; then
-    echo "You are not owner of ~/.docker. Please enter the password to allow the access to ~/.docker and with this run Docker without root access."
-    sudo chown -R $(whoami) ~/.docker
-fi
+# if [ "$docker_owner" == "" ]; then
+#     echo "You are not owner of ~/.docker. Please enter the password to allow the access to ~/.docker and with this run Docker without root access."
+#     sudo chown -R $(whoami) ~/.docker
+# fi
