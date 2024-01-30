@@ -14,15 +14,15 @@ BASEDIR=$(dirname "$(readlink -f "$0")")
 # fi
 
 echo ""
-echo "####################"
+echo "################################"
 echo "Checking requirements"
-echo "####################"
+echo "################################"
 echo ""
 
 /bin/bash $BASEDIR/requirements_installation.sh || exit 1
 
 echo ""
-echo "####################"
+echo "################################"
 echo ""
 
 # Check if the Docker daemon is running

@@ -55,7 +55,12 @@ RUN if [ "$GPU_FLAG" -eq "1" ] ; then pip install nvidia-cudnn-cu11==8.6.0.163 ;
 # And export the environment variable LD_LIBRARY_PATH
 ENV LD_LIBRARY_PATH lib/:/usr/local/lib/python${PYTHON_VERSION}/dist-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
 
+# Set the working directory
 WORKDIR /home 
+
+# # Custom cache invalidation
+# ARG CACHEBUST=1
+# RUN echo "${CACHEBUST}"
 
 # Download the notebook and requirements if they are not provided
 ADD $PATH_TO_NOTEBOOK ./${NOTEBOOK_NAME}
