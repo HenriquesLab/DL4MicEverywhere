@@ -344,7 +344,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                     "  with output_widget:\n" # In order to display the output
                     ) + global_variables + '\n' + tabbed_non_widget_code + ( # Add the global variables and the non widget code
                     "    plt.show()\n" # Add plt.show() in case there is any plot in tab_non_widget_code, so that it can be displayed
-                    "\ndef {function_name}_cache(output_widget):\n"
+                    f"\ndef {function_name}_cache(output_widget):\n"
                     ) + global_variables + '\n' + tabbed_cache_code + (
                     "\n"
                     f"button_{function_name} = widgets.Button(description='Load and run')\n" # Add the button that calls the function
