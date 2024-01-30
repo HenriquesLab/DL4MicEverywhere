@@ -1,8 +1,16 @@
 #!/bin/bash
+
+# Activate the user user
+echo ""
+echo "Running DL4MicEverywhere"
+echo "Please enter your password:"
+sudo echo ""
+
+# Get the directory of the script
 BASEDIR=$(dirname "$(readlink -f "$0")")
             
 # Run pre_launch_test.sh, stop if it fails
-/bin/bash $BASEDIR/.tools/pre_launch_test.sh || exit 1
+/bin/bash $BASEDIR/.tools/pre_launch_test.sh || (sleep 0.1 ; osascript -e 'tell application "Terminal" to quit') &
 
 # Function with the text to describe the usage of the bash script
 usage() {
@@ -60,6 +68,18 @@ check_parsed_argument() {
     else
         rename_parsed_argument $variable_name
     fi
+}
+
+function cache_gui {
+    echo "data_path : $1
+result_path : $2
+selected_folder : $3
+selected_notebook : $4
+config_path : $5
+notebook_path : $6
+requirements_path : $7
+gpu_flag : $8
+tag : $9" > $BASEDIR/.tools/.cache_gui
 }
 
 # Function to parse and read the configuration yaml file
@@ -158,6 +178,9 @@ else
         gpu_flag="${strarr[5]}"
         tag_aux="${strarr[6]}"
 
+        cache_gui "$data_path" "$result_path" "$selectedFolder" \
+                  "$selectedNotebook" "" "" "" "$gpu_flag" "$tag_aux"
+
         if [ "$tag_aux" != "-" ]; then
             docker_tag="$tag_aux"
         fi
@@ -174,6 +197,10 @@ else
         
         gpu_flag="${strarr[6]}"
         tag_aux="${strarr[7]}"
+
+        cache_gui "$data_path" "$result_path" "" "" \ 
+                  "config_path" "notebook_aux" "requirements_aux" \
+                  "$gpu_flag" "$tag_aux"
 
         if [ "$notebook_aux" != "-" ]; then
             notebook_path="$notebook_aux"
@@ -425,7 +452,7 @@ if grep -q credsStore ~/.docker/config.json; then
 fi
 
 # Execute the pre building tests
-/bin/bash $BASEDIR/.tools/pre_build_test.sh || exit 1
+/bin/bash $BASEDIR/.tools/pre_build_test.sh || (sleep 0.1 ; osascript -e 'tell application "Terminal" to quit') &
 
 # Check if an image with that tag exists locally and ask if the user whants to replace it.
 build_flag=0
@@ -507,6 +534,7 @@ else
             --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
             --build-arg NOTEBOOK_NAME="${notebook_name}" \
             --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
+            # \ --build-arg CACHEBUST=$(date +%s)
 
         DOCKER_OUT=$? # Gets if the docker image has been built
     else
@@ -523,7 +551,7 @@ else
 fi
 
 # Execute the post building tests
-/bin/bash $BASEDIR/.tools/post_build_test.sh || exit 1
+/bin/bash $BASEDIR/.tools/post_build_test.sh || (sleep 0.1 ; osascript -e 'tell application "Terminal" to quit') &
 
 # Local files, if included, need to be removed to avoid the overcrowding the folder
 if [ "$local_notebook_flag" -eq 1 ]; then
@@ -552,18 +580,29 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
         fi
     done
 
-    # TODO: Automatic token generation or ask to the user
-    notebook_token="1234567890"
+    # Based on the openssl command and the base64 encoding, a 50 characters token is generated
+    notebook_token=$(openssl rand -base64 50 | tr -dc 'a-zA-Z0-9')
+
+    echo ""
+    echo "################################################################################################################################"
+    echo ""
+    echo "   The generated token for the notebook is: $notebook_token"
+    echo ""
+    echo "################################################################################################################################"
+    echo ""
 
     # Launch a subprocess to open the browser with the port in 10 seconds
     /bin/bash $BASEDIR/.tools/open_browser.sh http://localhost:$port/lab/tree/$notebook_name/?token=$notebook_token &
 
+    # Define the command that will be run when the docker image is launched
+    docker_command="jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token; cp /home/docker_info.txt /home/results/docker_info.txt; cp /home/$notebook_name /home/results/$notebook_name;" 
+
     if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
-        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token 
+        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag"  /bin/bash -c "$docker_command"
     else
         # Run the docker image without activating the GPU
-        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token
+        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag"  /bin/bash -c "$docker_command"
     fi
 else
     echo "The docker image has not been built."
