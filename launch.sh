@@ -559,7 +559,7 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     /bin/bash $BASEDIR/.tools/open_browser.sh http://localhost:$port/lab/tree/$notebook_name/?token=$notebook_token &
 
     # Define the command that will be run when the docker image is launched
-    docker_command="jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token; cp /home/$notebook_name /home/results/$notebook_name;" 
+    docker_command="jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token; cp /home/docker_info.txt /home/results/docker_info.txt; cp /home/$notebook_name /home/results/$notebook_name;" 
 
     if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
