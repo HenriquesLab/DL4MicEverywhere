@@ -25,8 +25,8 @@ if ! command -v wish &> /dev/null; then
 
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # Linux
-        apt-get install tcl
-        apt-get install tk
+        apt-get -y install tcl
+        apt-get -y install tk
 
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         # Mac OSX
@@ -52,8 +52,8 @@ if ! command -v docker &> /dev/null; then
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # Linux
         # Add Docker's official GPG key:
-        apt-get update
-        apt-get install ca-certificates curl gnupg
+        apt-get -y update
+        apt-get -y install ca-certificates curl gnupg
         install -m 0755 -d /etc/apt/keyrings
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
         chmod a+r /etc/apt/keyrings/docker.gpg
@@ -63,10 +63,10 @@ if ! command -v docker &> /dev/null; then
         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
         $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
         tee /etc/apt/sources.list.d/docker.list > /dev/null
-        apt-get update
+        apt-get -y update
 
         # Install the latest Docker version
-        apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
         # Add the current user to the Docker group
         groupadd docker
