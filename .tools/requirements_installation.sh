@@ -68,6 +68,10 @@ if ! command -v docker &> /dev/null; then
         # Install the latest Docker version
         apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+        # Add the current user to the Docker group
+        groupadd docker
+        usermod -aG docker $USER
+
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         # Mac OSX
 
