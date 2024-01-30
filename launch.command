@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Activate the user user
-echo ""
-echo "Running DL4MicEverywhere"
-echo "Please enter your password:"
-sudo echo ""
-
 # Get the directory of the script
 BASEDIR=$(dirname "$(readlink -f "$0")")
             
