@@ -251,10 +251,10 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
             if needs_to_be_evaluated:
                 # It needs to be evaluated
                 non_widget_code += ' ' * count_spaces(line) + f"{var_name} = eval(widget_{var_name}.value)\n"
-                non_widget_code += ' '*count_spaces(line) + f"ipywidgets_edit_yaml(ipywidgets_edit_yaml_config_path, {function_name}_{var_name}, eval(widget_{var_name}.value))\n" 
+                non_widget_code += ' '*count_spaces(line) + f"ipywidgets_edit_yaml(ipywidgets_edit_yaml_config_path, '{function_name}_{var_name}', eval(widget_{var_name}.value))\n" 
             else:
                 non_widget_code += ' '*count_spaces(line) + f"{var_name} = widget_{var_name}.value\n"
-                non_widget_code += ' '*count_spaces(line) + f"ipywidgets_edit_yaml(ipywidgets_edit_yaml_config_path, {function_name}_{var_name}, widget_{var_name}.value)\n" 
+                non_widget_code += ' '*count_spaces(line) + f"ipywidgets_edit_yaml(ipywidgets_edit_yaml_config_path, '{function_name}_{var_name}', widget_{var_name}.value)\n" 
         else:
             # In the other the variable and function names are extracted
             assign_match = re.match(assignation_regex, line)
@@ -302,6 +302,8 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                         "from IPython.display import display, clear_output\n"
                         "import yaml\n"
                         "import os\n"
+                        "\n"
+                        "ipywidgets_edit_yaml_config_path = os.path.join(os.getcwd(), 'configuration.yaml')\n"
                         "\n"
                         "def ipywidgets_edit_yaml(yaml_path, key, value):\n"
                         "    if os.path.exists(yaml_path):\n"
