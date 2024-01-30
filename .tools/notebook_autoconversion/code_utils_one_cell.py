@@ -323,18 +323,24 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                     "  with output_widget:\n" # In order to display the output
                     ) + global_variables + '\n' + tabbed_non_widget_code + ( # Add the global variables and the non widget code
                     "    plt.show()\n" # Add plt.show() in case there is any plot in tab_non_widget_code, so that it can be displayed
-                    "button = widgets.Button(description='Load and run')\n" # Add the button that calls the function
-                    "output = widgets.Output()\n"
-                    "display(button, output)\n\n"
+                    "\ndef {function_name}_cache(output_widget):\n"
+                    "  pass\n"
+                    f"button_{function_name} = widgets.Button(description='Load and run')\n" # Add the button that calls the function
+                    f"cache_button_{function_name} = widgets.Button(description='Load and run')\n" # Add the button that calls the cache function
+                    f"output_{function_name} = widgets.Output()\n"
+                    f"display(button_{function_name}, output_{function_name})\n"
+                    f"display(cache_button_{function_name}, output_{function_name})\n\n"
                     f"def aux_{function_name}(_):\n" 
-                    f"  return {function_name}(output)\n\n"
-                    f"button.on_click(aux_{function_name})\n"
+                    f"  return {function_name}(output_{function_name})\n\n"
+                    f"def aux_{function_name}_cache(_):\n" 
+                    f"  return {function_name}_cache(output_{function_name})\n\n"
+                    f"button_{function_name}.on_click(aux_{function_name})\n"
+                    f"cache_button_{function_name}.on_click(aux_{function_name}_cache)\n"
                     )
         
         # Print finnished and final time
         code_cell += ("print('-------------------------------------------------------')\n"
                       "print('^ Introduce the arguments and click \"Load and run\" ^')\n") 
-
 
     else:
         # Otherwise, just add the code

@@ -65,14 +65,14 @@ def transform_nb(path_original_nb, path_new_nb, remove_sections=[]):
     ipywidget_imported = False
 
     # Iterate over each cell in the original notebook
-    for cell in removed_sections_ntb.cells:
+    for cell in i, cell in enumerate(colab_nb.cells):
         new_cells = []
 
         # If the cell is a code cell
         if cell.cell_type == "code":
             code = cell.source
             # Convert code to cells and track if ipywidgets is imported
-            new_cells, time_imported, ipywidget_imported = code_to_cell(code, time_imported=time_imported, ipywidget_imported=ipywidget_imported, function_name='function')
+            new_cells, time_imported, ipywidget_imported = code_to_cell(code, time_imported=time_imported, ipywidget_imported=ipywidget_imported, function_name=f'function_{i}')
 
         # If the cell is a markdown cell
         elif cell.cell_type == "markdown":
