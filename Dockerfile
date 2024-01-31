@@ -58,19 +58,8 @@ ENV LD_LIBRARY_PATH lib/:/usr/local/lib/python${PYTHON_VERSION}/dist-packages/nv
 # Set the working directory
 WORKDIR /home 
 
-# # Custom cache invalidation
-# ARG CACHEBUST=1
-# RUN echo "${CACHEBUST}"
-
-# Download the notebook and requirements if they are not provided
-ADD $PATH_TO_NOTEBOOK ./${NOTEBOOK_NAME}
-ADD $PATH_TO_REQUIREMENTS ./requirements.txt
-
-# Install the requirements and convert the notebook
+# Install nbformat and jupyterlab
 RUN pip install --upgrade pip && \
-    pip install -r requirements.txt && \
-    rm requirements.txt && \
-    git clone --branch reduce_code https://github.com/HenriquesLab/DL4MicEverywhere.git && \
     if [  "$(printf '%s\n' "3.8" "${PYTHON_VERSION}" | sort -V | head -n1)" = "3.8" ] ; then \
         # For Python between 3.8 and 3.11
         pip install nbformat==5.9.2 ; \ 
@@ -90,7 +79,22 @@ RUN pip install --upgrade pip && \
         # For Python 3.5 and 3.6
         pip install ipywidgets==8.0.0a0 && \ 
         pip install jupyterlab==2.3.2 ; \ 
-    fi && \
+    fi
+
+# Custom cache invalidation
+ARG CACHEBUST=1
+# All the layers bellow this will not be cached
+RUN echo "${CACHEBUST}"
+
+# Download the notebook and requirements if they are not provided
+ADD $PATH_TO_NOTEBOOK ./${NOTEBOOK_NAME}
+ADD $PATH_TO_REQUIREMENTS ./requirements.txt
+
+# Install the requirements and convert the notebook
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt && \
+    rm requirements.txt && \
+    git clone --branch reduce_code https://github.com/HenriquesLab/DL4MicEverywhere.git && \
     python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py -p . -n ${NOTEBOOK_NAME} -s ${SECTIONS_TO_REMOVE} && \ 
     mv colabless_${NOTEBOOK_NAME} ${NOTEBOOK_NAME} && \ 
     python DL4MicEverywhere/.tools/create_docker_info.py "/home/docker_info.txt" "${BASE_IMAGE}" "${PATH_TO_NOTEBOOK}" "${PATH_TO_REQUIREMENTS}" \
