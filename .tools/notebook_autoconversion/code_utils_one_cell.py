@@ -349,7 +349,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                     ) + global_variables + '\n' + tabbed_cache_code + (
                     "\n"
                     f"button_{function_name} = widgets.Button(description='Load and run')\n" # Add the button that calls the function
-                    f"cache_button_{function_name} = widgets.Button(description='Load previous settings')\n" # Add the button that calls the cache function
+                    f"cache_button_{function_name} = widgets.Button(description='Load prev. settings')\n" # Add the button that calls the cache function
                     f"output_{function_name} = widgets.Output()\n"
                     f"display(widgets.HBox((button_{function_name}, cache_button_{function_name})), output_{function_name})\n"
                     f"def aux_{function_name}(_):\n" 
@@ -363,7 +363,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
         # Print finnished and final time
         code_cell += ("print('--------------------------------------------------------------')\n"
                       "print('^ Introduce the arguments and click \"Load and run\". ^')\n"
-                      "print('^ Or first click \"Load previous settings\" if any previous ^')\n"
+                      "print('^ Or first click \"Load prev. settings\" if any previous ^')\n"
                       "print('^ settings have been saved and then click \"Load and run\". ^')\n") 
 
     else:
