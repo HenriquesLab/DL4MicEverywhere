@@ -65,7 +65,7 @@ def transform_nb(path_original_nb, path_new_nb, remove_sections=[]):
     ipywidget_imported = False
 
     # Iterate over each cell in the original notebook
-    for i, cell in enumerate(colab_nb.cells):
+    for i, cell in enumerate(removed_sections_ntb.cells):
         new_cells = []
 
         # If the cell is a code cell

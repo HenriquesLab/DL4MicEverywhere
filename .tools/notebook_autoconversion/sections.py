@@ -120,6 +120,7 @@ def remove_section(cells, section_localizer, section_to_rmv):
     # Update the cell sections and section localizer
     updated_cells, updated_section_localizer = update_cell_sections(reduced_cells, section_localizer, 
                                                                     section_to_rmv, next_section)
+    
     return updated_cells, updated_section_localizer
 
 def remove_section_list(cells, section_localizer, section_list):
