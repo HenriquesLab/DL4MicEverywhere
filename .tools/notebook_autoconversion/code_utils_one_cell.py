@@ -283,9 +283,9 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                 non_widget_code += ' '*count_spaces(line) + f"{var_name} = widget_{var_name}.value\n"
                 non_widget_code += ' '*count_spaces(line) + f"ipywidgets_edit_yaml(ipywidgets_edit_yaml_config_path, '{function_name}_{var_name}', widget_{var_name}.value)\n" 
 
-            cache_code += ' '*count_spaces(line) + f"cache_{var_name} = ipywidgets_read_yaml(ipywidgets_edit_yaml_config_path, '{function_name}_{var_name}')\n"
-            cache_code += ' '*count_spaces(line) + f"if cache_{var_name} != '':\n"
-            cache_code += ' '*(count_spaces(line)+1) + f"widget_{var_name}.value = cache_{var_name}\n\n"
+            cache_code += f"cache_{var_name} = ipywidgets_read_yaml(ipywidgets_edit_yaml_config_path, '{function_name}_{var_name}')\n"
+            cache_code += f"if cache_{var_name} != '':\n"
+            cache_code += f"    widget_{var_name}.value = cache_{var_name}\n\n"
             
         else:
             # In the other the variable and function names are extracted
@@ -348,8 +348,8 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                     f"\ndef {function_name}_cache(output_widget):\n"
                     ) + global_variables + '\n' + tabbed_cache_code + (
                     "\n"
-                    f"button_{function_name} = widgets.Button(description='Load and run')\n" # Add the button that calls the function
-                    f"cache_button_{function_name} = widgets.Button(description='Load cache')\n" # Add the button that calls the cache function
+                    f"button_{function_name} = widgets.Button(description='Load args and run')\n" # Add the button that calls the function
+                    f"cache_button_{function_name} = widgets.Button(description='Load cache and run')\n" # Add the button that calls the cache function
                     f"output_{function_name} = widgets.Output()\n"
                     f"display(widgets.HBox((button_{function_name}, cache_button_{function_name})), output_{function_name})\n"
                     f"def aux_{function_name}(_):\n" 
@@ -362,7 +362,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
         
         # Print finnished and final time
         code_cell += ("print('-------------------------------------------------------')\n"
-                      "print('^ Introduce the arguments and click \"Load arguments and run\" ^')\n"
+                      "print('^ Introduce the arguments and click \"Load args and run\" ^')\n"
                       "print('^ Or click \"Load cache and run\" if any cache exists^')\n") 
 
     else:
