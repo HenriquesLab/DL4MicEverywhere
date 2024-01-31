@@ -18,7 +18,7 @@ ipywidget_imported_code = ("import ipywidgets as widgets\n"
                         "import yaml\n"
                         "import os\n"
                         "\n"
-                        "ipywidgets_edit_yaml_config_path = os.path.join(os.getcwd(), 'results', 'widget_cache.yaml')\n"
+                        "ipywidgets_edit_yaml_config_path = os.path.join(os.getcwd(), 'results', 'widget_prev_settings.yaml')\n"
                         "\n"
                         "def ipywidgets_edit_yaml(yaml_path, key, value):\n"
                         "    if os.path.exists(yaml_path):\n"
@@ -349,7 +349,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                     ) + global_variables + '\n' + tabbed_cache_code + (
                     "\n"
                     f"button_{function_name} = widgets.Button(description='Load and run')\n" # Add the button that calls the function
-                    f"cache_button_{function_name} = widgets.Button(description='Load cache')\n" # Add the button that calls the cache function
+                    f"cache_button_{function_name} = widgets.Button(description='Load previous settings')\n" # Add the button that calls the cache function
                     f"output_{function_name} = widgets.Output()\n"
                     f"display(widgets.HBox((button_{function_name}, cache_button_{function_name})), output_{function_name})\n"
                     f"def aux_{function_name}(_):\n" 
@@ -361,10 +361,10 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                     )
         
         # Print finnished and final time
-        code_cell += ("print('-------------------------------------------------------')\n"
-                      "print('^ Introduce the arguments and click \"Load and run\".^')\n"
-                      "print('^ Or first click \"Load cache\" if any cache exists^')\n"
-                      "print('^ and then click \"Load and run\".^')\n") 
+        code_cell += ("print('--------------------------------------------------------------')\n"
+                      "print('^ Introduce the arguments and click \"Load and run\". ^')\n"
+                      "print('^ Or first click \"Load previous settings\" if any previous ^')\n"
+                      "print('^ settings have been saved and then click \"Load and run\". ^')\n") 
 
     else:
         # Otherwise, just add the code

@@ -508,9 +508,9 @@ if { [catch { exec nvidia-smi } msg] } {
 
 # Define a button to load cached data if there is so
 
-button .fr.principal.cache_btn -text "Load cache data" \
+button .fr.principal.cache_btn -text "Load previous settings" \
         -command "onLoadCache"
-place .fr.principal.cache_btn -relx 0.6 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+place .fr.principal.cache_btn -relx 0.55 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
 
 # Disable the cache if no cache file is found
 if {"$fexist" == "0"} {
