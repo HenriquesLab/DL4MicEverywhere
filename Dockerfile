@@ -1,6 +1,8 @@
 ARG BASE_IMAGE=""
 
+####
 ## Stage 1 - Download and convert the notebook
+####
 FROM python:3.9-alpine3.19 AS notebook_autoconversion
 RUN apk update && \
     apk add git
@@ -34,7 +36,9 @@ RUN git clone --branch reduce_code https://github.com/HenriquesLab/DL4MicEverywh
     python DL4MicEverywhere/.tools/create_docker_info.py "/home/docker_info.txt" "${BASE_IMAGE}" "${PATH_TO_NOTEBOOK}" "${PATH_TO_REQUIREMENTS}" \
        "${SECTIONS_TO_REMOVE}"  "${NOTEBOOK_NAME}" "${GPU_FLAG}" "${PYTHON_VERSION}"
 
+####
 ## Stage 2 - Set the final image (install packages, python, python libraries)
+####
 FROM ${BASE_IMAGE} AS final
 
 # Read all the arguments
@@ -70,11 +74,11 @@ RUN apt-get update && \
                        wget \ 
                        unzip \
                        git \
-                       libfreetype6-dev \
-                       ffmpeg \
                        libsm6 \
                        libxext6 \
                        libopenmpi-dev \
+                       libfreetype6-dev \
+                       ffmpeg \
                        pkg-config && \
     if [ "$GPU_FLAG" -eq "1" ] ; then apt-get install -y nvidia-cuda-toolkit ; fi && \
     apt-get clean && \
