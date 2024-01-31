@@ -13,6 +13,33 @@ function_regex = r"^\s*def\s+([a-zA-Z_]\w*)\s*\(.+\)\s*:\s*$"
 raw_regex = r"\{type:\"raw\"\}"
 comment_after_param_regex = r"(\[[^\]]*\]|\{[^}]*\})(?: [^#]*)?(\[[^\]]*\]|\{[^}]*\})* *#.*"
 
+ipywidget_imported_code = ("import ipywidgets as widgets\n" 
+                        "from IPython.display import display, clear_output\n"
+                        "import yaml\n"
+                        "import os\n"
+                        "\n"
+                        "ipywidgets_edit_yaml_config_path = os.path.join(os.getcwd(), 'results', 'widget_cache.yaml')\n"
+                        "\n"
+                        "def ipywidgets_edit_yaml(yaml_path, key, value):\n"
+                        "    if os.path.exists(yaml_path):\n"
+                        "        with open(yaml_path, 'r') as f:\n"
+                        "            config_data = yaml.safe_load(f)\n"
+                        "    else:\n"
+                        "        config_data = {}\n"   
+                        "    config_data[key] = value\n"
+                        "    with open(yaml_path, 'w') as new_f:\n"
+                        "        yaml.safe_dump(config_data, new_f, width=10e10, default_flow_style=False)\n"
+                        "\n"
+                        "def ipywidgets_read_yaml(yaml_path, key):\n"
+                        "    if os.path.exists(yaml_path):\n"
+                        "        with open(yaml_path, 'r') as f:\n"
+                        "            config_data = yaml.safe_load(f)\n"
+                        "        value = config_data.get(key, '')\n"
+                        "        return value\n"
+                        "    else:\n"
+                        "        return ''\n"
+                        "\n")    
+
 def param_to_widget(code):
     """
     Extracts components from a line with @param and creates ipywidgets based on the extracted information.
@@ -219,8 +246,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
     - new_cells (list): A list of code cells generated from the given code.
     - ipywidget_imported (bool): An updated value indicating whether the `ipywidgets` library has been imported.
     """
- 
-
+    
     # Future lines of code that are based on widgets or not
     widget_code = ''
     non_widget_code = ''
@@ -309,32 +335,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                     
         if not ipywidget_imported:
             # In case the ipywidgets library have not been imported yet
-            code_cell += ("import ipywidgets as widgets\n" 
-                        "from IPython.display import display, clear_output\n"
-                        "import yaml\n"
-                        "import os\n"
-                        "\n"
-                        "ipywidgets_edit_yaml_config_path = os.path.join(os.getcwd(), 'configuration.yaml')\n"
-                        "\n"
-                        "def ipywidgets_edit_yaml(yaml_path, key, value):\n"
-                        "    if os.path.exists(yaml_path):\n"
-                        "        with open(yaml_path, 'r') as f:\n"
-                        "            config_data = yaml.safe_load(f)\n"
-                        "    else:\n"
-                        "        config_data = {}\n"   
-                        "    config_data[key] = value\n"
-                        "    with open(yaml_path, 'w') as new_f:\n"
-                        "        yaml.safe_dump(config_data, new_f, width=10e10, default_flow_style=False)\n"
-                        "\n"
-                        "def ipywidgets_read_yaml(yaml_path, key):\n"
-                        "    if os.path.exists(yaml_path):\n"
-                        "        with open(yaml_path, 'r') as f:\n"
-                        "            config_data = yaml.safe_load(f)\n"
-                        "        value = config_data.get(key, '')\n"
-                        "        return value\n"
-                        "    else:\n"
-                        "        return ''\n"
-                        "\n")     
+            code_cell += ipywidget_imported_code
             ipywidget_imported = True
 
         code_cell += ("clear_output()\n\n" # In orther to renew the ipywidgets
@@ -350,7 +351,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                     f"button_{function_name} = widgets.Button(description='Load and run')\n" # Add the button that calls the function
                     f"cache_button_{function_name} = widgets.Button(description='Load cache')\n" # Add the button that calls the cache function
                     f"output_{function_name} = widgets.Output()\n"
-                    f"display(button_{function_name}, output_{function_name})\n"
+                    f"display(widgets.HBox((button_{function_name}, cache_button_{function_name})), output_{function_name})\n"
                     f"def aux_{function_name}(_):\n" 
                     f"  return {function_name}(output_{function_name})\n\n"
                     f"def aux_{function_name}_cache(_):\n" 
@@ -361,8 +362,8 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
         
         # Print finnished and final time
         code_cell += ("print('-------------------------------------------------------')\n"
-                      "print('^ Introduce the arguments and click \"Load and run\" ^')\n"
-                      "print('^ Or click \"Load cache\" ^')\n") 
+                      "print('^ Introduce the arguments and click \"Load arguments and run\" ^')\n"
+                      "print('^ Or click \"Load cache and run\" if any cache exists^')\n") 
 
     else:
         # Otherwise, just add the code
@@ -375,32 +376,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
             time_imported = True
         if not ipywidget_imported:
             # In case the ipywidgets library have not been imported yet
-            code_cell += ("import ipywidgets as widgets\n" 
-                        "from IPython.display import display, clear_output\n"
-                        "import yaml\n"
-                        "import os\n"
-                        "\n"
-                        "ipywidgets_edit_yaml_config_path = os.path.join(os.getcwd(), 'configuration.yaml')\n"
-                        "\n"
-                        "def ipywidgets_edit_yaml(yaml_path, key, value):\n"
-                        "    if os.path.exists(yaml_path):\n"
-                        "        with open(yaml_path, 'r') as f:\n"
-                        "            config_data = yaml.safe_load(f)\n"
-                        "    else:\n"
-                        "        config_data = {}\n"   
-                        "    config_data[key] = value\n"
-                        "    with open(yaml_path, 'w') as new_f:\n"
-                        "        yaml.safe_dump(config_data, new_f, width=10e10, default_flow_style=False)\n"
-                        "\n"
-                        "def ipywidgets_read_yaml(yaml_path, key):\n"
-                        "    if os.path.exists(yaml_path):\n"
-                        "        with open(yaml_path, 'r') as f:\n"
-                        "            config_data = yaml.safe_load(f)\n"
-                        "        value = config_data.get(key, '')\n"
-                        "        return value\n"
-                        "    else:\n"
-                        "        return ''\n"
-                        "\n")
+            code_cell += ipywidget_imported_code
             ipywidget_imported = True    
             
         # Print running and store the initial_time
