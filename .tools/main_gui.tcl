@@ -98,9 +98,9 @@ proc onLoadCache {} {
     global result_path
     global selectedFolder
     global selectedNotebook
-    global config_path
-    global notebook_path
-    global requirements_path
+    global yaml_path
+    global ipynb_path
+    global txt_path
     global gpu
     global tag
 
@@ -117,13 +117,13 @@ proc onLoadCache {} {
         set selectedNotebook "$cache_selected_notebook"
     }
     if  {"$cache_config_path" != ""} {
-        set config_path "$cache_config_path"
+        set yaml_path "$cache_config_path"
     }
     if  {"$cache_notebook_path" != ""} {
-        set notebook_path "$cache_notebook_path"
+        set ipynb_path "$cache_notebook_path"
     }
     if  {"$cache_requirements_path" != ""} {
-        set requirements_path "$cache_requirements_path"
+        set txt_path "$cache_requirements_path"
     }
     if  {"$cache_gpu_flag" != ""} {
         set gpu "$cache_gpu_flag"
