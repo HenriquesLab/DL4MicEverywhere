@@ -1,5 +1,41 @@
 ARG BASE_IMAGE=""
-FROM ${BASE_IMAGE}
+
+## Stage 1 - Download and convert the notebook
+FROM python:3.9-alpine3.19 AS notebook_autoconversion
+RUN apk update && \
+    apk add git
+
+WORKDIR /home
+RUN pip install --upgrade pip && \
+    pip install nbformat==5.9.2
+
+# Read all the arguments
+ARG BASE_IMAGE
+ARG PATH_TO_NOTEBOOK
+ARG PATH_TO_REQUIREMENTS
+ARG SECTIONS_TO_REMOVE
+ARG NOTEBOOK_NAME
+ARG GPU_FLAG
+ARG PYTHON_VERSION
+
+# Custom cache invalidation
+ARG CACHEBUST=1
+
+# All the layers bellow this will not be cached
+RUN echo "${CACHEBUST}"
+
+# Download the notebook
+ADD $PATH_TO_NOTEBOOK ./${NOTEBOOK_NAME}
+
+# Autoconvert the notebook
+RUN git clone --branch reduce_code https://github.com/HenriquesLab/DL4MicEverywhere.git  && \
+    python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py -p . -n ${NOTEBOOK_NAME} -s ${SECTIONS_TO_REMOVE}  && \
+    mv colabless_${NOTEBOOK_NAME} ${NOTEBOOK_NAME}  && \
+    python DL4MicEverywhere/.tools/create_docker_info.py "/home/docker_info.txt" "${BASE_IMAGE}" "${PATH_TO_NOTEBOOK}" "${PATH_TO_REQUIREMENTS}" \
+       "${SECTIONS_TO_REMOVE}"  "${NOTEBOOK_NAME}" "${GPU_FLAG}" "${PYTHON_VERSION}"
+
+## Stage 2 - Set the final image (install packages, python, python libraries)
+FROM ${BASE_IMAGE} AS final
 
 # Read all the arguments
 ARG PATH_TO_NOTEBOOK=""
@@ -90,19 +126,15 @@ ARG CACHEBUST=1
 RUN echo "${CACHEBUST}"
 
 # Download the notebook and requirements if they are not provided
-ADD $PATH_TO_NOTEBOOK ./${NOTEBOOK_NAME}
 ADD $PATH_TO_REQUIREMENTS ./requirements.txt
 
 # Install the requirements and convert the notebook
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
-    rm requirements.txt && \
-    git clone --branch reduce_code https://github.com/HenriquesLab/DL4MicEverywhere.git && \
-    python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py -p . -n ${NOTEBOOK_NAME} -s ${SECTIONS_TO_REMOVE} && \ 
-    mv colabless_${NOTEBOOK_NAME} ${NOTEBOOK_NAME} && \ 
-    python DL4MicEverywhere/.tools/create_docker_info.py "/home/docker_info.txt" "${BASE_IMAGE}" "${PATH_TO_NOTEBOOK}" "${PATH_TO_REQUIREMENTS}" \
-       "${SECTIONS_TO_REMOVE}"  "${NOTEBOOK_NAME}" "${GPU_FLAG}" "${PYTHON_VERSION}" && \
-    rm -r DL4MicEverywhere
+    rm requirements.txt
+    
+# Copy the converted notebook from stage 1
+COPY --from=notebook_autoconversion /home/${NOTEBOOK_NAME} /home/docker_info.txt /home
 
 ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/lib/cuda
 
