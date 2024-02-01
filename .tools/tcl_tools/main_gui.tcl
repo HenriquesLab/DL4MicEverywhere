@@ -326,7 +326,7 @@ proc parseYaml {notebook_name} {
     global selectedFolder
 
     # Read a yaml file
-    catch {exec /bin/bash $basedir/.tools/parse_yaml.sh "$basedir" "$selectedFolder" "$notebook_name"} output
+    catch {exec /bin/bash $basedir/.tools/bash_tools/parse_yaml.sh "$basedir" "$selectedFolder" "$notebook_name"} output
 
     set arguments [split $output \n]
 

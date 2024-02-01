@@ -24,7 +24,7 @@ jobs:
         run: pip install -r .tools/requirements.txt
       - name: Update all the configurations
         working-directory: ./DL4MicEverywhere
-        run: python3 .tools/update_with_zc_manifest.py
+        run: python3 .tools/python_tools/update_with_zc_manifest.py
       - name: Commit the changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:

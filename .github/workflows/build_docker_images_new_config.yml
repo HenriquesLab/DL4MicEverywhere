@@ -29,9 +29,9 @@ jobs:
       - name: Install requirements
         run: pip install -r .tools/requirements.txt
       - name: Update the version of the notebook on the configuration
-        run: python3 .tools/update_zerocost_version.py '${{ inputs.config_file }}' 
+        run: python3 .tools/python_tools/update_zerocost_version.py '${{ inputs.config_file }}' 
       - name: Update the docker_tag on the configuration
-        run: python3 .tools/update_configuration.py '${{ inputs.config_file }}' 
+        run: python3 .tools/python_tools/update_configuration.py '${{ inputs.config_file }}' 
 
       # Now that the configuration is updated, we can extract the arguments
       - name: Check notebook_url attribute on configuration.yaml
@@ -307,9 +307,9 @@ jobs:
       - name: Install requirements
         run: pip install -r .tools/requirements.txt
       - name: Update the version of the notebook on the configuration
-        run: python3 .tools/update_zerocost_version.py '${{ inputs.config_file }}' 
+        run: python3 .tools/python_tools/update_zerocost_version.py '${{ inputs.config_file }}' 
       - name: Update the docker_tag on the configuration
-        run: python3 .tools/update_configuration.py '${{ inputs.config_file }}' 
+        run: python3 .tools/python_tools/update_configuration.py '${{ inputs.config_file }}' 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: GitHub Action - Update the notebook version on the configuration
