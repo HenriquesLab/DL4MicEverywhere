@@ -9,8 +9,8 @@ sleep 5
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # Linux
     if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
-	# Linux inside the Windows Subsystem for Linux needs to export/link the start command
-	export BROWSER="powershell.exe /C start"
+        # Linux inside the Windows Subsystem for Linux needs to export/link the start command
+        export BROWSER="powershell.exe /C start"
     fi
     xdg-open $url
 elif [[ "$OSTYPE" == "darwin"* ]]; then

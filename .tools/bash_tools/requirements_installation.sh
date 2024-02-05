@@ -44,6 +44,18 @@ else
     echo "TCL/TK already installed."
 fi 
 
+# Verify if xdg-open is installed on the system and otherwise install it
+if ! command -v xdg-open &> /dev/null; then
+    
+    echo "Installing xdg-utils..."
+
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # Linux
+        # Add Docker's official GPG key:
+        apt-get -yinstall xdg-utils
+    fi
+fi
+
 # Verify if Docker is installed on the system and otherwise install it
 if ! command -v docker &> /dev/null; then
     
