@@ -131,6 +131,12 @@ proc onLoadCache {} {
     if  {"$cache_tag" != ""} {
         set tag "$cache_tag"
     }
+    
+    # Update the information in the description box
+    if {"$selectedNotebook" != "-"} {
+        parseYaml $selectedNotebook
+    }
+
 }
 
 proc onDone {} {
