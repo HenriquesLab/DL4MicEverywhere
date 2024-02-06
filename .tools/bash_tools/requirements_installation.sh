@@ -45,14 +45,13 @@ else
 fi 
 
 # Verify if xdg-open is installed on the system and otherwise install it
-if ! command -v xdg-open &> /dev/null; then
-    
-    echo "Installing xdg-utils..."
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    if ! command -v xdg-open &> /dev/null; then 
+        echo "Installing xdg-utils..."
 
-    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        # Linux
-        # Add Docker's official GPG key:
-        apt-get -yinstall xdg-utils
+        apt-get -y install xdg-utils
+    else
+        echo "xdg-utils already installed."
     fi
 fi
 
