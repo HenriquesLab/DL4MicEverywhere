@@ -9,7 +9,7 @@ services:
       - ~/.Xauthority:/root/.Xauthority
       - /tmp/.X11-unix:/tmp/.X11-unix
     environment:
-      - DISPLAY=${DISPLAY}
+      - DISPLAY=docker.for.mac.host.internal:0
     network_mode: "host"
     ports:
       - "8888:8888"
