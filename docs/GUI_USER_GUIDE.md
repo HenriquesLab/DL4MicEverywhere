@@ -175,7 +175,7 @@ After selecting the file, the window should look like this:
 
 # Connect to remote workstations via SSH
 
-You can use the GUI with remote workstations when a SSH connection is established. 
+You can use the GUI with remote workstations when an SSH connection is established. 
 
 **iOS / Mac**
 If you are using an iOS system to connect via SSH, you need to install [Xquartz](https://www.xquartz.org/). You can easily do this using the following command in the terminal:
@@ -202,6 +202,14 @@ or
 ```
 ssh -L -X username@XXX.XX.XX.XXX
 ```
+
+The `-Y` option in the `ssh` command enables trusted X11 forwarding. This means that the remote X11 applications have permissions to connect to the local X11 display. It is a secure way to run X11 applications on a remote machine and have them displayed on a local machine. The `-Y` option is preferred over the `-X` option, for security reasons.
+
+
+The `-L` option in the `ssh` command is used to set up local port forwarding. It allows you to create a secure tunnel from a local machine to a destination machine through the SSH server. This can be useful for accessing services on a remote machine securely or for bypassing firewall restrictions.
+When using the `-L` option, you specify the local address and port, the remote address, and the remote port to which the traffic will be forwarded. For example, the following command sets up local port forwarding: `ssh -L 8080:localhost:80 user@remote`. This command forwards all traffic sent to port `8080` on the local machine to port `80` on the remote machine.
+Local port forwarding can be used to secure traffic and access remote services securely. It is commonly used in scenarios where direct access to a service is restricted or when encryption and security are required for the communication.
+
 **Run DL4MicEverywhere**
 ```
 cd DL4MicEverywhere
