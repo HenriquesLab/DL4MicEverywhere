@@ -76,14 +76,14 @@ ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu${UBUNTU_VERSION//.}/x86_64/3bf863cc.pub && \
     apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
-        cuda-command-line-tools-${CUDA_VERSION%.*.*}-$(echo ${CUDA_VERSION} | cut -d'.' -f 2) \
-        cuda-nvrtc-${CUDA_VERSION%.*.*}-$(echo ${CUDA_VERSION} | cut -d'.' -f 2) \
-        libcublas-${CUDA_VERSION%.*.*}-$(echo ${CUDA_VERSION} | cut -d'.' -f 2) \
-        libcublas-dev-${CUDA_VERSION%.*.*}-$(echo ${CUDA_VERSION} | cut -d'.' -f 2) \
-        libcufft-${CUDA_VERSION%.*.*}-$(echo ${CUDA_VERSION} | cut -d'.' -f 2) \
-        libcurand-${CUDA_VERSION%.*.*}-$(echo ${CUDA_VERSION} | cut -d'.' -f 2) \
-        libcusolver-${CUDA_VERSION%.*.*}-$(echo ${CUDA_VERSION} | cut -d'.' -f 2) \
-        libcusparse-${CUDA_VERSION%.*.*}-$(echo ${CUDA_VERSION} | cut -d'.' -f 2) \
+        cuda-command-line-tools-${CUDA_VERSION%.*.*}-8 \
+        cuda-nvrtc-${CUDA_VERSION%.*.*}-8 \
+        libcublas-${CUDA_VERSION%.*.*}-8 \
+        libcublas-dev-${CUDA_VERSION%.*.*}-8 \
+        libcufft-${CUDA_VERSION%.*.*}-8 \
+        libcurand-${CUDA_VERSION%.*.*}-8 \
+        libcusolver-${CUDA_VERSION%.*.*}-8 \
+        libcusparse-${CUDA_VERSION%.*.*}-8 \
         libcudnn8=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*} \
         libgomp1 \
         build-essential \
