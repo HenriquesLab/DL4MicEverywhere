@@ -1,4 +1,5 @@
-ARG BASE_IMAGE=""
+
+ARG UBUNTU_VERSION
 
 ####
 ## Stage 1 - Download and convert the notebook
@@ -33,13 +34,13 @@ ADD $PATH_TO_NOTEBOOK ./${NOTEBOOK_NAME}
 RUN git clone --branch reduce_code https://github.com/HenriquesLab/DL4MicEverywhere.git  && \
     python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py -p . -n ${NOTEBOOK_NAME} -s ${SECTIONS_TO_REMOVE}  && \
     mv colabless_${NOTEBOOK_NAME} ${NOTEBOOK_NAME}  && \
-    python DL4MicEverywhere/.tools/python_tools/create_docker_info.py "/home/docker_info.txt" "${BASE_IMAGE}" "${PATH_TO_NOTEBOOK}" "${PATH_TO_REQUIREMENTS}" \
+    python DL4MicEverywhere/.tools/python_tools/create_docker_info.py "/home/docker_info.txt" "${UBUNTU_VERSION}" "" "" "${PATH_TO_NOTEBOOK}" "${PATH_TO_REQUIREMENTS}" \
        "${SECTIONS_TO_REMOVE}"  "${NOTEBOOK_NAME}" "${GPU_FLAG}" "${PYTHON_VERSION}"
 
 ####
 ## Stage 2 - Set the final image (install packages, python, python libraries)
 ####
-FROM ${BASE_IMAGE} AS final
+FROM ubuntu:${UBUNTU_VERSION} AS final
 
 # Read all the arguments
 ARG PATH_TO_NOTEBOOK=""

@@ -12,6 +12,7 @@ cite:
 config:
   dl4miceverywhere:
     cuda_version: 11.8.0
+    cudnn_version: 8.6.0.163
     description: U-Net_2D_DL4Mic is the conversion of the 2D U-Net from ZeroCostDL4Mic.
     dl4miceverywhere_version: 1.0.0
     docker_hub_image: u-net_2d_zerocostdl4mic-z2.1.1-d1.0.0

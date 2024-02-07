@@ -65,6 +65,7 @@ jobs:
     outputs:
       ubuntu_version: ${{ steps.ubuntu_version.outputs.result }}
       cuda_version: ${{ steps.cuda_version.outputs.result }}
+      cudnn_version: ${{ steps.cudnn_version.outputs.result }}
       python_version: ${{ steps.python_version.outputs.result }}
       notebook_url: ${{ steps.notebook_url.outputs.result }}
       requirements_url: ${{ steps.requirements_url.outputs.result }}
@@ -98,6 +99,11 @@ jobs:
         id: cuda_version
         with:
           cmd: yq '.config.dl4miceverywhere.cuda_version' '${{ matrix.notebook }}' 
+      - name: Check cudnn_version attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: cudnn_version
+        with:
+          cmd: yq '.config.dl4miceverywhere.cudnn_version' '${{ matrix.notebook }}' 
       - name: Check ubuntu_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: ubuntu_version
@@ -138,6 +144,9 @@ jobs:
             exit 1
           elif [[ 'null' = '${{ steps.cuda_version.outputs.result }}' ]] ; then 
             echo 'The key cuda_version is not in the configuration.yaml file.' 
+            exit 1
+          elif [[ 'null' = '${{ steps.cudnn_version.outputs.result }}' ]] ; then 
+            echo 'The key cudnn_version is not in the configuration.yaml file.' 
             exit 1
           elif [[ 'null' = '${{ steps.ubuntu_version.outputs.result }}' ]] ; then 
             echo 'The key ubuntu_version is not in the configuration.yaml file.' 

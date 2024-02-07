@@ -284,6 +284,7 @@ eval $(parse_yaml "$config_path")
 check_parsed_argument notebook_url
 check_parsed_argument requirements_url
 check_parsed_argument cuda_version
+check_parsed_argument cudnn_version
 check_parsed_argument ubuntu_version
 check_parsed_argument python_version
 check_parsed_argument sections_to_remove
@@ -291,13 +292,6 @@ check_parsed_argument notebook_version
 check_parsed_argument description
 rename_parsed_argument dl4miceverywhere_version # Not required to be present and therefore the cheking is skipped
 rename_parsed_argument docker_hub_image # Not required to be present and therefore the cheking is skipped
-
-# Base image is selected based on the GPU selection
-if [ "$gpu_flag" -eq 1 ]; then
-   base_img="nvidia/cuda:${cuda_version}-base-ubuntu${ubuntu_version}"
-else
-   base_img="ubuntu:${ubuntu_version}"
-fi
 
 if [ -z "$notebook_path" ]; then
     # Use the URL from the configuration file if no local notebook path is specified
@@ -407,7 +401,9 @@ fi
 # Set the docker's tag
 if [ "$test_flag" -eq 1 ]; then
     echo ""
-    echo "base_img: $base_img"
+    echo "ubuntu_version: $ubuntu_version"
+    echo "cuda_version: $cuda_version"
+    echo "cudnn_version: $cudnn_version"
     echo "python_version: $python_version"
     echo "notebook_path: $notebook_path"
     echo "requirements_path: $requirements_path"
@@ -507,7 +503,6 @@ else
     fi
 fi
 
-
 # Pull the docker image from docker hub
 if [ "$build_flag" -eq 3 ]; then
     docker pull "$docker_tag"
@@ -517,7 +512,9 @@ else
     if [ "$build_flag" -eq 2 ]; then
         if [ "$gpu_flag" -eq 1 ]; then
             docker build --file $BASEDIR/Dockerfile.gpu -t $docker_tag $BASEDIR\
-                --build-arg BASE_IMAGE="${base_img}" \
+                --build-arg UBUNTU_VERSION="${ubuntu_version}" \
+                --build-arg CUDA_VERSION="${cuda_version}" \
+                --build-arg CUDNN_VERSION="${cudnn_version}" \
                 --build-arg GPU_FLAG="${gpu_flag}" \
                 --build-arg PYTHON_VERSION="${python_version}" \
                 --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
@@ -527,7 +524,7 @@ else
                 --build-arg CACHEBUST=$(date +%s)
         else
             docker build --file $BASEDIR/Dockerfile -t $docker_tag $BASEDIR\
-                --build-arg BASE_IMAGE="${base_img}" \
+                --build-arg UBUNTU_VERSION="${ubuntu_version}" \
                 --build-arg GPU_FLAG="${gpu_flag}" \
                 --build-arg PYTHON_VERSION="${python_version}" \
                 --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \

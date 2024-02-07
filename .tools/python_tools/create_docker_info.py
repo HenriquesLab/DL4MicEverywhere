@@ -9,14 +9,16 @@ def add_docker_extra(filename_path):
 
     f.close()
 
-def create_docker_arguments(filename_path, base_image, path_to_notebook, path_to_requirements,
-         sections_to_remove, notebook_name, gpu_flag, python_version
-         ):
+def create_docker_arguments(filename_path, ubuntu_version, cuda_version, cudnn_version, 
+                            path_to_notebook, path_to_requirements,
+                            sections_to_remove, notebook_name, gpu_flag, python_version
+                            ):
     
     f = open(filename_path, "w")
-    
     f.write('The arguments that have been used to build the Docker image are:\n')
-    f.write(f'\tBASE_IMAGE="{base_image}"\n')
+    f.write(f'\tUBUNTU_VERSION="{ubuntu_version}"\n')
+    f.write(f'\tCUDA_VERSION="{cuda_version}"\n')
+    f.write(f'\tCUDNN_VERSION="{cudnn_version}"\n')
     f.write(f'\tPATH_TO_NOTEBOOK="{path_to_notebook}"\n')
     f.write(f'\tPATH_TO_REQUIREMENTS="{path_to_requirements}"\n')
     f.write(f'\tSECTIONS_TO_REMOVE="{sections_to_remove}"\n')
@@ -26,18 +28,21 @@ def create_docker_arguments(filename_path, base_image, path_to_notebook, path_to
     f.close()
 
 if __name__ == '__main__':
-    if len(sys.argv) == 9:
+    if len(sys.argv) == 11:
         filename_path = sys.argv[1]
 
-        base_image = sys.argv[2]
-        path_to_notebook = sys.argv[3]
-        path_to_requirements = sys.argv[4]
-        sections_to_remove = sys.argv[5]
-        notebook_name = sys.argv[6]
-        gpu_flag = sys.argv[7]
-        python_version = sys.argv[8]
+        ubuntu_version = sys.argv[2]
+        cuda_version = sys.argv[3]
+        cudnn_version = sys.argv[4]
+        path_to_notebook = sys.argv[5]
+        path_to_requirements = sys.argv[6]
+        sections_to_remove = sys.argv[7]
+        notebook_name = sys.argv[8]
+        gpu_flag = sys.argv[9]
+        python_version = sys.argv[10]
 
-        sys.exit(create_docker_arguments(filename_path, base_image, path_to_notebook, path_to_requirements, 
-                      sections_to_remove, notebook_name, gpu_flag, python_version))
+        sys.exit(create_docker_arguments(filename_path, ubuntu_version, cuda_version, 
+                                         cudnn_version, path_to_notebook, path_to_requirements, 
+                                         sections_to_remove, notebook_name, gpu_flag, python_version))
     else:
         sys.exit(1)

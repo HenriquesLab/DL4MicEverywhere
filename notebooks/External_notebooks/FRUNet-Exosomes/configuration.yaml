@@ -4,6 +4,7 @@ cite:
 config:
   dl4miceverywhere:
     cuda_version: 11.2.2
+    cudnn_version: 8.1.1.33
     description: Ready to use notebook for the segmentation of small extrcaellular vesicles in transmission electron microscopy (TEM) images. The notebook will download the original code and dataset, and make the inference with a trained model.
     dl4miceverywhere_version: 1.0.0
     docker_hub_image: frunet_tem_exosomes_sev-e1.0.0-d1.0.0

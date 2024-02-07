@@ -12,6 +12,7 @@ cite:
 config:
   dl4miceverywhere:
     cuda_version: 11.8.0
+    cudnn_version: 8.6.0.163
     description: fnet_3D_DL4Mic is the conversion of the 3D fnet from ZeroCostDL4Mic.
     dl4miceverywhere_version: 1.0.0
     docker_hub_image: fnet_3d_zerocostdl4mic-z1.13.1-d1.0.0
