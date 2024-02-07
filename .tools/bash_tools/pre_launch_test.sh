@@ -29,21 +29,34 @@ echo ""
 if ! docker info &> /dev/null; then
     echo "Error: Docker daemon is not running"
 
-    docker_flag=$(wish $BASEDIR/.tools/tcl_tools/docker_desktop_gui.tcl)
-    if [ "$build_flag" -ne 1 ]; then
+    docker_flag=$(wish $BASEDIR/../tcl_tools/docker_desktop_gui.tcl)
+    if [[ "$build_flag" -ne 1 ]]; then
         if [[ "$OSTYPE" == "linux-gnu"* ]]; then
             # Linux
             if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
                 # Linux inside the Windows Subsystem for Linux needs to export/link the start command
                 "/mnt/c/Program Files/Docker/Docker/Docker Desktop.exe"
+                pid_docker=$!
+                # Wait until is opened
+                wait $pid_docker
+                sleep 5
             else
                 # Native Linux
                 systemctl --user start docker-desktop
+                pid_docker=$!
+                # Wait until is opened
+                wait $pid_docker
+                sleep 5
             fi
 
         elif [[ "$OSTYPE" == "darwin"* ]]; then
             # Mac OSX
-            open -a "Docker Desktop"
+            # Launch Docker Desktop
+            open -a Docker &
+            pid_docker=$!
+            # Wait until is opened
+            wait $pid_docker
+            sleep 5
         elif [[ "$OSTYPE" == "msys*" ]]; then
             # Windows
             echo "This is a Windows machine"

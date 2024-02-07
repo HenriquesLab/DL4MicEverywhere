@@ -13,6 +13,12 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
         (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >>  ~/.zprofile
         eval "$(/opt/homebrew/bin/brew shellenv)"
+
+        if ! command -v brew &> /dev/null; then
+            echo "Homebrew installation failed."
+            echo "Please try again or follow the offical installation instructions on their website: https://brew.sh/"
+            exit 1
+        fi
     else
         echo "Homebrew already installed."
     fi
@@ -38,6 +44,13 @@ if ! command -v wish &> /dev/null; then
         echo "This is a Windows machine"
     else
         echo "Unsupported OS: $OSTYPE"
+        exit 1
+    fi
+
+
+    if ! command -v wish &> /dev/null; then
+        echo "Wish installation failed."
+        echo "Please try again or follow the offical installation instructions on their website: https://brew.sh/"
         exit 1
     fi
 else
@@ -83,6 +96,22 @@ if ! command -v docker &> /dev/null; then
         groupadd docker
         usermod -aG docker $USER
 
+        if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
+            # Linux inside the Windows Subsystem for Linux needs to export/link the start command
+            "/mnt/c/Program Files/Docker/Docker/Docker Desktop.exe"
+            pid_docker=$!
+            # Wait until is opened
+            wait $pid_docker
+            sleep 5
+        else
+            # Native Linux
+            systemctl --user start docker-desktop
+            pid_docker=$!
+            # Wait until is opened
+            wait $pid_docker
+            sleep 5
+        fi
+
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         # Mac OSX
 
@@ -114,14 +143,11 @@ if ! command -v docker &> /dev/null; then
         echo 'export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"' >> ~/.bashrc
 
         # Launch Docker Desktop
-        # launchctl start docker
         open -a Docker &
         pid_docker=$!
+        # Wait until is opened
         wait $pid_docker
-        # # Wait for Docker Desktop to start
-        # while ! docker info &> /dev/null; do
-        #     sleep 1
-        # done
+        sleep 5
 
     elif [[ "$OSTYPE" == "msys*" ]]; then
         # Windows
