@@ -110,11 +110,12 @@ if ! command -v docker &> /dev/null; then
         hdiutil detach /Volumes/Docker
 
         # Add Docker Desktop (docker) to the environment variable PATH
-        export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"
+        echo 'export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"' >> ~/.zshrc
+        echo 'export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"' >> ~/.bashrc
 
         # Launch Docker Desktop
-        launchctl start docker
-        # open -a Docker
+        # launchctl start docker
+        open -a Docker
 
     elif [[ "$OSTYPE" == "msys*" ]]; then
         # Windows
