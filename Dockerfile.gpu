@@ -1,7 +1,5 @@
 ARG UBUNTU_VERSION
 ARG CUDA_VERSION
-ARG CUDNN_VERSION
-
 ####
 ## Stage 1 - Download and convert the notebook
 ####
@@ -51,6 +49,7 @@ ARG SECTIONS_TO_REMOVE=""
 ARG NOTEBOOK_NAME=""
 ARG GPU_FLAG=""
 ARG PYTHON_VERSION=""
+ARG CUDNN_VERSION=""
 
 # Set the language
 ENV LANG=C.UTF-8
@@ -73,7 +72,7 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 
 # Install common packages and cuda libraries 
-RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu${UBUNTU_VERSION//.}/x86_64/3bf863cc.pub && \
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub && \
     apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
         cuda-command-line-tools-${CUDA_VERSION%.*.*}-8 \
