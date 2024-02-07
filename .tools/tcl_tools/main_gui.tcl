@@ -363,11 +363,7 @@ proc parseYaml {notebook_name} {
 set advanced_options 0
 
 # Read the OS of the computer
-if {![info exists operative_system]} {
-    set exists basedir [lindex $argv 1]
-
-}
-
+set operative_system [lindex $argv 1]
 set is_mac 0
 set is_linux 0
 
