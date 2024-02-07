@@ -95,7 +95,7 @@ if ! command -v docker &> /dev/null; then
         if [[ $(uname -m) == 'arm64' ]]; then
             # Docker official website, to get the best experience, still recommends to install Rosetta
             # To install Rosetta 2 manually from the command line, run the following command:
-            softwareupdate --install-rosetta --agree-to-license
+            softwareupdate --agree-to-license --install-rosetta
 
             # Download the latest ARM64 Docker installer
             curl https://desktop.docker.com/mac/main/arm64/Docker.dmg -o /tmp/Docker.dmg
