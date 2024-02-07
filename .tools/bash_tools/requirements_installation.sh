@@ -15,7 +15,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
 
         if ! command -v brew &> /dev/null; then
-            echo "Homebrew installation failed."
+            echo -e "\033[0;31 Homebrew installation failed. \033[0m"
             echo "Please try again or follow the offical installation instructions on their website: https://brew.sh/"
             exit 1
         fi
@@ -47,10 +47,9 @@ if ! command -v wish &> /dev/null; then
         exit 1
     fi
 
-
     if ! command -v wish &> /dev/null; then
-        echo "Wish installation failed."
-        echo "Please try again or follow the offical installation instructions on their website: https://brew.sh/"
+        echo -e "\033[0;31 Wish (TCL/TK) installation failed. \033[0m"
+        echo "Please try again or follow the offical installation instructions on their website: https://www.tcl.tk/software/tcltk/"
         exit 1
     fi
 else
@@ -63,6 +62,10 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         echo "Installing xdg-utils..."
 
         apt-get -y install xdg-utils
+        if ! command -v xdg-open &> /dev/null; then 
+            echo -e "\033[0;31 xdg-utils installation failed. \033[0m"
+            echo "Please try again or follow the installation instructions on: https://installati.one/install-xdg-utils-ubuntu-20-04/"
+        fi
     else
         echo "xdg-utils already installed."
     fi
@@ -155,6 +158,11 @@ if ! command -v docker &> /dev/null; then
     else
         echo "Unsupported OS: $OSTYPE"
         exit 1
+    fi
+    
+    if ! command -v docker &> /dev/null; then
+        echo -e "\033[0;31 Docker installation failed. \033[0m"
+        echo "Please try again or follow the offical installation instructions on their website: https://docs.docker.com/get-docker/"
     fi
 else
     echo "Docker already installed."
