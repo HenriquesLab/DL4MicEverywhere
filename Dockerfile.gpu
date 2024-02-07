@@ -42,7 +42,7 @@ RUN git clone --branch reduce_code https://github.com/HenriquesLab/DL4MicEverywh
 ####
 ## Stage 2 - Set the final image (install packages, python, python libraries)
 ####
-FROM nvidia/cuda:${CUDA_VERSION}-base-ubuntu${UBUNTU_VERSION}" AS final
+FROM nvidia/cuda:${CUDA_VERSION}-base-ubuntu${UBUNTU_VERSION} AS final
 
 # Read all the arguments
 ARG PATH_TO_NOTEBOOK=""
@@ -73,18 +73,18 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 
 # Install common packages and cuda libraries 
-RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub && \
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu${UBUNTU_VERSION//.}/x86_64/3bf863cc.pub && \
     apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
-        cuda-command-line-tools-11-8 \
-        cuda-nvrtc-11-8 \
-        libcublas-11-8 \
-        libcublas-dev-11-8 \
-        libcufft-11-8 \
-        libcurand-11-8 \
-        libcusolver-11-8 \
-        libcusparse-11-8 \
-        libcudnn8=${CUDNN_VERSION}-1+cuda${CUDA_VERSION} \
+        cuda-command-line-tools-${CUDA_VERSION%.*.*}-$(echo $version| cut -d'.' -f 2) \
+        cuda-nvrtc-${CUDA_VERSION%.*.*}-$(echo $version| cut -d'.' -f 2) \
+        libcublas-${CUDA_VERSION%.*.*}-$(echo $version| cut -d'.' -f 2) \
+        libcublas-dev-${CUDA_VERSION%.*.*}-$(echo $version| cut -d'.' -f 2) \
+        libcufft-${CUDA_VERSION%.*.*}-$(echo $version| cut -d'.' -f 2) \
+        libcurand-${CUDA_VERSION%.*.*}-$(echo $version| cut -d'.' -f 2) \
+        libcusolver-${CUDA_VERSION%.*.*}-$(echo $version| cut -d'.' -f 2) \
+        libcusparse-${CUDA_VERSION%.*.*}-$(echo $version| cut -d'.' -f 2) \
+        libcudnn8=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*} \
         libgomp1 \
         build-essential \
         curl \
@@ -109,7 +109,7 @@ RUN add-apt-repository ppa:deadsnakes/ppa && \
     python${PYTHON_VERSION} -m pip install pip --upgrade && \
     update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${PYTHON_VERSION} 0 && \
     update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_VERSION} 0 && \
-    pip install nvidia-cudnn-cu${CUDA_VERSION%.*}==${CUDNN_VERSION} 
+    pip install nvidia-cudnn-cu${CUDA_VERSION%.*.*}==${CUDNN_VERSION} 
 
 # Export the environment variable LD_LIBRARY_PATH
 ENV LD_LIBRARY_PATH lib/:/usr/local/lib/python${PYTHON_VERSION}/dist-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
