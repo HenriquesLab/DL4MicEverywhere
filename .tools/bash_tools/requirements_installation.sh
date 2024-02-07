@@ -95,6 +95,11 @@ if ! command -v docker &> /dev/null; then
         # Install the latest Docker version
         apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+        # Download the Docker Desktop .deb file v4.27.1 and install it
+        curl https://desktop.docker.com/linux/main/amd64/136059/docker-desktop-4.27.1-amd64.deb -o /tmp/DockerDesktop.deb
+        apt-get -y update
+        apt-get -y install /tmp/DockerDesktop.deb
+
         # Add the current user to the Docker group
         groupadd docker
         usermod -aG docker $USER
@@ -133,11 +138,11 @@ if ! command -v docker &> /dev/null; then
             # To install Rosetta 2 manually from the command line, run the following command:
             softwareupdate --agree-to-license --install-rosetta
 
-            # Download the latest ARM64 Docker installer
-            curl https://desktop.docker.com/mac/main/arm64/Docker.dmg -o /tmp/Docker.dmg
+            # Download the v4.27.1 ARM64 Docker installer
+            curl https://desktop.docker.com/mac/main/arm64/136059/Docker.dmg -o /tmp/Docker.dmg
         else
-            # Download the latest AMD64 Docker installer
-            curl https://desktop.docker.com/mac/main/amd64/Docker.dmg -o /tmp/Docker.dmg
+            # Download the v4.27.1 latest AMD64 Docker installer
+            curl https://desktop.docker.com/mac/main/amd64/136059/Docker.dmg -o /tmp/Docker.dmg
         fi
 
         # Install Docker Desktop
