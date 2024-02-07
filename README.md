@@ -66,7 +66,7 @@ DL4MicEverywhere is designed to make deep learning more accessible, transparent,
 
 Reproduce the demo in the video with the `U-Net (2D) multilabel` notebook and [Bacillus subtilis segmentation data from DeepBacs](https://zenodo.org/records/5639253). Note that run time will vary from minutes to hours depending on the GPU availability and computing resources. 
 
-Refer to the [User Guide](docs/USER_GUIDE.md) and [Requirements Installation Guidelines](docs/REQUIREMENTS_INSTALLATION.md) for further details.
+Refer to the [Step-by-step "How to" guide](docs/USER_GUIDE.md) and [Requirements Installation Guidelines](docs/REQUIREMENTS_INSTALLATION.md) for further details.
 ### Requirements
 
 - Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop)).
@@ -100,14 +100,14 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 ## Documentation
 
 - [Requirements Installation Guidelines](docs/REQUIREMENTS_INSTALLATION.md)
-- [User Guide](docs/USER_GUIDE.md)
-  - [Data Preparation](docs/DATA.md)
-  - [Remote Connection](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/GUI_USER_GUIDE.md#connection-with-remote-workstations-through-ssh)
-- [Notebooks](https://github.com/HenriquesLab/DL4MicEverywhere/tree/main/notebooks)
+- [Step-by-step "How to" guide](docs/USER_GUIDE.md)
+- [Remote Connection](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/GUI_USER_GUIDE.md#connection-with-remote-workstations-through-ssh)
+- Notebooks
   - [Notebook Types](docs/NOTEBOOK_TYPES.md)
   - [Notebook List](docs/NOTEBOOKS.md)
+  - [Notebooks Folders](https://github.com/HenriquesLab/DL4MicEverywhere/tree/main/notebooks)
 - [Docker Desktop](docs/DOCKER_DESKTOP.md)
-- [Technical Design](docs/DESIGN.md)
+- [DL4MicEverywhere Technical Design](docs/DESIGN.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [FAQ](docs/FAQ.md)
 - [Contributing Guidelines](CONTRIBUTING.md) 
