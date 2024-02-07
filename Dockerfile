@@ -67,58 +67,21 @@ RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION} && \
     . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
 ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 
-
-ENV CUDNN_VERSION=8.6.0.163
-ENV TF_TENSORRT_VERSION=8.4.3
-ENV CUDA=11.8
-ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
-
-RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub 
-
-RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub && \
-    apt-get update && apt-get install -y --no-install-recommends \
-        ca-certificates \
-        cuda-command-line-tools-11-8 \
-        cuda-nvrtc-11-8 \
-        libcublas-11-8 \
-        libcublas-dev-11-8 \
-        libcufft-11-8 \
-        libcurand-11-8 \
-        libcusolver-11-8 \
-        libcusparse-11-8 \
-        libcudnn8=${CUDNN_VERSION}-1+cuda${CUDA} \
-        libgomp1 \
-        build-essential \
-        curl \
-        libfreetype6-dev \
-        pkg-config \
-        software-properties-common \
-        unzip \
-        wget \
-        git \
-        libopenmpi-dev \
-        libxext6 \
-        libsm6 \
-        ffmpeg  && \
+# Install common packages
+RUN apt-get update && \
+    apt-get install -y build-essential \
+                       software-properties-common \
+                       wget \ 
+                       unzip \
+                       git \
+                       libsm6 \
+                       libxext6 \
+                       libopenmpi-dev \
+                       libfreetype6-dev \
+                       ffmpeg \
+                       pkg-config && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-# # Install common packages and nvidia-cuda-toolkit
-# RUN apt-get update && \
-#     apt-get install -y build-essential \
-#                        software-properties-common \
-#                        wget \ 
-#                        unzip \
-#                        git \
-#                        libsm6 \
-#                        libxext6 \
-#                        libopenmpi-dev \
-#                        libfreetype6-dev \
-#                        ffmpeg \
-#                        pkg-config && \
-#     if [ "$GPU_FLAG" -eq "1" ] ; then apt-get install -y nvidia-cuda-toolkit ; fi && \
-#     apt-get clean && \
-#     rm -rf /var/lib/apt/lists/*
 
 # Instal Python 
 RUN add-apt-repository ppa:deadsnakes/ppa && \
@@ -128,11 +91,6 @@ RUN add-apt-repository ppa:deadsnakes/ppa && \
     python${PYTHON_VERSION} -m pip install pip --upgrade && \
     update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${PYTHON_VERSION} 0 && \
     update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_VERSION} 0
-
-# Run nvidia-cudnn-cu11 for Python
-RUN if [ "$GPU_FLAG" -eq "1" ] ; then pip install nvidia-cudnn-cu11==8.6.0.163 ; fi
-# And export the environment variable LD_LIBRARY_PATH
-ENV LD_LIBRARY_PATH lib/:/usr/local/lib/python${PYTHON_VERSION}/dist-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
 
 # Set the working directory
 WORKDIR /home 
@@ -175,7 +133,5 @@ RUN pip install --upgrade pip && \
     
 # Copy the converted notebook from stage 1
 COPY --from=notebook_autoconversion /home/${NOTEBOOK_NAME} /home/docker_info.txt /home
-
-ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/lib/cuda
 
 CMD bash
