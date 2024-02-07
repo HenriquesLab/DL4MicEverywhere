@@ -115,7 +115,13 @@ if ! command -v docker &> /dev/null; then
 
         # Launch Docker Desktop
         # launchctl start docker
-        open -a Docker
+        open -a Docker &
+        pid_docker=$!
+        wait $pid_docker
+        # # Wait for Docker Desktop to start
+        # while ! docker info &> /dev/null; do
+        #     sleep 1
+        # done
 
     elif [[ "$OSTYPE" == "msys*" ]]; then
         # Windows
