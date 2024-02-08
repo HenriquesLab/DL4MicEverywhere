@@ -9,12 +9,14 @@ set fexist [file exist $filename]
 
 if {"$fexist" == "1"} {
     #  read the file one line at a time
-    set fp [open $filename r]
-    while { [gets $fp data] >= 0 } {
-        set e [split $data " : "]
-        eval "set cache_[lindex $e 0] \"[lindex $e 3]\""
+    set fp [open "$filename" r]
+    while { [gets "$fp" data] >= 0 } {
+        set e [split "$data" ":"]
+        set varname [string trim [lindex "$e" 0]]
+        set varvalue [string trim [lindex "$e" 1]]
+        eval "set cache_$varname \"$varvalue\""
     }
-    close $fp
+    close "$fp"
 } else {
     set cache_data_path ""
     set cache_result_path ""
