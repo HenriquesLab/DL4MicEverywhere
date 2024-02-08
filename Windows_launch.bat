@@ -52,4 +52,4 @@ if %defaultdist%==0 (
 )
 
 :: At this point Ubuntu is installed and as the default distribution, run the launch.sh inside the WSL
-wsl.exe -d Ubuntu bash -E launch.sh
+wsl.exe -d Ubuntu bash -E Linux_launch.sh
