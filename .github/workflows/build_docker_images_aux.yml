@@ -125,7 +125,7 @@ jobs:
           push: true
           tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64
           build-args: |
-            UBUNTU_VERSION=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
+            UBUNTU_VERSION=${{ needs.get_arguments.outputs.ubuntu_version }}
             GPU_FLAG=0
             PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
             PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
