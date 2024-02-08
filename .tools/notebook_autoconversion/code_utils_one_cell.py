@@ -251,6 +251,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
     widget_code = ''
     non_widget_code = ''
     cache_code = ''
+    futute_imports = ''
     
     # List of variables and functions that need to be defined as global
     widget_var_list = []
@@ -300,7 +301,12 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                 func_list.append(function_match.group(1))
 
             # And the line is added as it is
-            non_widget_code += line + '\n'
+            if re.match("from __future__ import.*", line) or re.match("import __future__.*", line):
+                # In case it is a future import, it is added to the future imports
+                futute_imports += line + '\n'
+            else:
+                # In case it is not a future import, it is added to the non widget code
+                non_widget_code += line + '\n'
 
     new_cells = []
 
@@ -338,7 +344,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
             code_cell += ipywidget_imported_code
             ipywidget_imported = True
 
-        code_cell += ("clear_output()\n\n" # In orther to renew the ipywidgets
+        code_cell += futute_imports + ("clear_output()\n\n" # In orther to renew the ipywidgets
                     ) + widget_code + ( # Add the code with the widgets at the begining of the cell
                     f"\ndef {function_name}(output_widget):\n" # The function that will be called whwn clicking the button
                     "  output_widget.clear_output()\n" # Clear the output that was displayed when calling the function
@@ -384,6 +390,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
         code_cell += ("internal_aux_initial_time=datetime.now()\n" 
                       "print('Runnning...')\n"
                       "print('--------------------------------------')\n")
+        code_cell +=  futute_imports
         code_cell +=  non_widget_code
         
         code_cell += ("print('--------------------------------------')\n"
