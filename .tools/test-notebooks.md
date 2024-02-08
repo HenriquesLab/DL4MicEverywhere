@@ -17,7 +17,7 @@
 |  4 | CycleGAN                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :x:                    |
 |  5 | DFCAN                           | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :x: <sup>1</sup>       | :small_orange_diamond: |
 |  6 | DRMIME                          | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
-|  7 | DecoNoising (2D)                | :white_check_mark:   | :white_check_mark: | :x:                | :x: <sup>2</sup> 	 | :x: <sup>2</sup> 	  | :x: 		   |
+|  7 | DecoNoising (2D)                | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :x: <sup>2</sup> 	 | :x: <sup>2</sup> 	  | :x: 		   |
 |  8 | Deep-STORM                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
 |  9 | DenoiSeg                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
 | 10 | Detectron2                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
@@ -26,15 +26,15 @@
 | 13 | Label-free prediction (fnet) 2D | :white_check_mark:   | :white_check_mark: | :apple:            | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 14 | Label-free prediction (fnet) 3D | :white_check_mark:   | :white_check_mark: | :apple:            | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 15 | MaskRCNN (2D)                   | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
-| 16 | Noise2Void (2D)                 | :white_check_mark:   | :white_check_mark: | :x:                | :small_orange_diamond: | :small_orange_diamond: | :x: 		   |
-| 17 | Noise2Void (3D)                 | :white_check_mark:   | :white_check_mark: | :x:                | :small_orange_diamond: | :small_orange_diamond: | :x: 		   |
+| 16 | Noise2Void (2D)                 | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :x: 		   |
+| 17 | Noise2Void (3D)                 | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :x: 		   |
 | 18 | RetinaNet                       | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 19 | SplineDist (2D)                 | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 20 | StarDist (2D)                   | :white_check_mark:   | :white_check_mark: | :x:                | :white_check_mark:     | :white_check_mark:     | :x:                    |
 | 21 | StarDist (3D)                   | :white_check_mark:   | :white_check_mark: | :x:                | :small_orange_diamond: | :small_orange_diamond: | :x:                    |
-| 22 | U-Net (2D)                      | :white_check_mark:   | :white_check_mark: | :apple:            | :small_orange_diamond: | :small_orange_diamond: | :white_check_mark:     |
-| 23 | U-Net (2D) Multilabel           | :white_check_mark:   | :white_check_mark: | :apple:            | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
-| 24 | U-Net (3D)                      | :white_check_mark:   | :white_check_mark: | :apple:            | :white_check_mark:     | :white_check_mark:     | :small_orange_diamond: |
+| 22 | U-Net (2D)                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :white_check_mark:     |
+| 23 | U-Net (2D) Multilabel           | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
+| 24 | U-Net (3D)                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :small_orange_diamond: |
 | 25 | WGAN                            | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 26 | YOLOv2                          | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 27 | pix2pix                         | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
