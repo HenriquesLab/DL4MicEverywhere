@@ -1,6 +1,13 @@
 # DL4MicEverywhere Requirements Installation Guidelines
 
-The installation guideline will be different depending on your operative system. Select the operative system on you computer and follow the indicated steps:
+
+### Requirements
+
+- Docker installed on your system.
+- For GPU usage - NVIDIA GPU + CUDA drivers.
+- If you want to run the graphical user interface (GUI), [Tcl/Tk](https://www.tcl.tk/) must be installed on your computer. 
+
+The installation guidelines will be different depending on your operative system. Select the operative system on you computer and follow the indicated steps:
 
 <details>
 <summary>On Windows:</summary>
