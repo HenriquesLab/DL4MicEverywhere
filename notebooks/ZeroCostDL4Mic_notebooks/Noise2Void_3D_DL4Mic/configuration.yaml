@@ -14,8 +14,8 @@ config:
     cuda_version: 11.8.0
     cudnn_version: 8.6.0.163
     description: Noise2Void_3D_DL4Mic is the conversion of the 3D Noise2Void from ZeroCostDL4Mic.
-    dl4miceverywhere_version: 1.0.0
-    docker_hub_image: noise2void_3d_zerocostdl4mic-z1.16.2-d1.0.0
+    dl4miceverywhere_version: 2.0.0
+    docker_hub_image: noise2void_3d_zerocostdl4mic-z1.16.2-d2.0.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/Noise2Void_3D_ZeroCostDL4Mic.ipynb
     notebook_version: 1.16.2
     python_version: '3.10'
