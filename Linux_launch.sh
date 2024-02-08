@@ -1,8 +1,8 @@
 #!/bin/bash
 BASEDIR=$(dirname "$(readlink -f "$0")")
-
+            
 # Run pre_launch_test.sh, stop if it fails
-/bin/bash $BASEDIR/.tools/pre_launch_test.sh || exit 1
+/bin/bash $BASEDIR/.tools/bash_tools/pre_launch_test.sh || exit 1
 
 # Function with the text to describe the usage of the bash script
 usage() {
@@ -54,11 +54,24 @@ check_parsed_argument() {
     if [ -z "${!config_variable_name}" ]; then
         if [ -z "${!variable_name}" ]; then
             echo "$variable_name parameter is not specified on the configuration yaml."
+            # Close the terminal
             exit 1
         fi
     else
         rename_parsed_argument $variable_name
     fi
+}
+
+function cache_gui {
+    echo "data_path : $1
+result_path : $2
+selected_folder : $3
+selected_notebook : $4
+config_path : $5
+notebook_path : $6
+requirements_path : $7
+gpu_flag : $8
+tag : $9" > $BASEDIR/.tools/.cache_gui
 }
 
 # Function to parse and read the configuration yaml file
@@ -114,6 +127,7 @@ while getopts :hc:d:o:gn:r:t:x flag;do
         \?)
             echo "Invalid option: -$OPTARG"
             echo "Try bash ./launch.sh -h for more information."
+            # Close the terminal
             exit 1 ;;
     esac
 done
@@ -137,9 +151,10 @@ if [ $gui_flag -eq 0 ]; then
     fi
 else
     # If the GUI flag has been specified, run the function to show the GUI and read the arguments
-    gui_arguments=$(wish $BASEDIR/.tools/main_gui.tcl $BASEDIR $OSTYPE)
+    gui_arguments=$(wish $BASEDIR/.tools/tcl_tools/main_gui.tcl $BASEDIR $OSTYPE)
 
     if [ -z "$gui_arguments" ]; then
+        # Close the terminal
         exit 1
     fi
 
@@ -154,6 +169,8 @@ else
         selectedNotebook="${strarr[4]}"
         gpu_flag="${strarr[5]}"
         tag_aux="${strarr[6]}"
+
+        cache_gui "$data_path" "$result_path" "$selectedFolder" "$selectedNotebook" "" "" "" "$gpu_flag" "$tag_aux"
 
         if [ "$tag_aux" != "-" ]; then
             docker_tag="$tag_aux"
@@ -172,6 +189,8 @@ else
         gpu_flag="${strarr[6]}"
         tag_aux="${strarr[7]}"
 
+        cache_gui "$data_path" "$result_path" "" "" "$config_path" "$notebook_aux" "$requirements_aux" "$gpu_flag" "$tag_aux"
+
         if [ "$notebook_aux" != "-" ]; then
             notebook_path="$notebook_aux"
         fi
@@ -187,6 +206,8 @@ fi
 if [ -z "$config_path" ]; then 
     # If no configuration path has been specified, then exit with the error
     echo "No path to the configuration.yaml file has been specified, please make sure to use -c argument and give a value to it."
+    
+    # Close the terminal
     exit 1
 else
     # If a configuration path has been specified, check if it is valid
@@ -201,6 +222,8 @@ else
         fi
     else
         echo "$config_path is not valid."
+        
+        # Close the terminal
         exit 1
     fi
 fi 
@@ -208,7 +231,9 @@ fi
 if [ -z "$data_path" ]; then 
     # Exit with an error if no data path is specified
     echo "Please specify a path to the data folder using the -d argument."
-    exit 1
+    
+        # Close the terminal
+        exit 1
 else
     # Validate the specified data path
     if [[ -d "$data_path" ]]; then
@@ -217,6 +242,8 @@ else
         fi
     else
         echo "The specified data path $data_path is not valid."
+        
+        # Close the terminal
         exit 1
     fi
 fi 
@@ -224,6 +251,8 @@ fi
 if [ -z "$result_path" ]; then 
     # Exit with an error if no result path is specified
     echo "Please specify a path to the output folder using the -o argument."
+    
+    # Close the terminal
     exit 1
 else
     # Validate the specified result path
@@ -233,6 +262,8 @@ else
         fi
     else
         echo "The specified result path $result_path is not valid."
+        
+        # Close the terminal
         exit 1
     fi
 fi 
@@ -246,8 +277,6 @@ if [ "$test_flag" -eq 1 ]; then
     fi
 fi
 
-echo "$config_path"
-
 # Read the variables from the yaml file
 eval $(parse_yaml "$config_path")
 
@@ -255,6 +284,7 @@ eval $(parse_yaml "$config_path")
 check_parsed_argument notebook_url
 check_parsed_argument requirements_url
 check_parsed_argument cuda_version
+check_parsed_argument cudnn_version
 check_parsed_argument ubuntu_version
 check_parsed_argument python_version
 check_parsed_argument sections_to_remove
@@ -262,13 +292,6 @@ check_parsed_argument notebook_version
 check_parsed_argument description
 rename_parsed_argument dl4miceverywhere_version # Not required to be present and therefore the cheking is skipped
 rename_parsed_argument docker_hub_image # Not required to be present and therefore the cheking is skipped
-
-# Base image is selected based on the GPU selection
-if [ "$gpu_flag" -eq 1 ]; then
-   base_img="nvidia/cuda:${cuda_version}-base-ubuntu${ubuntu_version}"
-else
-   base_img="ubuntu:${ubuntu_version}"
-fi
 
 if [ -z "$notebook_path" ]; then
     # Use the URL from the configuration file if no local notebook path is specified
@@ -302,6 +325,8 @@ else
         local_notebook_flag=1
     else
         echo "$notebook_path does not exist."
+        
+        # Close the terminal
         exit 1
     fi
 fi
@@ -323,6 +348,8 @@ else
         local_requirements_flag=1
     else
         echo "$requirements_path does not exist."
+        
+        # Close the terminal
         exit 1
     fi
 fi
@@ -372,10 +399,11 @@ fi
 
 
 # Set the docker's tag
-
 if [ "$test_flag" -eq 1 ]; then
     echo ""
-    echo "base_img: $base_img"
+    echo "ubuntu_version: $ubuntu_version"
+    echo "cuda_version: $cuda_version"
+    echo "cudnn_version: $cudnn_version"
     echo "python_version: $python_version"
     echo "notebook_path: $notebook_path"
     echo "requirements_path: $requirements_path"
@@ -409,7 +437,7 @@ if grep -q credsStore ~/.docker/config.json; then
 fi
 
 # Execute the pre building tests
-/bin/bash $BASEDIR/.tools/pre_build_test.sh || exit 1
+/bin/bash $BASEDIR/.tools/bash_tools/pre_build_test.sh || exit 1
 
 # Check if an image with that tag exists locally and ask if the user whants to replace it.
 build_flag=0
@@ -422,7 +450,7 @@ else
     if docker image inspect $docker_tag >/dev/null 2>&1; then
         if [ "$gui_flag" -eq 1 ]; then 
             # If the GUI flag has been specified, show a window for ansewring local question
-            build_flag=$(wish $BASEDIR/.tools/local_img_gui.tcl)
+            build_flag=$(wish $BASEDIR/.tools/tcl_tools/local_img_gui.tcl)
         else
             echo "Image exists locally. Do you want to build and replace the existing one?"
             select yn in "Yes" "No"; do
@@ -455,7 +483,7 @@ else
                 # In case the architecture is available
                 if [ "$gui_flag" -eq 1 ]; then 
                     # If the GUI flag has been specified, show a window for ansewring hub question
-                    build_flag=$(wish $BASEDIR/.tools/hub_img_gui.tcl)
+                    build_flag=$(wish $BASEDIR/.tools/tcl_tools/hub_img_gui.tcl)
                 else
                     echo "The image ${docker_tag} is already available on docker hub. Do you preffer to pull it (faster option) instead of building it?"
                     select yn in "Yes" "No"; do
@@ -475,8 +503,6 @@ else
     fi
 fi
 
-echo $docker_tag
-
 # Pull the docker image from docker hub
 if [ "$build_flag" -eq 3 ]; then
     docker pull "$docker_tag"
@@ -484,14 +510,29 @@ if [ "$build_flag" -eq 3 ]; then
 else
     # Build the docker image without GUI
     if [ "$build_flag" -eq 2 ]; then
-        docker build $BASEDIR --no-cache -t $docker_tag \
-            --build-arg BASE_IMAGE="${base_img}" \
-            --build-arg GPU_FLAG="${gpu_flag}" \
-            --build-arg PYTHON_VERSION="${python_version}" \
-            --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
-            --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
-            --build-arg NOTEBOOK_NAME="${notebook_name}" \
-            --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}"
+        if [ "$gpu_flag" -eq 1 ]; then
+            docker build --file $BASEDIR/Dockerfile.gpu -t $docker_tag $BASEDIR\
+                --build-arg UBUNTU_VERSION="${ubuntu_version}" \
+                --build-arg CUDA_VERSION="${cuda_version}" \
+                --build-arg CUDNN_VERSION="${cudnn_version}" \
+                --build-arg GPU_FLAG="${gpu_flag}" \
+                --build-arg PYTHON_VERSION="${python_version}" \
+                --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
+                --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
+                --build-arg NOTEBOOK_NAME="${notebook_name}" \
+                --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" \
+                --build-arg CACHEBUST=$(date +%s)
+        else
+            docker build --file $BASEDIR/Dockerfile -t $docker_tag $BASEDIR\
+                --build-arg UBUNTU_VERSION="${ubuntu_version}" \
+                --build-arg GPU_FLAG="${gpu_flag}" \
+                --build-arg PYTHON_VERSION="${python_version}" \
+                --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
+                --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
+                --build-arg NOTEBOOK_NAME="${notebook_name}" \
+                --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" \
+                --build-arg CACHEBUST=$(date +%s)
+        fi
 
         DOCKER_OUT=$? # Gets if the docker image has been built
     else
@@ -500,13 +541,15 @@ else
         else
             # build flag is still 0, an error ocurred
             echo "Error building the docker image"
+            
+            # Close the terminal
             exit 1
         fi
     fi
 fi
 
 # Execute the post building tests
-/bin/bash $BASEDIR/.tools/post_build_test.sh || exit 1
+/bin/bash $BASEDIR/.tools/bash_tools/post_build_test.sh || exit 1
 
 # Local files, if included, need to be removed to avoid the overcrowding the folder
 if [ "$local_notebook_flag" -eq 1 ]; then
@@ -535,16 +578,37 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
         fi
     done
 
+    # Based on the openssl command and the base64 encoding, a 50 characters token is generated
+    notebook_token=$(openssl rand -base64 50 | tr -dc 'a-zA-Z0-9')
+
+    echo ""
+    echo "################################################################################################################################"
+    echo ""
+    echo "   The generated token for the notebook is: $notebook_token"
+    echo ""
+    echo "################################################################################################################################"
+    echo ""
+
+    # Launch a subprocess to open the browser with the port in 10 seconds
+    /bin/bash $BASEDIR/.tools/bash_tools/open_browser.sh http://localhost:$port/lab/tree/$notebook_name/?token=$notebook_token &
+
+    # Define the command that will be run when the docker image is launched
+    docker_command="jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token; cp /home/docker_info.txt /home/results/docker_info.txt; cp /home/$notebook_name /home/results/$notebook_name;" 
+
     if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
-        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" jupyter lab "${notebook_name}" --ip='0.0.0.0' --port=$port --no-browser --allow-root
+        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag"  /bin/bash -c "$docker_command"
     else
         # Run the docker image without activating the GPU
-        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag" jupyter lab "${notebook_name}" --ip='0.0.0.0' --port=$port --no-browser --allow-root
+        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag"  /bin/bash -c "$docker_command"
     fi
 else
     echo "The docker image has not been built."
     if [ "$test_flag" -eq 1 ]; then
+        # Close the terminal
         exit 1
     fi
 fi
+
+# Close the terminal
+exit 1

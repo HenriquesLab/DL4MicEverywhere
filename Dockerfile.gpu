@@ -1,6 +1,5 @@
-
 ARG UBUNTU_VERSION
-
+ARG CUDA_VERSION
 ####
 ## Stage 1 - Download and convert the notebook
 ####
@@ -21,6 +20,8 @@ ARG NOTEBOOK_NAME
 ARG GPU_FLAG
 ARG PYTHON_VERSION
 ARG UBUNTU_VERSION
+ARG CUDA_VERSION
+ARG CUDNN_VERSION
 
 # Custom cache invalidation
 ARG CACHEBUST=1
@@ -35,13 +36,14 @@ ADD $PATH_TO_NOTEBOOK ./${NOTEBOOK_NAME}
 RUN git clone --branch reduce_code https://github.com/HenriquesLab/DL4MicEverywhere.git  && \
     python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py -p . -n ${NOTEBOOK_NAME} -s ${SECTIONS_TO_REMOVE}  && \
     mv colabless_${NOTEBOOK_NAME} ${NOTEBOOK_NAME}  && \
-    python DL4MicEverywhere/.tools/python_tools/create_docker_info.py "/home/docker_info.txt" "${UBUNTU_VERSION}" "" "" "${PATH_TO_NOTEBOOK}" "${PATH_TO_REQUIREMENTS}" \
-       "${SECTIONS_TO_REMOVE}"  "${NOTEBOOK_NAME}" "${GPU_FLAG}" "${PYTHON_VERSION}"
+    python DL4MicEverywhere/.tools/python_tools/create_docker_info.py "/home/docker_info.txt" \
+        "${UBUNTU_VERSION}" "${CUDA_VERSION}" "${CUDNN_VERSION}" "${PATH_TO_NOTEBOOK}" "${PATH_TO_REQUIREMENTS}" \
+        "${SECTIONS_TO_REMOVE}"  "${NOTEBOOK_NAME}" "${GPU_FLAG}" "${PYTHON_VERSION}"
 
 ####
 ## Stage 2 - Set the final image (install packages, python, python libraries)
 ####
-FROM ubuntu:${UBUNTU_VERSION} AS final
+FROM nvidia/cuda:${CUDA_VERSION}-base-ubuntu${UBUNTU_VERSION} AS final
 
 # Read all the arguments
 ARG PATH_TO_NOTEBOOK=""
@@ -50,6 +52,7 @@ ARG SECTIONS_TO_REMOVE=""
 ARG NOTEBOOK_NAME=""
 ARG GPU_FLAG=""
 ARG PYTHON_VERSION=""
+ARG CUDNN_VERSION=""
 
 # Set the language
 ENV LANG=C.UTF-8
@@ -69,30 +72,49 @@ RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION} && \
     . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
 ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 
-# Install common packages
-RUN apt-get update && \
-    apt-get install -y build-essential \
-                       software-properties-common \
-                       wget \ 
-                       unzip \
-                       git \
-                       libsm6 \
-                       libxext6 \
-                       libopenmpi-dev \
-                       libfreetype6-dev \
-                       ffmpeg \
-                       pkg-config && \
+ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
+
+# Install common packages and cuda libraries 
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub && \
+    apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        cuda-command-line-tools-${CUDA_VERSION%.*.*}-8 \
+        cuda-nvrtc-${CUDA_VERSION%.*.*}-8 \
+        libcublas-${CUDA_VERSION%.*.*}-8 \
+        libcublas-dev-${CUDA_VERSION%.*.*}-8 \
+        libcufft-${CUDA_VERSION%.*.*}-8 \
+        libcurand-${CUDA_VERSION%.*.*}-8 \
+        libcusolver-${CUDA_VERSION%.*.*}-8 \
+        libcusparse-${CUDA_VERSION%.*.*}-8 \
+        libcudnn8=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*} \
+        libgomp1 \
+        build-essential \
+        curl \
+        libfreetype6-dev \
+        pkg-config \
+        software-properties-common \
+        unzip \
+        wget \
+        git \
+        libopenmpi-dev \
+        libxext6 \
+        libsm6 \
+        ffmpeg  && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Instal Python 
+# Instal Python and nvidia-cudnn-cuXX for Python
 RUN add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && apt-get install -y \
     python${PYTHON_VERSION} python${PYTHON_VERSION}-dev python3-pip python${PYTHON_VERSION}-venv && \
     rm -rf /var/lib/apt/lists/* && \
     python${PYTHON_VERSION} -m pip install pip --upgrade && \
     update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${PYTHON_VERSION} 0 && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_VERSION} 0
+    update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_VERSION} 0 && \
+    pip install nvidia-cudnn-cu${CUDA_VERSION%.*.*}==${CUDNN_VERSION} 
+
+# Export the environment variable LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH lib/:/usr/local/lib/python${PYTHON_VERSION}/dist-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
 
 # Set the working directory
 WORKDIR /home 
@@ -135,5 +157,7 @@ RUN pip install --upgrade pip && \
     
 # Copy the converted notebook from stage 1
 COPY --from=notebook_autoconversion /home/${NOTEBOOK_NAME} /home/docker_info.txt /home
+
+ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/lib/cuda
 
 CMD bash

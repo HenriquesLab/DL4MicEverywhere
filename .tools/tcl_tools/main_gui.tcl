@@ -1,6 +1,33 @@
 #! /usr/local/bin/wish
 
+# Set the BASEDIR
 set basedir [lindex $argv 0]
+
+# Check if there is cache information
+set filename "$basedir/.tools/.cache_gui"
+set fexist [file exist $filename]
+
+if {"$fexist" == "1"} {
+    #  read the file one line at a time
+    set fp [open "$filename" r]
+    while { [gets "$fp" data] >= 0 } {
+        set e [split "$data" ":"]
+        set varname [string trim [lindex "$e" 0]]
+        set varvalue [string trim [lindex "$e" 1]]
+        eval "set cache_$varname \"$varvalue\""
+    }
+    close "$fp"
+} else {
+    set cache_data_path ""
+    set cache_result_path ""
+    set cache_selected_folder ""
+    set cache_selected_notebook ""
+    set cache_config_path ""
+    set cache_notebook_path ""
+    set cache_requirements_path ""
+    set cache_gpu_flag ""
+    set cache_tag ""
+}
 
 # Define the shape of the window
 set width 600
@@ -54,6 +81,64 @@ proc onSelectResult {} {
 
     set file [tk_chooseDirectory -parent .]
     set result_path $file
+}
+
+proc onLoadCache {} {
+    # Cached information
+    global cache_data_path
+    global cache_result_path
+    global cache_selected_folder
+    global cache_selected_notebook
+    global cache_config_path
+    global cache_notebook_path
+    global cache_requirements_path
+    global cache_gpu_flag
+    global cache_tag
+
+    # Variables from the widgets
+    global data_path
+    global result_path
+    global selectedFolder
+    global selectedNotebook
+    global yaml_path
+    global ipynb_path
+    global txt_path
+    global gpu
+    global tag
+
+    if  {"$cache_data_path" != ""} {
+        set data_path "$cache_data_path"
+    }
+    if  {"$cache_result_path" != ""} {
+        set result_path "$cache_result_path"
+    }
+    if  {"$cache_selected_folder" != ""} {
+        set selectedFolder "$cache_selected_folder"
+    }
+    if  {"$cache_selected_notebook" != ""} {
+        set selectedNotebook "$cache_selected_notebook"
+    }
+    if  {"$cache_config_path" != ""} {
+        set yaml_path "$cache_config_path"
+    }
+    if  {"$cache_notebook_path" != ""} {
+        set ipynb_path "$cache_notebook_path"
+    }
+    if  {"$cache_requirements_path" != ""} {
+        set txt_path "$cache_requirements_path"
+    }
+    if  {"$cache_gpu_flag" != ""} {
+        set gpu "$cache_gpu_flag"
+    }
+    if  {"$cache_tag" != ""} {
+        set tag "$cache_tag"
+    }
+    
+    # Update the information in the description box
+    if {"$selectedNotebook" != "-"} {
+        parseYaml $selectedNotebook
+    }
+
 }
 
 proc onDone {} {
@@ -150,7 +235,8 @@ proc onAdvanced {} {
         place .fr.principal.result_entry -relx 0.02 -rely [expr 0.82 / ( 2 - $advanced_options ) ]
         place .fr.principal.result_btn -relx 0.85 -rely [expr 0.825 / ( 2 - $advanced_options ) ]
 
-        place .fr.principal.gpu -relx 0.05 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
+        place .fr.principal.gpu -relx 0.15 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
+        place .fr.principal.cache_btn -relx 0.6 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
 
         .fr.principal.notebook_description configure -height [expr 1 + ($is_mac * 2)] 
         .fr.principal.notebook_description delete 0.0 end
@@ -175,7 +261,8 @@ proc onAdvanced {} {
         place .fr.principal.result_entry -relx 0.02 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
         place .fr.principal.result_btn -relx 0.85 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
 
-        place .fr.principal.gpu -relx 0.05 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+        place .fr.principal.gpu -relx 0.15 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+        place .fr.principal.cache_btn -relx 0.6 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
 
         .fr.principal.notebook_description configure -height [expr 4 + ($is_mac * 2)] 
         .fr.principal.notebook_description delete 0.0 end
@@ -247,7 +334,7 @@ proc parseYaml {notebook_name} {
     global selectedFolder
 
     # Read a yaml file
-    catch {exec /bin/bash $basedir/.tools/parse_yaml.sh "$basedir" "$selectedFolder" "$notebook_name"} output
+    catch {exec /bin/bash $basedir/.tools/bash_tools/parse_yaml.sh "$basedir" "$selectedFolder" "$notebook_name"} output
 
     set arguments [split $output \n]
 
@@ -419,13 +506,24 @@ set result_path ""
 # Define the checkbutton for the GPU usage
 
 checkbutton .fr.principal.gpu -text "Allow GPU" -variable gpu
-place .fr.principal.gpu -relx 0.05 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+place .fr.principal.gpu -relx 0.15 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
 
 # Disable the GPU option in case 'nvidia-smi' command is not found
 if { [catch { exec nvidia-smi } msg] } {
     .fr.principal.gpu configure -state disable
 }
 
+
+# Define a button to load cached data if there is so
+
+button .fr.principal.cache_btn -text "Load previous settings" \
+        -command "onLoadCache"
+place .fr.principal.cache_btn -relx 0.55 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+
+# Disable the cache if no cache file is found
+if {"$fexist" == "0"} {
+    .fr.principal.cache_btn configure -state disable
+}
 
 ##### Advanced arguments section #####
 

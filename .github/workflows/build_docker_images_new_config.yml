@@ -15,6 +15,7 @@ jobs:
       notebook_url: ${{ steps.notebook_url.outputs.result }}
       requirements_url: ${{ steps.requirements_url.outputs.result }}
       cuda_version: ${{ steps.cuda_version.outputs.result }}
+      cudnn_version: ${{ steps.cudnn_version.outputs.result }}
       ubuntu_version: ${{ steps.ubuntu_version.outputs.result }}
       python_version: ${{ steps.python_version.outputs.result }}
       sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}
@@ -29,9 +30,9 @@ jobs:
       - name: Install requirements
         run: pip install -r .tools/requirements.txt
       - name: Update the version of the notebook on the configuration
-        run: python3 .tools/update_zerocost_version.py '${{ inputs.config_file }}' 
+        run: python3 .tools/python_tools/update_zerocost_version.py '${{ inputs.config_file }}' 
       - name: Update the docker_tag on the configuration
-        run: python3 .tools/update_configuration.py '${{ inputs.config_file }}' 
+        run: python3 .tools/python_tools/update_configuration.py '${{ inputs.config_file }}' 
 
       # Now that the configuration is updated, we can extract the arguments
       - name: Check notebook_url attribute on configuration.yaml
@@ -49,6 +50,11 @@ jobs:
         id: cuda_version
         with:
           cmd: yq '.config.dl4miceverywhere.cuda_version' '${{ inputs.config_file }}' 
+      - name: Check cudnn_version attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: cudnn_version
+        with:
+          cmd: yq '.config.dl4miceverywhere.cudnn_version' '${{ inputs.config_file }}' 
       - name: Check ubuntu_version attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: ubuntu_version
@@ -92,6 +98,7 @@ jobs:
           echo 'notebook_url: ${{ steps.notebook_url.outputs.result }}'
           echo 'requirements_url: ${{ steps.requirements_url.outputs.result }}'
           echo 'cuda_version: ${{ steps.cuda_version.outputs.result }}'
+          echo 'cudnn_version: ${{ steps.cudnn_version.outputs.result }}'
           echo 'ubuntu version: ${{ steps.ubuntu_version.outputs.result }}'
           echo 'python_version: ${{ steps.python_version.outputs.result }}'
           echo 'sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}'
@@ -143,7 +150,9 @@ jobs:
           push: true
           tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu
           build-args: |
-            BASE_IMAGE=nvidia/cuda:${{ needs.get_arguments.outputs.cuda_version }}-base-ubuntu${{ needs.get_arguments.outputs.ubuntu_version }}
+            UBUNTU_VERSION=${{ needs.get_arguments.outputs.ubuntu_version }}
+            CUDA_VERSION=${{ needs.get_arguments.outputs.cuda_version }}
+            CUDNN_VERSION=${{ needs.get_arguments.outputs.cudnn_version }}
             GPU_FLAG=1
             PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
             PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
@@ -179,7 +188,7 @@ jobs:
           push: true
           tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
           build-args: |
-              BASE_IMAGE=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
+              UBUNTU_VERSION=ubuntu:${{ needs.get_arguments.outputs.ubuntu_version }}
               GPU_FLAG=0
               PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
               PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
@@ -307,9 +316,9 @@ jobs:
       - name: Install requirements
         run: pip install -r .tools/requirements.txt
       - name: Update the version of the notebook on the configuration
-        run: python3 .tools/update_zerocost_version.py '${{ inputs.config_file }}' 
+        run: python3 .tools/python_tools/update_zerocost_version.py '${{ inputs.config_file }}' 
       - name: Update the docker_tag on the configuration
-        run: python3 .tools/update_configuration.py '${{ inputs.config_file }}' 
+        run: python3 .tools/python_tools/update_configuration.py '${{ inputs.config_file }}' 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: GitHub Action - Update the notebook version on the configuration

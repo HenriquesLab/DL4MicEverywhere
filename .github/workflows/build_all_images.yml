@@ -17,7 +17,7 @@ jobs:
       - name: Install requirements
         run: pip install -r .tools/requirements.txt
       - name: Update all the configurations
-        run: python3 .tools/update_configuration.py
+        run: python3 .tools/python_tools/update_configuration.py
       - name: List configurations
         id: config_list
         run: |
@@ -27,7 +27,7 @@ jobs:
           echo "$files_json"
           first=true
           for file in $configurations_list; do
-            python3 .tools/update_configuration.py $file
+            python3 .tools/python_tools/update_configuration.py $file
             echo "$file was changed"
             if [ "$first" = true ]; then
               files_json+=$file

@@ -16,7 +16,7 @@ jobs:
       - name: Install requirements
         run: pip install -r .tools/requirements.txt
       - name: Generate notebooks list
-        run: python3 .tools/list_of_notebooks.py
+        run: python3 .tools/python_tools/list_of_notebooks.py
       - name: Commit the changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:

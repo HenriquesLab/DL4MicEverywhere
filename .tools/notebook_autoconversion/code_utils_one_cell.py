@@ -13,6 +13,33 @@ function_regex = r"^\s*def\s+([a-zA-Z_]\w*)\s*\(.+\)\s*:\s*$"
 raw_regex = r"\{type:\"raw\"\}"
 comment_after_param_regex = r"(\[[^\]]*\]|\{[^}]*\})(?: [^#]*)?(\[[^\]]*\]|\{[^}]*\})* *#.*"
 
+ipywidget_imported_code = ("import ipywidgets as widgets\n" 
+                        "from IPython.display import display, clear_output\n"
+                        "import yaml\n"
+                        "import os\n"
+                        "\n"
+                        "ipywidgets_edit_yaml_config_path = os.path.join(os.getcwd(), 'results', 'widget_prev_settings.yaml')\n"
+                        "\n"
+                        "def ipywidgets_edit_yaml(yaml_path, key, value):\n"
+                        "    if os.path.exists(yaml_path):\n"
+                        "        with open(yaml_path, 'r') as f:\n"
+                        "            config_data = yaml.safe_load(f)\n"
+                        "    else:\n"
+                        "        config_data = {}\n"   
+                        "    config_data[key] = value\n"
+                        "    with open(yaml_path, 'w') as new_f:\n"
+                        "        yaml.safe_dump(config_data, new_f, width=10e10, default_flow_style=False)\n"
+                        "\n"
+                        "def ipywidgets_read_yaml(yaml_path, key):\n"
+                        "    if os.path.exists(yaml_path):\n"
+                        "        with open(yaml_path, 'r') as f:\n"
+                        "            config_data = yaml.safe_load(f)\n"
+                        "        value = config_data.get(key, '')\n"
+                        "        return value\n"
+                        "    else:\n"
+                        "        return ''\n"
+                        "\n")    
+
 def param_to_widget(code):
     """
     Extracts components from a line with @param and creates ipywidgets based on the extracted information.
@@ -219,11 +246,12 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
     - new_cells (list): A list of code cells generated from the given code.
     - ipywidget_imported (bool): An updated value indicating whether the `ipywidgets` library has been imported.
     """
- 
-
+    
     # Future lines of code that are based on widgets or not
     widget_code = ''
     non_widget_code = ''
+    cache_code = ''
+    futute_imports = ''
     
     # List of variables and functions that need to be defined as global
     widget_var_list = []
@@ -251,8 +279,15 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
             if needs_to_be_evaluated:
                 # It needs to be evaluated
                 non_widget_code += ' ' * count_spaces(line) + f"{var_name} = eval(widget_{var_name}.value)\n"
+                non_widget_code += ' '*count_spaces(line) + f"ipywidgets_edit_yaml(ipywidgets_edit_yaml_config_path, '{function_name}_{var_name}', eval(widget_{var_name}.value))\n" 
             else:
                 non_widget_code += ' '*count_spaces(line) + f"{var_name} = widget_{var_name}.value\n"
+                non_widget_code += ' '*count_spaces(line) + f"ipywidgets_edit_yaml(ipywidgets_edit_yaml_config_path, '{function_name}_{var_name}', widget_{var_name}.value)\n" 
+
+            cache_code += f"cache_{var_name} = ipywidgets_read_yaml(ipywidgets_edit_yaml_config_path, '{function_name}_{var_name}')\n"
+            cache_code += f"if cache_{var_name} != '':\n"
+            cache_code += f"    widget_{var_name}.value = cache_{var_name}\n\n"
+            
         else:
             # In the other the variable and function names are extracted
             assign_match = re.match(assignation_regex, line)
@@ -266,7 +301,12 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                 func_list.append(function_match.group(1))
 
             # And the line is added as it is
-            non_widget_code += line + '\n'
+            if re.match("from __future__ import.*", line) or re.match("import __future__.*", line):
+                # In case it is a future import, it is added to the future imports
+                futute_imports += line + '\n'
+            else:
+                # In case it is not a future import, it is added to the non widget code
+                non_widget_code += line + '\n'
 
     new_cells = []
 
@@ -275,8 +315,13 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
 
         # For that all the code needs to be tabbed inside the function
         tabbed_non_widget_code = ""
+
         for line in non_widget_code.split('\n'):
             tabbed_non_widget_code += " "*4 + line + '\n'
+
+        tabbed_cache_code = ""
+        for line in cache_code.split('\n'):
+            tabbed_cache_code += " "*4 + line + '\n'
 
         # Global variables that will be inside the function in order to be accesible in the notebook
         global_widgets_var = "".join([" "*4 + f"global {var}\n" for var in widget_var_list])
@@ -296,29 +341,36 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
                     
         if not ipywidget_imported:
             # In case the ipywidgets library have not been imported yet
-            code_cell += ("import ipywidgets as widgets\n" 
-                          "from IPython.display import display, clear_output\n")       
+            code_cell += ipywidget_imported_code
             ipywidget_imported = True
 
-        code_cell += ("clear_output()\n\n" # In orther to renew the ipywidgets
+        code_cell += futute_imports + ("clear_output()\n\n" # In orther to renew the ipywidgets
                     ) + widget_code + ( # Add the code with the widgets at the begining of the cell
                     f"\ndef {function_name}(output_widget):\n" # The function that will be called whwn clicking the button
                     "  output_widget.clear_output()\n" # Clear the output that was displayed when calling the function
                     "  with output_widget:\n" # In order to display the output
                     ) + global_variables + '\n' + tabbed_non_widget_code + ( # Add the global variables and the non widget code
                     "    plt.show()\n" # Add plt.show() in case there is any plot in tab_non_widget_code, so that it can be displayed
-                    "button = widgets.Button(description='Load and run')\n" # Add the button that calls the function
-                    "output = widgets.Output()\n"
-                    "display(button, output)\n\n"
+                    f"\ndef {function_name}_cache(output_widget):\n"
+                    ) + global_variables + '\n' + tabbed_cache_code + (
+                    "\n"
+                    f"button_{function_name} = widgets.Button(description='Load and run')\n" # Add the button that calls the function
+                    f"cache_button_{function_name} = widgets.Button(description='Load prev. settings')\n" # Add the button that calls the cache function
+                    f"output_{function_name} = widgets.Output()\n"
+                    f"display(widgets.HBox((button_{function_name}, cache_button_{function_name})), output_{function_name})\n"
                     f"def aux_{function_name}(_):\n" 
-                    f"  return {function_name}(output)\n\n"
-                    f"button.on_click(aux_{function_name})\n"
+                    f"  return {function_name}(output_{function_name})\n\n"
+                    f"def aux_{function_name}_cache(_):\n" 
+                    f"  return {function_name}_cache(output_{function_name})\n\n"
+                    f"button_{function_name}.on_click(aux_{function_name})\n"
+                    f"cache_button_{function_name}.on_click(aux_{function_name}_cache)\n"
                     )
         
         # Print finnished and final time
-        code_cell += ("print('-------------------------------------------------------')\n"
-                      "print('^ Introduce the arguments and click \"Load and run\" ^')\n") 
-
+        code_cell += ("print('--------------------------------------------------------------')\n"
+                      "print('^ Introduce the arguments and click \"Load and run\". ^')\n"
+                      "print('^ Or first click \"Load prev. settings\" if any previous ^')\n"
+                      "print('^ settings have been saved and then click \"Load and run\". ^')\n") 
 
     else:
         # Otherwise, just add the code
@@ -331,14 +383,14 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
             time_imported = True
         if not ipywidget_imported:
             # In case the ipywidgets library have not been imported yet
-            code_cell += ("import ipywidgets as widgets\n" 
-                          "from IPython.display import display, clear_output\n")       
-            ipywidget_imported = True
+            code_cell += ipywidget_imported_code
+            ipywidget_imported = True    
             
         # Print running and store the initial_time
         code_cell += ("internal_aux_initial_time=datetime.now()\n" 
                       "print('Runnning...')\n"
                       "print('--------------------------------------')\n")
+        code_cell +=  futute_imports
         code_cell +=  non_widget_code
         
         code_cell += ("print('--------------------------------------')\n"
