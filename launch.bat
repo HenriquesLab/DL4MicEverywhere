@@ -17,7 +17,7 @@ if not exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" (
 :: Check if WSL is installed
 for /f "tokens=* USEBACKQ skip=1" %%g in (`wsl --status`) do (set wslworking=%%g)
 :: In case is not installed, install it
-if [%wslworking%]==[] wsl --install
+if ["%wslworking%"]==[] wsl --install
 
 :: Go trough all the WSL distributions in your computer
 for /f "tokens=* USEBACKQ skip=1" %%F in (`wsl --list`) do (

@@ -40,6 +40,9 @@ if ! docker info &> /dev/null; then
                 # Wait until is opened
                 wait $pid_docker
                 sleep 5
+                while ! docker info &> /dev/null; do
+                    sleep 5
+                done
             else
                 # Native Linux
                 systemctl --user start docker-desktop
@@ -47,6 +50,9 @@ if ! docker info &> /dev/null; then
                 # Wait until is opened
                 wait $pid_docker
                 sleep 5
+                while ! docker info &> /dev/null; do
+                    sleep 5
+                done
             fi
 
         elif [[ "$OSTYPE" == "darwin"* ]]; then
@@ -57,6 +63,9 @@ if ! docker info &> /dev/null; then
             # Wait until is opened
             wait $pid_docker
             sleep 5
+            while ! docker info &> /dev/null; do
+                sleep 5
+            done
         elif [[ "$OSTYPE" == "msys*" ]]; then
             # Windows
             echo "This is a Windows machine"
