@@ -12,6 +12,16 @@ The system comprises the following key components:
 - Configuration files detailing notebook specifics.
 - Interactive Jupyter Notebooks with ipywidgets.
 
+## General requirements
+
+Before you can use DL4MicEverywhere, ensure you have the following:
+
+- Docker installed on your system.
+- For GPU usage - NVIDIA GPU + CUDA drivers.
+- If you want to run the graphical user interface (GUI), [Tcl/Tk](https://www.tcl.tk/) must be installed on your computer. 
+
+In case you miss some of the requirements, follow the steps described on the [REQUIREMENTS INSTALLATION](REQUIREMENTS_INSTALLATION.md).
+
 ## Docker Containers
 
 At the heart of DL4MicEverywhere are Docker containers, each corresponding to a notebook (see [notebook types](NOTEBOOK_TYPES.md)). These containers package all the necessary dependencies and configurations required for the smooth operation of the notebooks, thereby enhancing reproducibility by mitigating software environment discrepancies.
