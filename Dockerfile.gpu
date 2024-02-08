@@ -12,7 +12,6 @@ RUN pip install --upgrade pip && \
     pip install nbformat==5.9.2
 
 # Read all the arguments
-ARG BASE_IMAGE
 ARG PATH_TO_NOTEBOOK
 ARG PATH_TO_REQUIREMENTS
 ARG SECTIONS_TO_REMOVE
