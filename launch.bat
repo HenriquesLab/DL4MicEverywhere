@@ -5,7 +5,19 @@ set WSL_UTF8=1
 setlocal enabledelayedexpansion
 
 set defaultdist=none
-set /A isubuntu=0
+dockerset /A isubuntu=0
+
+if not exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" (
+  :: Download Docker Desktop
+  bitsadmin.exe /transfer "DownloadDocker" "https://desktop.docker.com/win/main/amd64/136059/Docker Desktop Installer.exe" "%temp%\DockerDesktopInstaller.exe"
+  :: Install it
+  powershell -Command Start-Process "%temp%\DockerDesktopInstaller.exe" -Wait install
+)
+
+:: Check if WSL is installed
+for /f "tokens=* USEBACKQ skip=1" %%g in (`wsl --status`) do (set wslworking=%%g)
+:: In case is not installed, install it
+if [%wslworking%]==[] wsl --install
 
 :: Go trough all the WSL distributions in your computer
 for /f "tokens=* USEBACKQ skip=1" %%F in (`wsl --list`) do (
