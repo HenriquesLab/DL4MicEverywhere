@@ -5,7 +5,7 @@ set WSL_UTF8=1
 setlocal enabledelayedexpansion
 
 set defaultdist=none
-dockerset /A isubuntu=0
+set /A isubuntu=0
 
 if not exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" (
   :: Download Docker Desktop
