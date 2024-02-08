@@ -79,7 +79,9 @@ Docker images occupy between 3 and 5 GB of memory, so it is advisable to manage 
 
 ## 3. Work with DL4MicEverywhere notebooks
 After building a Docker image and running a container to run the notebooks, DL4MicEverywhere will automatically run Jupyter Lab and open it in the default browser.
-The notebooks, inspired by ZeroCostDL4Mic, are designed to be user-friendly and do not require programming skills to run them. When you open the notebook in Jupyter Lab, code cells are hidden with a message `# Run this cell to visualise the parameters and click the button to execute the code ...`. 
+The notebooks, inspired by ZeroCostDL4Mic, are designed to be user-friendly and do not require programming skills to run them. Follow their [Step-by-step "How to"](https://github.com/HenriquesLab/ZeroCostDL4Mic/wiki/Step-by-step-run-through) to get further details about parameters and data formats. 
+
+When you open the notebook in Jupyter Lab, code cells are hidden with a message `# Run this cell to visualise the parameters and click the button to execute the code ...`. 
 
 When you run the code cells (either by pressing `Ctrl+Enter` or clicking on the play symbol on the top bar of the notebook), an interactive menu appears as shown in the image. In this menu, you can specify any required parameter. After specifying all the parameters, click on "Load and run". Note that if you do not click, the code of that cell will not run. Likewise, if you run the cell again, the parameters will need to be specified again. 
 
