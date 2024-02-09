@@ -278,5 +278,6 @@ Node: 'model/lambda_3/FFT2D'
 
 <details>
 <summary> <sup>3</sup> Code incompatibility </summary>
-	Some workflows are compiled for GPU usage using CUDA, which impedes the usage of the notebook in the absence of a GPU. In these cases, an error such as `Torch not compiled with CUDA enabled.` is frequent.
+	- Some workflows are compiled for GPU usage using CUDA, which impedes the usage of the notebook in the absence of a GPU. In these cases, an error such as `Torch not compiled with CUDA enabled.` is frequent.
+	- Lack of compatibility with ARM64 systems appears often with old code/dependencies as back in the time they were not compiled for this system architecture.
 </details>
