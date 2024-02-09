@@ -53,22 +53,14 @@ DL4MicEverywhere is designed to make deep learning more accessible, transparent,
 
 ## What is a DL4MicEverywhere notebook?
 
-- A DL4MicEverywhere notebook is designed to assist researchers in utilizing deep learning models for image processing.
+- A notebook to assist researchers in utilizing deep-learning models for image processing.
 - It is fully encapsulated within a Docker container, providing a controlled and versioned snapshot of the dependencies required for the notebook.
 - The versions of the required libraries are controlled upstream and downstream of the Docker container.
 - The notebook is validated using continuous integration (CI) workflows to ensure compatibility with MacOS, Windows, and Linux.
 - It features a user-friendly interface similar to ZeroCostDL4Mic, allowing users to train the model, perform quality checks, and run inference on new data.
 - The notebook is fully traceable and open source.
 
-## Getting Started
-
-[![alt text](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/ezgif.com-video-to-gif.gif)](https://youtu.be/d1FB_zc5gVc)
-
-Reproduce the demo in the video with the `U-Net (2D) multilabel` notebook and [Bacillus subtilis segmentation data from DeepBacs](https://zenodo.org/records/5639253). Note that run time will vary from minutes to hours depending on the GPU availability and computing resources. 
-
-Refer to the [Step-by-step "How to" guide](docs/USER_GUIDE.md) and [Requirements Installation Guidelines](docs/REQUIREMENTS_INSTALLATION.md) for further details.
-
-### Quickstart MacOs/Linux/Windows
+## Quickstart MacOs/Linux/Windows
 
 > ⚠️: **IMPORTANT:**
 > The GPU usage on Windows 10 machines is not working at this moment due to some TensorFlow and NVIDIA compatibility issues. This issue is under development (alternatives like conda are considered [here](https://github.com/HenriquesLab/DL4MicEverywhere/tree/Pass-to-conda)) and discussed [here](https://github.com/HenriquesLab/DL4MicEverywhere/issues/24). 
@@ -79,7 +71,13 @@ Refer to the [Step-by-step "How to" guide](docs/USER_GUIDE.md) and [Requirements
 
 With Docker, all dependencies are neatly bundled. Just launch and access deep learning workflows through an intuitive interface!
 
-### Requirements
+Refer to the [Step-by-step "How to" guide](docs/USER_GUIDE.md) and [Requirements Installation Guidelines](docs/REQUIREMENTS_INSTALLATION.md) for further details.
+
+Reproduce the demo in the video with the `U-Net (2D) multilabel` notebook and [Bacillus subtilis segmentation data from DeepBacs](https://zenodo.org/records/5639253). Note that run time will vary from minutes to hours depending on the GPU availability and computing resources. 
+
+[![alt text](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/ezgif.com-video-to-gif.gif)](https://youtu.be/d1FB_zc5gVc)
+
+#### Requirements
 DL4MicEverywhere rely on the following external software that is automatically installed when launching the tool.
 - Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop)).
 - For the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/).
@@ -92,9 +90,8 @@ If GPU acceleration is desired, the following needs to be installed:
 We welcome contributions! Please check out the [contributing guidelines](CONTRIBUTING.md) to get started.
 
 ## Documentation
-
-- [Requirements Installation Guidelines](docs/REQUIREMENTS_INSTALLATION.md)
 - [Step-by-step "How to" guide](docs/USER_GUIDE.md)
+  - [Manual Installation of the Requirements](docs/REQUIREMENTS_INSTALLATION.md)
 - [Remote Connection](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/GUI_USER_GUIDE.md#connection-with-remote-workstations-through-ssh)
 - Notebooks
   - [Notebook Types](docs/NOTEBOOK_TYPES.md)
