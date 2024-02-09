@@ -73,22 +73,14 @@ Refer to the [Step-by-step "How to" guide](docs/USER_GUIDE.md) and [Requirements
 - For GPU acceleration - NVIDIA GPU + CUDA drivers ([setup](https://docs.nvidia.com/cuda/)).
 - For the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/).
 
-### Quickstart MacOS/Linux
-
-1. Clone this repo: `git clone https://github.com/HenriquesLab/DL4MicEverywhere.git`
-2. Navigate to the repo directory.
-3. Run `sudo -E bash launch.sh` to launch the notebook selection GUI.
-4. Choose a notebook and run!
-
-### Quickstart Windows
+### Quickstart MacOs/Linux/Windows
 
 > ⚠️: **IMPORTANT:**
-> The GPU usage on Windows machines is not working at this moment due to some TensorFlow and NVIDIA compatibility issues. This issue is under development (alternatives like conda are considered [here](https://github.com/HenriquesLab/DL4MicEverywhere/tree/Pass-to-conda)) and discussed [here](https://github.com/HenriquesLab/DL4MicEverywhere/issues/24). 
+> The GPU usage on Windows 10 machines is not working at this moment due to some TensorFlow and NVIDIA compatibility issues. This issue is under development (alternatives like conda are considered [here](https://github.com/HenriquesLab/DL4MicEverywhere/tree/Pass-to-conda)) and discussed [here](https://github.com/HenriquesLab/DL4MicEverywhere/issues/24). 
 
-1. Clone this repo: `git clone https://github.com/HenriquesLab/DL4MicEverywhere.git`
-2. Navigate to the repo directory.
-3. Run `wsl bash launch.sh` to launch the notebook selection GUI.
-4. Choose a notebook and run!
+1. Download the ZIP file of the DL4MicEverywhere repository [here](https://github.com/HenriquesLab/DL4MicEverywhere/archive/refs/heads/main.zip) and extract it.
+2. Double-click the launcher in the DL4MicEverywhere folder that has the same name as your system (e.g., `Windows_launch` for Windows operating systems). A GUI will automatically pop-up.
+3. Choose a notebook and run!
 
 With Docker, all dependencies are neatly bundled. Just launch and access deep learning workflows through an intuitive interface!
 
