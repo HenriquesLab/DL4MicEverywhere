@@ -25,7 +25,7 @@ def main():
         config_version = config_data['config']['dl4miceverywhere']['notebook_version']
         zerocost_version = all_notebook_versions[all_notebook_versions["Notebook"] == dict_dl4miceverywhere_to_version[notebook]]['Version'].iloc[0]
         if config_version != zerocost_version:
-            updated_notebooks.append(notebook)
+            updated_notebooks.append(configuration_path)
 
     if len(updated_notebooks) == 0:
         print('')
