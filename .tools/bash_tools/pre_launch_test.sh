@@ -41,8 +41,10 @@ if ! docker info &> /dev/null; then
                 wait $pid_docker
                 sleep 5
                 while ! docker info &> /dev/null; do
+                    echo "Waiting for Docker to start..."
                     sleep 5
                 done
+                echo "Docker started"
             else
                 # Native Linux
                 systemctl --user start docker-desktop
