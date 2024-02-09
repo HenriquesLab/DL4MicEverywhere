@@ -13,7 +13,7 @@ config:
   dl4miceverywhere:
     cuda_version: 11.7.1
     cudnn_version: 8.6.0.163
-    description: EmbedSeg_2D_DL4Mic is the conversion of the 2D EmbedSeg from ZeroCostDL4Mic. 
+    description: EmbedSeg_2D_DL4Mic is the conversion of the 2D EmbedSeg from ZeroCostDL4Mic.
     dl4miceverywhere_version: 2.0.0
     docker_hub_image: embedseg_2d_zerocostdl4mic-z1.14.1-d2.0.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/EmbedSeg_2D_ZeroCostDL4Mic.ipynb
