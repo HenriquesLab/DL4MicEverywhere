@@ -23,7 +23,7 @@
 |  8 | Deep-STORM                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
 |  9 | DenoiSeg                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
 | 10 | Detectron2                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :white_circle:         |
-| 11 | EmbedSeg (2D)                   | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
+| 11 | EmbedSeg (2D)                   | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :white_circle:         |
 | 12 | FRUNet                          | :white_check_mark:   | :white_check_mark: | :x:                | :small_orange_diamond: | :small_orange_diamond: | :x: 		   |
 | 13 | Label-free prediction (fnet) 2D | :white_check_mark:   | :white_check_mark: | :apple:            | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 14 | Label-free prediction (fnet) 3D | :white_check_mark:   | :white_check_mark: | :apple:            | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
