@@ -187,7 +187,7 @@ jobs:
               NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
               SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
 
-  build-only-arm64:
+  build_only_arm64:
     name: Only push ARM64 to Docker Hub
     if: ${{ always() && contains(needs.build_amd64.result, 'failure') }}
     needs:
@@ -221,7 +221,7 @@ jobs:
           -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
             
-  build-only-amd64:
+  build_only_amd64:
     name: Only push AMD64 to Docker Hub
     if: ${{ always() && contains(needs.build_arm64.result, 'failure') }}
     needs:
@@ -254,7 +254,8 @@ jobs:
           -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
           -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64
-  build-multi-architecture:
+          
+  build_multi_architecture:
     name: Both push AMD64 and ARM64 to Docker Hub
     needs:
       - get_arguments
@@ -287,3 +288,28 @@ jobs:
           -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64 \
           henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
+
+  update_config:
+    name: Update the versions on configurations
+    runs-on: [ubuntu-latest]
+    if: ${{ always() && ( contains(needs.build_multi_architecture.result, 'success')  || contains(needs.build_only_arm64.result, 'success') || contains(needs.build_only_amd64.result, 'success') ) }}
+    needs:
+      - build_multi_architecture
+      - build_only_arm64
+      - build_only_amd64
+    steps:
+      - name: Wait a minute
+        run: sleep 60
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+      - name: Update the repository with git pull
+        run: git pull
+      - name: Install requirements
+        run: pip install -r .tools/requirements.txt
+      - name: Update the version of the notebook on the configuration
+        run: python3 .tools/python_tools/update_zerocost_version.py '${{ inputs.config_file }}' 
+      - name: Update the docker_tag on the configuration
+        run: python3 .tools/python_tools/update_configuration.py '${{ inputs.config_file }}' 
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: GitHub Action - Update the notebook version on the configuration
