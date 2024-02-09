@@ -20,7 +20,7 @@
 |  7 | DecoNoising (2D)                | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :x: <sup>2</sup> 	 | :x: <sup>2</sup> 	  | :x: 		   |
 |  8 | Deep-STORM                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
 |  9 | DenoiSeg                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
-| 10 | Detectron2                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
+| 10 | Detectron2                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :x: <sup>3</sup> 	   |
 | 11 | EmbedSeg (2D)                   | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 12 | FRUNet                          | :white_check_mark:   | :white_check_mark: | :x:                | :small_orange_diamond: | :small_orange_diamond: | :x: 		   |
 | 13 | Label-free prediction (fnet) 2D | :white_check_mark:   | :white_check_mark: | :apple:            | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
@@ -44,7 +44,10 @@
 <summary> <sup>2</sup> DecoNoising error:</summary>
 	Problems with the GitHub repository pn2v (https://github.com/juglab/pn2v). Due to a change in the code, the **pn2v** folder is now in a **src**, breaking all the imports that are **from pn2v**, even the ones that *deconosing** has.
 </details>
-
+<details>
+<summary> <sup>3</sup> Detectron2 error:</summary>
+	Torch not compiled with CUDA enabled.
+</details>
 <details>
 <summary> <sup>1</sup> DFCAN error:</summary>
 
