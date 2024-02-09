@@ -15,9 +15,9 @@ config:
     cudnn_version: 8.6.0.163
     description: EmbedSeg_2D_DL4Mic is the conversion of the 2D EmbedSeg from ZeroCostDL4Mic.
     dl4miceverywhere_version: 2.0.0
-    docker_hub_image: embedseg_2d_zerocostdl4mic-z1.14.1-d2.0.0
+    docker_hub_image: embedseg_2d_zerocostdl4mic-z1.15.0-d2.0.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/EmbedSeg_2D_ZeroCostDL4Mic.ipynb
-    notebook_version: 1.14.1
+    notebook_version: 1.15.0
     python_version: '3.9'
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/EmbedSeg_2D_requirements_simple.txt
     sections_to_remove: 1.0. 1.1. 2.
