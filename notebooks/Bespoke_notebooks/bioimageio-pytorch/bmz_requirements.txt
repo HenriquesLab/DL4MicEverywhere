@@ -3,3 +3,4 @@ bioimageio.core==0.5.9
 matplotlib==3.5.3
 imageio==2.31.2
 numpy==1.21.6
+torch==2.2.0
