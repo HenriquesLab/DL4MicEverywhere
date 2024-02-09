@@ -332,6 +332,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
 
         # All the new lines of code are ensambled
         code_cell = "# Run this cell to visualize the parameters and click the button to execute the code\n"
+        code_cell +=  futute_imports
         if not time_imported:
             # In case the time library have not been imported yet
             code_cell += ("from datetime import datetime\n")       
@@ -344,7 +345,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
             code_cell += ipywidget_imported_code
             ipywidget_imported = True
 
-        code_cell += futute_imports + ("clear_output()\n\n" # In orther to renew the ipywidgets
+        code_cell += ("clear_output()\n\n" # In orther to renew the ipywidgets
                     ) + widget_code + ( # Add the code with the widgets at the begining of the cell
                     f"\ndef {function_name}(output_widget):\n" # The function that will be called whwn clicking the button
                     "  output_widget.clear_output()\n" # Clear the output that was displayed when calling the function
@@ -375,6 +376,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
     else:
         # Otherwise, just add the code
         code_cell = "# Run this cell to execute the code\n" 
+        code_cell +=  futute_imports
         
         # We want the imports to be in the first cell, even if it does not have ipywidgets
         if not time_imported:
@@ -390,7 +392,6 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
         code_cell += ("internal_aux_initial_time=datetime.now()\n" 
                       "print('Runnning...')\n"
                       "print('--------------------------------------')\n")
-        code_cell +=  futute_imports
         code_cell +=  non_widget_code
         
         code_cell += ("print('--------------------------------------')\n"

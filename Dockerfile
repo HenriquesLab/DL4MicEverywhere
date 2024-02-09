@@ -31,7 +31,7 @@ RUN echo "${CACHEBUST}"
 ADD $PATH_TO_NOTEBOOK ./${NOTEBOOK_NAME}
 
 # Autoconvert the notebook
-RUN git clone --branch reduce_code https://github.com/HenriquesLab/DL4MicEverywhere.git  && \
+RUN git clone https://github.com/HenriquesLab/DL4MicEverywhere.git  && \
     python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py -p . -n ${NOTEBOOK_NAME} -s ${SECTIONS_TO_REMOVE}  && \
     mv colabless_${NOTEBOOK_NAME} ${NOTEBOOK_NAME}  && \
     python DL4MicEverywhere/.tools/python_tools/create_docker_info.py "/home/docker_info.txt" "${UBUNTU_VERSION}" "" "" "${PATH_TO_NOTEBOOK}" "${PATH_TO_REQUIREMENTS}" \
