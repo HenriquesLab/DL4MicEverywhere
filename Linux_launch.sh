@@ -511,7 +511,10 @@ else
     # Build the docker image without GUI
     if [ "$build_flag" -eq 2 ]; then
         if [ "$gpu_flag" -eq 1 ]; then
-            docker build --file $BASEDIR/Dockerfile.gpu -t $docker_tag $BASEDIR\
+            echo "To build the docker image, you need to provide root access by entering your password."
+            echo "Otherwise, you can choose the option of getting the image from Docker Hub or follow"
+            echo "the steps in our documentation."
+            sudo docker build --file $BASEDIR/Dockerfile.gpu -t $docker_tag $BASEDIR\
                 --build-arg UBUNTU_VERSION="${ubuntu_version}" \
                 --build-arg CUDA_VERSION="${cuda_version}" \
                 --build-arg CUDNN_VERSION="${cudnn_version}" \
@@ -523,7 +526,10 @@ else
                 --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" \
                 --build-arg CACHEBUST=$(date +%s)
         else
-            docker build --file $BASEDIR/Dockerfile -t $docker_tag $BASEDIR\
+            echo "To build the docker image, you need to provide root access by entering your password."
+            echo "Otherwise, you can choose the option of getting the image from Docker Hub or follow"
+            echo "the steps in our documentation."
+            sudo docker build --file $BASEDIR/Dockerfile -t $docker_tag $BASEDIR\
                 --build-arg UBUNTU_VERSION="${ubuntu_version}" \
                 --build-arg GPU_FLAG="${gpu_flag}" \
                 --build-arg PYTHON_VERSION="${python_version}" \

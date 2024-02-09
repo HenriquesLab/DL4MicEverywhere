@@ -58,7 +58,7 @@ local_dl4miceverywhere_version="$config_dl4miceverywhere_dl4miceverywhere_versio
 local_description="$config_dl4miceverywhere_description"
 
 # Get the remote version on the configuration.yaml (on DL4MicEverywhere repository)
-eval $(get_yaml_args_from_url https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/versioning/notebooks/$2/$3/configuration.yaml)
+eval $(get_yaml_args_from_url https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/$2/$3/configuration.yaml)
 
 # Compare the local and remote versions to check if there is an update.
 # Different cases:

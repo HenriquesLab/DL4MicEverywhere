@@ -31,8 +31,8 @@ if ! command -v wish &> /dev/null; then
 
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # Linux
-        apt-get -y install tcl
-        apt-get -y install tk
+        sudo apt-get -y install tcl
+        sudo apt-get -y install tk
 
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         # Mac OSX
@@ -61,7 +61,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     if ! command -v xdg-open &> /dev/null; then 
         echo "Installing xdg-utils..."
 
-        apt-get -y install xdg-utils
+        sudo tapt-get -y install xdg-utils
         if ! command -v xdg-open &> /dev/null; then 
             echo -e "\033[0;31 xdg-utils installation failed. \033[0m"
             echo "Please try again or follow the installation instructions on: https://installati.one/install-xdg-utils-ubuntu-20-04/"
@@ -79,30 +79,26 @@ if ! command -v docker &> /dev/null; then
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # Linux
         # Add Docker's official GPG key:
-        apt-get -y update
-        apt-get -y install ca-certificates curl gnupg
+        sudo apt-get -y update
+        sudo apt-get -y install ca-certificates curl gnupg
         install -m 0755 -d /etc/apt/keyrings
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        chmod a+r /etc/apt/keyrings/docker.gpg
+        sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
         # Add the repository to Apt sources:
         echo \
         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
         $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
         tee /etc/apt/sources.list.d/docker.list > /dev/null
-        apt-get -y update
+        sudo apt-get -y update
 
         # Install the latest Docker version
-        apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
         # Download the Docker Desktop .deb file v4.27.1 and install it
         curl https://desktop.docker.com/linux/main/amd64/136059/docker-desktop-4.27.1-amd64.deb -o /tmp/DockerDesktop.deb
-        apt-get -y update
-        apt-get -y install /tmp/DockerDesktop.deb
-
-        # Add the current user to the Docker group
-        groupadd docker
-        usermod -aG docker $USER
+        sudo apt-get -y update
+        sudo apt-get -y install /tmp/DockerDesktop.deb
 
         if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
             # Linux inside the Windows Subsystem for Linux needs to export/link the start command
