@@ -8,10 +8,8 @@ from dict_parser import dict_dl4miceverywhere_to_version
 
 def main(config_path):
     
-    print(config_path)
     # Extract the name of the notebook
     notebook_name = config_path.split('/')[-2]
-    print(notebook_name)
 
     # Read the versions of the notebooks
     all_notebook_versions = pd.read_csv("https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/Latest_Notebook_versions.csv", dtype=str)
