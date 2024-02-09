@@ -64,7 +64,10 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     if ! command -v xdg-open &> /dev/null; then 
         echo "Installing xdg-utils..."
 
-        sudo tapt-get -y install xdg-utils
+        sudo apt-get -y update
+        sudo apt -y update
+        sudo apt -y upgrade
+        sudo apt-get -y install xdg-utils
         if ! command -v xdg-open &> /dev/null; then 
             echo -e "\033[0;31 xdg-utils installation failed. \033[0m"
             echo "Please try again or follow the installation instructions on: https://installati.one/install-xdg-utils-ubuntu-20-04/"
