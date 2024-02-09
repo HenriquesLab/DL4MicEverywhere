@@ -77,13 +77,8 @@ jobs:
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
-      - name: install requirements
-        run: pip install -r .tools/requirements.txt
-      - name: update all the configurations
-        run: python3 .tools/python_tools/update_configuration.py '${{ matrix.notebook }}' 
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Bot - update configuration version tag
+
+      # First check the attributes of the configuration
       - name: Check notebook_url attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: notebook_url
@@ -166,6 +161,14 @@ jobs:
           else 
             echo 'The configuration.yaml file is defined with all its keys.'
           fi
+
+      # Then we update the configuration.yaml
+      - name: Install requirements
+        run: pip install -r .tools/requirements.txt
+      - name: Update the version of the notebook on the configuration
+        run: python3 .tools/python_tools/update_zerocost_version.py '${{ matrix.notebook }}' 
+      - name: Update the docker_tag on the configuration
+        run: python3 .tools/python_tools/update_configuration.py '${{ matrix.notebook }}' 
   
   check_urls:  
     name: Check notebook's and requirements' URLs
