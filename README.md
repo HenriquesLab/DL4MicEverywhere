@@ -67,23 +67,25 @@ DL4MicEverywhere is designed to make deep learning more accessible, transparent,
 Reproduce the demo in the video with the `U-Net (2D) multilabel` notebook and [Bacillus subtilis segmentation data from DeepBacs](https://zenodo.org/records/5639253). Note that run time will vary from minutes to hours depending on the GPU availability and computing resources. 
 
 Refer to the [Step-by-step "How to" guide](docs/USER_GUIDE.md) and [Requirements Installation Guidelines](docs/REQUIREMENTS_INSTALLATION.md) for further details.
-### Requirements
-
-- Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop)).
-- For GPU acceleration - NVIDIA GPU + CUDA drivers ([setup](https://docs.nvidia.com/cuda/)).
-- For the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/).
 
 ### Quickstart MacOs/Linux/Windows
 
 > ⚠️: **IMPORTANT:**
 > The GPU usage on Windows 10 machines is not working at this moment due to some TensorFlow and NVIDIA compatibility issues. This issue is under development (alternatives like conda are considered [here](https://github.com/HenriquesLab/DL4MicEverywhere/tree/Pass-to-conda)) and discussed [here](https://github.com/HenriquesLab/DL4MicEverywhere/issues/24). 
 
-1. Download the ZIP file of the DL4MicEverywhere repository [here](https://github.com/HenriquesLab/DL4MicEverywhere/archive/refs/heads/main.zip) and extract it.
-2. Double-click the launcher in the DL4MicEverywhere folder that has the same name as your system (e.g., `Windows_launch` for Windows operating systems). A GUI will automatically pop-up.
+1. Download the ZIP file of the DL4MicEverywhere repository [here](https://github.com/HenriquesLab/DL4MicEverywhere/archive/refs/heads/main.zip) and unzip it.
+2. Double-click the launcher in the DL4MicEverywhere folder that has the same name as your system (e.g., `Windows_launch` for Windows operating systems). A GUI will automatically pop up.
 3. Choose a notebook and run!
 
 With Docker, all dependencies are neatly bundled. Just launch and access deep learning workflows through an intuitive interface!
 
+### Requirements
+DL4MicEverywhere rely on the following external software that is automatically installed when launching the tool.
+- Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop)).
+- For the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/).
+
+If GPU acceleration is desired, the following needs to be installed:
+- NVIDIA GPU + CUDA drivers ([setup](https://docs.nvidia.com/cuda/)).
 
 ## Contributing
 
