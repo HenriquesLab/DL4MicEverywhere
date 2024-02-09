@@ -6,13 +6,13 @@ DL4MicEverywhere is a user-friendly platform that allows you to run deep learnin
 
 ### Download DL4MicEverywhere Repository:
 
-* **Option 1**: Download the last version of DL4MicEverywhere from GitHub's repository
+* **Option 1**: Download the last version of DL4MicEverywhere from GitHub's repository:
 
     1. Download a ZIP file of the DL4MicEverywhere repository by clicking [here](https://github.com/HenriquesLab/DL4MicEverywhere/archive/refs/heads/main.zip).
 
-    2. Unzip the downloaded file and enter in the DL4MicEverywhere folder. 
+    2. Unzip the downloaded file and go to the DL4MicEverywhere folder. 
 
-* **Option 2**: Download from the terminal using git
+* **Option 2**: Download from the terminal using git:
 
     > ⚠️: **IMPORTANT**:
     > `git` must be installed. If not, follow the [official installation steps](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
@@ -26,8 +26,8 @@ DL4MicEverywhere is a user-friendly platform that allows you to run deep learnin
     ```
 
 ### Run DL4MicEverywhere for the first time:
-DL4MicEverywhere has an executable for each operatin system. Double-click on the one that has the same name as your system (e.g., `Windows_launch` for Windows operating systems). The program will check for the requirements and it will install them if they are not. You need to have root/admin permissions to install DL4MicEverywhere for the first time. If it encounters any issue during the automatic installation of the requirements, you can find detailed information about the requirements and how to manually install them in [REQUIREMENTS INSTALLATION](REQUIREMENTS_INSTALLATION.md).
-Once the process has finished, the computer needs to be restarted. 
+DL4MicEverywhere comes packaged with an executable for each operating system. Double-click on the one that has the same name as your system (e.g., `Windows_launch` for Windows operating systems). To run DL4MicEverywhere for the first time you need to have root/admin permissions as the program will check for the presence of the requirements and will attempt to install any that are missing. If it encounters an issue during the automatic installation of the requirements, the [REQUIREMENTS INSTALLATION](REQUIREMENTS_INSTALLATION.md) page has detailed information about the requirements and intructions on how to manually install them.
+Once the process has finished, the computer needs to be restarted.
 This is a single process the first time that DL4MicEverywhere is launched. 
 
 ## Quickstart 
@@ -41,15 +41,15 @@ Double-click the launcher in the DL4MicEverywhere folder that has the same name 
 
 **Select a notebook:**
 
-Select one of the available notebooks, such as U-Net 2D or StarDist 3D. This will populate the description on the right.
+- Select one of the available notebooks, such as U-Net 2D or StarDist 3D. This will populate the description on the right.
 
 **Specify data and output folders:** 
 
-Use the GUI to select the folder containing your input data and the folder where you want to save results. 
+- Use the GUI to select the folder containing your input data and the folder where you want to save results. 
 
 **Click "Run" to launch the notebook:**
 
-This action will build a Docker container for the selected notebook and then start it. Follow the prompts to access the Jupyter interface through your web browser.
+- This action will build a Docker container for the selected notebook and then start it. Follow the prompts to access the Jupyter interface through your web browser.
 
 Now, you're ready to run deep learning workflows through an intuitive UI!
 
@@ -63,7 +63,7 @@ Double-click the launcher in the DL4MicEverywhere folder that has the same name 
 
 ## 2. Docker images
 
-DL4MicEverywhere will either pull a container image from Dockerhub or build one for you if there isn't one suitable for your operating system and configuration. The interface may ask you 
+DL4MicEverywhere will either pull a container image from Dockerhub or build one for you if there isn't one suitable for your operating system and configuration. The interface may ask you:
 
 1. if there is already an image on your machine, would you like to rebuild and replace it?
 2. if there is no image on your machine but there is one on the Docker hub, would you like to build it?
