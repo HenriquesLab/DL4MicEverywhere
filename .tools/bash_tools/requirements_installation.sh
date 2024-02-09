@@ -31,7 +31,9 @@ if ! command -v wish &> /dev/null; then
 
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # Linux
+        sudo apt-get udpate
         sudo apt-get -y install tcl
+        sudo apt-get udpate
         sudo apt-get -y install tk
 
     elif [[ "$OSTYPE" == "darwin"* ]]; then
