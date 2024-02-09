@@ -13,7 +13,7 @@ config:
   dl4miceverywhere:
     cuda_version: 11.8.0
     cudnn_version: 8.6.0.163
-    description: 3D-RCAN_DL4Mic is the conversion of the CellPose 2D notebook from ZeroCostDL4Mic.
+    description: 3D-RCAN_DL4Mic is the conversion of the 3D-RCAN notebook from ZeroCostDL4Mic.
     dl4miceverywhere_version: 2.0.0
     docker_hub_image: 3d_rcan_zerocostdl4mic-z1.14.1-d2.0.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/3D_RCAN_ZeroCostDL4Mic.ipynb
