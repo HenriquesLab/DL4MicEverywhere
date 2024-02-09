@@ -6,6 +6,8 @@
 
 :small_orange_diamond: : Needs to be tested
 
+:white_circle: : Incompatibile <sup>3</sup> 	
+
 :large_blue_circle: : Needs data
 
 |    | Network                         | configuration.yaml   | Building AMD64     | Building ARM64     | Working AMD64          | Working GPU            | Working ARM64          |
@@ -20,7 +22,7 @@
 |  7 | DecoNoising (2D)                | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :x: <sup>2</sup> 	 | :x: <sup>2</sup> 	  | :x: 		   |
 |  8 | Deep-STORM                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
 |  9 | DenoiSeg                        | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :large_blue_circle:    | :large_blue_circle:    | :large_blue_circle:    |
-| 10 | Detectron2                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :x: <sup>3</sup> 	   |
+| 10 | Detectron2                      | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :white_circle:         |
 | 11 | EmbedSeg (2D)                   | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 12 | FRUNet                          | :white_check_mark:   | :white_check_mark: | :x:                | :small_orange_diamond: | :small_orange_diamond: | :x: 		   |
 | 13 | Label-free prediction (fnet) 2D | :white_check_mark:   | :white_check_mark: | :apple:            | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
@@ -39,18 +41,8 @@
 | 26 | YOLOv2                          | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :small_orange_diamond: | :small_orange_diamond: | :small_orange_diamond: |
 | 27 | pix2pix                         | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark:     | :white_check_mark:     | :white_check_mark:     |
 
-
-<details>
-<summary> <sup>2</sup> DecoNoising error:</summary>
-	Problems with the GitHub repository pn2v (https://github.com/juglab/pn2v). Due to a change in the code, the **pn2v** folder is now in a **src**, breaking all the imports that are **from pn2v**, even the ones that *deconosing** has.
-</details>
-<details>
-<summary> <sup>3</sup> Detectron2 error:</summary>
-	Torch not compiled with CUDA enabled.
-</details>
 <details>
 <summary> <sup>1</sup> DFCAN error:</summary>
-
 
 ```
 2023-11-16 16:38:55.990201: I tensorflow/core/common_runtime/executor.cc:1197] [/device:CPU:0] (DEBUG INFO) Executor start aborting (this does not indicate an error and you can ignore this message): INVALID_ARGUMENT: You must feed a value for placeholder tensor 'Placeholder/_0' with dtype int32
@@ -276,5 +268,15 @@ Node: 'model/lambda_3/FFT2D'
 0 successful operations.
 0 derived errors ignored. [Op:__inference_train_function_33231]
 ```
+</details>
 
+
+<details>
+<summary> <sup>2</sup> DecoNoising error:</summary>
+	Problems with the GitHub repository pn2v (https://github.com/juglab/pn2v). Due to a change in the code, the **pn2v** folder is now in a **src**, breaking all the imports that are **from pn2v**, even the ones that *deconosing** has.
+</details>
+
+<details>
+<summary> <sup>3</sup> Code incompatibility </summary>
+	Some workflows are compiled for GPU usage using CUDA, which impedes the usage of the notebook in the absence of a GPU. In these cases, an error such as `Torch not compiled with CUDA enabled.` is frequent.
 </details>
