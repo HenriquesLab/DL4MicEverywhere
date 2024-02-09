@@ -2,7 +2,7 @@ import re
 import nbformat
 
 # Usefull regular expressions 
-installation_regex = r'(pip|conda) install (\w+)'
+installation_regex = r'(pip|conda) install (.*)'
 float_regex = r"[-+]?\d*\.\d+|[-+]?\d+"
 ipywidget_style = "{'description_width': 'initial'}"
 param_regex = r"(\w+)\s*=\s*([\S\s]+?)\s*#@param\s*(.+)"
@@ -264,11 +264,15 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
         installation_match = re.search(installation_regex, line)
         if installation_match:
             library_name = installation_match.group(2)
-            if library_name != '.':
-                # The installation lines of an external library are removed
-                pass
-            else:
+
+            # Remove the comment
+            if '#' in library_name:
+                library_name = library_name[:library_name.index('#')]
+
+            # Only the installation lines of an external library are kept
+            if '-r ' in library_name or '--requirement ' in library_name or '-e ' in library_name or '--editable ' in library_name or library_name=='.':
                 widget_code += line + '\n'
+                
         elif re.search(param_regex, line):
             # The lines with #@param are replaced with ipywidgets based on the parameters
             new_line, var_name, needs_to_be_evaluated = param_to_widget(line)

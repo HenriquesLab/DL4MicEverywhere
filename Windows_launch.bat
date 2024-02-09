@@ -18,7 +18,7 @@ if not exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" (
 for /f "tokens=* USEBACKQ skip=1" %%g in (`wsl --status`) do (set wslworking=%%g)
 
 :: In case is not installed, install it
-if ["%wslworking%"]==[""] wsl --install --no-launch
+if ["%wslworking%"]==[""] wsl --install
 
 :: Go trough all the WSL distributions in your computer
 for /f "tokens=* USEBACKQ skip=1" %%F in (`wsl --list`) do (
@@ -43,7 +43,7 @@ for /f "tokens=* USEBACKQ skip=1" %%F in (`wsl --list`) do (
 :: First check if Ubuntu is installed
 if %isubuntu%==0 (
   :: If it is not installed, install Ubuntu
-  wsl --install --no-launch Ubuntu
+  wsl --install Ubuntu
 ) else (
   :: If it is intalled, check if it is the default distribution
   if not %defaultdist%==Ubuntu (
@@ -53,4 +53,4 @@ if %isubuntu%==0 (
 )
 
 :: At this point Ubuntu is installed and as the default distribution, run the launch.sh inside the WSL
-wsl.exe -d Ubuntu bash -E Linux_launch.sh
+wsl -d Ubuntu bash -E Linux_launch.sh
