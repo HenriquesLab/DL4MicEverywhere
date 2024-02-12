@@ -287,9 +287,9 @@ check_parsed_argument cuda_version
 check_parsed_argument cudnn_version
 check_parsed_argument ubuntu_version
 check_parsed_argument python_version
-check_parsed_argument sections_to_remove
 check_parsed_argument notebook_version
-check_parsed_argument description
+rename_parsed_argument description # Not required to be present and therefore the cheking is skipped
+rename_parsed_argument sections_to_remove # Not required to be present and therefore the cheking is skipped
 rename_parsed_argument dl4miceverywhere_version # Not required to be present and therefore the cheking is skipped
 rename_parsed_argument docker_hub_image # Not required to be present and therefore the cheking is skipped
 
