@@ -52,7 +52,7 @@ The [GUI](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/GUI_US
 
 **Can I use my own custom notebook?**
 
-Yes, you can specify the path to a local notebook file when launching via the `-n` flag. This will override the notebook selection GUI. Your notebook file will be mounted into the container.
+The [GUI](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/GUI_USER_GUIDE.md#select-a-local-notebook) has a option to select your own custom notebook. The [CLI](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/CLI_USER_GUIDE.md#optional-arguments), which is executed with the `Linux_launch.sh` script, includes `-n` argument where you can specify the path to a local notebook file, this will override the notebook defined in the `configuration.yaml` file. Your notebook file will be the one loaded into the Docker image.
 
 ## Development
 
