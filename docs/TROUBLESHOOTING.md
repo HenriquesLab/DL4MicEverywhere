@@ -137,6 +137,30 @@ This guide provides solutions to common issues encountered when using DL4MicEver
 - Try tuning model hyperparameters and architecture.
 - Consider using a more suitable model or training scheme.
   
+## Launchers
+
+**`MacOs_launher` cannot be oppened**
+
+MacOS computers will notify you that they cannot verify if a file you downloaded from internet is free from malware and it will drop you the following message:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TROUBLESHOOTING/macos_cannot_open.png" 
+     alt="Cannot open"
+     width="40%" 
+     height="40%" />
+
+In that case, instead of double-clicking the file you will need to tight click it and chose the `Open` option and you will get a different message as it can be seen in the following images:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TROUBLESHOOTING/macos_right_click.png" 
+     alt="Cannot open"
+     width="40%" 
+     height="40%" />
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TROUBLESHOOTING/macos_allows_open.png" 
+     alt="Cannot open"
+     width="40%" 
+     height="40%" />
+
+In this new message, by clicking `Open` you are allowing your to run by double click the launcher for future ocasions. 
+
 ## General
 
 Still encountering problems? Search GitHub issues or raise a new one with details to reproduce the problem. We'll do our best to help resolve it!

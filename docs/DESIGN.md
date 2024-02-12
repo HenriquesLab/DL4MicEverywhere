@@ -32,7 +32,7 @@ GitHub Actions are set up to automatically build and publish these containers to
 
 ## Launch Script and GUI
 
-Three different launchers are provided, one for each operative system:
+There is a different launchers for each operative system:
 
 - [`MacOS_launch.sh`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/MacOS_launch.sh): which is a double click launcher for MacOS systems. You might get a message saying 'cannot be oppened because it is from an unidentified developer', if that is the case, right click `MacOS_launch.sh` and select `Open` option, what will launch a similar message but know with an `Open` option.
 - [`Windows_launch.sh`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/Windows_launch.sh)
