@@ -5,14 +5,14 @@ After installing the necessary requirements (follow the [Requirements Installati
 ### **On Linux:**
 Run the following command in the terminal:
 > ℹ️ **NOTE**:
-    > You need to be located in the DL4MicEverywhere folder, where `Linux_launch.sh` is in.
+> You need to be located in the DL4MicEverywhere folder, where `Linux_launch.sh` is in.
 ```
 bash Linux_launch.sh
 ```
 
 If you want a double click file, you will need to run the following command in the terminal:
 > ℹ️ **NOTE**:
-    > You need to be located in the DL4MicEverywhere folder, where `.tools` folder is in.
+> You need to be located in the DL4MicEverywhere folder, where `.tools` folder is in.
 ```
 bash .tools/create_desktop.sh
 ```
@@ -22,7 +22,7 @@ This will create a `DL4MicEverywhere.desktop` file in your Desktop. You will nee
 Double click the `MacOS_launch.command` file (you might get the [following message](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md#macos_launher-cannot-be-oppened)) or run the following command in the terminal:
 
 > ℹ️ **NOTE**:
-    > You need to be located in the DL4MicEverywhere folder, where `MacOS_launch.command` is in.
+> You need to be located in the DL4MicEverywhere folder, where `MacOS_launch.command` is in.
 ```
 bash MacOS_launch.command
 ```
@@ -31,14 +31,16 @@ bash MacOS_launch.command
 Double click the `Windows_launch.bat` file (you might get the [following message](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md#windows_launher-cannot-be-oppened)) or run the following command in the terminal:
 
 > ℹ️ **NOTE**:
-    > You need to be located in the DL4MicEverywhere folder, where `Windows_launch.bat` is in.
+> You need to be located in the DL4MicEverywhere folder, where `Windows_launch.bat` is in.
 ```
 .\Windows_launch.bat
 ```
 
-Executing this command will open the following window:
+---
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI.png" 
+After any of these launching options, a terminal window will open. This windows will be in the background checking the requirements and executing the main code, please **DO NOT** close this window. After applying the checkings, if everything has gone well, the following GUI will appear: 
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_clean.png" 
      alt="Main window"
      width="40%" 
      height="40%" />
@@ -47,10 +49,10 @@ Executing this command will open the following window:
 
 The image above displays the simple usage interface. A default list of notebooks is provided. First, you need to choose the folder containing the model you want to use:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/DEFAULT_1.png" 
-     alt="Main window"
-     width="40%" 
-     height="40%" />
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_notebook_type.png" 
+     alt="Notebook type"
+     width="30%" 
+     height="30%" />
 
 The available folders are: 
  - [Bespoke_notebooks](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/Bespoke_notebooks/README.md)
@@ -59,23 +61,19 @@ The available folders are:
 
 After selecting the folder, you need to choose the notebook you want to use from the second list:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/DEFAULT_2.png" 
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_notebook_name.png" 
      alt="Main window"
-     width="40%" 
-     height="40%" />
-
-In this example, we have selected the pix2pix notebook from the ZeroCost folder:
-
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/DEFAULT_RESULT.png" 
-     alt="Main window"
-     width="40%" 
-     height="40%" />
+     width="30%" 
+     height="30%" />
 
 After selecting the notebook, there are only two mandatory arguments: **Data folder** and **Output folder**. 
 
 ### Choose the data folder
 
 In the **Path to the data folder** section, you can either paste the path to the file directly or click on the **Select** button. 
+
+> ℹ️ **NOTE**:
+> If you are on Windows, plese use the **Select** button instead of pasting the path. The GUI is run inside the Windows Subsystem for Linux, what changes the path's format. For example `C:\Users\username\Downloads` will need to be `/mnt/c/Users/username/Downloads`. 
 
 The path you select here should lead to the folder containing the data you want to use in your model, such as the images for training, the weights of a pretrained model, etc. Clicking the **Select** button will open a window displaying your file system:
 
@@ -86,7 +84,7 @@ The path you select here should lead to the folder containing the data you want 
 
 After selecting the path to the folder, the main window should look like this:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/DATA_RESULT.png" 
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_data.png" 
      alt="Main window after data folder"
      width="40%" 
      height="40%" />
@@ -96,6 +94,8 @@ After selecting the path to the folder, the main window should look like this:
 
 In the **Path to the output folder** section, you can either paste the path to the file directly or click on the **Select** button. 
 
+> ℹ️ **NOTE**:
+> If you are on Windows, plese use the **Select** button instead of pasting the path. The GUI is run inside the Windows Subsystem for Linux, what changes the path's format. For example `C:\Users\username\Downloads` will need to be `/mnt/c/Users/username/Downloads`.
 
 > ⚠️: **IMPORTANT:**
 > Only the files you store in this folder will be saved once you close the program, the rest will be lost.
@@ -109,36 +109,29 @@ The path you select here should lead to the folder where you plan to save and st
 
 After selecting the path to the folder, the main window should look like this:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/OUTPUT_RESULT.png" 
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_output.png" 
      alt="Main window after output folder"
      width="40%" 
      height="40%" />
 
-With these arguments set, you can click **Done** to execute the program. Additionally, you can choose to use a GPU (if your device has one) and you can assign a custom tag to the Docker image that will be built.
+With these arguments set, you can click **Run** to execute the program. Additionally, you can choose to use a GPU (if your device has one) and you can assign a custom tag to the Docker image that will be built.
 
 ### Activate/Deactivate the GPU
 
-The **Allow GPU** checkbox allows you to choose whether or not to use the GPU (it is unchecked by default). Once selected, the main window will look like this:
+> ℹ️ **NOTE**:
+> This option, will only be available if a configured Nvidia Graphic Card is detected on your computer.
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GPU.png" 
-     alt="Main window after GPU"
-     width="40%" 
-     height="40%" />
+The **Allow GPU** checkbox allows you to choose whether or not to use the GPU (it is unchecked by default). To use the GPU you just need to click it and a ☑️ will appear.
 
-### Assign a custom tag to the Docker image
+### Load previous setting
 
-You can enter the tag you want in the **Tag** textbox. In the following example, we assign the tag 'MyTag' to the Docker image:
-
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TAG.png" 
-     alt="Main window after Tag"
-     width="40%" 
-     height="40%" />
+This option will be dissabled the first time you run DL4MicEverywhere, since there are no previous settings. Once you click `Run`, this option will be allowed for the next time. By clicking this button you will load the settings that you previously choose, facilitating the workflow in cases where you are running the same configuration multiple times. 
 
 ## Advanced usage
 
 You can also click on the **Advanced options** button at the bottom to display a new section:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/ADVANCED.png" 
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_advanced.png" 
      alt="Advanced options"
      width="40%" 
      height="40%" />
@@ -151,14 +144,14 @@ In the **Path to the configuration.yaml** section, you can either paste the path
 
 You need to select the path to the configuration.yaml file you want to use (make sure it follows the [defined structure](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/FORMAT.md)). Clicking the **Select** button will open a window displaying your file system:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/CONFIG.png" 
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_config_select.png" 
      alt="Select the local configuration"
      width="60%" 
      height="60%" />
 
 After selecting the file, the window should look like this:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/CONFIG_RESULT.png" 
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_config.png" 
      alt="Select the local configuration result"
      width="40%" 
      height="40%" />
@@ -167,14 +160,14 @@ After selecting the file, the window should look like this:
 
 Just like the `configuration.yaml` file selection, you can select a `.ipynb` notebook instead of the one provided in the `configuration.yaml` that follows the ZeroCostDL4Mic structure:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/NOTEBOOK.png" 
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_notebook_select.png" 
      alt="Select the local notebook"
      width="60%" 
      height="60%" />
 
 After selecting the file, the window should look like this:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/NOTEBOOK_RESULT.png" 
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_notebook.png" 
      alt="Select the local notebook result"
      width="40%" 
      height="40%" />
@@ -183,18 +176,27 @@ After selecting the file, the window should look like this:
 
 You can also select a `requirements.txt` file instead of the one provided in the `configuration.yaml`. This file should contain the Python libraries that you want to be installed in the container:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/REQUIREMENTS.png" 
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_requ_select.png" 
      alt="Select the local requirements"
      width="60%" 
      height="60%" />
 
 After selecting the file, the window should look like this:
 
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/REQUIREMENTS_RESULT.png" 
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_requ.png" 
      alt="Select the local requirements result"
      width="40%" 
      height="40%" />
 
+### Assign a custom tag to the Docker image
+
+You can enter the tag you want in the **Tag** textbox. In the following example, we assign the tag 'MyTag' to the Docker image:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_tag.png" 
+     alt="Main window after Tag"
+     width="40%" 
+     height="40%" />
+     
 # Connect to remote workstations via SSH
 
 You can use the GUI with remote workstations when an SSH connection is established. 
@@ -235,7 +237,7 @@ Local port forwarding can be used to secure traffic and access remote services s
 **Run DL4MicEverywhere**
 ```
 cd DL4MicEverywhere
-sudo -E bash launch.sh
+sudo -E bash Linux_launch.sh
 ```
 **Launch Jupyter lab with the remote port**
 After the Docker image is built and Jupyter lab is launched remotely, you need to connect via SSH to the port assigned to Jupyter. To do this, check the new window for the port. For example, in the image below, it is `8888`
