@@ -45,13 +45,15 @@ RUN git clone https://github.com/HenriquesLab/DL4MicEverywhere.git  && \
 FROM nvidia/cuda:${CUDA_VERSION}-base-ubuntu${UBUNTU_VERSION} AS final
 
 # Read all the arguments
-ARG PATH_TO_NOTEBOOK=""
-ARG PATH_TO_REQUIREMENTS=""
-ARG SECTIONS_TO_REMOVE=""
-ARG NOTEBOOK_NAME=""
-ARG GPU_FLAG=""
-ARG PYTHON_VERSION=""
-ARG CUDNN_VERSION=""
+ARG PATH_TO_NOTEBOOK
+ARG PATH_TO_REQUIREMENTS
+ARG SECTIONS_TO_REMOVE
+ARG NOTEBOOK_NAME
+ARG GPU_FLAG
+ARG PYTHON_VERSION
+ARG UBUNTU_VERSION
+ARG CUDA_VERSION
+ARG CUDNN_VERSION
 
 # Set the language
 ENV LANG=C.UTF-8
@@ -73,18 +75,21 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 
 ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 
+RUN echo ${UBUNTU_VERSION%.*}${UBUNTU_VERSION#*.}
+
 # Install common packages and cuda libraries 
-RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub && \
+RUN aux_cuda_version=${CUDA_VERSION%.*} && \
+    apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu${UBUNTU_VERSION%.*}${UBUNTU_VERSION#*.}/x86_64/3bf863cc.pub && \
     apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
-        cuda-command-line-tools-${CUDA_VERSION%.*.*}-8 \
-        cuda-nvrtc-${CUDA_VERSION%.*.*}-8 \
-        libcublas-${CUDA_VERSION%.*.*}-8 \
-        libcublas-dev-${CUDA_VERSION%.*.*}-8 \
-        libcufft-${CUDA_VERSION%.*.*}-8 \
-        libcurand-${CUDA_VERSION%.*.*}-8 \
-        libcusolver-${CUDA_VERSION%.*.*}-8 \
-        libcusparse-${CUDA_VERSION%.*.*}-8 \
+        cuda-command-line-tools-${CUDA_VERSION%.*.*}-${aux_cuda_version#*.} \
+        cuda-nvrtc-${CUDA_VERSION%.*.*}-${aux_cuda_version#*.} \
+        libcublas-${CUDA_VERSION%.*.*}-${aux_cuda_version#*.} \
+        libcublas-dev-${CUDA_VERSION%.*.*}-${aux_cuda_version#*.}  \
+        libcufft-${CUDA_VERSION%.*.*}-${aux_cuda_version#*.}  \
+        libcurand-${CUDA_VERSION%.*.*}-${aux_cuda_version#*.}  \
+        libcusolver-${CUDA_VERSION%.*.*}-${aux_cuda_version#*.}  \
+        libcusparse-${CUDA_VERSION%.*.*}-${aux_cuda_version#*.}  \
         libcudnn8=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*} \
         libgomp1 \
         build-essential \
