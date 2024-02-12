@@ -1,17 +1,39 @@
 # Launch the GUI
 
-After installing the necessary requirements (follow the [Requirements Installation]() in case you have not done it yet), you can launch the GUI by executing the following command in the terminal:
+After installing the necessary requirements (follow the [Requirements Installation]() in case you have not done it yet), you can launch the GUI:
+
+### **On Linux:**
+Run the following command in the terminal:
+> ℹ️ **NOTE**:
+    > You need to be located in the DL4MicEverywhere folder, where `Linux_launch.sh` is in.
+```
+bash Linux_launch.sh
+```
+
+If you want a double click file, you will need to run the following command in the terminal:
+> ℹ️ **NOTE**:
+    > You need to be located in the DL4MicEverywhere folder, where `.tools` folder is in.
+```
+bash .tools/create_desktop.sh
+```
+This will create a `DL4MicEverywhere.desktop` file in your Desktop. You will need to right click the file and ´Allow Launching´, after that you will always be able to launch DL4MicEverywhere by double clicking it.  
+
+### **On MacOS:**
+Double click the `MacOS_launch.command` file (you might get the [following message](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md#macos_launher-cannot-be-oppened)) or run the following command in the terminal:
 
 > ℹ️ **NOTE**:
-    > You need to be located in the DL4MicEverywhere folder, where the file launch.sh is in.
+    > You need to be located in the DL4MicEverywhere folder, where `MacOS_launch.command` is in.
+```
+bash MacOS_launch.command
+```
 
-**On MacOS/Linux:**
+### **On Windows:**
+Double click the `Windows_launch.bat` file (you might get the [following message](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md#windows_launher-cannot-be-oppened)) or run the following command in the terminal:
+
+> ℹ️ **NOTE**:
+    > You need to be located in the DL4MicEverywhere folder, where `Windows_launch.bat` is in.
 ```
-sudo -E bash launch.sh
-```
-**On Windows:**
-```
-wsl bash launch.sh
+.\Windows_launch.bat
 ```
 
 Executing this command will open the following window:
