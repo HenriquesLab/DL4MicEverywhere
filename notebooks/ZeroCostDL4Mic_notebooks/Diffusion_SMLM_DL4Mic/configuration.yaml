@@ -21,7 +21,7 @@ config:
     docker_hub_image: diffusion_smlm_zerocostdl4mic-z1.12-d2.0.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/Diffusion_Model_SMLM_ZeroCostDL4Mic.ipynb
     notebook_version: 1.12
-    python_version: '3.10'
+    python_version: '3.9'
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/Diffusion_model_SMLM_requirements.txt
     sections_to_remove: 1.1. 2.
     ubuntu_version: '22.04'
