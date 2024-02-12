@@ -32,12 +32,12 @@ Here is a simple usage case, where one of the provided `configuration.yaml` file
 
 **On MacOS/Linux:**
 ```
-sudo -E bash launch.sh -c ./notebooks/CARE_2D_DL4Mic/configuration.yaml -d ./data_folder -o ./results_folder
+sudo -E bash Linux_launch.sh -c ./notebooks/CARE_2D_DL4Mic/configuration.yaml -d ./data_folder -o ./results_folder
 ```
 
 **On Windows:**
 ```
-wsl bash launch.sh -c ./notebooks/CARE_2D_DL4Mic/configuration.yaml -d ./data_folder -o ./results_folder
+wsl bash Linux_launch.sh -c ./notebooks/CARE_2D_DL4Mic/configuration.yaml -d ./data_folder -o ./results_folder
 ```
 
 A more complex example would be:
@@ -47,11 +47,11 @@ A more complex example would be:
     
 **On MacOS/Linux:**
 ```
-sudo -E bash launch.sh -c ./my_notebooks/CARE_2D_DL4Mic/configuration.yaml -d /home/user/Documents/data_folder -o /home/user/Documents/results_folder -g -n /home/user/Desktop/MyFancyZeroCostDL4MicNotebook.ipynb -r ./modified_requirements.txt -t MyNewContainer
+sudo -E bash Linux_launch.sh -c ./my_notebooks/CARE_2D_DL4Mic/configuration.yaml -d /home/user/Documents/data_folder -o /home/user/Documents/results_folder -g -n /home/user/Desktop/MyFancyZeroCostDL4MicNotebook.ipynb -r ./modified_requirements.txt -t MyNewContainer
 ```
 **On Windows:**
 ```
-wsl bash launch.sh -c ./my_notebooks/CARE_2D_DL4Mic/configuration.yaml -d /home/user/Documents/data_folder -o /home/user/Documents/results_folder -g -n /home/user/Desktop/MyFancyZeroCostDL4MicNotebook.ipynb -r ./modified_requirements.txt -t MyNewContainer
+wsl bash Linux_launch.sh -c ./my_notebooks/CARE_2D_DL4Mic/configuration.yaml -d /home/user/Documents/data_folder -o /home/user/Documents/results_folder -g -n /home/user/Desktop/MyFancyZeroCostDL4MicNotebook.ipynb -r ./modified_requirements.txt -t MyNewContainer
 ```
 
 In this example, you use your own `configuration.yaml` file, your ZeroCost4Mic style notebook, and your `requirements.txt` file. You also allow the container to use GPUs and assign the tag `MyNewContainer` to the Docker image that will be created.
