@@ -1,0 +1,44 @@
+authors:
+- Estibaliz Gómez-de-Mariscal
+- Constantin Pape
+- Mariana Ferreira
+- BioImage Model Zoo team
+badges:
+- icon: https://colab.research.google.com/assets/colab-badge.svg
+  label: Open in Colab
+  url: https://colab.research.google.com/github/HenriquesLab/DL4MicEverywhere/blob/master/notebooks/Bespoke_notebooks/bioimageio-pytorch/load_bioimageio_model.ipynb
+cite:
+- doi: https://doi.org/10.1101/2022.06.07.495102
+  text: "Wei Ouyang, Fynn Beuttenmueller, Estibaliz Gómez-de-Mariscal, Constantin Pape, et al., BioImage Model Zoo: A Community-Driven Resource for Accessible Deep Learning in BioImage Analysis, bioRxiv 2022"
+- doi: https://doi.org/10.1101/2023.11.19.567606
+  text: "Iván Hidalgo-Cenalmor, Joanna W Pylvänäinen, Mariana G Ferreira, et al., DL4MicEverywhere: Deep learning for microscopy made flexible, shareable, and reproducible, bioRxiv 2023"
+config:
+  dl4miceverywhere:
+    cuda_version: 11.2.2
+    cudnn_version: 8.1.1.33
+    description: Notebook to load models from the BioImage Model Zoo in PyTorch
+    dl4miceverywhere_version: 2.0.0
+    docker_hub_image: bmz-pytorch-b1.0.0-d2.0.0
+    notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/bioimageio-MF/notebooks/Bespoke_notebooks/bioimageio-pytorch/load_bioimageio_model.ipynb
+    notebook_version: 1.0.0
+    python_version: '3.10'
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/bioimageio-MF/notebooks/Bespoke_notebooks/bioimageio-pytorch/requirements.txt
+    sections_to_remove: 1.0.
+    ubuntu_version: '22.04'
+description:  Notebook to load models from the BioImage Model Zoo in PyTorch
+download_url: https://colab.research.google.com/github/HenriquesLab/DL4MicEverywhere/blob/master/notebooks/Bespoke_notebooks/bioimageio-pytorch/load_bioimageio_model.ipynb
+format_version: 0.2.3
+git_repo: https://github.com/bioimage-io/core-bioimage-io-python/tree/main
+id: Notebook_bioimageio_pytorch
+links:
+- Notebook Preview
+name: General BioImageIO notebook - PyTorch
+tags:
+- colab
+- notebook
+- general-notebook
+- pytorch
+- ZeroCostDL4Mic
+- dl4miceverywhere
+type: application
+version: 1.0.0
