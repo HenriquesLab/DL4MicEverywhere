@@ -4,7 +4,7 @@
 
 **What is DL4MicEverywhere?**
 
-DL4MicEverywhere is an initiative that encapsulates deep learning workflows for microscopy into standalone Docker containers. It offers easy access to cutting-edge deep learning through interactive Jupyter notebooks.
+DL4MicEverywhere is an initiative that encapsulates deep learning workflows for microscopy into standalone Docker image. It offers easy access to cutting-edge deep learning through interactive Jupyter notebooks.
 
 **What can I do with DL4MicEverywhere?**
 
@@ -28,7 +28,7 @@ For more detailed instructions, refer to the [step-by-step guideline](https://gi
 
 **How do I select and initiate a notebook?**
 
-The `launch.sh` script offers a graphical interface to select a notebook. You can choose from a list of available notebooks. The GUI also allows you to specify the input data path and output folder. Once selected, the notebook will initiate in a Docker container.
+The `Linux_launch.sh`, `MacOS_launch.command` or `Windows_launch.bat` (depending on your operative system) scripts offer a graphical interface to select a notebook. You can choose from a list of available notebooks. The GUI also allows you to specify the input data path and output folder. Once selected, the notebook will initiate in a Docker container.
 
 **Do I need to code to use the notebooks?** 
 
@@ -48,7 +48,7 @@ The Docker images are automatically built from the repository contents and hoste
 
 **How do I switch between CPU and GPU processing?**
 
-The `launch.sh` script includes a `-g` flag to enable GPU processing. If `-g` is set, the notebook will run on an Nvidia GPU-enabled Docker image. Otherwise, it will use a CPU image.
+The `Linux_launch.sh` script includes a `-g` flag to enable GPU processing (if a configure Nvidia Graphic Card can be found on your device). If `-g` is set, the notebook will run on an Nvidia GPU-enabled Docker image. Otherwise, it will use a CPU image.
 
 **Can I use my own custom notebook?**
 
