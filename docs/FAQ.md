@@ -48,7 +48,7 @@ The Docker images are automatically built from the repository contents and hoste
 
 **How do I switch between CPU and GPU processing?**
 
-The `Linux_launch.sh` script includes a `-g` flag to enable GPU processing (if a configure Nvidia Graphic Card can be found on your device). If `-g` is set, the notebook will run on an Nvidia GPU-enabled Docker image. Otherwise, it will use a CPU image.
+The [GUI](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/GUI_USER_GUIDE.md#activatedeactivate-the-gpu) has a option to choose between the use of CPU or GPU. The [CLI](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/CLI_USER_GUIDE.md#optional-arguments), which is executed with the `Linux_launch.sh` script, includes a `-g` flag to enable GPU processing (if a configure Nvidia Graphic Card can be found on your device). If `-g` is set, the notebook will run on an Nvidia GPU-enabled Docker image. Otherwise, it will use a CPU image.
 
 **Can I use my own custom notebook?**
 
