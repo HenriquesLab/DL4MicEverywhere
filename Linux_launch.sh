@@ -583,12 +583,16 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     port=8888
     while ( lsof -i:$port &> /dev/null )
     do
+
+        echo WARNING: Port $port is already allocated.
         port=$((port+1))
         if [ $port -gt 9000 ]; then
             # We want the port to be between 8000 and 9000
             port=8000
         fi
     done
+
+    echo SUCCESS: Port $port will be used.
 
     # Based on the openssl command and the base64 encoding, a 50 characters token is generated
     notebook_token=$(openssl rand -base64 50 | tr -dc 'a-zA-Z0-9')

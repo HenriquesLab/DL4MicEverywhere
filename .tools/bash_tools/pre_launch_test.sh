@@ -27,7 +27,7 @@ echo ""
 
 # Check if the Docker daemon is running
 if ! docker info &> /dev/null; then
-    echo "Error: Docker daemon is not running"
+    echo "WARNING: Docker daemon is not running"
 
     docker_flag=$(wish $BASEDIR/../tcl_tools/docker_desktop_gui.tcl)
     if [[ "$build_flag" -ne 1 ]]; then
