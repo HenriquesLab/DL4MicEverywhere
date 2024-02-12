@@ -39,9 +39,9 @@ This guide provides solutions to common issues encountered when using DL4MicEver
 This issue happens on Windows computers because the virtualization is not enabled in you BIOS and usually comes with the following message and forcing Docker to stop or close.
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TROUBLESHOOTING/Windows_virt_docker.PNG" 
-     alt="Cannot open"
-     width="30%" 
-     height="30%" />
+     alt="Docker virtualization"
+     width="60%" 
+     height="60%" />
 
 This process requires you to restart your computer, enter the BIOS and enabling this option. For more detailed instructions, we recommend following the step described on the following videos [Enable Virtualization on Windows 10](https://www.youtube.com/watch?v=LQIyowZMiY8) or [Enable Virtualization on Windows 11](https://youtu.be/t8f-zw_wcWM?si=pG2FlhXMImwrWfg7).
 
@@ -177,8 +177,8 @@ This time you will get a different message, and by clicking `Open` you are allow
 
 Windows computers will warn you that the file you want to launch is an unrecognized app and will pop you the following message:
 
-<img src="hhttps://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/WINDOWS_FIRST_USE_WARNING.png" 
-     alt="Windows protected"
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TROUBLESHOOTING/Windows_cannot_open.png" 
+     alt="Windows cannot open"
      width="30%" 
      height="30%" />
      
@@ -186,10 +186,10 @@ To allow the double click launching you just need to choose the ´More info´ op
 
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TROUBLESHOOTING/Windows_allow_open.png" 
-     alt="Windows protected"
+     alt="Windows allow"
      width="30%" 
      height="30%" />
-
+     
 ## General
 
 ### **WsRegisterDistribution failed with error: 0x80370102**
@@ -197,9 +197,9 @@ To allow the double click launching you just need to choose the ´More info´ op
 This issue happens on Windows computers because the virtualization is not enabled in you BIOS and usually comes with the following message and forcing Docker to stop or close.
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TROUBLESHOOTING/Windows_virt_wsl.PNG" 
-     alt="Cannot open"
-     width="30%" 
-     height="30%" />
+     alt="WSL virtualization"
+     width="60%" 
+     height="60%" />
 
 This process requires you to restart your computer, enter the BIOS and enabling this option. For more detailed instructions, we recommend following the step described on the following videos [Enable Virtualization on Windows 10](https://www.youtube.com/watch?v=LQIyowZMiY8) or [Enable Virtualization on Windows 11](https://youtu.be/t8f-zw_wcWM?si=pG2FlhXMImwrWfg7).
 
