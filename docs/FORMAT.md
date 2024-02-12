@@ -11,6 +11,7 @@ The structure of these YAML file is the same as in the BioImage Model Zoo with a
         * **`notebook_url`**: The URL to the Jupyter notebook that is stored in the Docker image.
         * **`requirements_url`**: The URL Python dependencies that are installed in the Docker image.
         * **`cuda_version`**: The CUDA version in the Docker image. The CUDA version is used to pull the Ubuntu image from Docker Hub (from [Nvidia](https://hub.docker.com/r/nvidia/dcgm-exporter) if GPU is selected). Its version (and the `ubuntu_version`) should be one from the following [list](https://gitlab.com/nvidia/container-images/cuda/blob/master/doc/supported-tags.md).
+        * **`cudnn_version`**: The cuDNN (CUDA Deep Neural Network) library's version in the Docker image. The cuDNN version is used for the installation of libraries that will allow the training of Deep Neural Networks(if GPU is selected).
         * **`ubuntu_version`**: The Ubuntu version for the operating system in the Docker image. This version is used to pull the base image from Docker Hub (from [Nvidia](https://hub.docker.com/r/nvidia/dcgm-exporter) if GPU is selected and from [Ubuntu](https://hub.docker.com/_/ubuntu) otherwise). The selected Ubuntu version must be between among the supported tags.
         * **`python_version`**: The installed Python version in the docker image.
         * **`sections_to_remove`**: The sections from the ZeroCostDL4Mic style notebook that are removed. Must be separated by spaces and follow the X.X. format. To keep all the sections, leave this argument empty; you still need to declare it.
@@ -27,6 +28,7 @@ config:
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/CARE_2D_ZeroCostDL4Mic.ipynb
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/CARE_2D_requirements_simple.txt
     cuda_version: 11.8.0
+    cuda_version:  8.6.0.163
     ubuntu_version: '22.04'
     python_version: '3.10'
     sections_to_remove: 1.1. 1.2. 2. 6.3.
@@ -34,6 +36,5 @@ config:
     notebook_version: 1.15.2
     dl4miceverywhere_version: 1.0.0
     docker_hub_image: care_2d_zerocostdl4mic-z1.15.2-d1.0.0
-
 ```
 Find the complete file [here](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/ZeroCostDL4Mic_notebooks/CARE_2D_DL4Mic/configuration.yaml). 
