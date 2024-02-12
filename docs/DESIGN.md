@@ -34,9 +34,9 @@ GitHub Actions are set up to automatically build and publish these containers to
 
 There is a different launchers for each operative system:
 
-- [`MacOS_launch.sh`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/MacOS_launch.sh): which is a double click launcher for MacOS systems. You might get a message saying 'cannot be oppened because it is from an unidentified developer', if that is the case, right click `MacOS_launch.sh` and select `Open` option, what will launch a similar message but know with an `Open` option.
-- [`Windows_launch.sh`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/Windows_launch.sh)
-- [`Linux_launch.sh`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/Linux_launch.sh)
+- [`MacOS_launch.command`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/MacOS_launch.sh): which is a double click launcher for MacOS systems. Your computer might block the use of this file, in that case follow the steps we provide in [this troubleshoot](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md#macos_launher-cannot-be-oppened). 
+- [`Windows_launch.bat`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/Windows_launch.sh): which is a double click launcher for Windows systems. Your computer might block the use of this file, in that case follow the steps we provide in [this troubleshoot](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md#windows_launher-cannot-be-oppened). 
+- [`Linux_launch.sh`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/Linux_launch.sh): is the main launcher that is called by the others, this is not a double click launcher, but you can create one by running the `create_desktop.sh` script.
 
 The [`Linux_launch.sh`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/Linux_launch.sh) script offers a straightforward interface for building and running the Docker containers. It manages argument parsing, configuration file reading, pre-build testing, image building, and container execution.
 
