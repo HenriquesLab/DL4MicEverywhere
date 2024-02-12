@@ -130,6 +130,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: Dockerfile
           platforms: linux/amd64
           push: true
           tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64
@@ -146,6 +147,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: Dockerfile.gpu
           platforms: linux/amd64
           push: true
           tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu
@@ -184,6 +186,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: Dockerfile
           platforms: linux/arm64
           push: true
           tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
