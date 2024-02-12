@@ -115,7 +115,13 @@ while getopts :hc:d:o:gn:r:t:x flag;do
         o)
             result_path="$OPTARG" ;;
         g)
-            gpu_flag=1 ;;
+            if nvidia-smi &> /dev/null; then
+                gpu_flag=1
+            else
+                echo ""
+                echo "Sorry, there is no configured Nvidia graphic card on your device, the docker image will be created without GPU."
+                echo ""
+            fi ;;
         n)
             notebook_path="$OPTARG" ;;
         r)
