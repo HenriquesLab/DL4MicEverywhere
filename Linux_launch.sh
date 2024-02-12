@@ -563,6 +563,8 @@ fi
 # Execute the post building tests
 /bin/bash $BASEDIR/.tools/bash_tools/post_build_test.sh || exit 1
 
+sleep 3
+
 # Local files, if included, need to be removed to avoid the overcrowding the folder
 if [ "$local_notebook_flag" -eq 1 ]; then
    rm $BASEDIR/notebook.ipynb
@@ -589,6 +591,7 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
         if [ $port -gt 9000 ]; then
             # We want the port to be between 8000 and 9000
             port=8000
+        sleep 1
         fi
     done
 
