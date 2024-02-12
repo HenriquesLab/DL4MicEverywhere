@@ -198,8 +198,8 @@ This issue happens on Windows computers because the virtualization is not enable
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TROUBLESHOOTING/Windows_virt_wsl.PNG" 
      alt="WSL virtualization"
-     width="60%" 
-     height="60%" />
+     width="75%" 
+     height="75%" />
 
 This process requires you to restart your computer, enter the BIOS and enabling this option. For more detailed instructions, we recommend following the step described on the following videos [Enable Virtualization on Windows 10](https://www.youtube.com/watch?v=LQIyowZMiY8) or [Enable Virtualization on Windows 11](https://youtu.be/t8f-zw_wcWM?si=pG2FlhXMImwrWfg7).
 
