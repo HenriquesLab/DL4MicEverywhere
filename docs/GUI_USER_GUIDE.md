@@ -248,6 +248,6 @@ After the Docker image is built and Jupyter lab is launched remotely, you need t
 
 To establish the connection, open a new window in the Terminal and type:
 ```
-ssh -L 8888:localhost:8888 ocb@172.22.50.188
+ssh -L 8888:localhost:8888 username@XXX.XX.XX.XXX
 ```
 Copy the path given by the terminal into a browser (the one highlighted in the screenshot above).
