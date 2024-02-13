@@ -21,7 +21,7 @@ config:
     docker_hub_image: bmz-pytorch-b1.0.0-d2.0.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/bioimageio-MF/notebooks/Bespoke_notebooks/bioimageio-pytorch/load_bioimageio_model.ipynb
     notebook_version: 1.0.0
-    python_version: '3.10'
+    python_version: '3.9'
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/bioimageio-MF/notebooks/Bespoke_notebooks/bioimageio-pytorch/requirements.txt
     sections_to_remove: 1.0.
     ubuntu_version: '20.04'
