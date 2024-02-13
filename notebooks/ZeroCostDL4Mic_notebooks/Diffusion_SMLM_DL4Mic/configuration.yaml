@@ -1,6 +1,6 @@
 authors:
-- "Alon Saguy"
-- "Yoav Shechtman"
+- Alon Saguy
+- Yoav Shechtman
 badges:
 - icon: https://colab.research.google.com/assets/colab-badge.svg
   label: Open in Colab
@@ -8,7 +8,7 @@ badges:
 cite:
 - text: 'Saguy Alon, Tav Nahimov, Maia Lehrman, Onit Alalouf, and Yoav Shechtman. This microtubule does not exist: Super-resolution microscopy image generation by a diffusion model. bioRxiv, 2023-07. https://doi.org/10.1101/2023.07.06.548004'
   url: https://doi.org/10.1101/2023.07.06.548004
-- text: 'Nichol, A.Q. and Dhariwal, P., 2021, July. Improved denoising diffusion probabilistic models. In International Conference on Machine Learning (pp. 8162-8171). PMLR.'
+- text: Nichol, A.Q. and Dhariwal, P., 2021, July. Improved denoising diffusion probabilistic models. In International Conference on Machine Learning (pp. 8162-8171). PMLR.
   url: https://proceedings.mlr.press/v139/nichol21a.html
 - doi: https://doi.org/10.1038/s41467-021-22518-0
   text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
@@ -18,7 +18,7 @@ config:
     cudnn_version: 8.6.0.163
     description: Diffusion_SMLM_DL4Mic is the conversion of the Diffusion Model for SMLM from ZeroCostDL4Mic.
     dl4miceverywhere_version: 2.0.0
-    docker_hub_image: diffusion_smlm_zerocostdl4mic-z1.12-d2.0.0
+    docker_hub_image: diffusion_model_smlm_zerocostdl4mic-z1.12-d2.0.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/Diffusion_Model_SMLM_ZeroCostDL4Mic.ipynb
     notebook_version: 1.12
     python_version: '3.9'
