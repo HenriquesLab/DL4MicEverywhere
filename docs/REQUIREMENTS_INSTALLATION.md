@@ -1,5 +1,6 @@
 # DL4MicEverywhere Requirements Installation Guidelines
 
+You can double-click the launcher in the DL4MicEverywhere folder (which has the same name as your system, e.g., Windows_launch for Windows operating systems) to launch the GUI, but it also does some requirements checking. At the beginning of the process, the launcher checks if the requirements listed below are installed; otherwise, they are installed automatically. It can happen that the installation is not successfully done; in that case, please follow the guidelines provided on this page.
 
 ### Requirements
 
@@ -23,7 +24,7 @@ Windows operating systems require a slightly more complicated installation proce
 - Install and/or update all the GPU [NVIDIA drivers](https://www.nvidia.com/download/index.aspx), [cudatoolkit](https://developer.nvidia.com/cuda-toolkit), and [cuDNN](https://developer.nvidia.com/cudnn) necessary for your GPU.  
 
 ## 1. Docker Desktop installation
-Firstly, Docker Desktop needs to be installed on your computer. Follow the official guidelines: https://docs.docker.com/desktop/install/mac-install/
+Firstly, Docker Desktop needs to be installed on your computer. Follow the official guidelines: https://docs.docker.com/desktop/install/windows-install/:
  - During installation tick the recommended **WLS2** option.
  - To finalize the installation **Restart** the computer.
 
@@ -33,8 +34,9 @@ Firstly, Docker Desktop needs to be installed on your computer. Follow the offic
 Open a Command Line (cmd.exe) or PowerShell window and run:
  
 ```
-wsl --install
+wsl --install -d Ubuntu
 ```
+
 This will install Ubuntu inside WSL.
 
 Once the installation ends it will ask for a username and a password. This is not necessary, exit the installation by using **Ctrl+C** or by closing the window.
@@ -65,10 +67,10 @@ TCL/TK is required for the graphical user interface (GUI) of DL4MicEverywhere, a
 
 This requires running the following commands in the Command Line or PowerShell window:
 ```
-wsl apt-get update
+wsl sudo apt-get -y update
 ```
 ```
-wsl apt-get install tk
+wsl sudo apt-get -y install tk
 ```
 
 Now TCL/TK should be installed inside WSL's Ubuntu.
@@ -77,7 +79,7 @@ To check if TCL/TK is correctly installed run:
 ```
 wsl wish
 ```
-This should open a new window named Wish. If it fails repeat the previous steps again.
+This should open a new window named Wish. If it fails repeat the previous steps again or create a [Issue](https://github.com/HenriquesLab/DL4MicEverywhere/issues/new/choose) letting us know your problem. 
 
 </details>
 
@@ -95,8 +97,9 @@ The only requirement to use the graphical user interface (GUI) is to have [Tcl/T
 Most Unix / Linux operating system distributions include Tcl and Tk. If not already installed, use your system's package manager to install the appropriate packages. For Ubuntu, use the following commands:
 
 ```
-sudo apt-get install tcl
-sudo apt-get install tk
+sudo apt-get -y update
+sudo apt-get -y install tcl
+sudo apt-get -y install tk
 ```
 
 </details>
