@@ -5,7 +5,7 @@ import nbformat
 installation_regex = r'(pip|conda) install (.*)'
 float_regex = r"[-+]?\d*\.\d+|[-+]?\d+"
 ipywidget_style = "{'description_width': 'initial'}"
-param_regex = r"(\w+)\s*=\s*([\S\s]+?)\s*#@param\s*(.+)"
+param_regex = r"(\w+)\s*=\s*([\S\s]+?)\s*# *@param\s*(.+)"
 
 assignation_regex =  r'^\s*([a-zA-Z_]\w*(?:\s*,\s*[a-zA-Z_]\w*)*)\s*=\s*.*$'
 function_regex = r"^\s*def\s+([a-zA-Z_]\w*)\s*\(.+\)\s*:\s*$"
