@@ -1,7 +1,7 @@
 authors:
-- "Estibaliz Gómez-de-Mariscal"
+- "Estibaliz G\xF3mez-de-Mariscal"
 - Constantin Pape
-- Iván Hidalgo-Cenalmor
+- "Iv\xE1n Hidalgo-Cenalmor"
 - BioImage Model Zoo team
 badges:
 - icon: https://colab.research.google.com/assets/colab-badge.svg
