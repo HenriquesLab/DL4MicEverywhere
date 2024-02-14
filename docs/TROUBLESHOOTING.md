@@ -150,7 +150,7 @@ This process requires you to restart your computer, enter the BIOS and enabling 
   
 ## Launchers
 
-### **`MacOs_launher` cannot be oppened**
+### **`MacOs_launcher` cannot be oppened**
 
 MacOS computers will notify you that the file you want to launch cannot verified if it is free from malware and it will pop you the following message:
 
@@ -182,7 +182,7 @@ Windows computers will warn you that the file you want to launch is an unrecogni
      width="30%" 
      height="30%" />
      
-To allow the double click launching you just need to choose the ´More info´ option and after that click on ´Run anyway´ as in it can be seen bellow, allowing with this to run this file in future occasions.
+To allow the double click launching you just need to choose the ´More info´ option and after that click on ´Run anyway´ as in it can be seen below, allowing with this to run this file in future occasions.
 
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TROUBLESHOOTING/Windows_allow_open.png" 

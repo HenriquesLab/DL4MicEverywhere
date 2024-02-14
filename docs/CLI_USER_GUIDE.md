@@ -1,6 +1,6 @@
 # DL4MicEverywhere Command Line Interface (CLI) User Guide
 
-If you prefer to execute using the terminal, the following are the arguments you can use along with the command to execute the bash file. Note that if you wish to use the graphical user interface (without providing any argument), you need to follow the steps in the [GUI tutorial](GUI_USER_GUIDE.md).
+If you prefer to execute using the terminal, the following are the arguments you can use along with the command to execute the bash file. Note that if you wish to use the graphical user interface (without providing any argument), you need to follow the steps in the main [User Guide](USER_GUIDE.md).
 
 # **Mandatory** arguments
 

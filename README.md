@@ -92,7 +92,7 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 ## Documentation
 - [Step-by-step "How to" guide](docs/USER_GUIDE.md)
   - [Manual Installation of the Requirements](docs/REQUIREMENTS_INSTALLATION.md)
-- [Remote Connection](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/GUI_USER_GUIDE.md#connection-with-remote-workstations-through-ssh)
+- [Remote Connection](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/REMOTE_CONNECTION.md)
 - Notebooks
   - [Notebook Types](docs/NOTEBOOK_TYPES.md)
   - [Notebook List](docs/NOTEBOOKS.md)

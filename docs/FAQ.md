@@ -22,7 +22,7 @@ DL4MicEverywhere allows you to utilize the pre-packaged Jupyter notebooks for a 
 2. Double-click the launcher in the DL4MicEverywhere folder that has the same name as your system (e.g., `Windows_launch` for Windows operating systems). A GUI will automatically pop-up.
 3. Choose a notebook and run!
 
-For more detailed instructions, refer to the [step-by-step guideline](https://github.com/HenriquesLab/DL4MicEverywhere/wiki/Step%E2%80%90by%E2%80%90step-guideline).
+For more detailed instructions, refer to the [User Guide](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/USER_GUIDE.md).
 
 ## Usage
 
@@ -48,11 +48,11 @@ The Docker images are automatically built from the repository contents and hoste
 
 **How do I switch between CPU and GPU processing?**
 
-The [GUI](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/GUI_USER_GUIDE.md#activatedeactivate-the-gpu) has a option to choose between the use of CPU or GPU. The [CLI](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/CLI_USER_GUIDE.md#optional-arguments), which is executed with the `Linux_launch.sh` script, includes a `-g` flag to enable GPU processing (if a configure Nvidia Graphic Card can be found on your device). If `-g` is set, the notebook will run on an Nvidia GPU-enabled Docker image. Otherwise, it will use a CPU image.
+The [GUI](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/USER_GUIDE.md#activatedeactivate-the-gpu) has a option to choose between the use of CPU or GPU. The [CLI](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/CLI_USER_GUIDE.md#optional-arguments), which is executed with the `Linux_launch.sh` script, includes a `-g` flag to enable GPU processing (if a configure Nvidia Graphic Card can be found on your device). If `-g` is set, the notebook will run on an Nvidia GPU-enabled Docker image. Otherwise, it will use a CPU image.
 
 **Can I use my own custom notebook?**
 
-The [GUI](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/GUI_USER_GUIDE.md#select-a-local-notebook) has a option to select your own custom notebook. The [CLI](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/CLI_USER_GUIDE.md#optional-arguments), which is executed with the `Linux_launch.sh` script, includes `-n` argument where you can specify the path to a local notebook file, this will override the notebook defined in the `configuration.yaml` file. Your notebook file will be the one loaded into the Docker image.
+The [GUI](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/USER_GUIDE.md#select-a-local-notebook) has a option to select your own custom notebook. The [CLI](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/CLI_USER_GUIDE.md#optional-arguments), which is executed with the `Linux_launch.sh` script, includes `-n` argument where you can specify the path to a local notebook file, this will override the notebook defined in the `configuration.yaml` file. Your notebook file will be the one loaded into the Docker image.
 
 ## Development
 
