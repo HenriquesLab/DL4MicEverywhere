@@ -6,7 +6,7 @@ authors:
 badges:
 - icon: https://colab.research.google.com/assets/colab-badge.svg
   label: Open in Colab
-  url: https://colab.research.google.com/github/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/Bespoke_notebooks/bioimageio-tensorflow/load_bioimageio_model.ipynb
+  url: https://colab.research.google.com/github/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/Bespoke_notebooks/bioimageio-tensorflow/load_bioimageio_tensorflow.ipynb
 cite:
 - doi: https://doi.org/10.1101/2022.06.07.495102
   text: "Wei Ouyang, Fynn Beuttenmueller, Estibaliz G\xF3mez-de-Mariscal, Constantin Pape, et al., BioImage Model Zoo: A Community-Driven Resource for Accessible Deep Learning in BioImage Analysis, bioRxiv 2022"
@@ -19,14 +19,14 @@ config:
     description: Notebook to load models from the BioImage Model Zoo in TensorFlow 
     dl4miceverywhere_version: 2.0.0
     docker_hub_image: load_bioimageio_tensorflow-b1.0.0-d2.0.0
-    notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/bioimageio-tensorflow/load_bioimageio_model.ipynb
+    notebook_url: https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/Bespoke_notebooks/bioimageio-tensorflow/load_bioimageio_tensorflow.ipynb
     notebook_version: 1.0.0
     python_version: '3.9'
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/bioimageio-tensorflow/requirements.txt
     sections_to_remove: 1.0.
     ubuntu_version: '20.04'
 description: Notebook to load models from the BioImage Model Zoo in TensorFlow
-download_url: https://colab.research.google.com/github/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/Bespoke_notebooks/bioimageio-tensorflow/load_bioimageio_model.ipynb
+download_url: https://colab.research.google.com/github/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/Bespoke_notebooks/bioimageio-tensorflow/load_bioimageio_tensorflow.ipynb
 format_version: 0.2.3
 git_repo: https://github.com/bioimage-io/core-bioimage-io-python/tree/main
 links:
