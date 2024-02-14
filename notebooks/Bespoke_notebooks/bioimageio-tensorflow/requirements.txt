@@ -4,3 +4,4 @@ matplotlib==3.5.3
 imageio==2.31.2
 numpy==1.23.5
 tensorflow==2.15
+pooch==1.8
