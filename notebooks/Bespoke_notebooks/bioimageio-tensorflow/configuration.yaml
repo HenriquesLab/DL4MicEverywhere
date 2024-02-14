@@ -1,12 +1,12 @@
 authors:
-- "Estibaliz G\xF3mez-de-Mariscal"
+- "Estibaliz Gómez-de-Mariscal"
 - Constantin Pape
-- Mariana Ferreira
+- Iván Hidalgo-Cenalmor
 - BioImage Model Zoo team
 badges:
 - icon: https://colab.research.google.com/assets/colab-badge.svg
   label: Open in Colab
-  url: https://colab.research.google.com/github/HenriquesLab/DL4MicEverywhere/blob/master/notebooks/Bespoke_notebooks/bioimageio-pytorch/load_bioimageio_model.ipynb
+  url: https://colab.research.google.com/github/HenriquesLab/DL4MicEverywhere/blob/master/notebooks/Bespoke_notebooks/bioimageio-tensorflow/load_bioimageio_model.ipynb
 cite:
 - doi: https://doi.org/10.1101/2022.06.07.495102
   text: "Wei Ouyang, Fynn Beuttenmueller, Estibaliz G\xF3mez-de-Mariscal, Constantin Pape, et al., BioImage Model Zoo: A Community-Driven Resource for Accessible Deep Learning in BioImage Analysis, bioRxiv 2022"
@@ -29,7 +29,6 @@ description: Notebook to load models from the BioImage Model Zoo in TensorFlow
 download_url: https://colab.research.google.com/github/HenriquesLab/DL4MicEverywhere/blob/master/notebooks/Bespoke_notebooks/bioimageio-tensorflow/load_bioimageio_model.ipynb
 format_version: 0.2.3
 git_repo: https://github.com/bioimage-io/core-bioimage-io-python/tree/main
-id: Notebook_bioimageio_pytorch
 links:
 - Notebook Preview
 name: General BioImageIO notebook - TensorFlow
@@ -37,7 +36,7 @@ tags:
 - colab
 - notebook
 - general-notebook
-- pytorch
+- tensorflow
 - ZeroCostDL4Mic
 - dl4miceverywhere
 type: application
