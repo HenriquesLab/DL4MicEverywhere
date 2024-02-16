@@ -17,8 +17,14 @@ if not exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" (
   :: echo x=msgbox("To ensure that all the changes are properly applied, please restart your computer. Then click the Windows_launcher again.",0,"Installation completed") >> %tmp%\tmp.vbs
   :: wscript %tmp%\tmp.vbs
   :: del %tmp%\tmp.vbs
-  msg * "Docker Desktop installation completed! To ensure that all the changes are properly applied, please restart your computer. Then click the Windows_launcher."
-  exit 1
+  echo ""
+  echo "----------------------------------------------------"
+  echo "Docker Desktop installation completed!"
+  echo "To ensure that all the changes are properly applied, please restart your computer." 
+  echo "Then click the Windows_launcher."
+  echo "----------------------------------------------------"
+  pause
+  exit
 )
 
 :: Check if WSL is installed
@@ -56,8 +62,15 @@ if %isubuntu%==0 (
   :: echo x=msgbox("To ensure that all the changes are properly applied, please restart your computer. Then click the Windows_launcher again.",0,"Installation completed") >> %tmp%\tmp.vbs
   :: wscript %tmp%\tmp.vbs
   :: del %tmp%\tmp.vbs
-  msg * "Ubuntu installation on WSL completed! To ensure that all the changes are properly applied, please restart your computer. Then click the Windows_launcher."
-  exit 1
+  
+  echo ""
+  echo "----------------------------------------------------"
+  echo "Ubuntu in WSL installation completed!"
+  echo "To ensure that all the changes are properly applied, please restart your computer." 
+  echo "Then click the Windows_launcher."
+  echo "----------------------------------------------------"
+  pause
+  exit
 ) else (
   :: If it is intalled, check if it is the default distribution
   if not %defaultdist%==Ubuntu (
