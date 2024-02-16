@@ -33,7 +33,7 @@ To run DL4MicEverywhere for the first time you need to have root/admin permissio
 If it encounters an issue during the automatic installation of the requirements, the [REQUIREMENTS INSTALLATION](REQUIREMENTS_INSTALLATION.md) page has detailed information about the requirements and intructions on how to manually install them.
 Once the process has finished, the computer needs to be restarted.
 
-#### Running for the First Time on Windows:
+#### Running for the first time on Windows:
 
 The requirements installation on Windows, even if it is automated, goes through some steps that the user needs to be aware of:
 
