@@ -28,7 +28,19 @@ if not exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" (
 for /f "tokens=* USEBACKQ skip=1" %%g in (`wsl --status`) do (set wslworking=%%g)
 
 :: In case is not installed, install it
-if ["%wslworking%"]==[""] wsl --install
+if ["%wslworking%"]==[""] (
+  wsl --install Ubuntu
+  
+  :: Ask the user to restart its computer
+  echo 
+  echo ------------------------------------------------------------------------------------
+  echo Ubuntu in WSL installation completed!
+  echo To ensure that all the changes are properly applied, please restart your computer. 
+  echo Then click the Windows_launcher.
+  echo ------------------------------------------------------------------------------------
+  pause
+  exit
+)
 
 :: Go trough all the WSL distributions in your computer
 for /f "tokens=* USEBACKQ skip=1" %%F in (`wsl --list`) do (
