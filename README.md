@@ -75,7 +75,7 @@ Refer to the [Step-by-step "How to" guide](docs/USER_GUIDE.md) and [Requirements
 
 Reproduce the demo in the video with the `U-Net (2D) multilabel` notebook and [Bacillus subtilis segmentation data from DeepBacs](https://zenodo.org/records/5639253). Note that run time will vary from minutes to hours depending on the GPU availability and computing resources. 
 
-[![alt text](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/STEP_BY_STEP.gif)]([https://youtu.be/d1FB_zc5gVc](https://youtu.be/rUt1aG_AXh8?si=cz1j0rwVZbfDbCXG))
+[![alt text](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/STEP_BY_STEP.gif)](https://youtu.be/rUt1aG_AXh8?si=cz1j0rwVZbfDbCXG)
 
 #### Requirements
 DL4MicEverywhere rely on the following external software that is automatically installed when launching the tool.
