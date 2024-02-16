@@ -251,7 +251,7 @@ When you run the code cells (either by pressing `Ctrl+Enter` or clicking on the 
      width="60%" 
      height="60%" />
 
-## 5 Containerise your own pipelines (Advance mode)
+## 5 Containerise your own pipelines (Advanced options)
 The advance options of DL4MicEverywhere allows for the containerisation of local pipelines or custom configurations that are not published as part of the collection of DL4MicEverywhere. It also provides a chance to test the containerisation and the format of DL4MicEverywhere notebooks before uploading them . 
 
 Clicking on the **Advanced options** button at the bottom will display a new section:
