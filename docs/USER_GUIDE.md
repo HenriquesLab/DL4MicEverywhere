@@ -39,11 +39,13 @@ Docker Desktop installer will be automatically downloaded and launched. When pro
 After the installation has been completed, you will be asked to restart the computer, and the terminal will close. Please restart your computer and click again on the `Windows_launch` file.
 
 2. **Automatic Installation of Ubuntu Distribution on Windows Subsystem for Linux (WSL):**
-   In this step, the Ubuntu distribution will be automatically installed within WSL. Here, you will be asked for a username and a password. These do not have to be the same as in your computer, but you will need to remember them because you will be asked for them in the future. Once everything has been installed, the terminal will be inside the Ubuntu distribution. You will need to type `logout` and press Enter. With this, the installation will be completed, and you will be asked to restart your computer again.
+   In this step, the Ubuntu distribution will be automatically installed within WSL. You are asked for a username and a password. These can be different from the credentials on your computer, but you need to remember them for the future. Once everything has been installed, the terminal will be inside the Ubuntu distribution. You will need to type `logout` and press Enter. With this, the installation will be completed, and you will be asked to restart your computer again.
 
 3. **Requirements Installation within the WSL:**
-   In this last step, `TCL/TK` and `xdg-utils` will be automatically installed inside the WSL. If this is successful, you will not need to restart your computer. It might prompt you to start the Docker Desktop application on your computer. Afterwards, the GUI will pop up, and here you can follow the [steps below](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/USER_GUIDE.md#step-by-step-guide-to-use-dl4miceverywhere-notebooks). If the GUI is not displayed correctly, please restart your computer once more, and this issue will be fixed.
+  `TCL/TK` and `xdg-utils` will be automatically installed inside the WSL. If this is successful, you do not need to restart your computer. It might prompt you to start the Docker Desktop application on your computer. Afterwards, the GUI will pop up, and you can start using DL4MicEverywhere. If the GUI is not displayed correctly, please restart your computer once more, and this issue will be fixed.
 
+#### Linux:
+TODO (Iván)
 
 The [REQUIREMENTS INSTALLATION](REQUIREMENTS_INSTALLATION.md) page has detailed information about the requirements and instructions on how to manually install them. If you find problems with the installation, pplease, check our [Troubleshooting page](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md) and if your problem is not there, let us know creating an [issue](https://github.com/HenriquesLab/DL4MicEverywhere/issues).
 
