@@ -30,24 +30,65 @@ DL4MicEverywhere comes packaged with an executable for each operating system. Do
 
 To run DL4MicEverywhere for the first time you need to have root/admin permissions as the program will check for the presence of the requirements and will attempt to install any that are missing. 
 
-#### Windows:
+This automatic requirements installation will be different on each operative system:
 
-The installation on Windows guides you through few extra steps:
-
-1. **Automatic Docker Desktop Installation:**
-Docker Desktop installer will be automatically downloaded and launched. When prompted, ensure that the "Use WSL 2 instead of Hyper-V" option on the Configuration page is selected or not, depending on your choice of backend.
-After the installation has been completed, you will be asked to restart the computer, and the terminal will close. Please restart your computer and click again on the `Windows_launch` file.
-
-2. **Automatic Installation of Ubuntu Distribution on Windows Subsystem for Linux (WSL):**
-   In this step, the Ubuntu distribution will be automatically installed within WSL. You are asked for a username and a password. These can be different from the credentials on your computer, but you need to remember them for the future. Once everything has been installed, the terminal will be inside the Ubuntu distribution. You will need to type `logout` and press Enter. With this, the installation will be completed, and you will be asked to restart your computer again.
-
-3. **Requirements Installation within the WSL:**
-  `TCL/TK` and `xdg-utils` will be automatically installed inside the WSL. If this is successful, you do not need to restart your computer. It might prompt you to start the Docker Desktop application on your computer. Afterwards, the GUI will pop up, and you can start using DL4MicEverywhere. If the GUI is not displayed correctly, please restart your computer once more, and this issue will be fixed.
-
-#### Linux:
+<details>
+<summary>On Linux:</summary>
+    
 TODO (Iván)
 
-The [REQUIREMENTS INSTALLATION](REQUIREMENTS_INSTALLATION.md) page has detailed information about the requirements and instructions on how to manually install them. If you find problems with the installation, pplease, check our [Troubleshooting page](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md) and if your problem is not there, let us know creating an [issue](https://github.com/HenriquesLab/DL4MicEverywhere/issues).
+</details>
+
+
+<details>
+<summary>On MacOs:</summary>
+    
+The automatic installation on MacOs guides you through these steps:
+
+1. **Homebrew installation:**
+
+    1.1. Homebrew will be automatically downloaded and installed.
+
+    1.2. You need to enter the password and click RETURN/ENTER when asked.
+
+2. **TCL/TK and Docker Desktop are automatically installed (do not need interaction) and GUI will pop up.**
+
+</details>
+
+<details>
+<summary>On Windows:</summary>
+
+The automatic installation on Windows guides you through these steps:
+
+1. **Docker Desktop installation:**
+
+   1.1. Docker Desktop installer will be automatically downloaded and started.
+
+   1.2. During installation, ensure that the "Use WSL 2 instead of Hyper-V" option is selected ☑️.
+
+   1.3. After succesfull installation, the terminal will close. Please restart your computer and click again on the `Windows_launch` file.
+
+2. **Windows Subsystem for Linux (WSL) installation:**
+
+   2.1. Ubuntu will be automatically installed on WSL.
+
+   2.2. You need to enter a username and a password, these can be different from the credentials on your computer (**IMPORTANT:** remember the password for the future).
+
+   2.3. After installation, you will need to type `logout` and press Enter.
+
+   2.4. Then, the terminal will close. Please restart your computer and click again on the `Windows_launch` file.
+
+3. **Linux libraries installation and starting DL4MicEverywhere:**
+
+   3.1. Linux libraries (TCL/TK and xdg-open) will be automatically installed inside WSL.
+
+   3.2. If Docker Desktop is not already running, it will ask you to start it.
+
+   3.3. Finally, the GUI will pop up, and you can start using DL4MicEverywhere. If the GUI is not displayed correctly, please restart your computer once more to fix the issue.
+
+</details>
+
+The [REQUIREMENTS INSTALLATION](REQUIREMENTS_INSTALLATION.md) page has detailed information about the requirements and instructions on how to manually install them. If you find problems with the installation, please, check our [Troubleshooting page](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md) and if your problem is not there, let us know creating an [issue](https://github.com/HenriquesLab/DL4MicEverywhere/issues).
 
 
 # Quickstart 
