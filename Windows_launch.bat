@@ -14,9 +14,10 @@ if not exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" (
   powershell -Command Start-Process "%temp%\DockerDesktopInstaller.exe" -Wait install
 
   :: Ask the user to restart its computer
-  echo x=msgbox("To ensure that all the changes are properly applied, please restart your computer. Then click the Windows_launcher again.",0,"Installation completed") >> %tmp%\tmp.vbs
-  wscript %tmp%\tmp.vbs
-  del %tmp%\tmp.vbs
+  :: echo x=msgbox("To ensure that all the changes are properly applied, please restart your computer. Then click the Windows_launcher again.",0,"Installation completed") >> %tmp%\tmp.vbs
+  :: wscript %tmp%\tmp.vbs
+  :: del %tmp%\tmp.vbs
+  msg * "Docker Desktop installation completed! To ensure that all the changes are properly applied, please restart your computer. Then click the Windows_launcher."
   exit 1
 )
 
@@ -52,9 +53,10 @@ if %isubuntu%==0 (
   wsl --install Ubuntu
   
   :: Ask the user to restart its computer
-  echo x=msgbox("To ensure that all the changes are properly applied, please restart your computer. Then click the Windows_launcher again.",0,"Installation completed") >> %tmp%\tmp.vbs
-  wscript %tmp%\tmp.vbs
-  del %tmp%\tmp.vbs
+  :: echo x=msgbox("To ensure that all the changes are properly applied, please restart your computer. Then click the Windows_launcher again.",0,"Installation completed") >> %tmp%\tmp.vbs
+  :: wscript %tmp%\tmp.vbs
+  :: del %tmp%\tmp.vbs
+  msg * "Ubuntu installation on WSL completed! To ensure that all the changes are properly applied, please restart your computer. Then click the Windows_launcher."
   exit 1
 ) else (
   :: If it is intalled, check if it is the default distribution
