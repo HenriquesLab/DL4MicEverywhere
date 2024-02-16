@@ -2,9 +2,9 @@
 
 DL4MicEverywhere is a user-friendly platform that allows you to run deep learning notebooks for microscopy imaging analysis on your local machine or remote infrastructure. This guide will walk you through the steps to get started.
 
-## Installation
+# Installation
 
-### Download DL4MicEverywhere Repository:
+## Download DL4MicEverywhere Repository:
 
 * **Option 1**: Download the last version of DL4MicEverywhere from GitHub's repository:
 
@@ -25,7 +25,7 @@ DL4MicEverywhere is a user-friendly platform that allows you to run deep learnin
     cd DL4MicEverywhere
     ```
 
-### Run DL4MicEverywhere for the first time:
+## Run DL4MicEverywhere for the first time:
 DL4MicEverywhere comes packaged with an executable for each operating system. Double-click on the one that has the same name as your system (e.g., `Windows_launch` for Windows operating systems).
 
 To run DL4MicEverywhere for the first time you need to have root/admin permissions as the program will check for the presence of the requirements and will attempt to install any that are missing. 
@@ -35,7 +35,7 @@ Once the process has finished, the computer needs to be restarted.
 
 This is a single process the first time that DL4MicEverywhere is launched. 
 
-## Quickstart 
+# Quickstart 
 
 > ⚠️: **IMPORTANT:**
 > The GPU usage on Windows 10 machines is not working at this moment due to some TensorFlow and NVIDIA compatibility issues. This issue is under development (alternatives like conda are considered [here](https://github.com/HenriquesLab/DL4MicEverywhere/tree/Pass-to-conda)) and discussed [here](https://github.com/HenriquesLab/DL4MicEverywhere/issues/24). 
@@ -59,10 +59,10 @@ Double-click the launcher in the DL4MicEverywhere folder that has the same name 
 Now, you're ready to run deep learning workflows through an intuitive UI!
 
 
-## Step-by-step guide to use DL4MicEverywhere notebooks
+# Step-by-step guide to use DL4MicEverywhere notebooks
 
 
-### 1. Launch DL4MicEverywhere
+## 1. Launch DL4MicEverywhere
 
 Double-click the launcher in the DL4MicEverywhere folder that has the same name as your system (e.g., `Windows_launch` for Windows operating systems). A GUI will automatically pop-up.
 
@@ -124,7 +124,7 @@ After using the appropriate launching option, a terminal window will open. This 
      
 DL4MicEverywhere can also be launched, without GUI, via the command line, check out our [CLI User Guide](docs/CLI_USER_GUIDE.md) for how to do it.
 
-### 2. GUI interface
+## 2. GUI interface
 
 The image below displays the basic GUI interface. A default list of model notebooks is provided. First, you need to choose the folder containing the model you want to use:
 
@@ -147,7 +147,7 @@ After selecting the folder, you need to choose the notebook you want to use from
 
 After selecting the notebook, there are only two mandatory arguments: **Data folder** and **Output folder**. 
 
-#### Choose the data folder
+### Choose the data folder
 
 In the **Path to the data folder** section, you can either paste the path to the file directly or click on the **Select** button. 
 
@@ -169,7 +169,7 @@ After selecting the path to the folder, the main window should look like this:
      height="40%" />
 
 
-#### Choose the output folder
+### Choose the output folder
 
 In the **Path to the output folder** section, you can either paste the path to the file directly or click on the **Select** button. 
 
@@ -195,90 +195,18 @@ After selecting the path to the folder, the main window should look like this:
 
 With these arguments set, you can click **Run** to execute the program. Additionally, you can choose to use a GPU (if your device has one) and you can assign a custom tag to the Docker image that will be built.
 
-#### Activate/Deactivate the GPU
+### Activate/Deactivate the GPU
 
 > ℹ️ **NOTE**:
 > This option, will only be available if a configured Nvidia Graphic Card is detected on your computer.
 
 The **Allow GPU** checkbox allows you to choose whether or not to use the GPU (it is unchecked by default). To use the GPU you just need to click it and a ☑️ will appear.
 
-#### Load previous setting
+### Load previous setting
 
 The first time you run DL4MicEverywhere this setting will be disabled, as there are no previous settings. Once you click `Run`, the used settings will be stored and will be available in the next time you run DL4MicEverywhere. By clicking this button you will load the last settings that were used, facilitating the workflow in cases where you are running the same configuration multiple times. 
 
-#### Advanced options
-
-Clicking on the **Advanced options** button at the bottom will display a new section:
-
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_advanced.png" 
-     alt="Advanced options"
-     width="40%" 
-     height="40%" />
-
-When you choose this option, the **default notebooks** section will be disabled and will not consider the information you provide there. The rest of the arguments you provided will remain intact. In the advanced options, you can provide paths to local files of the `configuration.yaml`, `notebook.ipynb`, and `requirements.txt`.
-
-#### Select a local `configuration.yaml`:
-
-In the **Path to the configuration.yaml** section, you can either paste the path to the file directly or click on the **Select** button. 
-
-Providing a valid `configuration.yaml` file is **mandatory** when using the advanced options. You need to select the path to the configuration.yaml file you want to use (make sure it follows the [defined structure](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/FORMAT.md)). Clicking the **Select** button will open a window displaying your file system:
-
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_config_select.png" 
-     alt="Select the local configuration"
-     width="60%" 
-     height="60%" />
-
-After selecting the file, the window should look like this:
-
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_config.png" 
-     alt="Select the local configuration result"
-     width="40%" 
-     height="40%" />
-
-#### Select a local notebook:
-
-Just like the `configuration.yaml` file selection, you can select a `.ipynb` notebook instead of the one provided in the `configuration.yaml` that follows the ZeroCostDL4Mic structure:
-
-
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_notebook_select.png" 
-     alt="Select the local notebook"
-     width="60%" 
-     height="60%" />
-
-After selecting the file, the window should look like this:
-
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_notebook.png" 
-     alt="Select the local notebook result"
-     width="40%" 
-     height="40%" />
-
-#### Select a local requirements file:
-
-You can also select a `requirements.txt` file instead of the one provided in the `configuration.yaml`. This file should contain the Python libraries that you want to be installed in the container:
-
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_requ_select.png" 
-     alt="Select the local requirements"
-     width="60%" 
-     height="60%" />
-
-After selecting the file, the window should look like this:
-
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_requ.png" 
-     alt="Select the local requirements result"
-     width="40%" 
-     height="40%" />
-
-#### Assign a custom tag to the Docker image
-
-You can enter the tag you want in the **Tag** textbox. In the following example, we assign the tag 'MyTag' to the Docker image:
-
-<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_tag.png" 
-     alt="Main window after Tag"
-     width="40%" 
-     height="40%" />
- 
-
-### 3. Docker images
+## 3. Docker images
 
 DL4MicEverywhere will either pull a container image from Dockerhub or build one for you if there isn't one suitable for your operating system and configuration. The interface may ask you:
 
@@ -301,7 +229,7 @@ While building or pulling the image, your terminal window will look like this:
 
 Docker images occupy between 3 and 5 GB of memory, so it is advisable to manage them periodically. Check how to do it [here](DOCKER_DESKTOP.md)
 
-### 4. Working with DL4MicEverywhere notebooks
+## 4. Working with DL4MicEverywhere notebooks
 After building a Docker image and running a container to run the notebooks, DL4MicEverywhere will automatically run Jupyter Lab and open it in the default browser.
 The notebooks, inspired by ZeroCostDL4Mic, are designed to be user-friendly and do not require programming skills to run them. Follow their [Step-by-step "How to"](https://github.com/HenriquesLab/ZeroCostDL4Mic/wiki/Step-by-step-run-through) to get further details about parameters and data formats. 
 
@@ -322,3 +250,76 @@ When you run the code cells (either by pressing `Ctrl+Enter` or clicking on the 
      alt="Jupyter Lab home directory"
      width="60%" 
      height="60%" />
+
+## 5 Containerise your own pipelines (Advance mode)
+The advance options of DL4MicEverywhere allows for the containerisation of local pipelines or custom configurations that are not published as part of the collection of DL4MicEverywhere. It also provides a chance to test the containerisation and the format of DL4MicEverywhere notebooks before uploading them . 
+
+Clicking on the **Advanced options** button at the bottom will display a new section:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_advanced.png" 
+     alt="Advanced options"
+     width="40%" 
+     height="40%" />
+
+When you choose this option, the **default notebooks** section will be disabled and will not consider the information you provide there. The rest of the arguments you provided will remain intact. In the advanced options, you can provide paths to local files of the `configuration.yaml`, `notebook.ipynb`, and `requirements.txt`.
+
+### Select a local `configuration.yaml`:
+
+In the **Path to the configuration.yaml** section, you can either paste the path to the file directly or click on the **Select** button. 
+
+Providing a valid `configuration.yaml` file is **mandatory** when using the advanced options. You need to select the path to the configuration.yaml file you want to use (make sure it follows the [defined structure](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/FORMAT.md)). Clicking the **Select** button will open a window displaying your file system:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_config_select.png" 
+     alt="Select the local configuration"
+     width="60%" 
+     height="60%" />
+
+After selecting the file, the window should look like this:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_config.png" 
+     alt="Select the local configuration result"
+     width="40%" 
+     height="40%" />
+
+### Select a local notebook:
+
+Just like the `configuration.yaml` file selection, you can select a `.ipynb` notebook instead of the one provided in the `configuration.yaml` that follows the ZeroCostDL4Mic structure:
+
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_notebook_select.png" 
+     alt="Select the local notebook"
+     width="60%" 
+     height="60%" />
+
+After selecting the file, the window should look like this:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_notebook.png" 
+     alt="Select the local notebook result"
+     width="40%" 
+     height="40%" />
+
+### Select a local requirements file:
+
+You can also select a `requirements.txt` file instead of the one provided in the `configuration.yaml`. This file should contain the Python libraries that you want to be installed in the container:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_requ_select.png" 
+     alt="Select the local requirements"
+     width="60%" 
+     height="60%" />
+
+After selecting the file, the window should look like this:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_requ.png" 
+     alt="Select the local requirements result"
+     width="40%" 
+     height="40%" />
+
+### Assign a custom tag to the Docker image
+
+You can enter the tag you want in the **Tag** textbox. In the following example, we assign the tag 'MyTag' to the Docker image:
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_tag.png" 
+     alt="Main window after Tag"
+     width="40%" 
+     height="40%" />
+ 
