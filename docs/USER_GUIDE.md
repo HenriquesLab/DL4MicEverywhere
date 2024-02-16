@@ -46,6 +46,7 @@ The requirements installation on Windows, even if it is automated, goes through 
 3. **Requirements Installation within the WSL:**
    In this last step, `TCL/TK` and `xdg-utils` will be automatically installed inside the WSL. If this is successful, you will not need to restart your computer. It might prompt you to start the Docker Desktop application on your computer. Afterwards, the GUI will pop up, and here you can follow the [steps below](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/USER_GUIDE.md#step-by-step-guide-to-use-dl4miceverywhere-notebooks). If the GUI is not displayed correctly, please restart your computer once more, and this issue will be fixed.
 
+During the installation you might encounter [problems with Virtualization](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md#wsregisterdistribution-failed-with-error-0x80370102), [oppening the launcher](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md#windows_launher-cannot-be-oppened), etc. Please, check our [Troubleshooting page](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md) and if your problem is not there, let us know creating an [issue](https://github.com/HenriquesLab/DL4MicEverywhere/issues).
 
 # Quickstart 
 
