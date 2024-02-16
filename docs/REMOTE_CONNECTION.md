@@ -2,14 +2,30 @@
 
 You can use the GUI with remote workstations when an SSH connection is established. 
 
-**iOS / Mac**
+[Watch the guide](https://youtu.be/UsjqNd-LFzc?si=X8fUMSIGo6I4HI3Y).
+
+<html>
+<a href="[#](https://youtu.be/d1FB_zc5gVc](https://youtu.be/UsjqNd-LFzc?si=X8fUMSIGo6I4HI3Y)"> 
+<img src="https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/documentation/Wiki%20images/REMOTE_SSH_WINDOWS.png" width="500">
+</a>
+</html>
+
+## SSH connection from Windows
+
+https://youtu.be/UsjqNd-LFzc?si=X8fUMSIGo6I4HI3Y
+
+## SSH connection using the terminal
+
+These guidelines are valid for Linux and macOS. In the case of macOS a little extra installation is needed.
+
+### iOS / macOS
 If you are using an iOS system to connect via SSH, you need to install [Xquartz](https://www.xquartz.org/). You can easily do this using the following command in the terminal:
 ```
 brew install --cask xquartz
 ```
 You need to restart the system after the installation. 
 
-**Launching the remote SSH connection**
+### Launching the remote SSH connection
 
 Try one of these: 
 ```
