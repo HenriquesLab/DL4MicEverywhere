@@ -100,23 +100,23 @@ WORKDIR /home
 RUN pip install --upgrade pip && \
     if [  "$(printf '%s\n' "3.8" "${PYTHON_VERSION}" | sort -V | head -n1)" = "3.8" ] ; then \
         # For Python between 3.8 and 3.11
-        pip install --no-cache-dir  nbformat==5.9.2 ; \ 
+        pip install  nbformat==5.9.2 ; \ 
     else \
         # For Python 3.7 or lower
-        pip install --no-cache-dir  nbformat==5.0.2 ; \
+        pip install  nbformat==5.0.2 ; \
     fi && \
     if [  "$(printf '%s\n' "3.7" "${PYTHON_VERSION}" | sort -V | head -n1)" = "3.7" ] ; then \
         # For Python between 3.7 and 3.11
-        pip install --no-cache-dir  ipywidgets==8.1.0 && \ 
-        pip install --no-cache-dir  jupyterlab==3.6.0 ; \ 
+        pip install  ipywidgets==8.1.0 && \ 
+        pip install  jupyterlab==3.6.0 ; \ 
     elif [  "$(printf '%s\n' "3.5" "${PYTHON_VERSION}" | sort -V | head -n1)" = "3.5" ] ; then \
         # For Python 3.4 or lower
-        pip install --no-cache-dir  ipywidgets==7.8.1 && \ 
-        pip install --no-cache-dir  jupyterlab==0.23.0 ; \ 
+        pip install  ipywidgets==7.8.1 && \ 
+        pip install  jupyterlab==0.23.0 ; \ 
     else \
         # For Python 3.5 and 3.6
-        pip install --no-cache-dir  ipywidgets==8.0.0a0 && \ 
-        pip install --no-cache-dir  jupyterlab==2.3.2 ; \ 
+        pip install  ipywidgets==8.0.0a0 && \ 
+        pip install  jupyterlab==2.3.2 ; \ 
     fi
 
 # Custom cache invalidation
@@ -129,7 +129,7 @@ ADD $PATH_TO_REQUIREMENTS ./requirements.txt
 
 # Install the requirements and convert the notebook
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
+    pip install -r requirements.txt && \
     rm requirements.txt
     
 # Copy the converted notebook from stage 1
