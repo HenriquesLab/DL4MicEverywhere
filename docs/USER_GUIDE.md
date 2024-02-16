@@ -35,7 +35,10 @@ This automatic requirements installation will be different on each operative sys
 <details>
 <summary>On Linux:</summary>
     
-TODO (Iván)
+The automatic installation on Linux guides you through these steps:
+
+1. **TCL/TK and Docker Desktop are automatically installed (do not need interaction).**
+2. **The GUI will pop up, and you can start using DL4MicEverywhere**
 
 </details>
 
@@ -51,7 +54,9 @@ The automatic installation on MacOs guides you through these steps:
 
     1.2. You need to enter the password and click RETURN/ENTER when asked to start the installation.
 
-2. **TCL/TK and Docker Desktop are automatically installed (do not need interaction) and GUI will pop up.**
+2. **TCL/TK and Docker Desktop are automatically installed (do not need interaction).**
+
+3. **The GUI will pop up, and you can start using DL4MicEverywhere**
 
 </details>
 
@@ -84,7 +89,7 @@ The automatic installation on Windows guides you through these steps:
 
    3.2. If Docker Desktop is not already running, it will ask you to start it.
 
-   3.3. Finally, the GUI will pop up, and you can start using DL4MicEverywhere. If the GUI is not displayed correctly, please restart your computer once more to fix the issue.
+4. **The GUI will pop up, and you can start using DL4MicEverywhere** (if the GUI is not displayed correctly, please restart your computer once more to fix the issue).
 
 </details>
 
