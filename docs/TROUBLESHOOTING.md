@@ -71,6 +71,11 @@ This process requires you to restart your computer, enter the BIOS and enabling 
 - Check Docker build logs for errors. Debug or raise issue.
 - Consider updating Docker engine and Nvidia driver to latest versions.
 
+### **Notebooks fail to open right after building Docker image in Windows**
+
+- Run the **Windows_launcher.bat** again.
+- Click `Load previous settings` and then `Run`.
+
 ### **Terminal command of DL4MicEverywhere does not find the specified files**
 
 - Ensure that all the paths are given with "quotation marks" and remove spaces in the file names. 
@@ -147,7 +152,7 @@ This process requires you to restart your computer, enter the BIOS and enabling 
 - Ensure training data is sufficient and correctly formatted.
 - Try tuning model hyperparameters and architecture.
 - Consider using a more suitable model or training scheme.
-  
+ 
 ## Launchers
 
 ### **`MacOs_launcher` cannot be oppened**
