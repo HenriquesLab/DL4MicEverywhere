@@ -1,6 +1,7 @@
 # Connect to remote workstations via SSH
 
 You can use the GUI with remote workstations when an SSH connection is established. 
+## SSH connection from Windows
 
 [Watch the guide](https://youtu.be/UsjqNd-LFzc?si=X8fUMSIGo6I4HI3Y).
 
@@ -10,9 +11,6 @@ You can use the GUI with remote workstations when an SSH connection is establish
 </a>
 </html>
 
-## SSH connection from Windows
-
-https://youtu.be/UsjqNd-LFzc?si=X8fUMSIGo6I4HI3Y
 
 ## SSH connection using the terminal
 
