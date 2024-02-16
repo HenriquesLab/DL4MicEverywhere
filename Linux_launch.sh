@@ -629,5 +629,9 @@ else
     fi
 fi
 
-# Close the terminal
+# Close the terminal when user press enter
+echo ""
+echo "------------------------------------"
+read -p "Press enter to close the terminal"
+echo "------------------------------------" 
 exit 1

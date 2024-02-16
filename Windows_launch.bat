@@ -12,6 +12,12 @@ if not exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" (
   bitsadmin.exe /transfer "DownloadDocker" "https://desktop.docker.com/win/main/amd64/136059/Docker Desktop Installer.exe" "%temp%\DockerDesktopInstaller.exe"
   :: Install it
   powershell -Command Start-Process "%temp%\DockerDesktopInstaller.exe" -Wait install
+
+  :: Ask the user to restart its computer
+  echo x=msgbox("To ensure that all the changes are properly applied, please restart your computer. Then click the Windows_launcher again.",0,"Installation completed") >> %tmp%\tmp.vbs
+  wscript %tmp%\tmp.vbs
+  del %tmp%\tmp.vbs
+  exit 1
 )
 
 :: Check if WSL is installed
@@ -44,6 +50,12 @@ for /f "tokens=* USEBACKQ skip=1" %%F in (`wsl --list`) do (
 if %isubuntu%==0 (
   :: If it is not installed, install Ubuntu
   wsl --install Ubuntu
+  
+  :: Ask the user to restart its computer
+  echo x=msgbox("To ensure that all the changes are properly applied, please restart your computer. Then click the Windows_launcher again.",0,"Installation completed") >> %tmp%\tmp.vbs
+  wscript %tmp%\tmp.vbs
+  del %tmp%\tmp.vbs
+  exit 1
 ) else (
   :: If it is intalled, check if it is the default distribution
   if not %defaultdist%==Ubuntu (
