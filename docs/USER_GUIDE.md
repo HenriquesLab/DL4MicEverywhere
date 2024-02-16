@@ -47,9 +47,9 @@ The automatic installation on MacOs guides you through these steps:
 
 1. **Homebrew installation:**
 
-    1.1. Homebrew will be automatically downloaded and installed.
+    1.1. Homebrew will be automatically downloaded.
 
-    1.2. You need to enter the password and click RETURN/ENTER when asked.
+    1.2. You need to enter the password and click RETURN/ENTER when asked to start the installation.
 
 2. **TCL/TK and Docker Desktop are automatically installed (do not need interaction) and GUI will pop up.**
 
