@@ -78,9 +78,9 @@ The automatic installation on Windows guides you through these steps:
 
    2.4. Then, the terminal will close. Please restart your computer and click again on the `Windows_launch` file.
 
-3. **Linux libraries installation and starting DL4MicEverywhere:**
+3. **Ubuntu libraries installation and starting DL4MicEverywhere:**
 
-   3.1. Linux libraries (TCL/TK and xdg-open) will be automatically installed inside WSL.
+   3.1. Ubuntu libraries (TCL/TK and xdg-open) will be automatically installed.
 
    3.2. If Docker Desktop is not already running, it will ask you to start it.
 
