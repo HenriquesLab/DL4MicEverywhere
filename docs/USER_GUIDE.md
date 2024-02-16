@@ -37,8 +37,9 @@ This automatic requirements installation will be different on each operative sys
     
 The automatic installation on Linux guides you through these steps:
 
-1. **TCL/TK and Docker Desktop are automatically installed (do not need interaction).**
-2. **The GUI will pop up, and you can start using DL4MicEverywhere**
+1. **You need to enter the password when asked.**
+2. **TCL/TK and Docker Desktop are automatically installed (do not need interaction).**
+3. **The GUI will pop up, and you can start using DL4MicEverywhere**
 
 </details>
 
@@ -50,13 +51,12 @@ The automatic installation on MacOs guides you through these steps:
 
 1. **Homebrew installation:**
 
-    1.1. Homebrew will be automatically downloaded.
-
-    1.2. You need to enter the password and click RETURN/ENTER when asked to start the installation.
+    1.1. You need to enter the password when asked.
+    1.2. Click **RETURN/ENTER** when asked to start the installation.
 
 2. **TCL/TK and Docker Desktop are automatically installed (do not need interaction).**
 
-3. **The GUI will pop up, and you can start using DL4MicEverywhere**
+3. **The GUI will pop up, and you can start using DL4MicEverywhere.**
 
 </details>
 
@@ -67,27 +67,21 @@ The automatic installation on Windows guides you through these steps:
 
 1. **Docker Desktop installation:**
 
-   1.1. Docker Desktop installer will be automatically downloaded and started.
+   1.1. During installation, ensure that the **"Use WSL 2 instead of Hyper-V"** option is selected ☑️.
 
-   1.2. During installation, ensure that the "Use WSL 2 instead of Hyper-V" option is selected ☑️.
-
-   1.3. After succesfull installation, the terminal will close. Please restart your computer and click again on the `Windows_launch` file.
+   1.2. After succesfull installation, the terminal will close. Please restart your computer and click again on the `Windows_launch` file.
 
 2. **Windows Subsystem for Linux (WSL) installation:**
 
-   2.1. Ubuntu will be automatically installed on WSL.
+   2.1. You need to enter a username and a password, these can be different from the credentials on your computer (**IMPORTANT:** remember the password for the future).
 
-   2.2. You need to enter a username and a password, these can be different from the credentials on your computer (**IMPORTANT:** remember the password for the future).
+   2.2. After installation, you will need to type `logout` and press **ENTER**.
 
-   2.3. After installation, you will need to type `logout` and press Enter.
-
-   2.4. Then, the terminal will close. Please restart your computer and click again on the `Windows_launch` file.
+   2.3. Then, the terminal will close. Please restart your computer and click again on the `Windows_launch` file.
 
 3. **Ubuntu libraries installation and starting DL4MicEverywhere:**
 
-   3.1. Ubuntu libraries (TCL/TK and xdg-open) will be automatically installed.
-
-   3.2. If Docker Desktop is not already running, it will ask you to start it.
+   3.1. If Docker Desktop is not already running, it will ask you to start it.
 
 4. **The GUI will pop up, and you can start using DL4MicEverywhere** (if the GUI is not displayed correctly, please restart your computer once more to fix the issue).
 
