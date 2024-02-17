@@ -52,21 +52,24 @@ for /f "tokens=* USEBACKQ skip=1" %%F in (`wsl --list`) do (
   set "defaultless=!dist:Default=!"
 
   :: Check if the distrubution name contained Default
-  if not !dist!==!defaultless! set defaultdist=!defaultless:~0,-3!
+  if not !dist!==!defaultless! (
+    set defaultless=!defaultless:~0,-3!
+    set defaultdist=!defaultless!
+  )
 
   :: Remove the word Ubuntu in that name
-  set "ubuntuless=!dist:Ubuntu=!"
+  set "ubuntuless=!defaultless:Ubuntu=!"
 
-  :: Check if the distrubution name contained Default
-  if not !dist!==!ubuntuless! set /A isubuntu=1
-
+  :: Check if the distrubution name contained Ubuntu
+  if !ubuntuless!=="" set /A isubuntu=1
 )
 
 :: First check if Ubuntu is installed
 if %isubuntu%==0 (
   :: If it is not installed, install Ubuntu
   wsl --install Ubuntu
-  
+  wsl --set-default Ubuntu
+
   :: Ask the user to restart its computer
   echo 
   echo ------------------------------------------------------------------------------------
@@ -78,7 +81,8 @@ if %isubuntu%==0 (
   exit
 ) else (
   :: If it is intalled, check if it is the default distribution
-  if not %defaultdist%==Ubuntu (
+  if not %defaultdist%==Ubuntu (  
+    echo No default ubuntu
     :: If not, set as the default one
     wsl --set-default Ubuntu
   )
