@@ -82,7 +82,6 @@ if %isubuntu%==0 (
 ) else (
   :: If it is intalled, check if it is the default distribution
   if not %defaultdist%==Ubuntu (  
-    echo No default ubuntu
     :: If not, set as the default one
     wsl --set-default Ubuntu
   )
