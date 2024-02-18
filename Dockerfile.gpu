@@ -42,7 +42,7 @@ RUN git clone https://github.com/HenriquesLab/DL4MicEverywhere.git  && \
 ####
 ## Stage 2 - Set the final image (install packages, python, python libraries)
 ####
-FROM nvidia/cuda:${CUDA_VERSION}-base-ubuntu${UBUNTU_VERSION} AS final
+FROM nvidia/cuda:${CUDA_VERSION}-devel-ubuntu${UBUNTU_VERSION} AS final
 
 # Read all the arguments
 ARG PATH_TO_NOTEBOOK
@@ -161,6 +161,6 @@ RUN pip install --upgrade pip && \
 # Copy the converted notebook from stage 1
 COPY --from=notebook_autoconversion /home/${NOTEBOOK_NAME} /home/docker_info.txt /home
 
-ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/lib/cuda
+ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/local/cuda
 
 CMD bash

@@ -77,6 +77,27 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     fi
 fi
 
+# Verify if netstat is installed on the WSL and otherwise install it
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
+        # Linux inside the Windows Subsystem for Linux needs to export/link the start command
+        if ! command -v netstat &> /dev/null; then 
+            echo "Installing net-tools..."
+
+            sudo apt-get -y update
+            sudo apt -y update
+            sudo apt -y upgrade
+            sudo apt -y install net-tools
+            if ! command -v netstat &> /dev/null; then 
+                echo -e "\033[0;31 net-tools installation failed. \033[0m"
+                echo "Please try again or follow the installation instructions on: https://installati.one/install-net-tools-ubuntu-20-04/"
+            fi
+        else
+            echo "net-tools already installed."
+        fi
+    fi
+fi
+
 # Verify if Docker is installed on the system and otherwise install it
 if ! command -v docker &> /dev/null; then
     

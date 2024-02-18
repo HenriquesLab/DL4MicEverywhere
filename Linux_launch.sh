@@ -583,18 +583,30 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
 
     # Find a usable port
     port=8888
-    while ( lsof -i:$port &> /dev/null )
-    do
-
-        echo WARNING: Port $port is already allocated.
-        port=$((port+1))
-        if [ $port -gt 9000 ]; then
-            # We want the port to be between 8000 and 9000
-            port=8000
-        sleep 1
-        fi
-    done
-
+    if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
+        # Linux inside the Windows Subsystem for Linux needs to look differently to the ports
+        while ( netstat -a | grep :$port &> /dev/null )
+        do
+            echo WARNING: Port $port is already allocated.
+            port=$((port+1))
+            if [ $port -gt 9000 ]; then
+                # We want the port to be between 8000 and 9000
+                port=8000
+            sleep 1
+            fi
+        done
+    else
+        while ( lsof -i:$port &> /dev/null )
+        do
+            echo WARNING: Port $port is already allocated.
+            port=$((port+1))
+            if [ $port -gt 9000 ]; then
+                # We want the port to be between 8000 and 9000
+                port=8000
+            sleep 1
+            fi
+        done
+    fi
     echo SUCCESS: Port $port will be used.
 
     # Based on the openssl command and the base64 encoding, a 50 characters token is generated
