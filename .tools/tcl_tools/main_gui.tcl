@@ -114,6 +114,7 @@ proc onLoadCache {} {
     }
     if  {"$cache_selected_folder" != ""} {
         set selectedFolder "$cache_selected_folder"
+        onComboboxFolder "$cache_selected_folder"
     }
     if  {"$cache_selected_notebook" != ""} {
         set selectedNotebook "$cache_selected_notebook"
