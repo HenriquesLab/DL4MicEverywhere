@@ -96,6 +96,7 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 - [Remote Connection](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/REMOTE_CONNECTION.md)
 - Notebooks
   - [Notebook Types](docs/NOTEBOOK_TYPES.md)
+  - [Notebook Format](docs/FORMAT.md)
   - [Notebook List](docs/NOTEBOOKS.md)
   - [Notebooks Folders](https://github.com/HenriquesLab/DL4MicEverywhere/tree/main/notebooks)
 - [Docker Desktop](docs/DOCKER_DESKTOP.md)
