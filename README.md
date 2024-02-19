@@ -103,6 +103,7 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 - [DL4MicEverywhere Technical Design](docs/DESIGN.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [FAQ](docs/FAQ.md)
+- [ZeroCostDL4Mic and DL4MicEverywhere over time](docs/DL4MicEverywhere_overtime.md)
 - [Contributing Guidelines](CONTRIBUTING.md) 
 
 Don't hesitate to reach out if you need any clarification!
