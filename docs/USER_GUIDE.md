@@ -157,7 +157,12 @@ Double click the `Windows_launch.bat` file (you might get the [following message
 <details>
 <summary>On Linux:</summary>
 
-Double-click the `DL4MicEverywhere.desktop` file created in [Run DL4MicEverywhere for the first time](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/USER_GUIDE.md#run-dl4miceverywhere-for-the-first-time) or run the following command in the terminal:
+Right-click `Linux_launch.sh` file and select **Run as a Program**. 
+
+Or double-click the `DL4MicEverywhere.desktop` file created in [Run DL4MicEverywhere for the first time](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/USER_GUIDE.md#run-dl4miceverywhere-for-the-first-time).
+
+Or run the following command in the terminal:
+
 > ℹ️ **NOTE**:
 > You need to be located in the DL4MicEverywhere folder, where `Linux_launch.sh` is in.
 ```
