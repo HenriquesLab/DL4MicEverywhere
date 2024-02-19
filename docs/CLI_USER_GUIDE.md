@@ -34,7 +34,7 @@ In this simple usage case, a `configuration.yaml` file from DL4MicEverwhere is u
 
 **On MacOS/Linux:**
 ```
-sudo -E bash Linux_launch.sh -c ./notebooks/CARE_2D_DL4Mic/configuration.yaml -d ./data_folder -o ./results_folder
+bash Linux_launch.sh -c ./notebooks/CARE_2D_DL4Mic/configuration.yaml -d ./data_folder -o ./results_folder
 ```
 
 **On Windows:**
@@ -48,7 +48,7 @@ In this complex usage case, you can use your own `configuration.yaml` file, your
 
 **On MacOS/Linux:**
 ```
-sudo -E bash Linux_launch.sh -c ./my_notebooks/CARE_2D_DL4Mic/configuration.yaml -d /home/user/Documents/data_folder -o /home/user/Documents/results_folder -g -n /home/user/Desktop/MyFancyZeroCostDL4MicNotebook.ipynb -r ./modified_requirements.txt -t MyNewContainer
+bash Linux_launch.sh -c ./my_notebooks/CARE_2D_DL4Mic/configuration.yaml -d /home/user/Documents/data_folder -o /home/user/Documents/results_folder -g -n /home/user/Desktop/MyFancyZeroCostDL4MicNotebook.ipynb -r ./modified_requirements.txt -t MyNewContainer
 ```
 **On Windows:**
 ```
