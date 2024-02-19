@@ -26,23 +26,10 @@ DL4MicEverywhere is a user-friendly platform that allows you to run deep learnin
     ```
 
 ## Run DL4MicEverywhere for the first time:
-DL4MicEverywhere comes packaged with an executable for each operating system. Double-click on the one that has the same name as your system (e.g., `Windows_launch` for Windows operating systems).
 
 To run DL4MicEverywhere for the first time you need to have root/admin permissions as the program will check for the presence of the requirements and will attempt to install any that are missing. 
 
-This automatic requirements installation will be different on each operative system:
-
-<details>
-<summary>On Linux:</summary>
-    
-The automatic installation on Linux guides you through these steps:
-
-1. **You need to enter the password when asked.**
-2. **TCL/TK and Docker Desktop are automatically installed (do not need interaction).**
-3. **The GUI will pop up, and you can start using DL4MicEverywhere**
-
-</details>
-
+DL4MicEverywhere comes packaged with an executable for each operating system. Double-click on the one that has the same name as your system (e.g., `Windows_launch` for Windows operating systems). This automatic requirements installation will be different on each operative system:
 
 <details>
 <summary>On MacOs:</summary>
@@ -87,6 +74,24 @@ The automatic installation on Windows guides you through these steps:
 
 </details>
 
+<details>
+<summary>On Linux:</summary>
+
+Run the following command in the terminal to create a double-click file:
+> ℹ️ **NOTE**:
+> You need to be located in the DL4MicEverywhere folder, where `.tools` folder is in.
+```
+bash .tools/create_desktop.sh
+```
+This will create a `DL4MicEverywhere.desktop` file in your Desktop. You will need to right-click the file and ´Allow Launching´, after that launch DL4MicEverywhere by double-clicking it. The automatic installation guides you through these steps:
+
+1. **You need to enter the password when asked.**
+2. **TCL/TK and Docker Desktop are automatically installed (do not need interaction).**
+3. **The GUI will pop up, and you can start using DL4MicEverywhere**
+
+</details>
+
+
 The [REQUIREMENTS INSTALLATION](REQUIREMENTS_INSTALLATION.md) page has detailed information about the requirements and instructions on how to manually install them. If you find problems with the installation, please, check our [Troubleshooting page](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md) and if your problem is not there, let us know creating an [issue](https://github.com/HenriquesLab/DL4MicEverywhere/issues).
 
 
@@ -121,26 +126,6 @@ Now, you're ready to run deep learning workflows through an intuitive UI!
 
 Double-click the launcher in the DL4MicEverywhere folder that has the same name as your system (e.g., `Windows_launch` for Windows operating systems). A GUI will automatically pop-up.
 
-<details>
-<summary>On Linux:</summary>
-
-
-Run the following command in the terminal:
-> ℹ️ **NOTE**:
-> You need to be located in the DL4MicEverywhere folder, where `Linux_launch.sh` is in.
-```
-bash Linux_launch.sh
-```
-
-If you want a double click file, you will need to run the following command in the terminal:
-> ℹ️ **NOTE**:
-> You need to be located in the DL4MicEverywhere folder, where `.tools` folder is in.
-```
-bash .tools/create_desktop.sh
-```
-This will create a `DL4MicEverywhere.desktop` file in your Desktop. You will need to right click the file and ´Allow Launching´, after that you will always be able to launch DL4MicEverywhere by double clicking it.  
-
-</details>
 
 <details>
 <summary>On MacOs:</summary>
@@ -165,6 +150,18 @@ Double click the `Windows_launch.bat` file (you might get the [following message
 > You need to be located in the DL4MicEverywhere folder, where `Windows_launch.bat` is in.
 ```
 .\Windows_launch.bat
+```
+</details>
+
+
+<details>
+<summary>On Linux:</summary>
+
+Double-click the `DL4MicEverywhere.desktop` file created in [Run DL4MicEverywhere for the first time](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/USER_GUIDE.md#run-dl4miceverywhere-for-the-first-time) or run the following command in the terminal:
+> ℹ️ **NOTE**:
+> You need to be located in the DL4MicEverywhere folder, where `Linux_launch.sh` is in.
+```
+bash Linux_launch.sh
 ```
 </details>
 
