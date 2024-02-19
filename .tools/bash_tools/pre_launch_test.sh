@@ -95,6 +95,7 @@ if ! docker info &> /dev/null; then
             read -p "Press enter to close the terminal."
             echo "------------------------------------" 
             exit 1
+        fi
     else
         echo ""
         echo "------------------------------------"
