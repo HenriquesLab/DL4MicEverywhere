@@ -167,15 +167,7 @@ else
     gui_arguments=$(wish $BASEDIR/.tools/tcl_tools/main_gui.tcl $BASEDIR $OSTYPE)
 
     if [ -z "$gui_arguments" ]; then
-        # Close the terminal
-        echo ""
-        echo "------------------------------------"
-        echo "Something has gone wrong with the parameters that have been passed."
-        echo "Please, check that the specified parameters are correct."
-        echo "If the problem persists, please create an issue on GitHub:"
-        echo "  https://github.com/HenriquesLab/DL4MicEverywhere/issues"
-        read -p "Press enter to close the terminal."
-        echo "------------------------------------" 
+        # No arguments were provided, this means that the GUI has been closed, so close the terminal
         exit 1
     fi
 
