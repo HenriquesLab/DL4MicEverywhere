@@ -30,7 +30,7 @@ if ! docker info &> /dev/null; then
     echo "WARNING: Docker daemon is not running"
 
     docker_flag=$(wish $BASEDIR/../tcl_tools/docker_desktop_gui.tcl)
-    if [[ "$build_flag" -ne 1 ]]; then
+    if [[ "$docker_flag" -ne 1 ]]; then
         if [[ "$OSTYPE" == "linux-gnu"* ]]; then
             # Linux
             if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
@@ -76,10 +76,33 @@ if ! docker info &> /dev/null; then
             # Windows
             echo "This is a Windows machine"
         else
+            echo ""
+            echo "------------------------------------"
             echo "Unsupported OS: $OSTYPE"
+            echo "We only provide support for Windows, MacOS and Linux."
+            read -p "Press enter to close the terminal."
+            echo "------------------------------------" 
             exit 1
         fi
+
+        if ! docker info &> /dev/null; then
+            echo ""
+            echo "------------------------------------"
+            echo "Docker daemon or Docker Desktop has still not been started."
+            echo "Make sure that is correctly installed and running."
+            echo "If you want, you can start Docker Desktop by yourself."
+            echo "Run DL4MicEverywhere again when it is running."
+            read -p "Press enter to close the terminal."
+            echo "------------------------------------" 
+            exit 1
     else
-        exit 1 
+        echo ""
+        echo "------------------------------------"
+        echo "Docker daemon or Docker Desktop needs to be running."
+        echo "Make sure that is correctly installed." 
+        echo "If you want, you can start Docker Desktop by yourself."
+        read -p "Press enter to close the terminal."
+        echo "------------------------------------" 
+        exit 1
     fi
 fi

@@ -53,8 +53,15 @@ check_parsed_argument() {
     
     if [ -z "${!config_variable_name}" ]; then
         if [ -z "${!variable_name}" ]; then
-            echo "$variable_name parameter is not specified on the configuration yaml."
             # Close the terminal
+            echo ""
+            echo "------------------------------------"
+            echo "$variable_name parameter is not specified on the configuration yaml."
+            echo "Please specify the $variable_name parameter on the configuration yaml."
+            echo "If the problem persists, please create an issue on GitHub:"
+            echo "  https://github.com/HenriquesLab/DL4MicEverywhere/issues"
+            read -p "Press enter to close the terminal."
+            echo "------------------------------------" 
             exit 1
         fi
     else
@@ -161,6 +168,14 @@ else
 
     if [ -z "$gui_arguments" ]; then
         # Close the terminal
+        echo ""
+        echo "------------------------------------"
+        echo "Something has gone wrong with the parameters that have been passed."
+        echo "Please, check that the specified parameters are correct."
+        echo "If the problem persists, please create an issue on GitHub:"
+        echo "  https://github.com/HenriquesLab/DL4MicEverywhere/issues"
+        read -p "Press enter to close the terminal."
+        echo "------------------------------------" 
         exit 1
     fi
 
@@ -211,9 +226,15 @@ fi
 
 if [ -z "$config_path" ]; then 
     # If no configuration path has been specified, then exit with the error
-    echo "No path to the configuration.yaml file has been specified, please make sure to use -c argument and give a value to it."
-    
     # Close the terminal
+    echo ""
+    echo "------------------------------------"
+    echo "No path to the configuration.yaml file has been specified."
+    echo "If you are using the CLI, please make sure to use -c argument and give a value to it."
+    echo "If you are using the GUI, please make sure to use that you have selected a default"
+    echo "notebook or a local oath to a configuration."
+    read -p "Press enter to close the terminal."
+    echo "------------------------------------" 
     exit 1
 else
     # If a configuration path has been specified, check if it is valid
@@ -227,19 +248,28 @@ else
             echo "Path to the configuration folder: $config_path"
         fi
     else
-        echo "$config_path is not valid."
-        
         # Close the terminal
+        echo ""
+        echo "------------------------------------"
+        echo "The give path to the configuration is not valid: $config_path"
+        echo "Please, check that this path is correct and exists."
+        read -p "Press enter to close the terminal."
+        echo "------------------------------------" 
         exit 1
     fi
 fi 
 
 if [ -z "$data_path" ]; then 
     # Exit with an error if no data path is specified
-    echo "Please specify a path to the data folder using the -d argument."
-    
-        # Close the terminal
-        exit 1
+    # Close the terminal
+    echo ""
+    echo "------------------------------------"
+    echo "No path to the data folder has been specified."
+    echo "If you are using the CLI, please make sure to use -d argument and give a value to it."
+    echo "If you are using the GUI, please make sure to use that you have selected a path to the data folder."
+    read -p "Press enter to close the terminal."
+    echo "------------------------------------" 
+    exit 1
 else
     # Validate the specified data path
     if [[ -d "$data_path" ]]; then
@@ -247,18 +277,27 @@ else
             echo "Data path: $data_path"
         fi
     else
-        echo "The specified data path $data_path is not valid."
-        
         # Close the terminal
+        echo ""
+        echo "------------------------------------"
+        echo "The give path to the data folder is not valid: $data_path"
+        echo "Please, check that this path is correct and exists."
+        read -p "Press enter to close the terminal."
+        echo "------------------------------------" 
         exit 1
     fi
 fi 
 
 if [ -z "$result_path" ]; then 
     # Exit with an error if no result path is specified
-    echo "Please specify a path to the output folder using the -o argument."
-    
     # Close the terminal
+    echo ""
+    echo "------------------------------------"
+    echo "No path to the output folder has been specified."
+    echo "If you are using the CLI, please make sure to use -o argument and give a value to it."
+    echo "If you are using the GUI, please make sure to use that you have selected a path to the output folder."
+    read -p "Press enter to close the terminal."
+    echo "------------------------------------" 
     exit 1
 else
     # Validate the specified result path
@@ -267,9 +306,13 @@ else
             echo "Result path: $result_path"
         fi
     else
-        echo "The specified result path $result_path is not valid."
-        
         # Close the terminal
+        echo ""
+        echo "------------------------------------"
+        echo "The give path to the output folder is not valid: $result_path"
+        echo "Please, check that this path is correct and exists."
+        read -p "Press enter to close the terminal."
+        echo "------------------------------------" 
         exit 1
     fi
 fi 
@@ -330,9 +373,12 @@ else
         # If the notebook path is not valid, activate its flag for future processing
         local_notebook_flag=1
     else
-        echo "$notebook_path does not exist."
-        
-        # Close the terminal
+        echo ""
+        echo "------------------------------------"
+        echo "The give path to the notebook.ipynb is not valid: $notebook_path"
+        echo "Please, check that this path is correct and exists."
+        read -p "Press enter to close the terminal."
+        echo "------------------------------------" 
         exit 1
     fi
 fi
@@ -353,9 +399,12 @@ else
         # If the notebook path is not valid, activate its flag for future processing
         local_requirements_flag=1
     else
-        echo "$requirements_path does not exist."
-        
-        # Close the terminal
+        echo ""
+        echo "------------------------------------"
+        echo "The give path to the requirementes.txt is not valid: $requirements_path"
+        echo "Please, check that this path is correct and exists."
+        read -p "Press enter to close the terminal."
+        echo "------------------------------------" 
         exit 1
     fi
 fi
@@ -552,8 +601,12 @@ else
             DOCKER_OUT=0 # In case that is already built, it is good to run
         else
             # build flag is still 0, an error ocurred
-            echo "Error building the docker image"
-            
+            echo ""
+            echo "------------------------------------"
+            echo "Error looking for existing docker"
+            echo "image with the given tag: $docker_tag"
+            read -p "Press enter to close the terminal."
+            echo "------------------------------------" 
             # Close the terminal
             exit 1
         fi
@@ -634,16 +687,17 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
         docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag"  /bin/bash -c "$docker_command"
     fi
 else
-    echo "The docker image has not been built."
-    if [ "$test_flag" -eq 1 ]; then
-        # Close the terminal
-        exit 1
-    fi
+    echo ""
+    echo "------------------------------------"
+    echo "Error during the building of the docker image. Please check the logs."
+    read -p "Press enter to close the terminal."
+    echo "------------------------------------" 
+    exit 1 
 fi
 
 # Close the terminal when user press enter
 echo ""
 echo "------------------------------------"
-read -p "Press enter to close the terminal"
+read -p "Press enter to close the terminal."
 echo "------------------------------------" 
 exit 1

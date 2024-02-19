@@ -15,8 +15,13 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
 
         if ! command -v brew &> /dev/null; then
+            echo ""
+            echo "------------------------------------"
             echo -e "\033[0;31 Homebrew installation failed. \033[0m"
-            echo "Please try again or follow the offical installation instructions on their website: https://brew.sh/"
+            echo "Please try again or follow the requirements installation we provide:"
+            echo "https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/REQUIREMENTS_INSTALLATION.md"
+            read -p "Press enter to close the terminal."
+            echo "------------------------------------" 
             exit 1
         fi
     else
@@ -46,13 +51,23 @@ if ! command -v wish &> /dev/null; then
         # Windows
         echo "This is a Windows machine"
     else
+        echo ""
+        echo "------------------------------------"
         echo "Unsupported OS: $OSTYPE"
+        echo "We only provide support for Windows, MacOS and Linux."
+        read -p "Press enter to close the terminal."
+        echo "------------------------------------" 
         exit 1
     fi
 
     if ! command -v wish &> /dev/null; then
+        echo ""
+        echo "------------------------------------"
         echo -e "\033[0;31 Wish (TCL/TK) installation failed. \033[0m"
-        echo "Please try again or follow the offical installation instructions on their website: https://www.tcl.tk/software/tcltk/"
+        echo "Please try again or follow the requirements installation we provide:"
+        echo "https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/REQUIREMENTS_INSTALLATION.md"
+        read -p "Press enter to close the terminal."
+        echo "------------------------------------" 
         exit 1
     fi
 else
@@ -89,8 +104,14 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
             sudo apt -y upgrade
             sudo apt -y install net-tools
             if ! command -v netstat &> /dev/null; then 
+                echo ""
+                echo "------------------------------------"
                 echo -e "\033[0;31 net-tools installation failed. \033[0m"
-                echo "Please try again or follow the installation instructions on: https://installati.one/install-net-tools-ubuntu-20-04/"
+                echo "Please try again or follow the installation instructions on:"
+                echo "https://installati.one/install-net-tools-ubuntu-20-04/"
+                read -p "Press enter to close the terminal."
+                echo "------------------------------------" 
+                exit 1
             fi
         else
             echo "net-tools already installed."
@@ -191,13 +212,24 @@ if ! command -v docker &> /dev/null; then
         # Windows
         echo "This is a Windows machine"
     else
+        echo ""
+        echo "------------------------------------"
         echo "Unsupported OS: $OSTYPE"
+        echo "We only provide support for Windows, MacOS and Linux."
+        read -p "Press enter to close the terminal."
+        echo "------------------------------------" 
         exit 1
     fi
     
     if ! command -v docker &> /dev/null; then
+        echo ""
+        echo "------------------------------------"
         echo -e "\033[0;31 Docker installation failed. \033[0m"
-        echo "Please try again or follow the offical installation instructions on their website: https://docs.docker.com/get-docker/"
+        echo "Please try again or follow the installation instructions on:"
+        echo "https://installati.one/install-net-tools-ubuntu-20-04/"
+        read -p "Press enter to close the terminal."
+        echo "------------------------------------" 
+        exit 1
     fi
 else
     echo "Docker already installed."

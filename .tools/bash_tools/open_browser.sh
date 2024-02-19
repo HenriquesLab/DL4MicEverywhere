@@ -20,7 +20,12 @@ elif [[ "$OSTYPE" == "msys*" ]]; then
     # Windows
     start $url
 else
+    echo ""
+    echo "------------------------------------"
     echo "Unsupported OS: $OSTYPE"
+    echo "We only provide support for Windows, MacOS and Linux."
+    read -p "Press enter to close the terminal."
+    echo "------------------------------------" 
     exit 1
 fi
 
