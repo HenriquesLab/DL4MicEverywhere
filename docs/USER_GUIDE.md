@@ -50,7 +50,7 @@ The automatic installation on MacOs guides you through these steps:
 <details>
 <summary>On Windows:</summary>
 
-The automatic installation on Windows guides you through these steps:
+The automatic installation on Windows guides you through the following steps. You can also [watch a video tutorial](https://youtu.be/aUoZ4b3B9qU).
 
 1. **Docker Desktop installation:**
 
