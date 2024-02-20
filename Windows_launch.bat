@@ -6,6 +6,7 @@ setlocal enabledelayedexpansion
 
 set defaultdist=none
 set /A isubuntu=0
+set /A defaultubuntu=0
 
 if not exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" (
   :: Download Docker Desktop
@@ -48,20 +49,20 @@ for /f "tokens=* USEBACKQ skip=1" %%F in (`wsl --list`) do (
   :: Get distribution name
   set "dist=%%F"
 
-  :: Remove the word Default in that name
-  set "defaultless=!dist:Default=!"
+  :: Remove the word last parentheses in that name (that will be the default distribution)
+  set "withoutparentheses=!dist:)=!"
+  :: Check if the distrubution name contained paretheses (if so it is the default distribuition)
+  if not !dist!==!withoutparentheses! set defaultdist=!dist!
 
-  :: Check if the distrubution name contained Default
-  if not !dist!==!defaultless! (
-    set defaultless=!defaultless:~0,-3!
-    set defaultdist=!defaultless!
-  )
-
-  :: Remove the word Ubuntu in that name
-  set "ubuntuless=!defaultless:Ubuntu=!"
-
+  :: Remove the word Ubuntu in default distribution
+  set "defaultubuntuless=!defaultdist:Ubuntu=!"
+  :: Check if the default distrubution name contained Ubuntu
+  if not !defaultdist!==!defaultubuntuless! set /A defaultubuntu=1
+  
+  :: Remove the word Ubuntu in the distribution name
+  set "ubuntuless=!dist:Ubuntu=!"
   :: Check if the distrubution name contained Ubuntu
-  if "!ubuntuless!"=="" set /A isubuntu=1
+  if !dist!==!ubuntuless! set /A isubuntu=1
 )
 
 :: First check if Ubuntu is installed
@@ -81,7 +82,7 @@ if %isubuntu%==0 (
   exit
 ) else (
   :: If it is intalled, check if it is the default distribution
-  if not %defaultdist%==Ubuntu (  
+  if %defaultubuntu%==0 (  
     :: If not, set as the default one
     wsl --set-default Ubuntu
   )
