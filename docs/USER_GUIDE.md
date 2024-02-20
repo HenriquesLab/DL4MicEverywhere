@@ -101,9 +101,6 @@ The [REQUIREMENTS INSTALLATION](REQUIREMENTS_INSTALLATION.md) page has detailed 
 
 # Quickstart 
 
-> ⚠️: **IMPORTANT:**
-> The GPU usage on Windows 10 machines is not working at this moment due to some TensorFlow and NVIDIA compatibility issues. This issue is under development (alternatives like conda are considered [here](https://github.com/HenriquesLab/DL4MicEverywhere/tree/Pass-to-conda)) and discussed [here](https://github.com/HenriquesLab/DL4MicEverywhere/issues/24). 
-
 **Launch the notebook selection GUI:**
 
 Double-click the launcher in the DL4MicEverywhere folder that has the same name as your system (e.g., `Windows_launch` for Windows operating systems). A GUI will automatically pop-up.
