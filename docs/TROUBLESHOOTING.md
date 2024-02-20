@@ -180,6 +180,8 @@ This time you will get a different message, and by clicking `Open` you are allow
 
 ### **`Windows_launher` cannot be oppened**
 
+Please ensure you have downloaded DL4MicEverywhere as a ZIP file from the DL4MicEverywhere repository. The Git clone will not work, as Windows auto-converts the files.
+
 Windows computers will warn you that the file you want to launch is an unrecognized app and will pop you the following message:
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TROUBLESHOOTING/Windows_cannot_open.png" 
