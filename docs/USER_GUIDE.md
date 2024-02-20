@@ -6,7 +6,7 @@ DL4MicEverywhere is a user-friendly platform that allows you to run deep learnin
 
 ## Download DL4MicEverywhere Repository:
 
-* **Option 1**: Download the last version of DL4MicEverywhere from GitHub's repository:
+* **Option 1**: Download the last version of DL4MicEverywhere from GitHub's repository (use this if on Windows):
 
     1. Download a ZIP file of the DL4MicEverywhere repository by clicking [here](https://github.com/HenriquesLab/DL4MicEverywhere/archive/refs/heads/main.zip).
 
