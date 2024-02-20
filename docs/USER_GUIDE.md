@@ -56,21 +56,25 @@ The automatic installation on Windows guides you through the following steps. Yo
 
    1.1. During installation, ensure that the **"Use WSL 2 instead of Hyper-V"** option is selected ☑️.
 
-   1.2. After succesfull installation, the terminal will close. Please restart your computer and click again on the `Windows_launch` file.
+   1.2. After succesfull installation, the terminal will close. Please restart your computer.
 
 2. **Windows Subsystem for Linux (WSL) installation:**
 
-   2.1. You need to enter a username and a password, these can be different from the credentials on your computer (**IMPORTANT:** remember the password for the future).
+   2.1. Go to your DL4MicEverywhere folder and click again on the `Windows_launch` file.
 
-   2.2. After installation, you will need to type `logout` and press **ENTER**.
+   2.2 You need to enter a username and a password, these can be different from the credentials on your computer (**IMPORTANT:** remember the password for the future) (when entering the password, it will not be displayed).
 
-   2.3. Then, the terminal will close. Please restart your computer and click again on the `Windows_launch` file.
+   2.3. After installation, you will need to type `logout` and press **ENTER**.
+
+   2.4. Then press **ENTER** to clsoe the terminal. Please restart your computer.
 
 3. **Ubuntu libraries installation and starting DL4MicEverywhere:**
 
-   3.1. If Docker Desktop is not already running, it will ask you to start it.
+   3.1. Go to your DL4MicEverywhere folder and click again on the `Windows_launch` file.
 
-4. **The GUI will pop up, and you can start using DL4MicEverywhere** (if the GUI is not displayed correctly, please restart your computer once more to fix the issue).
+   3.2. If Docker Desktop is not already running, it will ask you to start it. If in 10 seconds Docker Desktop is not opened, you will need to open it manually and click again on the `Windows_launch` file.
+
+6. **The GUI will pop up, and you can start using DL4MicEverywhere** (if the GUI is not displayed correctly, please restart your computer once more to fix the issue).
 
 </details>
 
@@ -116,7 +120,7 @@ Double-click the launcher in the DL4MicEverywhere folder that has the same name 
 
 - This action will build a Docker container for the selected notebook and then start it. Follow the prompts to access the Jupyter interface through your web browser.
 
-Now, you're ready to run deep learning workflows through an intuitive UI!
+Now, you're ready to run deep learning workflows through an intuitive GUI!
 
 
 # Step-by-step guide to use DL4MicEverywhere notebooks
@@ -250,7 +254,7 @@ After selecting the path to the folder, the main window should look like this:
      width="40%" 
      height="40%" />
 
-With these arguments set, you can click **Run** to execute the program. Additionally, you can choose to use a GPU (if your device has one) and you can assign a custom tag to the Docker image that will be built.
+With these arguments set, you can click **Run** to execute the program. Additionally, you can choose to use a GPU (if your device has one) and you can assign a custom tag to the **Docker image** that will be built.
 
 ### Activate/Deactivate the GPU
 
@@ -265,32 +269,36 @@ The first time you run DL4MicEverywhere this setting will be disabled, as there 
 
 ## 3. Docker images
 
-DL4MicEverywhere will either pull a container image from Dockerhub or build one for you if there isn't one suitable for your operating system and configuration. The interface may ask you:
+DL4MicEverywhere will either get a **Docker image** from Docker Hub or build one for you if there isn't one suitable for your operating system and configuration. The GUI may ask you:
 
-1. if there is already an image on your machine, would you like to rebuild and replace it?
-2. if there is no image on your machine but there is one on Docker hub, would you like to download it?
+1. If there is already a **Docker image** on your computer, would you like to rebuild and replace it?
+    - Yes: You want to create a new **Docker image** instead of using the one in your computer.
+    - No: You want to use the existing **Docker image** on your computer.
+3. If there is no **Docker image** on your computer but there is one on Docker Hub, would you like to download it?
+    - Yes: You want to download the **Docker image** from Docker Hub.
+    - No: You want to create the **Docker image** on your computer.
 
 > ℹ️ **NOTE**:
-> Your system might require root access or password authentication to build a Docker image.
+> Your system might require root access or password authentication to build a **Docker image**.
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/PASSWORD_BUILDIMAGE.png" 
      alt="Root access is required to build a docker image"
      width="40%" 
      height="40%" />
    
-While building or pulling the image, your terminal window will look like this:
+While building or pulling the **Docker image**, your terminal window will look like this:
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/IMAGE_BUILD_TERMINAL.png" 
      alt="Terminal after building a docker image"
      width="60%" 
      height="60%" />
 
-Docker images occupy between 3 and 5 GB of memory, so it is advisable to manage them periodically. Check how to do it [here](DOCKER_DESKTOP.md)
+**Docker images** occupy some memory, so it is advisable to manage them periodically. Check how to do it [here](DOCKER_DESKTOP.md)
 
 ## 4. Working with DL4MicEverywhere notebooks
-After building a Docker image and running a container to run the notebooks, DL4MicEverywhere will automatically run Jupyter Lab and open it in the default browser.
+After building a **Docker image** and running a container to run the notebooks, DL4MicEverywhere will automatically run Jupyter Lab and open it in the default browser.
 The notebooks, inspired by ZeroCostDL4Mic, are designed to be user-friendly and do not require programming skills to run them. Follow their [Step-by-step "How to"](https://github.com/HenriquesLab/ZeroCostDL4Mic/wiki/Step-by-step-run-through) to get further details about parameters and data formats. 
 
-When you open the notebook in Jupyter Lab, code cells are hidden with a message `# Run this cell to visualise the parameters and click the button to execute the code ...`. 
+When you open the notebook in Jupyter Lab, code cells are hidden with three dots `...`. 
 
 When you run the code cells (either by pressing `Ctrl+Enter` or clicking on the play symbol on the top bar of the notebook), an interactive menu appears as shown in the image. In this menu, you can specify any required parameter. After specifying all the parameters, click on "Load and run". Note that if you do not click, the code of that cell will not run. Likewise, if you run the cell again, the parameters will need to be specified again. 
 
@@ -371,9 +379,9 @@ After selecting the file, the window should look like this:
      width="40%" 
      height="40%" />
 
-### Assign a custom tag to the Docker image
+### Assign a custom tag to the **Docker image**
 
-You can enter the tag you want in the **Tag** textbox. In the following example, we assign the tag 'MyTag' to the Docker image:
+You can enter the tag you want in the **Tag** textbox. In the following example, we assign the tag 'MyTag' to the **Docker image**:
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_tag.png" 
      alt="Main window after Tag"
