@@ -62,7 +62,7 @@ for /f "tokens=* USEBACKQ skip=1" %%F in (`wsl --list`) do (
   :: Remove the word Ubuntu in the distribution name
   set "ubuntuless=!dist:Ubuntu=!"
   :: Check if the distrubution name contained Ubuntu
-  if !dist!==!ubuntuless! set /A isubuntu=1
+  if not !dist!==!ubuntuless! set /A isubuntu=1
 )
 
 :: First check if Ubuntu is installed
