@@ -10,30 +10,32 @@ def update_config(config_path):
         manifest_data = yaml.safe_load(f)
     notebook_name = config_path.split('/')[-2]
 
-    # Find the name of the notebook on the manifest
-    for element in manifest_data['collection']:
-        if element['type'] == 'application':
-            if element['id'] == dict_dl4miceverywhere_to_manifest[notebook_name]:
-
-                # Read the information from configuration file and modify values
-                with open(config_path, 'r') as f:
-                    config_data = yaml.safe_load(f)
-                    for key, value in element.items():
-                        if key != 'config':
-                            config_data[key] = value
-
-                # We only want to modify one notebook
-                break
-
-    # Dumper to avoid null values and instead let the atributes empty
-    SafeDumper.add_representer(
-        type(None),
-        lambda dumper, value: dumper.represent_scalar(u'tag:yaml.org,2002:null', '')
-    )
-
-    # Writing a new yaml file with the modifications
-    with open(config_path, 'w') as new_f:
-        yaml.safe_dump(config_data, new_f, width=10e10, default_flow_style=False)
+    # Check if the notebook name is in the described dictionaries
+    if notebook_name in dict_dl4miceverywhere_to_manifest.keys():
+        # Find the name of the notebook on the manifest
+        for element in manifest_data['collection']:
+            if element['type'] == 'application':
+                if element['id'] == dict_dl4miceverywhere_to_manifest[notebook_name]:
+    
+                    # Read the information from configuration file and modify values
+                    with open(config_path, 'r') as f:
+                        config_data = yaml.safe_load(f)
+                        for key, value in element.items():
+                            if key != 'config':
+                                config_data[key] = value
+    
+                    # We only want to modify one notebook
+                    break
+    
+        # Dumper to avoid null values and instead let the atributes empty
+        SafeDumper.add_representer(
+            type(None),
+            lambda dumper, value: dumper.represent_scalar(u'tag:yaml.org,2002:null', '')
+        )
+    
+        # Writing a new yaml file with the modifications
+        with open(config_path, 'w') as new_f:
+            yaml.safe_dump(config_data, new_f, width=10e10, default_flow_style=False)
 
 def main():
     notebook_path = 'notebooks'
