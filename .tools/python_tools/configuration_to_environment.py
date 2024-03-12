@@ -30,7 +30,9 @@ def create_env(config_path, environment_folder_path, gpu_flag=0):
         for requirement in requirements:
             # If line is not empty and is not a comment, add it to the dependencies
             if requirement != '\n' and requirement[0].strip() != '#':
-                pip.append(requirement.replace('\n', '').strip())
+                if 'nbformat' not in requirement and 'ipywidgets' not in requirement and  'jupyterlab' not in requirement:
+                    # Not append these libraries, as they are already added bellow
+                    pip.append(requirement.replace('\n', '').strip())
 
     # Add pip requirements that should be in every file      
     if python_version in ['3.8', '3.9', '3.10', '3.11']:

@@ -13,7 +13,6 @@ dependencies:
   - astropy==5.2.1
   - opencv-python==4.7.0.72
   - ipython==8.4.0
-  - ipywidgets==8.1.1
   - matplotlib==3.5.0
   - numpy==1.22.4
   - pandas==1.5.3

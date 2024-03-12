@@ -17,7 +17,6 @@ dependencies:
   - future==0.18.3
   - google==2.0.3
   - gputools==0.2.14
-  - ipywidgets==8.1.0
   - matplotlib==3.7.1
   - numpy==1.22.4
   - opencv-python==4.8.0.76

@@ -14,7 +14,6 @@ dependencies:
   - csbdeep==0.7.3
   - opencv-python==4.7.0.72
   - fpdf2==2.7.4
-  - ipywidgets==8.1.1
   - matplotlib==3.5.0
   - numpy==1.22.4
   - pandas==1.5.3
