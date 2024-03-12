@@ -1,0 +1,26 @@
+channels:
+- defaults
+- anaconda
+- conda-forge
+dependencies:
+- python=3.9
+- pip
+- git
+- wget
+- unzip
+- pkg-config
+- pip:
+  - fpdf2==2.7.4
+  - imgaug==0.4.0
+  - ipython==8.4.0
+  - matplotlib==3.5.0
+  - numpy==1.22.4
+  - pandas==1.5.3
+  - Pillow==8.4.0
+  - pip==21.2.4
+  - scikit-image==0.19.3
+  - tensorflow==2.12.0
+  - nbformat==5.9.2
+  - ipywidgets==8.1.0
+  - jupyterlab==3.6.0
+name: dl4miceverywhere
