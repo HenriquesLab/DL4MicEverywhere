@@ -13,7 +13,7 @@ def create_env(config_path, environment_folder_path="", gpu_flag=0):
 
     if environment_folder_path=="":
         # Define am create the folder with the conda environments
-        environment_folder_path = config_path.replace('/notebooks/', '.conda_envs').replace('/configuration.yaml', '')
+        environment_folder_path = config_path.replace('/notebooks/', '/.conda_envs/').replace('/configuration.yaml', '')
     os.makedirs(environment_folder_path, exist_ok=True)
 
     # Read the information from configuration file
@@ -130,19 +130,19 @@ def create_env(config_path, environment_folder_path="", gpu_flag=0):
         yaml.safe_dump(env_data, new_f, width=10e10, default_flow_style=False)
 
 def main(gpu_flag=0):
-    notebook_path = 'notebooks'
+    notebook_path = './notebooks'
     for notebook_type in os.listdir(notebook_path):
         notebook_type_path = os.path.join(notebook_path, notebook_type)
         if os.path.isdir(notebook_type_path):
             for notebook_name in os.listdir(notebook_type_path):
                 if os.path.isdir(os.path.join(notebook_type_path, notebook_name)):
                     config_path = os.path.join(notebook_type_path, notebook_name, 'configuration.yaml')
-                    create_env(config_path, gpu_flag)
+                    create_env(config_path, gpu_flag=gpu_flag)
 
 if __name__ == '__main__':
     if len(sys.argv) <= 2:
         sys.exit(main(gpu_flag=int(sys.argv[1])))
     elif len(sys.argv) == 3:
-        sys.exit(create_env(sys.argv[1], gpu_flag=sys.argv[2]))
+        sys.exit(create_env(sys.argv[1], gpu_flag=int(sys.argv[2])))
     else:
-        sys.exit(create_env(sys.argv[1], environment_folder_path=sys.argv[3], gpu_flag=sys.argv[2]))
+        sys.exit(create_env(sys.argv[1], environment_folder_path=sys.argv[2], gpu_flag=int(sys.argv[3])))
