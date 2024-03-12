@@ -74,6 +74,11 @@ def create_env(config_path, environment_folder_path, gpu_flag=0):
         lambda dumper, value: dumper.represent_scalar(u'tag:yaml.org,2002:null', '')
     )
 
+    # Get the notebook name
+    notebook_url = config_data['config']['dl4miceverywhere']['notebook_url']
+    notebook_name = os.path.splitext(os.path.basename(notebook_url))[0].lower()
+
+    # Get the name that will be used in the conda environment (similar to the one for Docker Hub)
     if 'docker_hub_image' in config_data['config']['dl4miceverywhere'].keys():
         environment_file_name = config_data['config']['dl4miceverywhere']['docker_hub_image']
     else:
@@ -82,16 +87,36 @@ def create_env(config_path, environment_folder_path, gpu_flag=0):
         dl4miceverywhere_version = construct_data['version']
 
         notebook_version = config_data['config']['dl4miceverywhere']['notebook_version']
-        notebook_url = config_data['config']['dl4miceverywhere']['notebook_url']
 
-        notebook_name = os.path.splitext(os.path.basename(notebook_url))[0].lower()
         notebook_type = config_path.split('/')[-3]
-        environment_file_path = f'{notebook_name}-{notebook_vocals[notebook_type]}{notebook_version}-d{dl4miceverywhere_version}'
+        environment_file_name = f'{notebook_name}-{notebook_vocals[notebook_type]}{notebook_version}-d{dl4miceverywhere_version}'
     
+    # Add the GPU flag
+    if gpu_flag:
+        environment_file_name += '-gpu'
+
     # Create the path to the conda environment file
     environment_file_path = os.path.join(environment_folder_path, environment_file_name + '.yml')
 
-    # Create and write the environment yaml file with the modifications
+    # Create and write the environment yml file 
+    env_data = {}
+    with open(environment_file_path, 'w') as new_f:
+        env_data['name'] = 'dl4miceverywhere'
+        env_data['channels'] = ['defaults', 'anaconda', 'conda-forge']
+        env_data['dependencies'] = dependecies
+        yaml.safe_dump(env_data, new_f, width=10e10, default_flow_style=False)
+
+    # Create the 'latest' environment
+    environment_file_name = f'{notebook_name}-latest'
+
+    # Add the GPU flag
+    if gpu_flag:
+        environment_file_name += '-gpu'
+
+    # Create the path to the conda environment file
+    environment_file_path = os.path.join(environment_folder_path, environment_file_name + '.yml')
+
+    # Create and write the latest environment yml file
     env_data = {}
     with open(environment_file_path, 'w') as new_f:
         env_data['name'] = 'dl4miceverywhere'
