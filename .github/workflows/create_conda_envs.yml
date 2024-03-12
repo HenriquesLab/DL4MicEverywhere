@@ -1,0 +1,71 @@
+name: Build Docker images for single configuration
+
+on:
+  workflow_call:
+    inputs:
+      config_file: # the variable you can use in place of a matrix
+        required: true
+        type: string
+        
+jobs:
+  test_conda_without_GPU:
+    name: Test conda env files from configuration yamls without GPU
+    runs-on: ubuntu-latest
+    steps:
+        - name: Clone DL4MicEverywhere repository
+          uses: actions/checkout@v4
+        - name: Create the configuration file
+          run: python3 .tools/python_tools/configuration_to_environment.py '${{ inputs.config_file }}' environment.yml 0
+        - name: Load micromamba
+          uses: mamba-org/setup-micromamba@v1
+          with:
+            micromamba-version: '1.5.6-0' # any version from https://github.com/mamba-org/micromamba-releases
+            environment-file: environment.yml
+            init-shell: >-
+              bash
+              powershell
+            cache-environment: true
+            post-cleanup: 'all'
+
+  test_conda_with_GPU:
+    name: Test conda env files from configuration yamls with GPU
+    runs-on: ubuntu-latest
+    steps:
+        - name: Clone DL4MicEverywhere repository
+          uses: actions/checkout@v4
+        - name: Create the configuration file
+          run: python3 .tools/python_tools/configuration_to_environment.py '${{ inputs.config_file }}' environment_gpu.yml 1
+        - name: Load micromamba
+          uses: mamba-org/setup-micromamba@v1
+          with:
+            micromamba-version: '1.5.6-0' # any version from https://github.com/mamba-org/micromamba-releases
+            environment-file: environment_gpu.yml
+            init-shell: >-
+              bash
+              powershell
+            cache-environment: true
+            post-cleanup: 'all'
+
+  push_conda_env_without_GPU:
+    name: Update the versions on configurations
+    runs-on: [ubuntu-latest]
+    if: ${{ always() && contains(needs.test_conda_without_GPU.result, 'success') && contains(needs.test_conda_with_GPU.result, 'success') }}
+    needs:
+      - test_conda_without_GPU
+      - test_conda_with_GPU
+    steps:
+      - name: Wait a minute
+        run: sleep 60
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+      - name: Update the repository with git pull
+        run: git pull
+      - name: Install requirements
+        run: pip install -r .tools/requirements.txt
+      - name: Update the version of the notebook on the configuration
+        run: python3 .tools/python_tools/configuration_to_environment.py '${{ inputs.config_file }}' 0
+      - name: Update the docker_tag on the configuration
+        run: python3 .tools/python_tools/configuration_to_environment.py '${{ inputs.config_file }}' 1
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: GitHub Action - Update the notebook version on the configuration

@@ -9,8 +9,13 @@ notebook_vocals = {'ZeroCostDL4Mic_notebooks':'z',
                    'External_notebooks':'e',
                    'Bespoke_notebooks':'b'}
 
-def create_env(config_path, environment_folder_path, gpu_flag=0):
-    
+def create_env(config_path, environment_folder_path="", gpu_flag=0):
+
+    if environment_folder_path=="":
+        # Define am create the folder with the conda environments
+        environment_folder_path = config_path.replace('/notebooks/', '.conda_envs').replace('/configuration.yaml', '')
+    os.makedirs(environment_folder_path, exist_ok=True)
+
     # Read the information from configuration file
     with open(config_path, 'r') as f:
         config_data = yaml.safe_load(f)
@@ -126,22 +131,18 @@ def create_env(config_path, environment_folder_path, gpu_flag=0):
 
 def main(gpu_flag=0):
     notebook_path = 'notebooks'
-    conda_env_path = '.conda_envs'
     for notebook_type in os.listdir(notebook_path):
         notebook_type_path = os.path.join(notebook_path, notebook_type)
-        conda_notebook_type_path = os.path.join(conda_env_path, notebook_type)
         if os.path.isdir(notebook_type_path):
             for notebook_name in os.listdir(notebook_type_path):
                 if os.path.isdir(os.path.join(notebook_type_path, notebook_name)):
-                    # Define a create the folder with the conda environments
-                    conda_env_folder_path = os.path.join(conda_notebook_type_path, notebook_name)
-                    os.makedirs(conda_env_folder_path, exist_ok=True)
-
                     config_path = os.path.join(notebook_type_path, notebook_name, 'configuration.yaml')
-                    create_env(config_path, conda_env_folder_path, gpu_flag)
+                    create_env(config_path, gpu_flag)
 
 if __name__ == '__main__':
     if len(sys.argv) <= 2:
         sys.exit(main(gpu_flag=int(sys.argv[1])))
+    elif len(sys.argv) == 3:
+        sys.exit(create_env(sys.argv[1], gpu_flag=sys.argv[2]))
     else:
-        sys.exit(create_env(sys.argv[1], sys.argv[2], gpu_flag=sys.argv[3]))
+        sys.exit(create_env(sys.argv[1], environment_folder_path=sys.argv[3], gpu_flag=sys.argv[2]))
