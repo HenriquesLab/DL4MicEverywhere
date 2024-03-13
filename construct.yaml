@@ -1,8 +1,8 @@
 name: "dl4miceverywhere"
 version: "2.0.0"
 channels:
-- "http://repo.continuum.io/pkgs/main/"
-environment_file: environment.yml
+  - "http://repo.continuum.io/pkgs/main/"
+environment: base
 # license_file: EULA.txt
 # welcome_image: photo.png  # [win]
 # Pip dependencies are NOT recommended. If you do need them
