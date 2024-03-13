@@ -33,14 +33,14 @@ jobs:
           repository: "pyinstaller/pyinstaller"
           submodules: "recursive"
           path: "pyinstaller"
-      - name: Install PyInstaller
-        run: |
-          cd pyinstaller
-          python -m pip install -e .
-      - name: Build Bootloader
-        run: |
-          cd pyinstaller/bootloader
-          python ./waf all --target-arch=64bit
+      # - name: Install PyInstaller
+      #   run: |
+      #     cd pyinstaller
+      #     python -m pip install -e .
+      # - name: Build Bootloader
+      #   run: |
+      #     cd pyinstaller/bootloader
+      #     python ./waf all --target-arch=64bit
       - name: Build
         run: |
           pyinstaller launcher.spec
