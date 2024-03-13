@@ -1,8 +1,0 @@
-name: release
-on:
-  push:
-    branches:
-      - "*"
-jobs:
-  build:
-    uses: ./.github/workflows/build_workflow.yml

@@ -1,53 +1,17 @@
-name: Build constructor
-
-on: 
+name: Build constructors for different Python versions
+on:
   workflow_call:
-    inputs:
-      python-version:
-        required: true
-        type: string
-      os:
-        required: true
-        type: string
-      shell:
-        required: true
-        type: string
-
 jobs:
   build-constructor:
-    runs-on: ${{ inputs.os }}
-    defaults:
-      run:
-        shell: ${{ inputs.shell }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          environment-file: environment.gpu.yml
-          python-version: ${{ inputs.python-version }}
-          miniforge-variant: Mambaforge
-          miniforge-version: latest
-          mamba-version: "*"
-          use-mamba: true
-      - name: Check Python version
-        run: python --version
-      # - name: Make python ver env
-      #   run: mamba create -n dl4miceverywhere python=${{ inputs.python-version }}
-      # - name: Update env
-        # run: mamba env update -n dl4miceverywhere -f environment.gpu.yml
-      - name: constructor
-        run: constructor --output-dir dist/main
-      - name: Rename installer
-        run: mv dist/main/*.sh dist/main/${{ inputs.python-version }}-${{ inputs.os }}.sh
-      - name: Upload Installer
-        uses: actions/upload-artifact@v2
-        with:
-          name: installer-${{ inputs.python-version }}-${{ inputs.os }}
-          path: dist/main/**/*
-      # - uses: softprops/action-gh-release@v1
-      #   with:
-      #     draft: true
-      #     files: dist/main/*
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is  
+    strategy:
+      matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+        os: [ubuntu-latest]
+        include:
+          - os: ubuntu-latest
+            shell: bash -l {0}
+    uses: ./.github/workflows/build_constructor.yml
+    with:
+      python-version: ${{ matrix.python-version }}
+      os: ${{ matrix.os }}
+      shell: ${{ matrix.shell }}

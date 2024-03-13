@@ -1,0 +1,8 @@
+name: Build to check when a branch is pushed
+on:
+  push:
+    branches:
+      - "*"
+jobs:
+  build:
+    uses: ./.github/workflows/build_workflow_aux.yml

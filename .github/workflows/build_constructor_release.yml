@@ -1,11 +1,11 @@
-name: release
+name: Build and publish ZIPs when release
 on:
   push:
     tags:
       - "*"
 jobs:
   build:
-    uses: ./.github/workflows/build_workflow.yml
+    uses: ./.github/workflows/build_workflow_aux.yml
   release:
     needs: build
     permissions:
