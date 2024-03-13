@@ -4,13 +4,10 @@ channels:
 - defaults
 dependencies:
 - constructor
-- gcc
 - make
 - freetype
 - libsm-cos6-x86_64
 - curl
-- wget
-- unzip
 - git
 - ffmpeg
 - pkg-config
