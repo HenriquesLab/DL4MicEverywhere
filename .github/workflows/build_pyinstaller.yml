@@ -22,7 +22,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           environment-file: environment.gpu.yml
-          python-version: ${{ inputs.python-version }}
+          # python-version: ${{ inputs.python-version }}
           miniforge-variant: Mambaforge
           miniforge-version: latest
           mamba-version: "*"
