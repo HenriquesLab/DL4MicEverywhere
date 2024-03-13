@@ -1,0 +1,61 @@
+name: Build PyInstaller
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
+      os:
+        required: true
+        type: string
+      shell:
+        required: true
+        type: string
+jobs:
+  build-pyinstaller:
+    runs-on: ${{ inputs.os }}
+    defaults:
+      run:
+        shell: ${{ inputs.shell }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          environment-file: environment.yml
+          python-version: ${{ inputs.python-version }}
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          mamba-version: "*"
+          use-mamba: true
+      - name: Checkout PyInstaller for Bootloader Build
+        uses: actions/checkout@v2
+        with:
+          repository: "pyinstaller/pyinstaller"
+          submodules: "recursive"
+          path: "pyinstaller"
+      - name: Install PyInstaller
+        run: |
+          cd pyinstaller
+          python -m pip install -e .
+      - name: Build Bootloader
+        run: |
+          cd pyinstaller/bootloader
+          python ./waf all --target-arch=64bit
+      - name: Build
+        run: |
+          pyinstaller launcher.spec
+      # - name: Build
+      #   run: |
+      #     pyinstaller launcher.spec
+      # - name: Archive Release
+      #   uses: thedoctor0/zip-release@0.7.5
+      #   with:
+      #     type: 'zip'
+      #     directory: "dist"
+      #     filename: installer-${{ inputs.python-version }}-${{ inputs.os }}.zip
+      - name: Upload Installer
+        uses: actions/upload-artifact@v2
+        with:
+          name: pyinstaller-${{ inputs.python-version }}-${{ inputs.os }}
+          path: |
+            dist/**/*
