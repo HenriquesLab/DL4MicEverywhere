@@ -1,0 +1,2 @@
+build:
+	pyinstaller launcher.spec
