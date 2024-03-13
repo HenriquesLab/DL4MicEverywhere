@@ -15,6 +15,7 @@ dependencies:
 - ffmpeg
 - pkg-config
 - nodejs
+- pyinstaller
 - cudatoolkit=11.0 # Adjust the version number as needed
 - pip:
   - pip
