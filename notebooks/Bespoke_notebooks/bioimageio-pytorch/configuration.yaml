@@ -20,10 +20,10 @@ config:
     dl4miceverywhere_version: 2.0.0
     docker_hub_image: load_bioimageio_pytorch-b1.1.0-d2.0.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/bioimageio-pytorch/load_bioimageio_pytorch.ipynb
-    notebook_version: 1.1.0
+    notebook_version: 1.2.0
     python_version: '3.9'
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/bioimageio-pytorch/requirements.txt
-    sections_to_remove: 1.0.
+    sections_to_remove: 1.0. 5.1.
     ubuntu_version: '20.04'
 description: Notebook to load models from the BioImage Model Zoo in PyTorch
 download_url: https://colab.research.google.com/github/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/Bespoke_notebooks/bioimageio-pytorch/load_bioimageio_pytorch.ipynb
@@ -40,4 +40,4 @@ tags:
 - ZeroCostDL4Mic
 - dl4miceverywhere
 type: application
-version: 1.1.0
+version: 1.2.0
