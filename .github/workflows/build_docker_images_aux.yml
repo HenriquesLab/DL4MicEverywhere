@@ -25,7 +25,9 @@ jobs:
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
-
+      - name: Update the docker_tag on the configuration
+        run: python3 .tools/python_tools/update_configuration.py '${{ matrix.notebook }}' 
+        
       - name: Check notebook_url attribute on configuration.yaml
         uses: mikefarah/yq@master
         id: notebook_url
