@@ -6,7 +6,7 @@ from dict_parser import dict_dl4miceverywhere_to_manifest
 
 def update_config(config_path):
     # Read the information from the manifest
-    with open('../ZeroCostDL4Mic/manifest.bioimage.io.yaml', 'r') as f:
+    with open('../ZeroCostDL4Mic/manifest.bioimage.io.yaml', 'r', encoding='utf8') as f:
         manifest_data = yaml.safe_load(f)
     notebook_name = config_path.split('/')[-2]
 
@@ -18,7 +18,7 @@ def update_config(config_path):
                 if element['id'] == dict_dl4miceverywhere_to_manifest[notebook_name]:
     
                     # Read the information from configuration file and modify values
-                    with open(config_path, 'r') as f:
+                    with open(config_path, 'r', encoding='utf8') as f:
                         config_data = yaml.safe_load(f)
                         for key, value in element.items():
                             if key != 'config':
@@ -34,7 +34,7 @@ def update_config(config_path):
         )
     
         # Writing a new yaml file with the modifications
-        with open(config_path, 'w') as new_f:
+        with open(config_path, 'w', encoding='utf8') as new_f:
             yaml.safe_dump(config_data, new_f, width=10e10, default_flow_style=False)
 
 def main():

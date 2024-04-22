@@ -19,7 +19,7 @@ def main():
         configuration_path = os.path.join(dl4miceverywhere_notebooks_path, notebook, 'configuration.yaml')
 
         # Read the information from the configuration
-        with open(configuration_path, 'r') as f:
+        with open(configuration_path, 'r', encoding='utf8') as f:
             config_data = yaml.safe_load(f)
         
         config_version = config_data['config']['dl4miceverywhere']['notebook_version']

@@ -16,7 +16,7 @@ def main(config_path):
         zerocost_version = all_notebook_versions[all_notebook_versions["Notebook"] == dict_dl4miceverywhere_to_version[notebook_name]]['Version'].iloc[0]
         
         # Read the information from configuration file and modify values
-        with open(config_path, 'r') as f:
+        with open(config_path, 'r', encoding='utf8') as f:
             config_data = yaml.safe_load(f)
             config_data['config']['dl4miceverywhere']['notebook_version'] = f'{zerocost_version}'
 
@@ -27,7 +27,7 @@ def main(config_path):
         )
 
         # Writing a new yaml file with the modifications
-        with open(config_path, 'w') as new_f:
+        with open(config_path, 'w', encoding='utf8') as new_f:
             yaml.safe_dump(config_data, new_f, width=10e10, default_flow_style=False)
     else:
         print('Notebook not found in the ZeroCostDL4Mic manifest')
