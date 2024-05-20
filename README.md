@@ -110,19 +110,22 @@ Don't hesitate to reach out if you need any clarification!
 We extend our gratitude to the [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) contributors for their work on the original notebooks. We also thank the [AI4Life](https://ai4life.eurobioimaging.eu/) consortium for their support and continuous feedback.
 
 ## How to cite this work
- 
-_Iván Hidalgo-Cenalmor, Joanna W Pylvänäinen, Mariana G Ferreira, Craig T Russell, Ignacio Arganda-Carreras, AI4Life Consortium, Guillaume Jacquemet, Ricardo Henriques, Estibaliz Gómez-de-Mariscal.
-**DL4MicEverywhere: Deep learning for microscopy made flexible, shareable, and reproducible. bioRxiv 2023**
-DOI: [https://doi.org/10.1101/2023.11.19.567606](https://www.biorxiv.org/content/10.1101/2023.11.19.567606v1)_
 
-[![alt text](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/Preprint.png)](https://doi.org/10.1101/2023.11.19.567606)
+_Iván Hidalgo-Cenalmor, Joanna W. Pylvänäinen, Mariana G. Ferreira, Craig T. Russell, Alon Saguy, Ignacio Arganda-Carreras, Yoav Shechtman, AI4Life Horizon Europe Program Consortium, Guillaume Jacquemet, Ricardo Henriques & Estibaliz Gómez-de-Mariscal.
+**DL4MicEverywhere: deep learning for microscopy made flexible, shareable and reproducible.  Nat Methods 2024**
+DOI: [https://doi.org/10.1038/s41592-024-02295-6](https://www.nature.com/articles/s41592-024-02295-6)_
+
+Free access via Springer Nature link: [https://rdcu.be/dIdIw](https://rdcu.be/dIdIw)
+
+[![NatureMethodsPaper](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/NatureMethod_Paper.png)](https://doi.org/10.1038/s41592-024-02295-6)
+
 ```
-@article{hidalgo2023dl4miceverywhere,
-  title={{DL4MicEverywhere}: {Deep} learning for microscopy made flexible, shareable, and reproducible},
-  author={Hidalgo-Cenalmor, Iv{\'a}n and Pylv{\"a}n{\"a}inen, Joanna W and Ferreira, Mariana G and Russell, Craig T and Arganda-Carreras, Ignacio and AI4Life Consortium and Jacquemet, Guillaume and Henriques, Ricardo and G{\'o}mez-de-Mariscal, Estibaliz},
-  journal={bioRxiv},
-  pages={2023--11},
-  year={2023},
-  publisher={Cold Spring Harbor Laboratory}
+@article{hidalgo2024dl4miceverywhere,
+  title={DL4MicEverywhere: deep learning for microscopy made flexible, shareable and reproducible},
+  author={Hidalgo-Cenalmor, Iv{\'a}n and Pylv{\"a}n{\"a}inen, Joanna W and G. Ferreira, Mariana and Russell, Craig T and Saguy, Alon and Arganda-Carreras, Ignacio and Shechtman, Yoav and Jacquemet, Guillaume and Henriques, Ricardo and others},
+  journal={Nature Methods},
+  pages={1--3},
+  year={2024},
+  publisher={Nature Publishing Group US New York}
 }
 ```
