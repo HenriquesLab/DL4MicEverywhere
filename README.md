@@ -113,9 +113,9 @@ We extend our gratitude to the [ZeroCostDL4Mic](https://github.com/HenriquesLab/
 
 _Iván Hidalgo-Cenalmor, Joanna W. Pylvänäinen, Mariana G. Ferreira, Craig T. Russell, Alon Saguy, Ignacio Arganda-Carreras, Yoav Shechtman, AI4Life Horizon Europe Program Consortium, Guillaume Jacquemet, Ricardo Henriques & Estibaliz Gómez-de-Mariscal.
 **DL4MicEverywhere: deep learning for microscopy made flexible, shareable and reproducible.  Nat Methods 2024**
-DOI: [https://doi.org/10.1038/s41592-024-02295-6](https://www.nature.com/articles/s41592-024-02295-6)_
+DOI: [https://doi.org/10.1038/s41592-024-02295-6](https://rdcu.be/dIdIw)_
 
-[![NatureMethodsPaper](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/NatureMethod_Paper_Title.png)](https://doi.org/10.1038/s41592-024-02295-6)
+[![NatureMethodsPaper](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/NatureMethod_Paper_Title.png)](https://rdcu.be/dIdIw)
 
 ```
 @article{hidalgo2024dl4miceverywhere,
