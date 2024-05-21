@@ -115,9 +115,7 @@ _Iván Hidalgo-Cenalmor, Joanna W. Pylvänäinen, Mariana G. Ferreira, Craig T. 
 **DL4MicEverywhere: deep learning for microscopy made flexible, shareable and reproducible.  Nat Methods 2024**
 DOI: [https://doi.org/10.1038/s41592-024-02295-6](https://www.nature.com/articles/s41592-024-02295-6)_
 
-Free access via Springer Nature link: [https://rdcu.be/dIdIw](https://rdcu.be/dIdIw)
-
-[![NatureMethodsPaper](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/NatureMethod_Paper.png)](https://doi.org/10.1038/s41592-024-02295-6)
+[![NatureMethodsPaper](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/NatureMethod_Paper_Title.png)](https://doi.org/10.1038/s41592-024-02295-6)
 
 ```
 @article{hidalgo2024dl4miceverywhere,
