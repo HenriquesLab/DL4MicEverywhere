@@ -1,0 +1,20 @@
+name: Build and publish ZIPs when release
+on:
+  push:
+    tags:
+      - "*"
+jobs:
+  build:
+    uses: ./.github/workflows/build_workflow.yml
+  release:
+    needs: build
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v2
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "**/*"
