@@ -1,6 +1,18 @@
 @echo off 
 @setlocal
 
+rem Get the full path of the script
+set "SCRIPT_PATH=%~dp0"
+
+rem Remove the trailing backslash (if any)
+if "%SCRIPT_PATH:~-1%"=="\" set "SCRIPT_PATH=%SCRIPT_PATH:~0,-1%"
+
+rem Set the BASEDIR variable
+set "BASEDIR=%SCRIPT_PATH%"
+
+rem Temporary disable echo for cleaner output
+@REM echo BASEDIR is %BASEDIR%
+
 set WSL_UTF8=1
 setlocal enabledelayedexpansion
 
@@ -88,5 +100,8 @@ if %isubuntu%==0 (
   )
 )
 
-:: At this point Ubuntu is installed and as the default distribution, run the launch.sh inside the WSL
+
+rem At this point Ubuntu is installed and set as the default distribution, run the Linux_launch.sh inside the WSL
+cd /d "%BASEDIR%"
+
 wsl -d Ubuntu bash -E Linux_launch.sh
