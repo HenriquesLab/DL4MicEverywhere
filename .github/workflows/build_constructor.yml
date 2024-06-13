@@ -10,7 +10,7 @@ jobs:
         include:
           - os: ubuntu-latest
             shell: bash -l {0}
-    uses: ./.github/workflows/build_constructor.yml
+    uses: ./.github/workflows/build_constructor_aux.yml
     with:
       python-version: ${{ matrix.python-version }}
       os: ${{ matrix.os }}
