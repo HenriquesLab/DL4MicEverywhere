@@ -5,9 +5,9 @@ on:
       - "*"
 jobs:
   build:
-    uses: ./.github/workflows/build_workflow_aux.yml
+    uses: ./.github/workflows/build_workflow_pushes.yml
   release:
-    needs: build
+    needs: build-constructor
     permissions:
       contents: write
     runs-on: ubuntu-latest
