@@ -5,9 +5,9 @@ on:
       - "*"
 jobs:
   build:
-    uses: ./.github/workflows/build_workflow_pushes.yml
+    uses: ./.github/workflows/build_workflow.yml
   release:
-    needs: build-constructor
+    needs: build
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -17,4 +17,4 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "**/*" 
+          artifacts: "**/*"
