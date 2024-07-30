@@ -31,6 +31,7 @@ download_url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4M
 format_version: 0.2.3
 git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
 id: Notebook_U-Net_2D_multilabel_ZeroCostDL4Mic
+license: MIT
 links:
 - Notebook Preview
 - Dataset_U-Net_2D_multilabel_DeepBacs

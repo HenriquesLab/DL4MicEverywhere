@@ -29,6 +29,7 @@ documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/mas
 download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/WGAN_ZeroCostDL4Mic.ipynb
 git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
 id: WGAN_ZeroCostDL4Mic.ipynb
+license: MIT
 links:
 - Notebook Preview
 name: WGAN - ZeroCostDL4Mic

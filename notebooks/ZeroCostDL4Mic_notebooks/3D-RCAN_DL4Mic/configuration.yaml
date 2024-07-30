@@ -29,6 +29,7 @@ documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/mas
 download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/3D_RCAN_ZeroCostDL4Mic.ipynb
 git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
 id: Notebook_RCAN_3D_ZeroCostDL4Mic
+license: MIT
 links:
 - Notebook Preview
 - Dataset_CARE_3D_ZeroCostDL4Mic
