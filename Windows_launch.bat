@@ -104,4 +104,13 @@ if %isubuntu%==0 (
 rem At this point Ubuntu is installed and set as the default distribution, run the Linux_launch.sh inside the WSL
 cd /d "%BASEDIR%"
 
+:: It might happen that by downloading it through 'git clone', the format of the files is on DOS/Windows.
+:: We need it in a Unix/Linux format, that is why we need to install dos2unix if needed and use it.
+wsl -d Ubuntu if command -v dos2unix -h 2>nul; then echo "dos2unix already installed."; else echo "Installing dos2unix..."; apt install dos2unix; fi
+
+:: Check if for example Linux_launch.sh is on DOS format, and if so use dos2unix to convert it
+wsl -d Ubuntu if [[ -n $(dos2unix --info=c "Linux_launch.sh") ]] ; then echo "Converting your files to Linux format..."; find . -type f -exec dos2unix -q '{}' '+'; fi
+
+:: At this point Ubuntu is installed and as the default distribution, run the launch.sh inside the WSL
+
 wsl -d Ubuntu bash -E Linux_launch.sh
