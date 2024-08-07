@@ -1,0 +1,9 @@
+channels:
+- conda-forge
+- anaconda
+- defaults
+dependencies:
+- python
+- constructor
+- pyinstaller
+- pip
