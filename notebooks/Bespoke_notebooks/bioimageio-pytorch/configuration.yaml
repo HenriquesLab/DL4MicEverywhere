@@ -23,7 +23,7 @@ config:
     notebook_version: 1.4.0
     python_version: '3.9'
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/bioimageio-pytorch/requirements.txt
-    sections_to_remove: 1.0. 5.1.
+    sections_to_remove: 1.1. 5.1.
     ubuntu_version: '20.04'
 description: Notebook to load models from the BioImage Model Zoo in PyTorch
 download_url: https://colab.research.google.com/github/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/Bespoke_notebooks/bioimageio-pytorch/load_bioimageio_pytorch.ipynb
