@@ -1,7 +1,9 @@
 # Requirements for load_model_and_create_your_own.ipynb placid-llama
-bioimageio.core==0.6.7
+bioimageio.core==0.6.8
 matplotlib==3.9.0
 imageio==2.31.2
 numpy==1.23.5
+onnxruntime==1.18.0
 torch==2.2.0
 pooch==1.8
+marshmallow==3.21.3
