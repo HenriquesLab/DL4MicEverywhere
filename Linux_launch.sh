@@ -78,7 +78,8 @@ config_path : $5
 notebook_path : $6
 requirements_path : $7
 gpu_flag : $8
-tag : $9" > $BASEDIR/.tools/.cache_gui
+tag : $9
+advanced_options : ${10}" > $BASEDIR/.tools/.cache_gui
 }
 
 # Function to parse and read the configuration yaml file
@@ -183,7 +184,7 @@ else
         gpu_flag="${strarr[5]}"
         tag_aux="${strarr[6]}"
 
-        cache_gui "$data_path" "$result_path" "$selectedFolder" "$selectedNotebook" "" "" "" "$gpu_flag" "$tag_aux"
+        cache_gui "$data_path" "$result_path" "$selectedFolder" "$selectedNotebook" "" "" "" "$gpu_flag" "$tag_aux" "$advanced_options"
 
         if [ "$tag_aux" != "-" ]; then
             docker_tag="$tag_aux"
@@ -202,7 +203,7 @@ else
         gpu_flag="${strarr[6]}"
         tag_aux="${strarr[7]}"
 
-        cache_gui "$data_path" "$result_path" "" "" "$config_path" "$notebook_aux" "$requirements_aux" "$gpu_flag" "$tag_aux"
+        cache_gui "$data_path" "$result_path" "" "" "$config_path" "$notebook_aux" "$requirements_aux" "$gpu_flag" "$tag_aux" "$advanced_options"
 
         if [ "$notebook_aux" != "-" ]; then
             notebook_path="$notebook_aux"

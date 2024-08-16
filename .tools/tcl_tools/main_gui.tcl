@@ -27,6 +27,7 @@ if {"$fexist" == "1"} {
     set cache_requirements_path ""
     set cache_gpu_flag ""
     set cache_tag ""
+    set cache_advanced_options ""
 }
 
 # Define the shape of the window
@@ -94,6 +95,7 @@ proc onLoadCache {} {
     global cache_requirements_path
     global cache_gpu_flag
     global cache_tag
+    global cache_advanced_options
 
     # Variables from the widgets
     global data_path
@@ -105,6 +107,7 @@ proc onLoadCache {} {
     global txt_path
     global gpu
     global tag
+    global advanced_options
 
     if  {"$cache_data_path" != ""} {
         set data_path "$cache_data_path"
@@ -134,11 +137,23 @@ proc onLoadCache {} {
     if  {"$cache_tag" != ""} {
         set tag "$cache_tag"
     }
+    if  {"$cache_advanced_options" != ""} {
+        set advanced_options "$cache_advanced_options"
+    }
     
     # Update the information in the description box
     if {"$selectedNotebook" != "-"} {
         parseYaml $selectedNotebook
     }
+
+    # Open advanced opions in case it was like that
+    if  {"$cache_advanced_options" != "1"} {
+        set advanced_options 1
+    } else {
+        set advanced_options 0
+        onAdvanced
+    }
+    
 
 }
 
