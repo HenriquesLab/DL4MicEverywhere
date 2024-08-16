@@ -230,7 +230,10 @@ if ! command -v docker &> /dev/null; then
         read -p "Press enter to close the terminal."
         echo "------------------------------------" 
         exit 1
-    fi
+    else
+        # Restart Docker service to ensure that works well
+        sudo service docker restart
+    fi 
 else
     echo "Docker already installed."
 fi
