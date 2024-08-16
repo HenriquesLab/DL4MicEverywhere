@@ -1,8 +1,19 @@
-name: Build to check when a branch is pushed
+name: Build constructors for different Python versions
 on:
   push:
     branches:
       - "*"
 jobs:
-  build:
-    uses: ./.github/workflows/build_workflow_aux.yml
+  build-constructor:
+    strategy:
+      matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+        os: [ubuntu-latest]
+        include:
+          - os: ubuntu-latest
+            shell: bash -l {0}
+    uses: ./.github/workflows/build_constructor_aux.yml
+    with:
+      python-version: ${{ matrix.python-version }}
+      os: ${{ matrix.os }}
+      shell: ${{ matrix.shell }}
