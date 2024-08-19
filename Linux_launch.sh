@@ -674,10 +674,10 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
 
     if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
-        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag"  /bin/bash -c "$docker_command"
+        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
     else
         # Run the docker image without activating the GPU
-        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" "$docker_tag"  /bin/bash -c "$docker_command"
+        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
     fi
 else
     echo ""
