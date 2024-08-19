@@ -9,7 +9,7 @@ on:
 jobs:
   update_documentation:
     name: Update the documentation
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, dl4miceverywhere-builder]
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4

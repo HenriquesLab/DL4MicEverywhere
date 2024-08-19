@@ -7,7 +7,7 @@ on:
 jobs:
   update_configuration:
     name: Update repository version and docker tag on configuration
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, dl4miceverywhere-builder]
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4

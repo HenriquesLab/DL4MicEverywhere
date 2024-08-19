@@ -8,7 +8,7 @@ on:
 jobs:
   update_configuration:
     name: Update configuration files with the manifest information from ZeroCostDL4Mic
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, dl4miceverywhere-builder]
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
