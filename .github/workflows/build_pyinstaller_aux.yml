@@ -19,7 +19,7 @@ jobs:
         shell: ${{ inputs.shell }}
     steps:
       - uses: actions/checkout@v4
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           environment-file: environment.yml
           python-version: ${{ inputs.python-version }}
