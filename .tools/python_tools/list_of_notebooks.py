@@ -11,7 +11,7 @@ zcdl4m_url = "https://raw.github.com/wiki/HenriquesLab/ZeroCostDL4Mic/Home.md"
 urlretrieve(zcdl4m_url, 'Home.md')
 
 # Load all the text data from ZCDL4M wiki into memory
-home = open('Home.md', 'r')
+home = open('Home.md', 'r', encoding='utf8')
 fileString = home.readlines()
 print(f"Number of lines to process {len(fileString)}. ")
 
@@ -29,7 +29,7 @@ while l < len(fileString):
         notebooks_task = fileString[l:k] # save the entire table
         del notebooks_task[1] # Remove the table delimiter from markdown
         # Write a text file that will be loaded as a pandas dataframe
-        with open(save_dir, 'w') as f:
+        with open(save_dir, 'w', encoding='utf8') as f:
             for line in notebooks_task:
                 f.write(line)
         # load the notebooks information as a pandas dataframe
@@ -80,7 +80,7 @@ notebooks = nd.to_markdown(index=False)
 for ref, ref_url in Dict.items():
     notebooks = notebooks.replace(f"[{ref}]", f"({ref_url})")
 # Store the text as a markdown
-with open(save_dir, 'w') as f:
+with open(save_dir, 'w', encoding='utf8') as f:
     f.write(notebooks)
 print(f"Notebook markdown stored at {save_dir}")
 

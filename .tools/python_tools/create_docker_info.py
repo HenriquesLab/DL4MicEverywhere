@@ -3,7 +3,7 @@ import os
 import sys
 
 def add_docker_extra(filename_path):
-    f = open(filename_path, "a")
+    f = open(filename_path, "a", encoding='utf8')
     
     f.write('\n')
 
@@ -14,7 +14,7 @@ def create_docker_arguments(filename_path, ubuntu_version, cuda_version, cudnn_v
                             sections_to_remove, notebook_name, gpu_flag, python_version
                             ):
     
-    f = open(filename_path, "w")
+    f = open(filename_path, "w", encoding='utf8')
     f.write('The arguments that have been used to build the Docker image are:\n')
     f.write(f'\tUBUNTU_VERSION="{ubuntu_version}"\n')
     f.write(f'\tCUDA_VERSION="{cuda_version}"\n')

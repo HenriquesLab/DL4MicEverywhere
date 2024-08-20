@@ -1,5 +1,5 @@
 authors:
-- "Estibaliz G\xF3mez-de-Mariscal"
+- "Estibaliz Gómez-de-Mariscal"
 - Constantin Pape
 - Mariana Ferreira
 - BioImage Model Zoo team
@@ -9,9 +9,9 @@ badges:
   url: https://colab.research.google.com/github/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/Bespoke_notebooks/bioimageio-pytorch/load_bioimageio_pytorch.ipynb
 cite:
 - doi: https://doi.org/10.1101/2022.06.07.495102
-  text: "Wei Ouyang, Fynn Beuttenmueller, Estibaliz G\xF3mez-de-Mariscal, Constantin Pape, et al., BioImage Model Zoo: A Community-Driven Resource for Accessible Deep Learning in BioImage Analysis, bioRxiv 2022"
+  text: "Wei Ouyang, Fynn Beuttenmueller, Estibaliz Gómez-de-Mariscal, Constantin Pape, et al., BioImage Model Zoo: A Community-Driven Resource for Accessible Deep Learning in BioImage Analysis, bioRxiv 2022"
 - doi: https://doi.org/10.1101/2023.11.19.567606
-  text: "Iv\xE1n Hidalgo-Cenalmor, Joanna W. Pylv\xE4n\xE4inen, Mariana G Ferreira, et al., DL4MicEverywhere: Deep learning for microscopy made flexible, shareable, and reproducible, bioRxiv 2023"
+  text: "Iván Hidalgo-Cenalmor, Joanna W. Pylvänäinen, Mariana G Ferreira, et al., DL4MicEverywhere: Deep learning for microscopy made flexible, shareable, and reproducible, bioRxiv 2023"
 config:
   dl4miceverywhere:
     cuda_version: 11.2.2
