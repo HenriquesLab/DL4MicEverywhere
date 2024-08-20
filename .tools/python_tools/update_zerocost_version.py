@@ -28,7 +28,7 @@ def main(config_path):
 
         # Writing a new yaml file with the modifications
         with open(config_path, 'w', encoding='utf8') as new_f:
-            yaml.safe_dump(config_data, new_f, width=10e10, default_flow_style=False)
+            yaml.safe_dump(config_data, new_f, width=10e10, default_flow_style=False, allow_unicode=True)
     else:
         print('Notebook not found in the ZeroCostDL4Mic manifest')
 
