@@ -18,7 +18,7 @@ jobs:
       run:
         shell: ${{ inputs.shell }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v2
         with:
           environment-file: environment.yml
@@ -28,7 +28,7 @@ jobs:
           mamba-version: "*"
           use-mamba: true
       - name: Checkout PyInstaller for Bootloader Build
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: "pyinstaller/pyinstaller"
           submodules: "recursive"
@@ -54,7 +54,7 @@ jobs:
       #     directory: "dist"
       #     filename: installer-${{ inputs.python-version }}-${{ inputs.os }}.zip
       - name: Upload Installer
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: pyinstaller-${{ inputs.python-version }}-${{ inputs.os }}
           path: |
