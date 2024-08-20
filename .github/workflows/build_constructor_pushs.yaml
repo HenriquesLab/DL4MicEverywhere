@@ -1,8 +1,7 @@
 name: Build constructors for different Python versions
 on:
   push:
-    branches:
-      - "*"
+    branches: [ main ]
 jobs:
   build-constructor:
     strategy:

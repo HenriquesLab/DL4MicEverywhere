@@ -1,4 +1,4 @@
-name: Build PyInstaller
+name: Build PyInstaller 
 on:
   workflow_call:
     inputs:

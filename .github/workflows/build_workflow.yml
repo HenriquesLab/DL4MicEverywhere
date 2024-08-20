@@ -1,5 +1,7 @@
-name: build
+name: Building Pyinstaller and Constructor
 on:
+  push:
+    branches: [ main ]
   workflow_call:
 jobs:
   build-pyinstaller:
@@ -15,7 +17,7 @@ jobs:
             shell: bash -l {0}
           # - os: macos-latest
           #   shell: bash -l {0}
-    uses: ./.github/workflows/build_pyinstaller.yml
+    uses: ./.github/workflows/build_pyinstaller_aux.yml
     with:
       python-version: ${{ matrix.python-version }}
       os: ${{ matrix.os }}
