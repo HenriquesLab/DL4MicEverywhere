@@ -498,7 +498,7 @@ else
     if docker image inspect $docker_tag >/dev/null 2>&1; then
         if [ "$gui_flag" -eq 1 ]; then 
             # If the GUI flag has been specified, show a window for ansewring local question
-            build_flag=$(wish $BASEDIR/.tools/tcl_tools/local_img_gui.tcl)
+            build_flag=$(wish $BASEDIR/.tools/tcl_tools/local_img_gui.tcl $OSTYPE)
         else
             echo "Image exists locally. Do you want to build and replace the existing one?"
             select yn in "Yes" "No"; do
@@ -531,7 +531,7 @@ else
                 # In case the architecture is available
                 if [ "$gui_flag" -eq 1 ]; then 
                     # If the GUI flag has been specified, show a window for ansewring hub question
-                    build_flag=$(wish $BASEDIR/.tools/tcl_tools/hub_img_gui.tcl)
+                    build_flag=$(wish $BASEDIR/.tools/tcl_tools/hub_img_gui.tcl $OSTYPE)
                 else
                     echo "The image ${docker_tag} is already available on docker hub. Do you preffer to pull it (faster option) instead of building it?"
                     select yn in "Yes" "No"; do
