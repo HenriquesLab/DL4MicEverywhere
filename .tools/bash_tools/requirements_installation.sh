@@ -145,9 +145,18 @@ if ! command -v docker &> /dev/null; then
         sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
         # Download the Docker Desktop .deb file v4.27.1 and install it
-        curl https://desktop.docker.com/linux/main/amd64/136059/docker-desktop-4.27.1-amd64.deb -o /tmp/DockerDesktop.deb
-        sudo apt-get -y update
-        sudo apt-get -y install /tmp/DockerDesktop.deb
+        # curl https://desktop.docker.com/linux/main/amd64/136059/docker-desktop-4.27.1-amd64.deb -o /tmp/DockerDesktop.deb
+        # sudo apt-get -y update
+        # sudo apt-get -y install /tmp/DockerDesktop.deb
+        
+        ## Allow to run Docker as a non-root user
+        # Create a docker group
+        sudo groupadd docker
+        # Add your user to that group
+        sudo usermod -aG docker $USER
+        # Activate the changes to groups
+        newgrp docker
+
 
         if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
             # Linux inside the Windows Subsystem for Linux needs to export/link the start command
