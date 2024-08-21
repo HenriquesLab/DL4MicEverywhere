@@ -30,7 +30,7 @@ download_url: https://colab.research.google.com/github/HenriquesLab/DL4MicEveryw
 format_version: 0.2.3
 git_repo: https://github.com/bioimage-io/core-bioimage-io-python/tree/main
 links:
-- Notebook Preview
+- Notebook Preview 
 name: General BioImageIO notebook - TensorFlow
 tags:
 - colab
