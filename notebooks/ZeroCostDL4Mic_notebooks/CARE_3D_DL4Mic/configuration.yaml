@@ -8,7 +8,7 @@ cite:
 - doi: https://doi.org/10.1038/s41467-021-22518-0
   text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
 - doi: https://doi.org/10.1038/s41592-018-0216-7
-  text: "Weigert, M., Schmidt, U., Boothe, T. et al. Content-aware image restoration: pushing the limits of fluorescence microscopy. Nat Methods 15, 1090\u20131097 (2018). https://doi.org/10.1038/s41592-018-0216-7"
+  text: 'Weigert, M., Schmidt, U., Boothe, T. et al. Content-aware image restoration: pushing the limits of fluorescence microscopy. Nat Methods 15, 1090–1097 (2018). https://doi.org/10.1038/s41592-018-0216-7'
 config:
   dl4miceverywhere:
     cuda_version: 11.8.0

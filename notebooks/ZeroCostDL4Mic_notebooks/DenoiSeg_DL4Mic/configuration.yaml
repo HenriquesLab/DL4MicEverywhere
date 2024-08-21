@@ -8,7 +8,7 @@ cite:
 - doi: https://doi.org/10.1038/s41467-021-22518-0
   text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
 - doi: https://doi.org/10.1007/978-3-030-66415-2_21
-  text: "Buchholz TO., Prakash M., Schmidt D., Krull A., Jug F. (2020) DenoiSeg: Joint Denoising and Segmentation. In: Bartoli A., Fusiello A. (eds) Computer Vision \u2013 ECCV 2020 Workshops. ECCV 2020. Lecture Notes in Computer Science, vol 12535. Springer, Cham. https://doi.org/10.1007/978-3-030-66415-2_21"
+  text: 'Buchholz TO., Prakash M., Schmidt D., Krull A., Jug F. (2020) DenoiSeg: Joint Denoising and Segmentation. In: Bartoli A., Fusiello A. (eds) Computer Vision – ECCV 2020 Workshops. ECCV 2020. Lecture Notes in Computer Science, vol 12535. Springer, Cham. https://doi.org/10.1007/978-3-030-66415-2_21'
 config:
   dl4miceverywhere:
     cuda_version: 11.8.0

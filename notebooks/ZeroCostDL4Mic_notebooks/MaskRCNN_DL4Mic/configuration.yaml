@@ -7,7 +7,7 @@ badges:
 cite:
 - doi: https://doi.org/10.1038/s41467-021-22518-0
   text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
-- text: "Kaiming He, Georgia Gkioxari, Piotr Doll\xE1r, Ross Girshick. Mask R-CNN . arXiv:1703.06870."
+- text: Kaiming He, Georgia Gkioxari, Piotr Dollár, Ross Girshick. Mask R-CNN . arXiv:1703.06870.
   url: https://arxiv.org/abs/1703.06870
 config:
   dl4miceverywhere:

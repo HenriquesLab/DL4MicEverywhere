@@ -7,7 +7,7 @@ badges:
 cite:
 - doi: https://doi.org/10.1038/s41467-021-22518-0
   text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
-- text: "Tsung-Yi Lin, Priya Goyal, Ross Girshick, Kaiming He, Piotr Doll\xE1r. Focal Loss for Dense Object Detection. arXiv:1708.02002"
+- text: Tsung-Yi Lin, Priya Goyal, Ross Girshick, Kaiming He, Piotr Dollár. Focal Loss for Dense Object Detection. arXiv:1708.02002
   url: https://arxiv.org/abs/1708.02002
 config:
   dl4miceverywhere:

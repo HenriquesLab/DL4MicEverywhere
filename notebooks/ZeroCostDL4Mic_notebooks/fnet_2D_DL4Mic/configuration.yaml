@@ -8,7 +8,7 @@ cite:
 - doi: https://doi.org/10.1038/s41467-021-22518-0
   text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
 - doi: https://doi.org/10.1038/s41592-018-0111-2
-  text: "Ounkomol, C., Seshamani, S., Maleckar, M.M. et al. Label-free prediction of three-dimensional fluorescence images from transmitted-light microscopy. Nat Methods 15, 917\u2013920 (2018). https://doi.org/10.1038/s41592-018-0111-2"
+  text: Ounkomol, C., Seshamani, S., Maleckar, M.M. et al. Label-free prediction of three-dimensional fluorescence images from transmitted-light microscopy. Nat Methods 15, 917–920 (2018). https://doi.org/10.1038/s41592-018-0111-2
 config:
   dl4miceverywhere:
     cuda_version: 11.8.0

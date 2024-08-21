@@ -1,5 +1,5 @@
 authors:
-- "Daniel Krentzel and Estibaliz G\xF3mez de Mariscal andthe ZeroCostDL4Mic Team"
+- Daniel Krentzel and Estibaliz Gómez de Mariscal andthe ZeroCostDL4Mic Team
 badges:
 - icon: https://colab.research.google.com/assets/colab-badge.svg
   label: Open in Colab
@@ -7,7 +7,7 @@ badges:
 cite:
 - doi: https://doi.org/10.1038/s41467-021-22518-0
   text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
-- text: "\xD6zg\xFCn \xC7i\xE7ek, Ahmed Abdulkadir, Soeren S. Lienkamp, Thomas Brox, Olaf Ronneberger. 3D U-Net: Learning Dense Volumetric Segmentation from Sparse Annotation. https://arxiv.org/abs/1606.06650"
+- text: 'Özgün Çiçek, Ahmed Abdulkadir, Soeren S. Lienkamp, Thomas Brox, Olaf Ronneberger. 3D U-Net: Learning Dense Volumetric Segmentation from Sparse Annotation. https://arxiv.org/abs/1606.06650'
   url: https://arxiv.org/abs/1606.06650
 config:
   dl4miceverywhere:
@@ -24,7 +24,7 @@ config:
     ubuntu_version: '22.04'
 covers:
 - https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/3D_Unet_notebook.png
-description: "3D binary segmentation. The 3D U-Net was first introduced by \xC7i\xE7ek et al for learning dense volumetric segmentations from sparsely annotated ground-truth data building upon the original U-Net architecture by Ronneberger et al. Note - visit the ZeroCostDL4Mic wiki to check the original publications this network is based on and make sure you cite these."
+description: 3D binary segmentation. The 3D U-Net was first introduced by Çiçek et al for learning dense volumetric segmentations from sparsely annotated ground-truth data building upon the original U-Net architecture by Ronneberger et al. Note - visit the ZeroCostDL4Mic wiki to check the original publications this network is based on and make sure you cite these.
 documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/README.md
 download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/U-Net_3D_ZeroCostDL4Mic.ipynb
 git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
