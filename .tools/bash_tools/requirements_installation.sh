@@ -144,11 +144,6 @@ if ! command -v docker &> /dev/null; then
         sudo apt-get -y update
         sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-        # Download the Docker Desktop .deb file v4.27.1 and install it
-        # curl https://desktop.docker.com/linux/main/amd64/136059/docker-desktop-4.27.1-amd64.deb -o /tmp/DockerDesktop.deb
-        # sudo apt-get -y update
-        # sudo apt-get -y install /tmp/DockerDesktop.deb
-        
         ## Allow to run Docker as a non-root user
         # Create a docker group
         sudo groupadd docker
@@ -157,6 +152,26 @@ if ! command -v docker &> /dev/null; then
         # Activate the changes to groups
         newgrp docker
 
+        # Check if the OS is Ubuntu 24.04 (Docker Destop is still not supported on it)
+        ubuntu_v=$(grep DISTRIB_RELEASE /etc/lsb-release | cut -f2 -d'=')
+        # Check if the actual version is 24.04
+        if [[ "${ubuntu_v//\"}" == "24.04" ]]; then
+            # As they say in their original installation guide: https://docs.docker.com/desktop/install/ubuntu/
+            # The latest Ubuntu 24.04 LTS is not yet supported. Docker Desktop will fail to start. 
+            # Due to a change in how the latest Ubuntu release restricts the unprivileged namespaces, 
+            # sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 needs to be run at least once
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+        fi
+
+        # Install latest Docker Desktop version
+        curl https://desktop.docker.com/linux/main/$(dpkg --print-architecture)/docker-desktop-$(dpkg --print-architecture).deb -o /tmp/DockerDesktop.deb
+        sudo apt-get -y update
+        sudo apt-get -y install /tmp/DockerDesktop.deb
+
+        # Download the Docker Desktop .deb file v4.27.1 and install it
+        # curl https://desktop.docker.com/linux/main/amd64/136059/docker-desktop-4.27.1-amd64.deb -o /tmp/DockerDesktop.deb
+        # sudo apt-get -y update
+        # sudo apt-get -y install /tmp/DockerDesktop.deb
 
         if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
             # Linux inside the Windows Subsystem for Linux needs to export/link the start command
