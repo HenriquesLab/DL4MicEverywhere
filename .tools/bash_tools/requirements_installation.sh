@@ -166,8 +166,10 @@ if ! command -v docker &> /dev/null; then
         sudo groupadd docker
         # Add your user to that group
         sudo usermod -aG docker $USER
+        
+        # As we will tell the user to restart its machine, this will not be needed
         # Activate the changes to groups
-        newgrp docker
+        # newgrp docker
 
         # Check if the OS is Ubuntu 24.04 (Docker Destop is still not supported on it)
         ubuntu_v=$(grep DISTRIB_RELEASE /etc/lsb-release | cut -f2 -d'=')
@@ -177,7 +179,13 @@ if ! command -v docker &> /dev/null; then
             # The latest Ubuntu 24.04 LTS is not yet supported. Docker Desktop will fail to start. 
             # Due to a change in how the latest Ubuntu release restricts the unprivileged namespaces, 
             # sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 needs to be run at least once
-            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+            
+            # This command would only work for the actual session, after reboot will be lost
+            # sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+            
+            # As previous command would be lost, we need to make it permanent modifying the following file
+            echo 'kernel.apparmor_restrict_unprivileged_userns = 0' | sudo tee -a /etc/sysctl.conf
+            # Instead of using "echo >>", as we need to use sudo, we will use "tee -a"
         fi
 
         # Install latest Docker Desktop version
@@ -190,25 +198,27 @@ if ! command -v docker &> /dev/null; then
         # sudo apt-get -y update
         # sudo apt-get -y install /tmp/DockerDesktop.deb
 
-        if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
-            # Linux inside the Windows Subsystem for Linux needs to export/link the start command
-            "/mnt/c/Program Files/Docker/Docker/Docker Desktop.exe"
-            pid_docker=$!
-            # Wait until is opened
-            wait $pid_docker
-            while ! docker info &> /dev/null; do
-                sleep 5
-            done
-        else
-            # Native Linux
-            systemctl --user start docker-desktop
-            pid_docker=$!
-            # Wait until is opened
-            wait $pid_docker
-            while ! docker info &> /dev/null; do
-                sleep 5
-            done
-        fi
+        # We want the user to restart its machine, for that reason we will not launch Docker Desktop
+
+        # if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
+        #     # Linux inside the Windows Subsystem for Linux needs to export/link the start command
+        #     "/mnt/c/Program Files/Docker/Docker/Docker Desktop.exe"
+        #     pid_docker=$!
+        #     # Wait until is opened
+        #     wait $pid_docker
+        #     while ! docker info &> /dev/null; do
+        #         sleep 5
+        #     done
+        # else
+        #     # Native Linux
+        #     systemctl --user start docker-desktop
+        #     pid_docker=$!
+        #     # Wait until is opened
+        #     wait $pid_docker
+        #     while ! docker info &> /dev/null; do
+        #         sleep 5
+        #     done
+        # fi
 
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         # Mac OSX
@@ -240,14 +250,16 @@ if ! command -v docker &> /dev/null; then
         echo 'export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"' >> ~/.zshrc
         echo 'export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"' >> ~/.bashrc
 
-        # Launch Docker Desktop
-        open -a Docker &
-        pid_docker=$!
-        # Wait until is opened
-        wait $pid_docker
-        while ! docker info &> /dev/null; do
-            sleep 5
-        done
+        # We want the user to restart its machine, for that reason we will not launch Docker Desktop
+
+        # # Launch Docker Desktop
+        # open -a Docker &
+        # pid_docker=$!
+        # # Wait until is opened
+        # wait $pid_docker
+        # while ! docker info &> /dev/null; do
+        #     sleep 5
+        # done
 
     elif [[ "$OSTYPE" == "msys*" ]]; then
         # Windows
@@ -288,7 +300,7 @@ if [[ "$any_installation_flag" -ne 0 ]]; then
         echo "reboot"
         if [[ "$OSTYPE" == "darwin"* ]]; then
             # Mac OSX
-            sudo shutdown -r now
+            sudo shutdown -r --show 1 
         else
             # Linux
             reboot
