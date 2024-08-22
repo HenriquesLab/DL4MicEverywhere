@@ -1,5 +1,9 @@
 #!/bin/bash
 
+BASEDIR=$(dirname "$(readlink -f "$0")")
+
+any_installation_flag=0
+
 # Check if hombrew is installed on your MacOs and otherwise install it
 if [[ "$OSTYPE" == "darwin"* ]]; then
     if ! command -v brew &> /dev/null; then
@@ -23,6 +27,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
             read -p "Press enter to close the terminal."
             echo "------------------------------------" 
             exit 1
+        else
+            any_installation_flag=1
         fi
     else
         echo "Homebrew already installed."
@@ -69,6 +75,8 @@ if ! command -v wish &> /dev/null; then
         read -p "Press enter to close the terminal."
         echo "------------------------------------" 
         exit 1
+    else
+        any_installation_flag=1
     fi
 else
     echo "TCL/TK already installed."
@@ -84,8 +92,15 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         sudo apt -y upgrade
         sudo apt-get -y install xdg-utils
         if ! command -v xdg-open &> /dev/null; then 
+            echo ""
+            echo "------------------------------------"
             echo -e "\033[0;31 xdg-utils installation failed. \033[0m"
             echo "Please try again or follow the installation instructions on: https://installati.one/install-xdg-utils-ubuntu-20-04/"
+            read -p "Press enter to close the terminal."
+            echo "------------------------------------" 
+            exit 1
+        else
+            any_installation_flag=1
         fi
     else
         echo "xdg-utils already installed."
@@ -112,6 +127,8 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
                 read -p "Press enter to close the terminal."
                 echo "------------------------------------" 
                 exit 1
+            else
+                any_installation_flag=1
             fi
         else
             echo "net-tools already installed."
@@ -255,9 +272,28 @@ if ! command -v docker &> /dev/null; then
         echo "------------------------------------" 
         exit 1
     else
+        any_installation_flag=1
         # Restart Docker service to ensure that works well
         sudo service docker restart
     fi 
 else
     echo "Docker already installed."
+fi
+
+# Check if any installation has been done and if so recommend the user to restart the computer
+if [[ "$any_installation_flag" -ne 0 ]]; 
+    # Show the window with the option to restart
+    requirements_flag=$(wish $BASEDIR/../tcl_tools/restart_computer.tcl)
+    if [[ "$requirements_flag" == 2 ]]; then
+        echo "reboot"
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # Mac OSX
+            sudo shutdown -r now
+        else
+            # Linux
+            reboot
+        fi
+    else
+        exit 1
+    fi
 fi

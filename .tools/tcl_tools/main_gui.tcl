@@ -147,9 +147,9 @@ proc onLoadCache {} {
     }
 
     # Open advanced opions in case it was like that
-    if  {"$cache_advanced_options" != "1"} {
-        set advanced_options 1
-    } else {
+    if  {"$cache_advanced_options" == "1"} {
+        # OnAdvanced is expecting that advanced_options is 0 so that it can open by itself
+        # the advanced section and change its value to 1. 
         set advanced_options 0
         onAdvanced
     }
