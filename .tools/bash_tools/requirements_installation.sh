@@ -294,10 +294,16 @@ fi
 
 # Check if any installation has been done and if so recommend the user to restart the computer
 if [[ "$any_installation_flag" -ne 0 ]]; then
+
+    echo ""
+    echo "------------------------------------"
+    echo "All dependencies have been successfully installed!"
+    echo "It's recommended to restart your computer to apply all changes."
+    echo "------------------------------------" 
+
     # Show the window with the option to restart
     requirements_flag=$(wish $BASEDIR/../tcl_tools/restart_computer.tcl)
     if [[ "$requirements_flag" == 2 ]]; then
-        echo "reboot"
         if [[ "$OSTYPE" == "darwin"* ]]; then
             # Mac OSX
             sudo shutdown -r --show 1 
