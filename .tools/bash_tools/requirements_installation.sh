@@ -303,14 +303,9 @@ if [[ "$any_installation_flag" -ne 0 ]]; then
 
     # Show the window with the option to restart
     requirements_flag=$(wish $BASEDIR/../tcl_tools/restart_computer.tcl)
-    if [[ "$requirements_flag" == 2 ]]; then
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-            # Mac OSX
-            sudo shutdown -r --show 1 
-        else
-            # Linux
-            reboot
-        fi
+    if [[ "$requirements_flag" == s2 ]]; then
+        # Restart the computer in 1 minutes
+        sudo shutdown -r 1
     else
         exit 1
     fi
