@@ -274,14 +274,14 @@ if ! command -v docker &> /dev/null; then
     else
         any_installation_flag=1
         # Restart Docker service to ensure that works well
-        sudo service docker restart
+        # sudo service docker restart
     fi 
 else
     echo "Docker already installed."
 fi
 
 # Check if any installation has been done and if so recommend the user to restart the computer
-if [[ "$any_installation_flag" -ne 0 ]]; 
+if [[ "$any_installation_flag" -ne 0 ]]; then
     # Show the window with the option to restart
     requirements_flag=$(wish $BASEDIR/../tcl_tools/restart_computer.tcl)
     if [[ "$requirements_flag" == 2 ]]; then
