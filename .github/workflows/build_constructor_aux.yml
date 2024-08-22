@@ -15,7 +15,7 @@ on:
 
 jobs:
   build-constructor:
-    runs-on: ${{ inputs.os }}
+    runs-on: [self-hosted, '${{ inputs.os }}']
     defaults:
       run:
         shell: ${{ inputs.shell }}
