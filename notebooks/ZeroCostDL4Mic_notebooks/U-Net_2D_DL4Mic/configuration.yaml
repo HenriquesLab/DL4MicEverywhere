@@ -34,7 +34,7 @@ links:
 - Notebook Preview
 - Dataset_U-Net_2D_DeepBacs
 name: U-Net (2D) - ZeroCostDL4Mic
-tags: 
+tags:
 - colab
 - notebook
 - U-Net
