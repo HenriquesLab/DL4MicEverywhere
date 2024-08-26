@@ -19,6 +19,10 @@ jobs:
         with:
             repository: HenriquesLab/ZeroCostDL4Mic
             path: ZeroCostDL4Mic
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          cache: 'pip' # caching pip dependencies
       - name: Install requirements
         working-directory: ./DL4MicEverywhere
         run: pip install -r .tools/requirements.txt
