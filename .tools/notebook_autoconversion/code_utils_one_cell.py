@@ -6,6 +6,7 @@ installation_regex = r'(pip|conda) install (.*)'
 float_regex = r"[-+]?\d*\.\d+|[-+]?\d+"
 ipywidget_style = "{'description_width': 'initial'}"
 param_regex = r"(\w+)\s*=\s*([\S\s]+?)\s*# *@param\s*(.+)"
+markdown_regex = r".*#\s*@markdown\s*(#*)\s*(.+)"
 
 assignation_regex =  r'^\s*([a-zA-Z_]\w*(?:\s*,\s*[a-zA-Z_]\w*)*)\s*=\s*.*$'
 function_regex = r"^\s*def\s+([a-zA-Z_]\w*)\s*\(.+\)\s*:\s*$"
@@ -14,7 +15,7 @@ raw_regex = r"\{type:\"raw\"\}"
 comment_after_param_regex = r"(\[[^\]]*\]|\{[^}]*\})(?: [^#]*)?(\[[^\]]*\]|\{[^}]*\})* *#.*"
 
 ipywidget_imported_code = ("import ipywidgets as widgets\n" 
-                        "from IPython.display import display, clear_output\n"
+                        "from IPython.display import Markdown, display, clear_output\n"
                         "import yaml as yaml_library\n"
                         "import os\n"
                         "\n"
@@ -272,7 +273,16 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
             # Only the installation lines of an external library are kept
             if '-r ' in library_name or '--requirement ' in library_name or '-e ' in library_name or '--editable ' in library_name or library_name=='.':
                 widget_code += line + '\n'
-                
+            
+        elif re.search(markdown_regex, line):
+            # The lines with #@markdown are displayed as display(Markdown(str))
+
+            # Extract the text in @markdown component
+            match_param = re.search(markdown_regex, line)
+            markdown_heading = match_param.group(1)
+            markdown_text = match_param.group(2)
+            widget_code += f'display(Markdown("{markdown_heading} {markdown_text}"))\n'
+
         elif re.search(param_regex, line):
             # The lines with #@param are replaced with ipywidgets based on the parameters
             new_line, var_name, needs_to_be_evaluated = param_to_widget(line)
