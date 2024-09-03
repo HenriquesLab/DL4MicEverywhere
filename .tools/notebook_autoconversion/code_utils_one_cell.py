@@ -16,6 +16,7 @@ comment_after_param_regex = r"(\[[^\]]*\]|\{[^}]*\})(?: [^#]*)?(\[[^\]]*\]|\{[^}
 
 ipywidget_imported_code = ("import ipywidgets as widgets\n" 
                         "from IPython.display import Markdown, display, clear_output\n"
+                        "from matplotlib import pyplot as plt\n"
                         "import yaml as yaml_library\n"
                         "import os\n"
                         "\n"
