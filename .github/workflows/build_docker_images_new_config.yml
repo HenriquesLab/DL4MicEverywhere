@@ -25,6 +25,11 @@ jobs:
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
+      # Set up Python for its use
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          cache: 'pip' # caching pip dependencies
 
       # First udpate the configuration file
       - name: Install requirements
@@ -316,6 +321,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Update the repository with git pull
         run: git pull
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          cache: 'pip' # caching pip dependencies
       - name: Install requirements
         run: pip install -r .tools/requirements.txt
       - name: Update the version of the notebook on the configuration
