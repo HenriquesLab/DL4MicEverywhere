@@ -27,7 +27,6 @@ jobs:
         with:
           environment-file: .tools/actions_utils/environment.gpu.yml
           python-version: ${{ inputs.python-version }}
-          miniforge-variant: Miniforge
           miniforge-version: latest
           mamba-version: "*"
           use-mamba: true
