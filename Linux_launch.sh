@@ -31,6 +31,7 @@ Here is a list of all available arguments:
  -n      Path to a local notebook file 'notebook.ipynb'. (optional)
  -r      Path to a local requirements file 'requirements.txt'. (optional)
  -t      Tag to be added to the docker image during building. (optional)
+ -p      Port number where to open the notebook.
  -x      Flag to indicate if it is a test run. This allows for the printing of useful debugging information. (optional)
 
 Code example:
@@ -112,7 +113,7 @@ local_notebook_flag=0
 local_requirements_flag=0
 
 # Let's parse the arguments
-while getopts :hc:d:o:gn:r:t:x flag;do
+while getopts :hc:d:o:gn:r:t:p:x flag;do
     case $flag in 
         h)
             usage ;;
@@ -136,6 +137,8 @@ while getopts :hc:d:o:gn:r:t:x flag;do
             requirements_path="$OPTARG" ;;
         t)
             docker_tag="$OPTARG" ;;
+        p)
+            port_number="$OPTARG" ;;
         x)
             test_flag=1 ;;
         \?)
@@ -627,8 +630,16 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
         exit 0
     fi
 
-    # Find a usable port
-    port=8888
+    # Choose an initial port
+    if [ -z "$port_number" ]; then
+        # In case user does not provide a port number, use the default 8888 port
+        port=8888
+    else
+        # Else, use the port provided by the user
+        port="$port_number"
+    fi
+
+    # Check if selected port is available if not try next one until finding a usable port. 
     if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
         # Linux inside the Windows Subsystem for Linux needs to look differently to the ports
         while ( netstat -a | grep :$port &> /dev/null )

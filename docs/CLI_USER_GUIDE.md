@@ -21,6 +21,8 @@ Note that if you wish to use the graphical user interface (without providing any
 
   `-t TAG`: `TAG` is the tag that will be assigned to the created Docker image. If it is not provided, the default tag from the configuration file will be taken and if that configuration file does not have a tag a custom one will be generated with name and version of the notebook.
 
+  `-p PORT_NUMBER`: `PORT_NUMBER` is the port number that the notebook will be open on: `http://127.0.0.1:PORT_NUMBER`. If it is not provided, the default port number `8888` will be used. Still, in both cases, if the port is not accessible and consecutive accessible one will be found. 
+
   `-x`: This flag indicates a test run. It is primarily used for GitHub actions and allows developers to verify if the process has been executed correctly.
 
 # **Example** usage
