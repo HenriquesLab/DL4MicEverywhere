@@ -136,11 +136,20 @@ This process requires you to restart your computer, enter the BIOS and enabling 
   }
   ``` 
 
-### **Notebooks run slow** 
+### **Kernel crash/fail or notebooks run slow**
 
-- Increase allocated resources for Docker engine (CPUs/RAM).
-- Lower model and data complexity. Simplify notebooks.
-- Consider using a machine with more powerful CPU/GPU resources.
+**Option 1**: Increase `CPU limit`, `Memory limit` and `Swap` on Docker Desktop settings.
+
+> If you are on Windows you will need to follow [this different steps](https://learn.microsoft.com/en-us/windows/wsl/wsl-config#configure-global-options-with-wslconfig).
+
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/DockerDesktop_Settings.png" 
+     alt="Docker Desktop settings"
+     width="70%" 
+     height="70%" />
+
+**Option 2**: Lower model and data complexity. Simplify notebooks.
+
+**Option 3**: Consider using a machine with more powerful CPU/GPU resources.
 
 ### **Notebooks crash/fail**
 
