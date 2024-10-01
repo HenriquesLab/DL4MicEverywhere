@@ -282,7 +282,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
             match_param = re.search(markdown_regex, line)
             markdown_heading = match_param.group(1)
             markdown_text = match_param.group(2)
-            widget_code += f'display(Markdown("{markdown_heading} {markdown_text}"))\n'
+            widget_code += f'display(Markdown("{markdown_heading} {markdown_text.replace('"', "'")}"))\n'
 
         elif re.search(param_regex, line):
             # The lines with #@param are replaced with ipywidgets based on the parameters
