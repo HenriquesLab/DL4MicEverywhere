@@ -35,8 +35,6 @@ def update_config(config_path):
         lambda dumper, value: dumper.represent_scalar(u'tag:yaml.org,2002:null', '')
     )
 
-    print(config_data['authors'])
-
     # Writing a new yaml file with the modifications
     with open(config_path, 'w', encoding='utf8') as new_f:
         yaml.safe_dump(config_data, new_f, width=10e10, default_flow_style=False, allow_unicode=True)
