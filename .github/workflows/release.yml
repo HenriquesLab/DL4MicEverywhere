@@ -2,7 +2,7 @@ name: Build and publish ZIPs when release
 on:
   push:
     tags:
-      - "*"
+      - "*.*.*"
 jobs:
   build:
     uses: ./.github/workflows/build_workflow.yml
@@ -17,4 +17,7 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "**/*"
+          artifacts: "**/*" # Add the downloaded artifact
+          makeLatest: true
+          name: "${{ github.event.head_commit.message }}" # Set the release name as the commit message
+          bodyFile: "./docs/CHANGELOG/${{ github.ref_name }}.md" # Look for the markdown file with the version name and use it as release message
