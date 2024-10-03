@@ -10,7 +10,7 @@ jobs:
     needs: build
     permissions:
       contents: write
-    runs-on: [self-hosted, dl4miceverywhere-builder]
+    runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
