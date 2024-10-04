@@ -17,8 +17,8 @@ config:
     cuda_version: 11.8.0
     cudnn_version: 8.6.0.163
     description: Diffusion_SMLM_DL4Mic is the conversion of the Diffusion Model for SMLM from ZeroCostDL4Mic.
-    dl4miceverywhere_version: 2.0.0
-    docker_hub_image: diffusion_model_smlm_zerocostdl4mic-z1.12-d2.0.0
+    dl4miceverywhere_version: 2.1.0
+    docker_hub_image: diffusion_model_smlm_zerocostdl4mic-z1.12-d2.1.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/Diffusion_Model_SMLM_ZeroCostDL4Mic.ipynb
     notebook_version: 1.12
     python_version: '3.9'
