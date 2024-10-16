@@ -2,6 +2,7 @@ authors:
 - Estibaliz Gómez-de-Mariscal
 - Constantin Pape
 - Mariana Ferreira
+- Iván Hidalgo-Cenalmor
 - BioImage Model Zoo team
 badges:
 - icon: https://colab.research.google.com/assets/colab-badge.svg
@@ -20,7 +21,7 @@ config:
     dl4miceverywhere_version: 2.1.0
     docker_hub_image: load_bioimageio_pytorch-b1.5.0-d2.1.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/bioimageio-pytorch/load_bioimageio_pytorch.ipynb
-    notebook_version: 1.5.0
+    notebook_version: 1.6.0
     python_version: '3.9'
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/bioimageio-pytorch/requirements.txt
     sections_to_remove: 1.1. 1.2.
