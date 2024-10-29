@@ -3,10 +3,13 @@ name: Build Docker images for single configuration
 on:
   workflow_call:
     inputs:
-      config_file: # the variable you can use in place of a matrix
+      config_file: # The variable you can use in place of a matrix
         required: true
         type: string
-        
+  workflow_dispatch: # Allow manual launching
+    inputs:
+      config_file:
+        type: string 
 jobs:
   get_arguments:
     name: Extract arguments from configuration
