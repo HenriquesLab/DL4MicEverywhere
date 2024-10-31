@@ -608,6 +608,40 @@ place .fr.advanced.tag -relx 0.02 -rely 0.84
 
 set tag ""
 
+##### Create the menu #####
+
+. config -menu .mb
+menu .mb -type menubar
+
+.mb add cascade -label DL4MicEverywhere -underline 0 -menu .mb.file
+menu .mb.file -type normal -tearoff 0
+.mb.file add command -label Info -underline 0 -command cmdinfo -accelerator Ctrl-i
+.mb.file add command -label Settings -underline 0 -command cmdsett -accelerator Ctrl-k
+.mb.file add separator
+.mb.file add command -label Quit -underline 0 -command exit -accelerator Ctrl-x
+
+bind .fr <Control-i> cmdinfo
+bind .fr <Control-k> cmdsett
+
+.mb add cascade -label Help -underline 0 -menu .mb.edit
+menu .mb.edit -type normal -tearoff 0
+.mb.edit add command -label Documentation -underline 0 -command cmddoc -accelerator Ctrl-d
+
+bind .fr <Control-d> cmddoc
+
+proc cmdinfo {} {
+    global basedir
+    exec wish "$basedir/.tools/tcl_tools/menubar/general_info.tcl"
+}
+proc cmdsett {}   {
+    global basedir
+    exec /bin/bash "$basedir/.tools/bash_tools/configure_settings.sh" "$basedir"
+}
+proc cmddoc {}   {
+    global basedir
+    exec wish "$basedir/.tools/tcl_tools/menubar/documentation.tcl"
+}
+
 ##### Create a window #####
 
 # Create the window, give a name to it and locate it in the middle of the screen
