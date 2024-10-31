@@ -635,7 +635,7 @@ proc cmdinfo {} {
 }
 proc cmdsett {}   {
     global basedir
-    exec /bin/bash "$basedir/.tools/bash_tools/configure_settings.sh" "$basedir"
+    exec /bin/bash "$basedir/.tools/bash_tools/configure_settings.sh"
 }
 proc cmddoc {}   {
     global basedir

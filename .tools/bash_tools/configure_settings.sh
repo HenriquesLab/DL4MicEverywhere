@@ -1,21 +1,21 @@
 
 #!/bin/bash
-BASEDIR=$1
+BASEDIR=$(dirname "$(readlink -f "$0")")
 
 function save_settings {
     echo "containerization : $1
 update : $2
-clean : $3" > $BASEDIR/.tools/.cache_settings
+clean : $3" > $BASEDIR/../.cache_settings
 }
 
-if [ ! -f $BASEDIR/.tools/.cache_settings ]; then
+if [ ! -f $BASEDIR/../.cache_settings ]; then
     echo Not exist
     # If the settings cache does not exist, run the initial settings window
-    settings=$(wish $BASEDIR/.tools/tcl_tools/menubar/initial_settings.tcl $BASEDIR)
+    settings=$(wish $BASEDIR/../tcl_tools/menubar/initial_settings.tcl $BASEDIR)
 else    
     echo Exist
     # Otherwise, run the regular settings window
-    settings=$(wish $BASEDIR/.tools/tcl_tools/menubar/settings.tcl $BASEDIR)
+    settings=$(wish $BASEDIR/../tcl_tools/menubar/settings.tcl $BASEDIR)
 fi
 
 if [ -z "$settings" ]; then
