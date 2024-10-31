@@ -47,13 +47,13 @@ pack .fr.principal -fill both -expand 1
 # Define the font
 font create myFont -size 10 -weight bold
 
-##### Settings section #####
+##### Preferences section #####
 
 ### Text
 
 label .fr.principal.intro_text_1 -text "Please, select the following options, you could always change"
 place .fr.principal.intro_text_1 -relx 0.03 -rely 0.02
-label .fr.principal.intro_text_2 -text "on the DL4MicEverywhere > Settings option on the menu bar."
+label .fr.principal.intro_text_2 -text "on the DL4MicEverywhere > Preferences option on the menu bar."
 place .fr.principal.intro_text_2 -relx 0.03 -rely 0.12
 
 ### Containerisation system
@@ -104,5 +104,5 @@ pack .fr.cancel -padx 0 -pady 2 -side right
 ##### Create a window #####
 
 # Create the window, give a name to it and locate it in the middle of the screen
-wm title . "Settings"
+wm title . "Preferences"
 wm geometry . ${width}x${height}+${width_offset}+${height_offset}

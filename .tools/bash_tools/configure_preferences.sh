@@ -3,7 +3,7 @@
 BASEDIR=$(dirname "$(readlink -f "$0")")
 
 function save_settings {
-    echo "containerization : $1
+    echo "containerisation : $1
 update : $2
 clean : $3" > $BASEDIR/../.cache_settings
 }
@@ -25,8 +25,8 @@ fi
 
 IFS=$'\n' read -d '' -r -a strarr <<<"$settings"
 
-containerization="${strarr[0]}"
+containerisation="${strarr[0]}"
 update="${strarr[1]}"
 clean="${strarr[2]}"
 
-save_settings "$containerization" "$update" "$clean"
+save_settings "$containerisation" "$update" "$clean"

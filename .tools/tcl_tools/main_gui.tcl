@@ -615,13 +615,15 @@ menu .mb -type menubar
 
 .mb add cascade -label DL4MicEverywhere -underline 0 -menu .mb.file
 menu .mb.file -type normal -tearoff 0
-.mb.file add command -label Info -underline 0 -command cmdinfo -accelerator Ctrl-i
-.mb.file add command -label Settings -underline 0 -command cmdsett -accelerator Ctrl-k
+.mb.file add command -label About -underline 0 -command cmdabout -accelerator Ctrl-i
+.mb.file add command -label Preferences -underline 0 -command cmdpref -accelerator Ctrl-p
+.mb.file add command -label "Check For Updates" -underline 0 -command cmdpcheckupdates -accelerator Ctrl-u
 .mb.file add separator
 .mb.file add command -label Quit -underline 0 -command exit -accelerator Ctrl-x
 
-bind .fr <Control-i> cmdinfo
-bind .fr <Control-k> cmdsett
+bind .fr <Control-i> cmdabout
+bind .fr <Control-p> cmdpref
+bind .fr <Control-u> cmdpcheckupdates
 
 .mb add cascade -label Help -underline 0 -menu .mb.edit
 menu .mb.edit -type normal -tearoff 0
@@ -629,13 +631,17 @@ menu .mb.edit -type normal -tearoff 0
 
 bind .fr <Control-d> cmddoc
 
-proc cmdinfo {} {
+proc cmdabout {} {
     global basedir
     exec wish "$basedir/.tools/tcl_tools/menubar/general_info.tcl"
 }
-proc cmdsett {}   {
+proc cmdpref {}   {
     global basedir
-    exec /bin/bash "$basedir/.tools/bash_tools/configure_settings.sh"
+    exec /bin/bash "$basedir/.tools/bash_tools/configure_preferences.sh"
+}
+proc cmdpcheckupdates {}   {
+    global basedir
+    exec /bin/bash "$basedir/.tools/bash_tools/check_for_updates.sh"
 }
 proc cmddoc {}   {
     global basedir

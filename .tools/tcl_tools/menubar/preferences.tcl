@@ -4,7 +4,7 @@
 set basedir [lindex $argv 0]
 
 # Check if there is cache information
-set filename "$basedir/.tools/.cache_settings"
+set filename "$basedir/.tools/.cache_preferences"
 set fexist [file exist $filename]
 
 if {"$fexist" == "1"} {
@@ -81,7 +81,7 @@ pack .fr.principal -fill both -expand 1
 # Define the font
 font create myFont -size 10 -weight bold
 
-##### Settings section #####
+##### Preferences section #####
 
 ### Containerisation system
 
@@ -130,5 +130,5 @@ pack .fr.cancel -padx 0 -pady 2 -side right
 ##### Create a window #####
 
 # Create the window, give a name to it and locate it in the middle of the screen
-wm title . "Settings"
+wm title . "Preferences"
 wm geometry . ${width}x${height}+${width_offset}+${height_offset}
