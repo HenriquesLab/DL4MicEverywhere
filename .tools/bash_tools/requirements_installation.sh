@@ -96,28 +96,73 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     fi
 fi
 
-# Verify if Docker is installed on the system and otherwise install it
-if ! command -v docker &> /dev/null; then
-    
-    /bin/bash $BASEDIR/requirements_installation/docker.sh || exit 1
-    
-    if ! command -v docker &> /dev/null; then
-        echo ""
-        echo "------------------------------------"
-        echo -e "\033[0;31 Docker installation failed. \033[0m"
-        echo "Please try again or follow the installation instructions on:"
-        echo "https://installati.one/install-net-tools-ubuntu-20-04/"
-        read -p "Press enter to close the terminal."
-        echo "------------------------------------" 
-        exit 1
-    else
-        any_installation_flag=1
-        # Restart Docker service to ensure that works well
-        # sudo service docker restart
-    fi 
+
+if [ ! -f $BASEDIR/../.cache_settings ]; then
+    # It shouldn't enter here, because at this point the .cache_settings file
+    # should be created. But just in case, Docker is the default containerisation sysyem.
+    containerisation="Docker"
 else
-    echo "Docker already installed."
+   containerisation=$(awk -F' : ' '$1 == "containerisation" {print $2}' $BASEDIR/../.cache_settings)
 fi
+
+if [[ "$containerisation" == "Docker"* ]]; then
+    # Verify if Docker is installed on the system and otherwise install it
+    if ! command -v docker &> /dev/null; then
+        
+        /bin/bash $BASEDIR/requirements_installation/docker.sh || exit 1
+        
+        if ! command -v docker &> /dev/null; then
+            echo ""
+            echo "------------------------------------"
+            echo -e "\033[0;31 Docker installation failed. \033[0m"
+            echo "Please try again or follow the installation instructions on:"
+            echo "https://installati.one/install-net-tools-ubuntu-20-04/"
+            read -p "Press enter to close the terminal."
+            echo "------------------------------------" 
+            exit 1
+        else
+            any_installation_flag=1
+            # Restart Docker service to ensure that works well
+            # sudo service docker restart
+        fi 
+    else
+        echo "Docker already installed."
+    fi
+
+elif [[ "$containerisation" == "Singularity"* ]]; then
+
+    # Verify if Singularity is installed on the system and otherwise install it
+    if ! command -v singularity &> /dev/null; then
+        
+        /bin/bash $BASEDIR/requirements_installation/singularity.sh || exit 1
+        
+        if ! command -v singularity &> /dev/null; then
+            echo ""
+            echo "------------------------------------"
+            echo -e "\033[0;31 Docker installation failed. \033[0m"
+            echo "Please try again or follow the installation instructions on:"
+            echo "https://installati.one/install-net-tools-ubuntu-20-04/"
+            read -p "Press enter to close the terminal."
+            echo "------------------------------------" 
+            exit 1
+        else
+            any_installation_flag=1
+            # Restart Docker service to ensure that works well
+            # sudo service docker restart
+        fi 
+    else
+        echo "Singularity already installed."
+    fi
+
+else
+    echo ""
+    echo "------------------------------------"
+    echo -e "\033[0;31 Something failed while choosing the containerisation system. \033[0m"
+    read -p "Press enter to close the terminal."
+    echo "------------------------------------" 
+    exit 1
+fi
+
 
 # Check if any installation has been done and if so recommend the user to restart the computer
 if [[ "$any_installation_flag" -ne 0 ]]; then
