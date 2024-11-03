@@ -25,85 +25,30 @@ echo ""
 echo "################################"
 echo ""
 
-# Check if the Docker daemon is running
-if ! docker info &> /dev/null; then
-    echo "WARNING: Docker daemon is not running"
+# Get the preferences choosen by the user, if they where choosen, if not the default
+if [ ! -f $BASEDIR/../.cache_preferences ]; then
+    containerisation="Docker"
+    update="-"
+    clean="-"
+else
+    containerisation=$(awk -F' : ' '$1 == "containerisation" {print $2}' $BASEDIR/../.cache_preferences)
+    update=$(awk -F' : ' '$1 == "update" {print $2}' $BASEDIR/../.cache_preferences)
+    clean=$(awk -F' : ' '$1 == "clean" {print $2}' $BASEDIR/../.cache_preferences)
+fi
 
-    docker_flag=$(wish $BASEDIR/../tcl_tools/docker_desktop_gui.tcl)
-    if [[ "$docker_flag" -ne 1 ]]; then
-        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-            # Linux
-            if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
-                # Linux inside the Windows Subsystem for Linux needs to export/link the start command
-                "/mnt/c/Program Files/Docker/Docker/Docker Desktop.exe"
-                pid_docker=$!
-                # Wait until is opened
-                wait $pid_docker
-                sleep 10
-                # while ! docker info &> /dev/null; do
-                #     echo "Waiting for Docker to start..."
-                #     sleep 5
-                # done
-                # echo "Docker started"
-            else
-                # Native Linux
-                systemctl --user start docker-desktop
-                pid_docker=$!
-                # Wait until is opened
-                wait $pid_docker
-                sleep 10
-                # while ! docker info &> /dev/null; do
-                #     echo "Waiting for Docker to start..."
-                #     sleep 5
-                # done
-                # echo "Docker started"
-            fi
-
-        elif [[ "$OSTYPE" == "darwin"* ]]; then
-            # Mac OSX
-            # Launch Docker Desktop
-            open -a Docker &
-            pid_docker=$!
-            # Wait until is opened
-            wait $pid_docker
-            sleep 10
-            # while ! docker info &> /dev/null; do
-            #     echo "Waiting for Docker to start..."
-            #     sleep 5
-            # done
-            # echo "Docker started"
-        elif [[ "$OSTYPE" == "msys*" ]]; then
-            # Windows
-            echo "This is a Windows machine"
-        else
-            echo ""
-            echo "------------------------------------"
-            echo "Unsupported OS: $OSTYPE"
-            echo "We only provide support for Windows, MacOS and Linux."
-            read -p "Press enter to close the terminal."
-            echo "------------------------------------" 
-            exit 1
-        fi
-
-        if ! docker info &> /dev/null; then
-            echo ""
-            echo "------------------------------------"
-            echo "Docker daemon or Docker Desktop has still not been started."
-            echo "Make sure that is correctly installed and running."
-            echo "If you want, you can start Docker Desktop by yourself."
-            echo "Run DL4MicEverywhere again when it is running."
-            read -p "Press enter to close the terminal."
-            echo "------------------------------------" 
-            exit 1
-        fi
-    else
-        echo ""
-        echo "------------------------------------"
-        echo "Docker daemon or Docker Desktop needs to be running."
-        echo "Make sure that is correctly installed." 
-        echo "If you want, you can start Docker Desktop by yourself."
-        read -p "Press enter to close the terminal."
-        echo "------------------------------------" 
-        exit 1
+# Check if the Docker daemon is running, if Docker option is chose
+if [[ "$containerisation" == "Docker"* ]]; then
+    if ! docker info &> /dev/null; then
+        /bin/bash $BASEDIR/pre_build_launch/check_docker_daemon.sh || exit 1
     fi
+fi
+
+# Check if the update option has been selected and run the script if so
+if [[ "$update" == "Automatically"* || "$update" == "Ask first"* ]]; then
+    /bin/bash $BASEDIR/pre_build_launch/update_dl4miceverywhere.sh || exit 1
+fi
+
+# Check if the clean option has been selected and run the script if so
+if [[ "$clean" == "Automatically"* ]]; then
+    /bin/bash $BASEDIR/pre_build_launch/clean_docker.sh || exit 1
 fi

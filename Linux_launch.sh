@@ -492,12 +492,12 @@ fi
 
 ###
 # Get what is the containerisation system that will be used
-if [ ! -f $BASEDIR/../.cache_settings ]; then
-    # It shouldn't enter here, because at this point the .cache_settings file
+if [ ! -f $BASEDIR/../.cache_preferences ]; then
+    # It shouldn't enter here, because at this point the .cache_preferences file
     # should be created. But just in case, Docker is the default containerisation sysyem.
     containerisation="Docker"
 else
-   containerisation=$(awk -F' : ' '$1 == "containerisation" {print $2}' $BASEDIR/../.cache_settings)
+   containerisation=$(awk -F' : ' '$1 == "containerisation" {print $2}' $BASEDIR/../.cache_preferences)
 fi
 ###
 
