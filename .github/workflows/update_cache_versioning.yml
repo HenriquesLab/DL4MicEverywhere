@@ -1,0 +1,20 @@
+name: Update cache file with the versioning from Docker images 
+on:
+  # At 02:00 AM of every day
+  schedule:
+      - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  update_configuration:
+    name: Update cache file with the versioning from Docker images
+    runs-on: [self-hosted, dl4miceverywhere-builder]
+    steps:
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+      - name: Run the script for cache creation
+        run: bash .tools/bash_tools/cache_docker_tags.sh 
+      - name: Commit the changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: GitHub Action - Update cache file with the versioning from Docker images

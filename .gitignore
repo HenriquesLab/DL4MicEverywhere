@@ -1,5 +1,6 @@
 # DL4MicEverywhere
-.tools/.cache*
+.tools/.cache/.cache_gui
+.tools/.cache/.cache_preferences
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -42,8 +43,6 @@ htmlcov/
 .nox/
 .coverage
 .coverage.*
-.cache
-.cache_gui
 nosetests.xml
 coverage.xml
 *.cover
