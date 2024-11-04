@@ -1,5 +1,5 @@
 # DL4MicEverywhere
-.tools/.cache_preferences
+.tools/.cache*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

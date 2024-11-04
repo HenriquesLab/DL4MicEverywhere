@@ -71,6 +71,7 @@ check_parsed_argument() {
 }
 
 function cache_gui {
+    mkdir -p "$BASEDIR/.tools/.cache"
     echo "data_path : $1
 result_path : $2
 selected_folder : $3
@@ -80,7 +81,7 @@ notebook_path : $6
 requirements_path : $7
 gpu_flag : $8
 tag : $9
-advanced_options : ${10}" > $BASEDIR/.tools/.cache_gui
+advanced_options : ${10}" > "$BASEDIR/.tools/.cache/.cache_gui"
 }
 
 # Function to parse and read the configuration yaml file
@@ -488,16 +489,16 @@ if grep -q credsStore ~/.docker/config.json; then
 fi
 
 # Execute the pre building tests
-/bin/bash $BASEDIR/.tools/bash_tools/pre_build_test.sh || exit 1
+/bin/bash "$BASEDIR/.tools/bash_tools/pre_build_test.sh" || exit 1
 
 ###
 # Get what is the containerisation system that will be used
-if [ ! -f $BASEDIR/../.cache_preferences ]; then
+if [ ! -f "$BASEDIR/../.cache/.cache_preferences" ]; then
     # It shouldn't enter here, because at this point the .cache_preferences file
     # should be created. But just in case, Docker is the default containerisation sysyem.
     containerisation="Docker"
 else
-   containerisation=$(awk -F' : ' '$1 == "containerisation" {print $2}' $BASEDIR/../.cache_preferences)
+   containerisation=$(awk -F' : ' '$1 == "containerisation" {print $2}' "$BASEDIR/../.cache/.cache_preferences")
 fi
 ###
 
@@ -514,7 +515,7 @@ else
         if docker image inspect $docker_tag >/dev/null 2>&1; then
             if [ "$gui_flag" -eq 1 ]; then 
                 # If the GUI flag has been specified, show a window for ansewring local question
-                build_flag=$(wish $BASEDIR/.tools/tcl_tools/local_img_gui.tcl $OSTYPE)
+                build_flag=$(wish "$BASEDIR/.tools/tcl_tools/local_img_gui.tcl" $OSTYPE)
             else
                 echo "Image exists locally. Do you want to build and replace the existing one?"
                 select yn in "Yes" "No"; do
