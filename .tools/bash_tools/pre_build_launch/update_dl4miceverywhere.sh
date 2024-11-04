@@ -36,7 +36,7 @@ else
         # In case they don't match, update it with git pull if you have git installed
         if [[ "$update" == "Ask first"* ]]; then
             # Check if you need to ask with a GUI
-            update_flag=$(wish $BASEDIR/../tcl_tools/update_gui.tcl)
+            update_flag=$(wish "$BASEDIR/../tcl_tools/update_gui.tcl")
         fi
 
         if [[ "$update" == "Automatically"* || "$update_flag" -ne 1 ]]; then
@@ -46,7 +46,7 @@ else
         # Otherwise update it using
         if [[ "$update" == "Ask first"* ]]; then
             # Check if you need to ask with a GUI
-            update_flag=$(wish $BASEDIR/../tcl_tools/update_gui.tcl)
+            update_flag=$(wish "$BASEDIR/../tcl_tools/update_gui.tcl")
         fi
 
         if [[ "$update" == "Automatically"* || "$update_flag" -ne 1 ]]; then

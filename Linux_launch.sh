@@ -2,7 +2,7 @@
 BASEDIR=$(dirname "$(readlink -f "$0")")
             
 # Run pre_launch_test.sh, stop if it fails
-/bin/bash $BASEDIR/.tools/bash_tools/pre_launch_test.sh || exit 1
+/bin/bash "$BASEDIR/.tools/bash_tools/pre_launch_test.sh" || exit 1
 
 # Function with the text to describe the usage of the bash script
 usage() {
@@ -170,7 +170,7 @@ if [ $gui_flag -eq 0 ]; then
     fi
 else
     # If the GUI flag has been specified, run the function to show the GUI and read the arguments
-    gui_arguments=$(wish $BASEDIR/.tools/tcl_tools/main_gui.tcl $BASEDIR $OSTYPE)
+    gui_arguments=$(wish "$BASEDIR/.tools/tcl_tools/main_gui.tcl" "$BASEDIR" "$OSTYPE")
 
     if [ -z "$gui_arguments" ]; then
         # No arguments were provided, this means that the GUI has been closed, so close the terminal
@@ -199,7 +199,7 @@ else
             versioned_docker_tag=$(/bin/bash "$BASEDIR/.tools/bash_tools/get_docker_tag.sh" "$selectedNotebook" "$selectedVersion")
         fi
 
-        config_path=$BASEDIR/notebooks/$selectedFolder/$selectedNotebook/configuration.yaml
+        config_path="$BASEDIR/notebooks/$selectedFolder/$selectedNotebook/configuration.yaml"
     else
         data_path="${strarr[1]}"
         result_path="${strarr[2]}"
@@ -576,7 +576,7 @@ else
                     # In case the architecture is available
                     if [ "$gui_flag" -eq 1 ]; then 
                         # If the GUI flag has been specified, show a window for ansewring hub question
-                        build_flag=$(wish $BASEDIR/.tools/tcl_tools/hub_img_gui.tcl $OSTYPE)
+                        build_flag=$(wish "$BASEDIR/.tools/tcl_tools/hub_img_gui.tcl" "$OSTYPE")
                     else
                         echo "The image ${docker_tag} is already available on docker hub. Do you preffer to pull it (faster option) instead of building it?"
                         select yn in "Yes" "No"; do
@@ -608,7 +608,7 @@ else
             echo "To build the docker image, you need to provide root access by entering your password."
             echo "Otherwise, you can choose the option of getting the image from Docker Hub or follow"
             echo "the steps in our documentation."
-            sudo docker build --file $BASEDIR/Dockerfile.gpu -t $docker_tag $BASEDIR\
+            sudo docker build --file "$BASEDIR/Dockerfile.gpu" -t $docker_tag "$BASEDIR"\
                 --build-arg UBUNTU_VERSION="${ubuntu_version}" \
                 --build-arg CUDA_VERSION="${cuda_version}" \
                 --build-arg CUDNN_VERSION="${cudnn_version}" \
@@ -623,7 +623,7 @@ else
             echo "To build the docker image, you need to provide root access by entering your password."
             echo "Otherwise, you can choose the option of getting the image from Docker Hub or follow"
             echo "the steps in our documentation."
-            sudo docker build --file $BASEDIR/Dockerfile -t $docker_tag $BASEDIR\
+            sudo docker build --file "$BASEDIR/Dockerfile" -t $docker_tag "$BASEDIR"\
                 --build-arg UBUNTU_VERSION="${ubuntu_version}" \
                 --build-arg GPU_FLAG="${gpu_flag}" \
                 --build-arg PYTHON_VERSION="${python_version}" \
@@ -653,17 +653,17 @@ else
 fi
 
 # Execute the post building tests
-/bin/bash $BASEDIR/.tools/bash_tools/post_build_test.sh || exit 1
+/bin/bash "$BASEDIR/.tools/bash_tools/post_build_test.sh" || exit 1
 
 sleep 3
 
 # Local files, if included, need to be removed to avoid the overcrowding the folder
 if [ "$local_notebook_flag" -eq 1 ]; then
-   rm $BASEDIR/notebook.ipynb
+   rm "$BASEDIR/notebook.ipynb"
 fi
 
 if [ "$local_requirements_flag" -eq 1 ]; then
-   rm $BASEDIR/requirements.txt
+   rm "$BASEDIR/requirements.txt"
 fi
 
 # If it has been built, run the docker
@@ -721,7 +721,7 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     echo ""
 
     # Launch a subprocess to open the browser with the port in 10 seconds
-    /bin/bash $BASEDIR/.tools/bash_tools/open_browser.sh http://localhost:$port/lab/tree/$notebook_name/?token=$notebook_token &
+    /bin/bash "$BASEDIR/.tools/bash_tools/open_browser.sh" "http://localhost:$port/lab/tree/$notebook_name/?token=$notebook_token" &
 
     # Define the command that will be run when the docker image is launched
     docker_command="jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token; cp /home/docker_info.txt /home/results/docker_info.txt; cp /home/$notebook_name /home/results/$notebook_name;" 

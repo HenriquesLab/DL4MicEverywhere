@@ -1,7 +1,7 @@
 
 echo "WARNING: Docker daemon is not running."
 
-docker_flag=$(wish $BASEDIR/../tcl_tools/docker_desktop_gui.tcl)
+docker_flag=$(wish "$BASEDIR/../tcl_tools/docker_desktop_gui.tcl")
 if [[ "$docker_flag" -ne 1 ]]; then
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # Linux

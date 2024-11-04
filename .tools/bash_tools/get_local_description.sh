@@ -2,11 +2,11 @@
 
 # Function to parse and read the configuration yaml file
 function get_yaml_args_from_file {
-   local prefix=$2
+   local prefix="$2"
    local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
    sed -ne "s|^\($s\):|\1|" \
         -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
-        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
+        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" "$1" |
    awk -F$fs '{
       indent = length($1)/2;
       vname[indent] = $2;
@@ -55,4 +55,4 @@ eval $(get_yaml_args_from_file "$1/notebooks/$2/$3/configuration.yaml")
 
 local_description="$config_dl4miceverywhere_description"
 
-echo $local_description
+echo "$local_description"

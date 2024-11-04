@@ -331,7 +331,7 @@ proc onComboboxSelectedFolder {notebook_folder} {
     set selectedVersion "-"
     
     # Always update the selected folder
-    set selectedFolder ${notebook_folder}
+    set selectedFolder "${notebook_folder}"
 
     # Reset the notebook list and version list
     set notebookList "-"
@@ -341,21 +341,24 @@ proc onComboboxSelectedFolder {notebook_folder} {
     if {"$selectedFolder" != "-"} {
         
         # Get the number of subfolders in the selected folder
-        catch {eval exec ls -1 -d [glob -nocomplain "$basedir/notebooks/$selectedFolder/*/"] | wc -l} num_folders
+
+        catch {eval exec find [glob "$basedir/notebooks/$selectedFolder/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | wc -l} num_folders
         
-        set no_folders 0
+        set no_folders_flag 0
         if {"$num_folders" == 1} {
             # In case only one folder has been found, it may be that there are no folder
-            catch {eval exec ls -1 -d [glob -nocomplain "$basedir/notebooks/$selectedFolder/*/"]} folder_name
+            catch {eval exec find [glob "$basedir/notebooks/$selectedFolder/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0} folder_name
+
             if {"$folder_name" == "."} {
                 # If the folder is called ".", this means that there are no folders
-                set no_folders 1
+                set no_folders_flag 1
             }
         }
 
-        if {"$no_folders" != 1} {
+        if {"$no_folders_flag" != 1} {
             # Notebook list will only be updated in case there are subfolders
-            catch {eval exec ls -d [glob "$basedir/notebooks/$selectedFolder/*/"] | xargs basename -a} output
+            catch {eval exec find [glob "$basedir/notebooks/$selectedFolder/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | xargs -0 -n 1 basename | sort} output
+
             append notebookList " " $output
         }
     
@@ -383,19 +386,18 @@ proc onComboboxSelectedNotebook {notebook_name} {
 
         # Reset the version list
         set versionList "-"
-
+        
         # Read a yaml file
-        catch {exec /bin/bash $basedir/.tools/bash_tools/get_local_description.sh "$basedir" "$selectedFolder" "$notebook_name"} output
-
-        set arguments [split $output \n]
+        catch {exec /bin/bash "$basedir/.tools/bash_tools/get_local_description.sh" "$basedir" "$selectedFolder" "$notebook_name"} output
+        set arguments [split "$output" \n]
 
         # Get the arguments that we want
         .fr.principal.notebook_description delete 0.0 end
-        .fr.principal.notebook_description insert end [lindex $arguments 2]
+        .fr.principal.notebook_description insert end [lindex "$arguments" 0]
 
         # Get the list with the versions
-        catch {exec /bin/bash $basedir/.tools/bash_tools/get_docker_versions.sh "$notebook_name"} version_list
-        append versionList " " $version_list
+        catch {exec /bin/bash "$basedir/.tools/bash_tools/get_docker_versions.sh" "$notebook_name"} version_list
+        append versionList " " "$version_list"
     } else {
         set selectedVersion "-"
         set versionList "-"
@@ -450,7 +452,7 @@ ttk::button .fr.advance -text "Advanced options" -command { onAdvanced }
 pack .fr.advance -padx 5 -side left 
 
 #### Manadatory argument section ######
-image create photo img1 -file ${basedir}/docs/logo/dl4miceverywhere-logo-small.png
+image create photo img1 -file "${basedir}/docs/logo/dl4miceverywhere-logo-small.png"
 label .fr.principal.logo -image img1
 place .fr.principal.logo -x 450 -y 5
 
@@ -478,22 +480,29 @@ place .fr.principal.intro_8 -relx 0.02 -rely [expr 0.42 / ( 2 - $advanced_option
 set folderList "-"
 
 # Get the number of folders
-catch {eval exec ls -1 -d [glob -nocomplain "$basedir/notebooks/*/"] | wc -l} num_folders
+catch {eval exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | wc -l} num_folders
 
-set no_folders 0
-if {"$num_folders" != 1} {
-    # In case only one folder has been found, it may be that there are no folder
-    catch {eval exec ls -1 -d [glob -nocomplain "$basedir/notebooks/*/"]} folder_name
+# Flag to indicate if there are no_folders_flag
+set no_folders_flag 0
+
+# Check the number of folders
+if {"$num_folders" == 0} {
+    # If it is 0, then there are no folders
+    set no_folders_flag_flag 1
+} else {
+    # Otherwise, check the depth on the folders
+    catch {eval exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0} folder_name
+    # Check if there are no subfolders 
     if {"$folder_name" == "."} {
-        # If the folder is called ".", this means that there are no folders
-        set no_folders 1
+        # If the folder_name is ".", this means that there are no subfolders on the notebooks folder
+        set no_folders_flag 1
     }
 }
 
-if {"$no_folders" != 1} {
-    # In case no folders are found 
-    catch {eval exec ls -d [glob "$basedir/notebooks/*/"] | xargs basename -a} aux_notebok_folder_list
-    append folderList " " $aux_notebok_folder_list
+# In case there are subfolders (flag of NO folders is off)
+if {"$no_folders_flag" == 0} {
+    catch {eval exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | xargs -0 -n 1 basename | sort} aux_notebok_folder_list
+    append folderList " " "$aux_notebok_folder_list"
 }
 
 set selectedFolder "-"

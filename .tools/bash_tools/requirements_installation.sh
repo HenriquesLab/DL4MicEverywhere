@@ -8,7 +8,7 @@ any_installation_flag=0
 if [[ "$OSTYPE" == "darwin"* ]]; then
     if ! command -v brew &> /dev/null; then
 
-        /bin/bash $BASEDIR/requirements_installation/homebrew.sh || exit 1
+        /bin/bash "$BASEDIR/requirements_installation/homebrew.sh" || exit 1
 
         if ! command -v brew &> /dev/null; then
             echo ""
@@ -30,7 +30,7 @@ fi
 # Verify if tcl/tk is installed on the system and otherwise install it
 if ! command -v wish &> /dev/null; then
     
-    /bin/bash $BASEDIR/requirements_installation/tcl_tk.sh || exit 1
+    /bin/bash "$BASEDIR/requirements_installation/tcl_tk.sh" || exit 1
 
     if ! command -v wish &> /dev/null; then
         echo ""
@@ -52,7 +52,7 @@ fi
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     if ! command -v xdg-open &> /dev/null; then 
 
-        /bin/bash $BASEDIR/requirements_installation/xdg_utils.sh || exit 1
+        /bin/bash "$BASEDIR/requirements_installation/xdg_utils.sh" || exit 1
 
         if ! command -v xdg-open &> /dev/null; then 
             echo ""
@@ -76,7 +76,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # Linux inside the Windows Subsystem for Linux needs to export/link the start command
         if ! command -v netstat &> /dev/null; then 
             
-            /bin/bash $BASEDIR/requirements_installation/net_tools.sh || exit 1
+            /bin/bash "$BASEDIR/requirements_installation/net_tools.sh" || exit 1
 
             if ! command -v netstat &> /dev/null; then 
                 echo ""
@@ -97,19 +97,19 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 fi
 
 
-if [ ! -f $BASEDIR/../.cache/.cache_preferences ]; then
+if [ ! -f "$BASEDIR/../.cache/.cache_preferences" ]; then
     # It shouldn't enter here, because at this point the .cache_preferences file
     # should be created. But just in case, Docker is the default containerisation sysyem.
     containerisation="Docker"
 else
-   containerisation=$(awk -F' : ' '$1 == "containerisation" {print $2}' $BASEDIR/../.cache/.cache_preferences)
+   containerisation=$(awk -F' : ' '$1 == "containerisation" {print $2}' "$BASEDIR/../.cache/.cache_preferences")
 fi
 
 if [[ "$containerisation" == "Docker"* ]]; then
     # Verify if Docker is installed on the system and otherwise install it
     if ! command -v docker &> /dev/null; then
         
-        /bin/bash $BASEDIR/requirements_installation/docker.sh || exit 1
+        /bin/bash "$BASEDIR/requirements_installation/docker.sh" || exit 1
         
         if ! command -v docker &> /dev/null; then
             echo ""
@@ -134,7 +134,7 @@ elif [[ "$containerisation" == "Singularity"* ]]; then
     # Verify if Singularity is installed on the system and otherwise install it
     if ! command -v singularity &> /dev/null; then
         
-        /bin/bash $BASEDIR/requirements_installation/singularity.sh || exit 1
+        /bin/bash "$BASEDIR/requirements_installation/singularity.sh" || exit 1
         
         if ! command -v singularity &> /dev/null; then
             echo ""
@@ -174,7 +174,7 @@ if [[ "$any_installation_flag" -ne 0 ]]; then
     echo "------------------------------------" 
 
     # Show the window with the option to restart
-    requirements_flag=$(wish $BASEDIR/../tcl_tools/restart_computer.tcl)
+    requirements_flag=$(wish "$BASEDIR/../tcl_tools/restart_computer.tcl")
     if [[ "$requirements_flag" == s2 ]]; then
         # Restart the computer at the moment of clicking
         sudo shutdown -r now

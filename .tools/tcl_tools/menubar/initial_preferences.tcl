@@ -1,8 +1,5 @@
 #! /usr/local/bin/wish
 
-# Set the BASEDIR
-set basedir [lindex $argv 0]
-
 proc onSave {} {
     global selectedContSystem
     global selectedUpdate 
