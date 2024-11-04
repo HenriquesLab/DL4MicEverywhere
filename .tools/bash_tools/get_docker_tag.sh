@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # Get the basedir
@@ -28,13 +27,14 @@ function get_yaml_args_from_file {
 }
 
 notebook_name=$1
+notebook_version=$2
 
 # Extract information from the cached versionings
 eval $(get_yaml_args_from_file "$BASEDIR/../.cache/.cache_versioning")
 
 # Extract the version list from the cached versioning
-notebook_variable=${notebook_name}_version_list
-version_list=${!notebook_variable}
+non_dot_notebook_version="$(echo "$notebook_version" | tr . _)"
+notebook_variable=${notebook_name}_${non_dot_notebook_version}
+notebook_tag=${!notebook_variable}
 
-# Return the version list
-echo $version_list
+echo $notebook_tag

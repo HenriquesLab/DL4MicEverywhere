@@ -74,7 +74,11 @@ function save_versioning {
                 # latest DL4MicEverywhere version 
                 local list_versions="${list_versions} ${version}"
                 local list_tag="${list_tag} ${tag}"
-                local paired_version_tag="${paired_version_tag}\t${version}: ${tag}\n"
+                
+                # Bash variables cannot have dots, that is why the dots are replaced with '-'
+                local non_dot_version="$(echo "$version" | tr . _)"
+
+                local paired_version_tag="${paired_version_tag}\t${non_dot_version}: ${tag}\n"
             fi
         done
 
@@ -107,7 +111,7 @@ for notebook_type in "$BASEDIR"/../../notebooks/*; do
             notebook_name=$(basename $notebook_url)
             notebook_name=${notebook_name%".ipynb"}
             notebook_name=$(echo $notebook_name | tr '[:upper:]' '[:lower:]')
-            
+
             echo "$(basename "$notebook_folder"):" >> "$cache_file"
 
             save_versioning "$notebook_name"

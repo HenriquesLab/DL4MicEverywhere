@@ -80,8 +80,9 @@ config_path : $5
 notebook_path : $6
 requirements_path : $7
 gpu_flag : $8
-tag : $9
-advanced_options : ${10}" > "$BASEDIR/.tools/.cache/.cache_gui"
+selected_version : $9
+tag : ${10}
+advanced_options : ${11}" > "$BASEDIR/.tools/.cache/.cache_gui"
 }
 
 # Function to parse and read the configuration yaml file
@@ -186,12 +187,16 @@ else
         selectedFolder="${strarr[3]}"
         selectedNotebook="${strarr[4]}"
         gpu_flag="${strarr[5]}"
-        tag_aux="${strarr[6]}"
+        selectedVersion="${strarr[6]}"
+        tag_aux="${strarr[7]}"
 
-        cache_gui "$data_path" "$result_path" "$selectedFolder" "$selectedNotebook" "" "" "" "$gpu_flag" "$tag_aux" "$advanced_options"
+        cache_gui "$data_path" "$result_path" "$selectedFolder" "$selectedNotebook" "" "" "" "$gpu_flag" "$selectedVersion" "$tag_aux" "$advanced_options"
 
-        if [ "$tag_aux" != "-" ]; then
+        if [ "$tag_aux" != "" ]; then
             docker_tag="$tag_aux"
+        elif [ "$selectedVersion" != "-" ]; then
+            echo "Selected Version: ${selectedVersion}"
+            versioned_docker_tag=$(/bin/bash "$BASEDIR/.tools/bash_tools/get_docker_tag.sh" "$selectedNotebook" "$selectedVersion")
         fi
 
         config_path=$BASEDIR/notebooks/$selectedFolder/$selectedNotebook/configuration.yaml
@@ -205,9 +210,10 @@ else
         requirements_aux="${strarr[5]}"
         
         gpu_flag="${strarr[6]}"
-        tag_aux="${strarr[7]}"
+        selectedVersion="${strarr[7]}"
+        tag_aux="${strarr[8]}"
 
-        cache_gui "$data_path" "$result_path" "" "" "$config_path" "$notebook_aux" "$requirements_aux" "$gpu_flag" "$tag_aux" "$advanced_options"
+        cache_gui "$data_path" "$result_path" "" "" "$config_path" "$notebook_aux" "$requirements_aux" "$gpu_flag" "" "$tag_aux" "$advanced_options"
 
         if [ "$notebook_aux" != "-" ]; then
             notebook_path="$notebook_aux"
@@ -215,7 +221,7 @@ else
         if [ "$requirements_aux" != "-" ]; then
             requirements_path="$requirements_aux"
         fi
-        if [ "$tag_aux" != "-" ]; then
+        if [ "$tag_aux" != "" ]; then
             docker_tag="$tag_aux"
         fi
     fi
@@ -342,11 +348,17 @@ rename_parsed_argument docker_hub_image # Not required to be present and therefo
 if [ -z "$notebook_path" ]; then
     # Use the URL from the configuration file if no local notebook path is specified
     notebook_path="${notebook_url}"
-    # Set the docker's tag if not specified
-    if [ -z "$docker_hub_image" ]; then
-        aux_docker_tag="$(basename "$notebook_path" .ipynb)"
+
+    # If there is no versioned tag
+    if [ -z "$versioned_docker_tag" ]; then
+        # Set the docker's tag if not specified
+        if [ -z "$docker_hub_image" ]; then
+            aux_docker_tag="$(basename "$notebook_path" .ipynb)"
+        else
+            aux_docker_tag="${docker_hub_image}"
+        fi
     else
-        aux_docker_tag="${docker_hub_image}"
+        aux_docker_tag="${versioned_docker_tag}"
     fi
 
     if [ "$test_flag" -eq 1 ]; then
@@ -354,11 +366,16 @@ if [ -z "$notebook_path" ]; then
     fi
 else
     # Otherwise check if the path is valid
-    # For the docker's tag if not specified
-    if [ -z "$docker_hub_image" ]; then
-        aux_docker_tag="$(basename "$notebook_path" .ipynb)"
+    # If there is no versioned tag
+    if [ -z "$versioned_docker_tag" ]; then
+        # For the docker's tag if not specified
+        if [ -z "$docker_hub_image" ]; then
+            aux_docker_tag="$(basename "$notebook_path" .ipynb)"
+        else
+            aux_docker_tag="${docker_hub_image}"
+        fi
     else
-        aux_docker_tag="${docker_hub_image}"
+        aux_docker_tag="${versioned_docker_tag}"
     fi
 
     if [ -f "$notebook_path" ]; then
@@ -409,12 +426,14 @@ fi
 if [ -z "$docker_tag" ]; then
     # If no tag has been specified for the docker image, then the default tag will be used (the name of the notebook)
     docker_tag=$aux_docker_tag
-
+    echo "Docker tag: ${docker_tag}"
+    echo "Docker Hub image: ${docker_hub_image}"
     if [ "$test_flag" -eq 1 ]; then 
         echo "No tag has been specified for the docker image, therefore the default tag $docker_tag will be used."
     fi
 
-    if [ -z "$docker_hub_image" ]; then
+    # If no version 
+    if [ -z "$docker_hub_image" ] && [ -z "$versioned_docker_tag" ]; then
         # Get the notebook type of the configuration file
         if [[ "$config_path" = *'ZeroCostDL4Mic_notebooks'* ]]; then
             notebook_type='z'
@@ -436,17 +455,27 @@ if [ -z "$docker_tag" ]; then
         else
             docker_tag=$docker_tag-$notebook_type$notebook_version-d$dl4miceverywhere_version
         fi
-        if [ "$gpu_flag" -eq 1 ]; then
-            docker_tag=$docker_tag-gpu
-        fi
     else
-        # In case the configuration file already has a docker_hub_image attribute
-        docker_tag=henriqueslab/dl4miceverywhere:$docker_hub_image
-        if [ "$gpu_flag" -eq 1 ]; then
-            docker_tag=$docker_tag-gpu
+        if [ -z "$versioned_docker_tag" ]; then
+            # In case there is no versioned_docker_tag attribute, that meens that there is a docker_hub_image
+            # In case the configuration file already has a docker_hub_image attribute
+            docker_tag=henriqueslab/dl4miceverywhere:$docker_hub_image
+        else
+            # Otherwise, it means that versioned_docker_tag was provided and will be used
+            docker_tag=henriqueslab/dl4miceverywhere:$versioned_docker_tag
         fi
     fi
 
+    # Check if GPU has been requested and add it to the tag if necessary
+    if [ "$gpu_flag" -eq 1 ]; then
+        docker_tag=$docker_tag-gpu
+    fi
+    echo "Final docker tag: ${docker_tag}"
+else
+    echo "The docker tag $docker_tag has been selected."
+    echo ""
+    echo "################################"
+    echo ""
 fi
 
 

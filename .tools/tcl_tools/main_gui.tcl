@@ -26,6 +26,7 @@ if {"$fexist" == "1"} {
     set cache_notebook_path ""
     set cache_requirements_path ""
     set cache_gpu_flag ""
+    set cache_selected_version ""
     set cache_tag ""
     set cache_advanced_options ""
 }
@@ -94,6 +95,7 @@ proc onLoadCache {} {
     global cache_notebook_path
     global cache_requirements_path
     global cache_gpu_flag
+    global cache_selected_version
     global cache_tag
     global cache_advanced_options
 
@@ -106,6 +108,7 @@ proc onLoadCache {} {
     global ipynb_path
     global txt_path
     global gpu
+    global selectedVersion
     global tag
     global advanced_options
 
@@ -118,9 +121,16 @@ proc onLoadCache {} {
     if  {"$cache_selected_folder" != ""} {
         set selectedFolder "$cache_selected_folder"
         onComboboxSelectedFolder "$cache_selected_folder"
-    }
-    if  {"$cache_selected_notebook" != ""} {
-        set selectedNotebook "$cache_selected_notebook"
+
+        if  {"$cache_selected_notebook" != ""} {
+            set selectedNotebook "$cache_selected_notebook"
+            # Update the information in the description box
+            onComboboxSelectedNotebook "$cache_selected_notebook"
+
+            if  {"$cache_selected_version" != ""} {
+                set selectedVersion "$cache_selected_version"
+            }
+        }
     }
     if  {"$cache_config_path" != ""} {
         set yaml_path "$cache_config_path"
@@ -140,11 +150,6 @@ proc onLoadCache {} {
     if  {"$cache_advanced_options" != ""} {
         set advanced_options "$cache_advanced_options"
     }
-    
-    # Update the information in the description box
-    if {"$selectedNotebook" != "-"} {
-        onComboboxSelectedNotebook $selectedNotebook
-    }
 
     # Open advanced opions in case it was like that
     if  {"$cache_advanced_options" == "1"} {
@@ -161,6 +166,7 @@ proc onDone {} {
     global data_path
     global result_path
     global gpu
+    global selectedVersion
     global tag
 
     if {"$data_path" == ""} {
@@ -188,6 +194,7 @@ proc onDone {} {
                     puts "$selectedFolder"
                     puts "$selectedNotebook"
                     puts "$gpu"
+                    puts "$selectedVersion"
                     puts "$tag"
                     
                     exit 0
@@ -220,6 +227,7 @@ proc onDone {} {
                     puts "$ipynb_path"
                     puts "$txt_path"
                     puts "$gpu"
+                    puts "$selectedVersion"
                     puts "$tag"
                     
                     exit 0
@@ -371,10 +379,10 @@ proc onComboboxSelectedNotebook {notebook_name} {
     if {"$notebook_name" != "-"} {
 
         # Reset selected version to latest and version list
-        set selectedVersion "latest"
+        set selectedVersion "-"
 
         # Reset the version list
-        set versionList ""
+        set versionList "-"
 
         # Read a yaml file
         catch {exec /bin/bash $basedir/.tools/bash_tools/get_local_description.sh "$basedir" "$selectedFolder" "$notebook_name"} output
