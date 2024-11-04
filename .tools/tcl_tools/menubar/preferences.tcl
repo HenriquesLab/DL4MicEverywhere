@@ -4,7 +4,7 @@
 set basedir [lindex $argv 0]
 
 # Check if there is cache information
-set filename "$basedir/.tools/.cache_preferences"
+set filename "$basedir/../.cache/.cache_preferences"
 set fexist [file exist $filename]
 
 if {"$fexist" == "1"} {
@@ -18,7 +18,7 @@ if {"$fexist" == "1"} {
     }
     close "$fp"
 } else {
-    set cache_containerization ""
+    set cache_containerisation ""
     set cache_update ""
     set cache_clean ""
 }
@@ -56,22 +56,7 @@ set height 220
 set width_offset [expr { ( [winfo vrootwidth  .] - $width  ) / 2 }]
 set height_offset [expr { ( [winfo vrootheight .] - $height ) / 2 }]
 
-# Read the OS of the computer
-set operative_system [lindex $argv 0]
-set is_mac 0
-set is_linux 0
-
-# Check if it is mac to change the display
-if {[string match darwin* $operative_system]} {
-    set is_mac 1
-}
-# Check if it is linux to change the display
-if {[string match linux-gnu* $operative_system]} {
-    set is_linux 1
-}
-
 ##### Define the frame #####
-
 frame .fr
 pack .fr -fill both -expand 1
 
@@ -90,7 +75,7 @@ label .fr.principal.notebook_text_! -text "Choose the installed and used contain
 label .fr.principal.notebook_label -text "Containerisation system:"
 place .fr.principal.notebook_label -relx 0.03 -rely 0.02
 
-set selectedContSystem ${cache_containerization}
+set selectedContSystem ${cache_containerisation}
 set listContSystem [list "Docker" "Singularity"]
 
 ttk::combobox .fr.principal.containerization -values $listContSystem -textvariable selectedContSystem -state readonly

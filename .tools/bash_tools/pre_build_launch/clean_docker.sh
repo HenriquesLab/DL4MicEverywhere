@@ -1,4 +1,4 @@
-echo "Releasing Docker memory..."
+echo "Releasing Docker memory ..."
 
 docker image prune -a -f # >/dev/null2>&1
 

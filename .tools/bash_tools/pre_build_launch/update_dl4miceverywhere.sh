@@ -2,15 +2,15 @@
 #!/bin/bash
 BASEDIR=$(dirname "$(readlink -f "$0")")
 
-if [ -f $BASEDIR/../../.cache_preferences ]; then
+if [ -f "$BASEDIR/../../.cache/.cache_preferences" ]; then
     # If this script is called, this file should always exist
-    update=$(awk -F' : ' '$1 == "update" {print $2}' $BASEDIR/../../.cache_preferences)
+    update=$(awk -F' : ' '$1 == "update" {print $2}' "$BASEDIR/../../.cache/.cache_preferences")
 else
     echo "Something went wrong when trying to update DL4MicEverywhere."
     exit 0
 fi
 
-echo "Checking DL4MicEverywhere version..."
+echo "Checking DL4MicEverywhere version ..."
 
 # Check if Git is installed
 if command -v git &> /dev/null; then

@@ -4,7 +4,7 @@
 set basedir [lindex $argv 0]
 
 # Check if there is cache information
-set filename "$basedir/.tools/.cache_gui"
+set filename "$basedir/.tools/.cache/.cache_gui"
 set fexist [file exist $filename]
 
 if {"$fexist" == "1"} {
@@ -239,20 +239,23 @@ proc onAdvanced {} {
         
         .fr.principal.notebooks configure -state disable
         .fr.principal.notebooks_folders configure -state disable
+        .fr.principal.versions configure -state disable
 
         place .fr.principal.notebooks_folders -relx 0.02 -rely [expr 0.55 / ( 2 - $advanced_options ) ]
         place .fr.principal.notebooks -relx 0.02 -rely [expr 0.55 / ( 2 - $advanced_options ) ]
 
-        place .fr.principal.data_label -relx 0.02 -rely [expr 0.63 / ( 2 - $advanced_options ) ]
-        place .fr.principal.data_entry -relx 0.02 -rely [expr 0.69 / ( 2 - $advanced_options ) ]
-        place .fr.principal.data_btn -relx 0.85 -rely [expr 0.685 / ( 2 - $advanced_options ) ]
+        place .fr.principal.data_label -relx 0.02 -rely [expr 0.625 / ( 2 - $advanced_options ) ]
+        place .fr.principal.data_entry -relx 0.02 -rely [expr 0.685 / ( 2 - $advanced_options ) ]
+        place .fr.principal.data_btn -relx 0.85 -rely [expr 0.68 / ( 2 - $advanced_options ) ]
 
         place .fr.principal.result_label -relx 0.02 -rely [expr 0.76 / ( 2 - $advanced_options ) ]
         place .fr.principal.result_entry -relx 0.02 -rely [expr 0.82 / ( 2 - $advanced_options ) ]
         place .fr.principal.result_btn -relx 0.85 -rely [expr 0.825 / ( 2 - $advanced_options ) ]
-
-        place .fr.principal.gpu -relx 0.15 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
-        place .fr.principal.cache_btn -relx 0.6 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
+        
+        place .fr.principal.gpu -relx 0.07 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
+        place .fr.principal.version_label -relx 0.29 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
+        place .fr.principal.versions -relx 0.39 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
+        place .fr.principal.cache_btn -relx 0.63 -rely [expr 0.905 / ( 2 - $advanced_options ) ]
 
         .fr.principal.notebook_description configure -height [expr 1 + ($is_mac * 2)] 
         .fr.principal.notebook_description delete 0.0 end
@@ -265,20 +268,23 @@ proc onAdvanced {} {
         
         .fr.principal.notebooks configure -state normal
         .fr.principal.notebooks_folders configure -state normal
+        .fr.principal.versions configure -state normal
 
         place .fr.principal.notebooks_folders -relx 0.02 -rely [expr 0.55 / ( 2 - $advanced_options ) ]
         place .fr.principal.notebooks -relx 0.02 -rely [expr 0.63 / ( 2 - $advanced_options ) ]
+        
+        place .fr.principal.data_label -relx 0.02 -rely [expr 0.705 / ( 2 - $advanced_options ) ]
+        place .fr.principal.data_entry -relx 0.02 -rely [expr 0.765 / ( 2 - $advanced_options ) ]
+        place .fr.principal.data_btn -relx 0.85 -rely [expr 0.76 / ( 2 - $advanced_options ) ]
 
-        place .fr.principal.data_label -relx 0.02 -rely [expr 0.71 / ( 2 - $advanced_options ) ]
-        place .fr.principal.data_entry -relx 0.02 -rely [expr 0.77 / ( 2 - $advanced_options ) ]
-        place .fr.principal.data_btn -relx 0.85 -rely [expr 0.765 / ( 2 - $advanced_options ) ]
-
-        place .fr.principal.result_label -relx 0.02 -rely [expr 0.85 / ( 2 - $advanced_options ) ]
-        place .fr.principal.result_entry -relx 0.02 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
-        place .fr.principal.result_btn -relx 0.85 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
-
-        place .fr.principal.gpu -relx 0.15 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
-        place .fr.principal.cache_btn -relx 0.6 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+        place .fr.principal.result_label -relx 0.02 -rely [expr 0.845 / ( 2 - $advanced_options ) ]
+        place .fr.principal.result_entry -relx 0.02 -rely [expr 0.905 / ( 2 - $advanced_options ) ]
+        place .fr.principal.result_btn -relx 0.85 -rely [expr 0.90 / ( 2 - $advanced_options ) ]
+        
+        place .fr.principal.gpu -relx 0.07 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+        place .fr.principal.version_label -relx 0.29 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+        place .fr.principal.versions -relx 0.39 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+        place .fr.principal.cache_btn -relx 0.63 -rely [expr 0.989 / ( 2 - $advanced_options ) ]
 
         .fr.principal.notebook_description configure -height [expr 4 + ($is_mac * 2)] 
         .fr.principal.notebook_description delete 0.0 end
@@ -305,17 +311,24 @@ proc onComboboxFolder {notebook_folder} {
     global basedir
 
     global selectedFolder
-    global selectedNotebook
     global notebookList
+    global selectedNotebook
 
-    # Reset selected notebook
+    # Variables to update the version of the notebook 
+    global versionList
+    global selectedVersion
+
+    # Reset selected notebook and version
     set selectedNotebook "-"
+    set selectedVersion "-"
     
     # Always update the selected folder
     set selectedFolder ${notebook_folder}
 
-    # Reset the notebook list
+    # Reset the notebook list and version list
     set notebookList "-"
+    set versionList "-"
+
     # Get notebooks on that folder
     if {"$selectedFolder" != "-"} {
         
@@ -349,6 +362,16 @@ proc parseYaml {notebook_name} {
     global basedir
     global selectedFolder
 
+    # Variables to update the version of the notebook 
+    global versionList
+    global selectedVersion
+
+    # Reset selected version to latest and version list
+    set selectedVersion "latest"
+
+    # Reset the notebook list
+    set notebookList "latest"
+
     # Read a yaml file
     catch {exec /bin/bash $basedir/.tools/bash_tools/parse_yaml.sh "$basedir" "$selectedFolder" "$notebook_name"} output
 
@@ -356,24 +379,12 @@ proc parseYaml {notebook_name} {
 
     # Get the arguments that we want
     .fr.principal.notebook_description delete 0.0 end
-
-    if {[lindex $arguments 0] == 1} {
-        .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
-        .fr.principal.notebook_description insert end "There is an updated version of this notebook.\n\n" highlight
-    }
-    if {[lindex $arguments 1] == 1} {
-        .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
-        .fr.principal.notebook_description insert end "There is an updated version of DL4MicEverywhere.\n\n" highlight
-    }
-    if {[lindex $arguments 1] == 2} {
-        .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
-        .fr.principal.notebook_description insert end "Local configuration file does not have dl4miceverywhere version.\n\n" highlight
-    }
-    if {[lindex $arguments 1] == 3} {
-        .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
-        .fr.principal.notebook_description insert end "Online configuration file does not have dl4miceverywhere version.\n\n" highlight
-    }
     .fr.principal.notebook_description insert end [lindex $arguments 2]
+
+    # Get the list with the versions
+    catch {exec /bin/bash $basedir/.tools/bash_tools/get_docker_versions.sh "$notebook_name"} version_list
+    append versionList " " $version_list
+    .fr.principal.versions configure -values $versionList
 
 }
 
@@ -492,51 +503,61 @@ place .fr.principal.notebook_description -relx 0.375 -rely [expr 0.495 / ( 2 - $
 
 # Define the button and display to load the path to the data folder
 
-
 label .fr.principal.data_label -text "Path to data folder:"
-place .fr.principal.data_label -relx 0.02 -rely [expr 0.71 / ( 2 - $advanced_options ) ]
+place .fr.principal.data_label -relx 0.02 -rely [expr 0.705 / ( 2 - $advanced_options ) ]
 
 entry .fr.principal.data_entry -textvariable data_path -width [expr 58 + ($is_mac * -5) + ($is_linux * 2)]
-place .fr.principal.data_entry -relx 0.02 -rely [expr 0.77 / ( 2 - $advanced_options ) ]
+place .fr.principal.data_entry -relx 0.02 -rely [expr 0.765 / ( 2 - $advanced_options ) ]
 
 button .fr.principal.data_btn -text "Select" \
         -command "onSelectData"
-place .fr.principal.data_btn -relx 0.85 -rely [expr 0.765 / ( 2 - $advanced_options ) ]
+place .fr.principal.data_btn -relx 0.85 -rely [expr 0.76 / ( 2 - $advanced_options ) ]
 
 set data_path ""
 
 # Define the button and display to load the path to the result folder
 
 label .fr.principal.result_label -text "Path to output folder:"
-place .fr.principal.result_label -relx 0.02 -rely [expr 0.85 / ( 2 - $advanced_options ) ]
+place .fr.principal.result_label -relx 0.02 -rely [expr 0.845 / ( 2 - $advanced_options ) ]
 
 entry .fr.principal.result_entry -textvariable result_path -width [expr 58 + ($is_mac * -5) + ($is_linux * 2)]
-place .fr.principal.result_entry -relx 0.02 -rely [expr 0.91 / ( 2 - $advanced_options ) ]
+place .fr.principal.result_entry -relx 0.02 -rely [expr 0.905 / ( 2 - $advanced_options ) ]
 
 button .fr.principal.result_btn -text "Select" \
         -command "onSelectResult"
-place .fr.principal.result_btn -relx 0.85 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
+place .fr.principal.result_btn -relx 0.85 -rely [expr 0.90 / ( 2 - $advanced_options ) ]
 
 set result_path ""
 
 # Define the checkbutton for the GPU usage
 
 checkbutton .fr.principal.gpu -text "Allow GPU" -variable gpu
-place .fr.principal.gpu -relx 0.15 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+place .fr.principal.gpu -relx 0.07 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
 
 # Disable the GPU option in case 'nvidia-smi' command is not found
 if { [catch { exec nvidia-smi } msg] } {
     .fr.principal.gpu configure -state disable
 }
 
+# Define the version number
+
+set versionList "-"
+set selectedVersion "-"
+
+label .fr.principal.version_label -text "Version:"
+place .fr.principal.version_label -relx 0.29 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+
+ttk::combobox .fr.principal.versions -values $versionList -textvariable selectedVersion -width 10 -state readonly
+place .fr.principal.versions -relx 0.39 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
 
 # Define a button to load cached data if there is so
 
 button .fr.principal.cache_btn -text "Load previous settings" \
         -command "onLoadCache"
-place .fr.principal.cache_btn -relx 0.55 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+place .fr.principal.cache_btn -relx 0.63 -rely [expr 0.989 / ( 2 - $advanced_options ) ]
 
 # Disable the cache if no cache file is found
+
 if {"$fexist" == "0"} {
     .fr.principal.cache_btn configure -state disable
 }
@@ -641,7 +662,13 @@ proc cmdpref {}   {
 }
 proc cmdpcheckupdates {}   {
     global basedir
-    exec /bin/bash "$basedir/.tools/bash_tools/check_for_updates.sh"
+    catch {exec wish "$basedir/.tools/tcl_tools/menubar/ask_update.tcl"} update_output
+
+    if {"$update_output" == "3"} {
+        exec echo "################################" &
+        exec echo "" &
+        exec /bin/bash  "$basedir/.tools/bash_tools/pre_build_launch/update_dl4miceverywhere.sh" &
+    }
 }
 proc cmddoc {}   {
     global basedir

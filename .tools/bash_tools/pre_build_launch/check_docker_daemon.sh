@@ -1,5 +1,5 @@
 
-echo "WARNING: Docker daemon is not running"
+echo "WARNING: Docker daemon is not running."
 
 docker_flag=$(wish $BASEDIR/../tcl_tools/docker_desktop_gui.tcl)
 if [[ "$docker_flag" -ne 1 ]]; then
