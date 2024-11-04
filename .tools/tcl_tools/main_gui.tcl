@@ -117,7 +117,7 @@ proc onLoadCache {} {
     }
     if  {"$cache_selected_folder" != ""} {
         set selectedFolder "$cache_selected_folder"
-        onComboboxFolder "$cache_selected_folder"
+        onComboboxSelectedFolder "$cache_selected_folder"
     }
     if  {"$cache_selected_notebook" != ""} {
         set selectedNotebook "$cache_selected_notebook"
@@ -143,7 +143,7 @@ proc onLoadCache {} {
     
     # Update the information in the description box
     if {"$selectedNotebook" != "-"} {
-        parseYaml $selectedNotebook
+        onComboboxSelectedNotebook $selectedNotebook
     }
 
     # Open advanced opions in case it was like that
@@ -290,7 +290,7 @@ proc onAdvanced {} {
         .fr.principal.notebook_description delete 0.0 end
         global selectedNotebook
         if {"$selectedNotebook" != "-"} {
-            parseYaml $selectedNotebook
+            onComboboxSelectedNotebook $selectedNotebook
         }
     }
 
@@ -307,7 +307,7 @@ proc onAdvanced {} {
 
 }
 
-proc onComboboxFolder {notebook_folder} {
+proc onComboboxSelectedFolder {notebook_folder} {
     global basedir
 
     global selectedFolder
@@ -356,36 +356,44 @@ proc onComboboxFolder {notebook_folder} {
     }
 
     .fr.principal.notebooks configure -values $notebookList
+    .fr.principal.versions configure -values $versionList
 }
 
-proc parseYaml {notebook_name} {
+proc onComboboxSelectedNotebook {notebook_name} {
     global basedir
     global selectedFolder
 
     # Variables to update the version of the notebook 
-    global versionList
     global selectedVersion
+    global versionList
 
-    # Reset selected version to latest and version list
-    set selectedVersion "latest"
+    # If a notebook has been selected
+    if {"$notebook_name" != "-"} {
 
-    # Reset the notebook list
-    set notebookList "latest"
+        # Reset selected version to latest and version list
+        set selectedVersion "latest"
 
-    # Read a yaml file
-    catch {exec /bin/bash $basedir/.tools/bash_tools/parse_yaml.sh "$basedir" "$selectedFolder" "$notebook_name"} output
+        # Reset the version list
+        set versionList ""
 
-    set arguments [split $output \n]
+        # Read a yaml file
+        catch {exec /bin/bash $basedir/.tools/bash_tools/get_local_description.sh "$basedir" "$selectedFolder" "$notebook_name"} output
 
-    # Get the arguments that we want
-    .fr.principal.notebook_description delete 0.0 end
-    .fr.principal.notebook_description insert end [lindex $arguments 2]
+        set arguments [split $output \n]
 
-    # Get the list with the versions
-    catch {exec /bin/bash $basedir/.tools/bash_tools/get_docker_versions.sh "$notebook_name"} version_list
-    append versionList " " $version_list
+        # Get the arguments that we want
+        .fr.principal.notebook_description delete 0.0 end
+        .fr.principal.notebook_description insert end [lindex $arguments 2]
+
+        # Get the list with the versions
+        catch {exec /bin/bash $basedir/.tools/bash_tools/get_docker_versions.sh "$notebook_name"} version_list
+        append versionList " " $version_list
+    } else {
+        set selectedVersion "-"
+        set versionList "-"
+    }
+
     .fr.principal.versions configure -values $versionList
-
 }
 
 # The flag that indicates if "Advanced options" will be used
@@ -492,11 +500,11 @@ place .fr.principal.notebook_label -relx 0.02 -rely [expr 0.49 / ( 2 - $advanced
 
 ttk::combobox .fr.principal.notebooks_folders -values $folderList -textvariable selectedFolder -state readonly
 place .fr.principal.notebooks_folders -relx 0.02 -rely [expr 0.55 / ( 2 - $advanced_options ) ]
-bind .fr.principal.notebooks_folders <<ComboboxSelected>> { onComboboxFolder [%W get]}
+bind .fr.principal.notebooks_folders <<ComboboxSelected>> { onComboboxSelectedFolder [%W get]}
 
 ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable selectedNotebook -state readonly
 place .fr.principal.notebooks -relx 0.02 -rely [expr 0.63 / ( 2 - $advanced_options ) ]
-bind .fr.principal.notebooks <<ComboboxSelected>> { parseYaml [%W get]}
+bind .fr.principal.notebooks <<ComboboxSelected>> { onComboboxSelectedNotebook [%W get]}
 
 text .fr.principal.notebook_description -width [expr 35 + ($is_mac * 15) + ($is_linux * 10) ] -height [expr 4 + ($is_mac * 2)] -borderwidth 1 -relief sunken
 place .fr.principal.notebook_description -relx 0.375 -rely [expr 0.495 / ( 2 - $advanced_options ) ]
