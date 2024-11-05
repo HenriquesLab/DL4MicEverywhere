@@ -679,7 +679,7 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     fi
 
     # Check if selected port is available if not try next one until finding a usable port. 
-    if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
+    if [[ "$OSTYPE" == "linux-gnu"* && "$(systemd-detect-virt)" == "wsl"* ]]; then        
         # Linux inside the Windows Subsystem for Linux needs to look differently to the ports
         while ( netstat -a | grep :$port &> /dev/null )
         do
