@@ -30,11 +30,12 @@ notebook_name=$1
 notebook_version=$2
 
 # Extract information from the cached versionings
-eval $(get_yaml_args_from_file "$BASEDIR/../.cache/.cache_versioning")
+eval $(get_yaml_args_from_file "$BASEDIR/../.cache/.cache_versioning" "var_")
 
 # Extract the version list from the cached versioning
-non_dot_notebook_version="$(echo "$notebook_version" | tr . _)"
-notebook_variable=${notebook_name}_${non_dot_notebook_version}
+non_dot_notebook_name="$(echo "$notebook_name" | tr . _ | tr - _ )"
+non_dot_notebook_version="$(echo "$notebook_version" | tr . _ | tr - _ )"
+notebook_variable="var_${non_dot_notebook_name}_${non_dot_notebook_version}"
 notebook_tag=${!notebook_variable}
 
 echo $notebook_tag

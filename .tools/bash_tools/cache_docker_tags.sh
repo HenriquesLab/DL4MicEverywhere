@@ -85,8 +85,8 @@ function save_versioning {
         local page=$((page + 1))
     done
 
-    echo -e "\tversion_list: $list_versions" >> "$cache_file"
-    echo -e "\ttag_list: $list_tag" >> "$cache_file"
+    echo -e "\tversion_list: '$list_versions'" >> "$cache_file"
+    echo -e "\ttag_list: '$list_tag'" >> "$cache_file"
     echo -e "$paired_version_tag" >> "$cache_file"
 
 }
@@ -112,7 +112,9 @@ for notebook_type in "$BASEDIR"/../../notebooks/*; do
             notebook_name=${notebook_name%".ipynb"}
             notebook_name=$(echo $notebook_name | tr '[:upper:]' '[:lower:]')
 
-            echo "$(basename "$notebook_folder"):" >> "$cache_file"
+            fixed_notebook_folder="$(echo "$notebook_folder" | tr . _ | tr - _)"
+
+            echo "$(basename "$fixed_notebook_folder"):" >> "$cache_file"
 
             save_versioning "$notebook_name"
         fi
