@@ -1,7 +1,9 @@
 
 echo "WARNING: Docker daemon is not running."
 
+# Launch the Windows asking the user to launch Docker Desktop
 docker_flag=$(wish "$BASEDIR/../tcl_tools/docker_desktop_gui.tcl")
+
 if [[ "$docker_flag" -ne 1 ]]; then
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # Linux

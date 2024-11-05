@@ -30,6 +30,11 @@ online_commit=$(curl -s "https://api.github.com/repos/HenriquesLab/DL4MicEverywh
 if [[ "$local_commit" != "$online_commit" && "$update" == "Ask first"* ]]; then
     # Check if you need to ask with a GUI
     update_flag=$(wish "$BASEDIR/../../tcl_tools/menubar/ask_update.tcl")
+    
+    if [ -z $update_flag ]; then
+        # In case the user closed the window, it will not be updated
+        update_flag=1
+    fi
 else 
     update_flag=1
 fi
@@ -51,7 +56,11 @@ if [[ "$update" == "Automatically"* || "$update_flag" -ne 1 ]]; then
             curl -L -o update.pack https://github.com/HenriquesLab/DL4MicEverywhere.git/info/refs?service=git-upload-pack
         fi
         echo "Succesfully udpated! The GUI will restart."
-        exit 0
+        echo ""
+        echo "################################"
+        echo ""
+
+        exit 1
     fi
 
     echo ""
