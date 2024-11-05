@@ -195,7 +195,6 @@ else
         if [ "$tag_aux" != "" ]; then
             docker_tag="$tag_aux"
         elif [ "$selectedVersion" != "-" ]; then
-            echo "Selected Version: ${selectedVersion}"
             versioned_docker_tag=$(/bin/bash "$BASEDIR/.tools/bash_tools/get_docker_tag.sh" "$selectedNotebook" "$selectedVersion")
         fi
 
@@ -426,8 +425,6 @@ fi
 if [ -z "$docker_tag" ]; then
     # If no tag has been specified for the docker image, then the default tag will be used (the name of the notebook)
     docker_tag=$aux_docker_tag
-    echo "Docker tag: ${docker_tag}"
-    echo "Docker Hub image: ${docker_hub_image}"
     if [ "$test_flag" -eq 1 ]; then 
         echo "No tag has been specified for the docker image, therefore the default tag $docker_tag will be used."
     fi
@@ -470,7 +467,6 @@ if [ -z "$docker_tag" ]; then
     if [ "$gpu_flag" -eq 1 ]; then
         docker_tag=$docker_tag-gpu
     fi
-    echo "Final docker tag: ${docker_tag}"
 else
     echo "The docker tag $docker_tag has been selected."
     echo ""
@@ -729,10 +725,20 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     if [ "$gpu_flag" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
         docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
+        echo -e "The command used to run this container has been:\n\tdocker run -it --gpus all -p $port:$port -v \"$data_path:/home/data\" -v \"$result_path:/home/results\" --shm-size=256m \"$docker_tag\"  /bin/bash -c \"$docker_command\"" >> "$result_path/docker_info.txt"
     else
         # Run the docker image without activating the GPU
         docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
+        echo -e "The command used to run this container has been:\n\tdocker run -it -p $port:$port -v \"$data_path:/home/data\" -v \"$result_path:/home/results\" --shm-size=256m \"$docker_tag\"  /bin/bash -c \"$docker_command\"" >> "$result_path/docker_info.txt"
     fi
+
+
+    # Read the variables from the yaml file
+    echo -e "Used docker tag has been:\n\t$docker_tag" >> "$result_path/docker_info.txt"
+
+    eval $(parse_yaml "$BASEDIR/construct.yaml" "contruct_info_")
+    echo -e "Used DL4MicEverywhere version has been:\n\t$contruct_info_version" >> "$result_path/docker_info.txt"
+
 else
     echo ""
     echo "------------------------------------"
