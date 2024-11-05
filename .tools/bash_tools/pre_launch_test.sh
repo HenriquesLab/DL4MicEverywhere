@@ -45,7 +45,7 @@ fi
 
 # Check if the update option has been selected and run the script if so
 if [[ "$update" == "Automatically"* || "$update" == "Ask first"* ]]; then
-    /bin/bash "$BASEDIR/pre_build_launch/update_dl4miceverywhere.sh" || exit 1
+    /bin/bash "$BASEDIR/pre_build_launch/update_dl4miceverywhere.sh" "0" || exit 1
 fi
 
 # Check if the clean option has been selected and run the script if so

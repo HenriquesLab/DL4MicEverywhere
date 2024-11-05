@@ -1,8 +1,15 @@
 #! /usr/local/bin/wish
 
+set already_asked [lindex $argv 0]
+
 # Define the shape of the window
-set width 400
-set height 80
+if {"$already_asked" == "0"} {
+    set width 400
+    set height 80
+} else {
+    set width 400
+    set height 60
+}
 set width_offset [expr { ( [winfo vrootwidth  .] - $width  ) / 2 }]
 set height_offset [expr { ( [winfo vrootheight .] - $height ) / 2 }]
 
@@ -14,10 +21,15 @@ pack .fr -fill both -expand 1
 frame .fr.principal -relief raised -borderwidth 1
 pack .fr.principal -fill both -expand 1
 
-label .fr.principal.text_1 -text "Your DL4MicEverywhere version seems to not be up to date." 
-place .fr.principal.text_1 -relx 0.02 -rely 0.1
-label .fr.principal.text_2 -text "Do you want to update DL4MicEverywhere?" 
-place .fr.principal.text_2 -relx 0.02 -rely 0.5
+if {"$already_asked" == "0"} {
+    label .fr.principal.text_1 -text "Your DL4MicEverywhere version seems to not be up to date." 
+    place .fr.principal.text_1 -relx 0.02 -rely 0.1
+    label .fr.principal.text_2 -text "Do you want to update DL4MicEverywhere?" 
+    place .fr.principal.text_2 -relx 0.02 -rely 0.5
+} else {
+    label .fr.principal.text_1 -text "Are you sure that you want to update DL4MicEverywhere?" 
+    place .fr.principal.text_1 -relx 0.02 -rely 0.1
+}
 
 # Define the buttons to submit the information or close the program
 

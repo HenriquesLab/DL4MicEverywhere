@@ -687,13 +687,8 @@ proc cmdpref {}   {
 }
 proc cmdpcheckupdates {}   {
     global basedir
-    catch {exec wish "$basedir/.tools/tcl_tools/menubar/ask_update.tcl"} update_output
-
-    if {"$update_output" == "3"} {
-        exec echo "################################" &
-        exec echo "" &
-        exec /bin/bash  "$basedir/.tools/bash_tools/pre_build_launch/update_dl4miceverywhere.sh" &
-    }
+    # Call the update script update_dl4miceverywhere.sh with argument already_asked=1 (true)
+    exec /bin/bash "$basedir/.tools/bash_tools/pre_build_launch/update_dl4miceverywhere.sh" "1" &
 }
 proc cmddoc {}   {
     global basedir

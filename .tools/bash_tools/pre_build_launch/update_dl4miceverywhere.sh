@@ -1,6 +1,7 @@
 
 #!/bin/bash
 BASEDIR=$(dirname "$(readlink -f "$0")")
+already_asked=$1
 
 if [ -f "$BASEDIR/../../.cache/.cache_preferences" ]; then
     # If this script is called, this file should always exist
@@ -26,28 +27,37 @@ fi
 # Get the latest commit on the DL4MicEverywhere's online repository
 online_commit=$(curl -s "https://api.github.com/repos/HenriquesLab/DL4MicEverywhere/commits/${branch_name}" | grep '"sha"' | head -1 | cut -d '"' -f 4)
 
-
-if [[ "$local_commit" != "$online_commit" && "$update" == "Ask first"* ]]; then
-    # Check if you need to ask with a GUI
-    update_flag=$(wish "$BASEDIR/../../tcl_tools/menubar/ask_update.tcl")
+if [[ "$already_asked" == "1" ]]; then 
+    # Check if an update is need
+    if [[ "$local_commit" == "$online_commit" ]]; then
+        # Tell the user that everything is up to date
+        # One line GUI with just Done button (first argument the title, second one the sentece)
+        wish "$BASEDIR/../../tcl_tools/oneline_done_gui.tcl" "Up to date" "You are up to date!"
+    else
+        # In case is needed, ask the user if they want to update
+        update_flag=$(wish "$BASEDIR/../../tcl_tools/menubar/ask_update.tcl" "$already_asked")
+    fi
+elif [[ "$local_commit" != "$online_commit" && "$update" == "Ask first"* ]]; then
+    # It will enter on pre_build only if an update is needed and the user has "Ask first" as preference
+    update_flag=$(wish "$BASEDIR/../../tcl_tools/menubar/ask_update.tcl" "$already_asked")
     
+    # In case the user closed the window, it will not be updated
     if [ -z $update_flag ]; then
-        # In case the user closed the window, it will not be updated
         update_flag=1
     fi
 else 
+    # Otherwise, no udpate
     update_flag=1
 fi
 
-if [[ "$update" == "Automatically"* || "$update_flag" -ne 1 ]]; then
+if [[ "$update" == "Automatically"* || "$update_flag" -eq 2 ]]; then
 
-    echo "Checking DL4MicEverywhere version ..."
-
+    if [[ "$already_asked" == "0" ]]; then echo "Checking DL4MicEverywhere version ..."; fi
     # Check if the commits match
     if [[ "$local_commit" == "$online_commit" ]]; then
-        echo "You are up to date!"
+        if [[ "$already_asked" == "0" ]]; then echo "You are up to date!"; fi
     else
-        echo "DL4MicEverywhere will be updated ..."
+        if [[ "$already_asked" == "0" ]]; then echo "DL4MicEverywhere will be updated ..."; fi
         if command -v git &> /dev/null; then
             # In case they don't match, update it with git pull if you have git installed
             git pull
@@ -55,16 +65,19 @@ if [[ "$update" == "Automatically"* || "$update_flag" -ne 1 ]]; then
             # Otherwise update it using
             curl -L -o update.pack https://github.com/HenriquesLab/DL4MicEverywhere.git/info/refs?service=git-upload-pack
         fi
-        echo "Succesfully udpated! The GUI will restart."
-        echo ""
-        echo "################################"
-        echo ""
+
+        if [[ "$already_asked" == "0" ]]; then 
+            echo "Succesfully udpated! The GUI will restart."
+        else
+            wish "$BASEDIR/../../tcl_tools/oneline_done_gui.tcl" "Succesfully updated" "Succesfully udpated! The GUI will restart."
+        fi
 
         exit 1
     fi
 
-    echo ""
-    echo "################################"
-    echo ""
-
+    if [[ "$already_asked" == "0" ]]; then 
+        echo ""
+        echo "################################"
+        echo ""
+    fi
 fi
