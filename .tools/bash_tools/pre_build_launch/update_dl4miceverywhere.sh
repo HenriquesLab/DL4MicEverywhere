@@ -10,8 +10,6 @@ else
     exit 0
 fi
 
-echo "Checking DL4MicEverywhere version ..."
-
 # Check if Git is installed
 if command -v git &> /dev/null; then
     # Get the name of the local branch
@@ -28,33 +26,36 @@ fi
 # Get the latest commit on the DL4MicEverywhere's online repository
 online_commit=$(curl -s "https://api.github.com/repos/HenriquesLab/DL4MicEverywhere/commits/${branch_name}" | grep '"sha"' | head -1 | cut -d '"' -f 4)
 
-# Check if the commits match
-if [[ "$local_commit" == "$online_commit" ]]; then
-    echo "You are up to date!"
-else
-    if command -v git &> /dev/null; then
-        # In case they don't match, update it with git pull if you have git installed
-        if [[ "$update" == "Ask first"* ]]; then
-            # Check if you need to ask with a GUI
-            update_flag=$(wish "$BASEDIR/../tcl_tools/update_gui.tcl")
-        fi
 
-        if [[ "$update" == "Automatically"* || "$update_flag" -ne 1 ]]; then
-            git pull
-        fi
-    else
-        # Otherwise update it using
-        if [[ "$update" == "Ask first"* ]]; then
-            # Check if you need to ask with a GUI
-            update_flag=$(wish "$BASEDIR/../tcl_tools/update_gui.tcl")
-        fi
-
-        if [[ "$update" == "Automatically"* || "$update_flag" -ne 1 ]]; then
-            curl -L -o update.pack https://github.com/HenriquesLab/DL4MicEverywhere.git/info/refs?service=git-upload-pack
-        fi
-    fi
+if [[ "$local_commit" != "$online_commit" && "$update" == "Ask first"* ]]; then
+    # Check if you need to ask with a GUI
+    update_flag=$(wish "$BASEDIR/../../tcl_tools/menubar/ask_update.tcl")
+else 
+    update_flag=1
 fi
 
-echo ""
-echo "################################"
-echo ""
+if [[ "$update" == "Automatically"* || "$update_flag" -ne 1 ]]; then
+
+    echo "Checking DL4MicEverywhere version ..."
+
+    # Check if the commits match
+    if [[ "$local_commit" == "$online_commit" ]]; then
+        echo "You are up to date!"
+    else
+        echo "DL4MicEverywhere will be updated ..."
+        if command -v git &> /dev/null; then
+            # In case they don't match, update it with git pull if you have git installed
+            git pull
+        else
+            # Otherwise update it using
+            curl -L -o update.pack https://github.com/HenriquesLab/DL4MicEverywhere.git/info/refs?service=git-upload-pack
+        fi
+        echo "Succesfully udpated! The GUI will restart."
+        exit 0
+    fi
+
+    echo ""
+    echo "################################"
+    echo ""
+
+fi
