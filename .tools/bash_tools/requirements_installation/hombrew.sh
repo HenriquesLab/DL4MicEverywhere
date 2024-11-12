@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "Installing Homebrew..."
 
 # Export non interactive variable to avoid asking for input

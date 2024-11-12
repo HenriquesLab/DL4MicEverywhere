@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "Installing Docker..."
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then

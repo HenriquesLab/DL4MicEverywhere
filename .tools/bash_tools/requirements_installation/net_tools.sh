@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "Installing net-tools..."
 
 sudo apt-get -y update

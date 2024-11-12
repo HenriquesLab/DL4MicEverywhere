@@ -1,3 +1,4 @@
+#!/bin/bash
 
 echo "Installing TCL/TK..."
 

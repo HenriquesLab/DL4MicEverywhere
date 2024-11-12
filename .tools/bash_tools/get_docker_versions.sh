@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # Get the basedir

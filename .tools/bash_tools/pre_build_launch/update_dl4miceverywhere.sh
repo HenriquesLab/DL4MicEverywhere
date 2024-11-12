@@ -1,5 +1,5 @@
-
 #!/bin/bash
+
 BASEDIR=$(dirname "$(readlink -f "$0")")
 already_asked=$1
 

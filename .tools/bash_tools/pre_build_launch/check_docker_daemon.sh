@@ -1,3 +1,4 @@
+#!/bin/bash
 
 echo "WARNING: Docker daemon is not running."
 

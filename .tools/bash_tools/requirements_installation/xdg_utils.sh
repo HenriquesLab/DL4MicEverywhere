@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "Installing xdg-utils..."
 
 sudo apt-get -y update

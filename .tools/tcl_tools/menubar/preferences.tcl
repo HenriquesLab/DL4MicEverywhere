@@ -76,7 +76,8 @@ label .fr.principal.notebook_label -text "Containerisation system:"
 place .fr.principal.notebook_label -relx 0.03 -rely 0.02
 
 set selectedContSystem ${cache_containerisation}
-set listContSystem [list "Docker" "Singularity"]
+set listContSystem [list "Docker"]
+# set listContSystem [list "Docker" "Singularity"]
 
 ttk::combobox .fr.principal.containerization -values $listContSystem -textvariable selectedContSystem -state readonly
 place .fr.principal.containerization -relx 0.48 -rely 0.02

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "Releasing Docker memory ..."
 
 # This will remove:
