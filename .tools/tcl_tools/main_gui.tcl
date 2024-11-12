@@ -692,7 +692,7 @@ proc cmdpcheckupdates {}   {
 }
 proc cmddoc {}   {
     global basedir
-    exec wish "$basedir/.tools/tcl_tools/menubar/documentation.tcl"
+    exec /bin/bash "$basedir/.tools/bash_tools/open_browser.sh" "https://github.com/HenriquesLab/DL4MicEverywhere?tab=readme-ov-file#dl4miceverywhere" &
 }
 
 ##### Create a window #####
