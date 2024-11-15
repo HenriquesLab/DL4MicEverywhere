@@ -44,12 +44,16 @@ if ! command -v wish &> /dev/null; then
     else
         any_installation_flag=1
     fi
-
-    # Once TCL/TK is installed, launch the settings/preferences window
-    /bin/bash "$basedir/.tools/bash_tools/cache_preferences.sh"
 else
     echo "TCL/TK already installed."
 fi 
+
+
+# Once TCL/TK is installed or if you know that is installed, launch the settings/preferences window
+# Only launch it if it has not been done yet, a.k.a. the preferences cache file does not exist
+if [ ! -f "$BASEDIR/../.cache/.cache_preferences" ]; then
+    /bin/bash "$BASEDIR/../bash_tools/cache_preferences.sh"
+fi
 
 # Verify if xdg-open is installed on the system and otherwise install it
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
