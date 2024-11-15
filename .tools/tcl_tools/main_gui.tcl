@@ -692,11 +692,11 @@ bind .fr <Control-d> cmddoc
 
 proc cmdabout {} {
     global basedir
-    exec wish "$basedir/.tools/tcl_tools/menubar/general_info.tcl"
+    exec wish "$basedir/.tools/tcl_tools/menubar/about.tcl" "$basedir"
 }
 proc cmdpref {}   {
     global basedir
-    exec /bin/bash "$basedir/.tools/bash_tools/configure_preferences.sh"
+    exec /bin/bash "$basedir/.tools/bash_tools/cache_preferences.sh"
 }
 proc cmdpcheckupdates {}   {
     global basedir
@@ -705,7 +705,7 @@ proc cmdpcheckupdates {}   {
 }
 proc cmddoc {}   {
     global basedir
-    exec /bin/bash "$basedir/.tools/bash_tools/open_browser.sh" "https://github.com/HenriquesLab/DL4MicEverywhere?tab=readme-ov-file#dl4miceverywhere" &
+    exec /bin/bash "$basedir/.tools/bash_tools/open_browser.sh" 1 "https://github.com/HenriquesLab/DL4MicEverywhere?tab=readme-ov-file#dl4miceverywhere" &
 }
 
 ##### Create a window #####

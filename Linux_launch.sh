@@ -348,20 +348,25 @@ rename_parsed_argument sections_to_remove # Not required to be present and there
 rename_parsed_argument dl4miceverywhere_version # Not required to be present and therefore the cheking is skipped
 rename_parsed_argument docker_hub_image # Not required to be present and therefore the cheking is skipped
 
+# Check if the notebook path is missing (SIMPLE USECASE) 
 if [ -z "$notebook_path" ]; then
-    # Use the URL from the configuration file if no local notebook path is specified
+    # Then the URL from the configuration file is used as notebook path
     notebook_path="${notebook_url}"
 
-    # If there is no versioned tag
-    if [ -z "$versioned_docker_tag" ]; then
-        # Set the docker's tag if not specified
-        if [ -z "$docker_hub_image" ]; then
-            aux_docker_tag="$(basename "$notebook_path" .ipynb)"
-        else
-            aux_docker_tag="${docker_hub_image}"
-        fi
-    else
+    # For the auxiliar docker tag, check if there is a notebook version
+    if [ ! -z "$versioned_docker_tag" ]; then
+        # If so, the corresponding versioned docker tag will be used as the auxiliar one
         aux_docker_tag="${versioned_docker_tag}"
+    else
+        # Otherwise, if the version is missing, 
+        # check if on advanced mode a docker hub image name has been selected
+        if [ ! -z "$docker_hub_image" ]; then
+            # If so, assign it as auxiliar docker tag
+            aux_docker_tag="${docker_hub_image}"
+        else
+            # Otherwise, assing it from the notebook name 
+            aux_docker_tag="$(basename "$notebook_path" .ipynb)"
+        fi
     fi
 
     if [ "$test_flag" -eq 1 ]; then
@@ -778,7 +783,7 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     echo ""
 
     # Launch a subprocess to open the browser with the port in 10 seconds
-    /bin/bash "$BASEDIR/.tools/bash_tools/open_browser.sh" "http://localhost:$port/lab/tree/$notebook_name/?token=$notebook_token" &
+    /bin/bash "$BASEDIR/.tools/bash_tools/open_browser.sh" 10 "http://localhost:$port/lab/tree/$notebook_name/?token=$notebook_token" &
 
     # Define the command that will be run when the docker image is launched
     docker_command="jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token; cp /home/docker_info.txt /home/results/docker_info.txt; cp /home/$notebook_name /home/results/$notebook_name;" 

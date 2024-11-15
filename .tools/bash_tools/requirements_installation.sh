@@ -44,6 +44,9 @@ if ! command -v wish &> /dev/null; then
     else
         any_installation_flag=1
     fi
+
+    # Once TCL/TK is installed, launch the settings/preferences window
+    /bin/bash "$basedir/.tools/bash_tools/cache_preferences.sh"
 else
     echo "TCL/TK already installed."
 fi 
