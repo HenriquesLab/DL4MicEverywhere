@@ -79,7 +79,7 @@ selected_notebook : $4
 config_path : $5
 notebook_path : $6
 requirements_path : $7
-gpu_flag : $8
+flag_gpu : $8
 selected_version : $9
 tag : ${10}
 advanced_options : ${11}" > "$BASEDIR/.tools/.cache/.cache_gui"
@@ -109,10 +109,13 @@ function parse_yaml {
 }
 
 # Let's define the default values for the flags
-gpu_flag=0
-test_flag=0
-local_notebook_flag=0
-local_requirements_flag=0
+flag_gpu=0
+flag_test=0
+flag_local_notebook=0
+flag_local_requirements=0
+
+# Flag to check if a version was selected
+flag_version_selected=0
 
 # Let's parse the arguments
 while getopts :hc:d:o:gn:r:t:p:x flag;do
@@ -127,7 +130,7 @@ while getopts :hc:d:o:gn:r:t:p:x flag;do
             result_path="$OPTARG" ;;
         g)
             if nvidia-smi &> /dev/null; then
-                gpu_flag=1
+                flag_gpu=1
             else
                 echo ""
                 echo "Sorry, there is no configured Nvidia graphic card on your device, the docker image will be created without GPU."
@@ -142,7 +145,7 @@ while getopts :hc:d:o:gn:r:t:p:x flag;do
         p)
             port_number="$OPTARG" ;;
         x)
-            test_flag=1 ;;
+            flag_test=1 ;;
         \?)
             echo "Invalid option: -$OPTARG"
             echo "Try bash ./launch.sh -h for more information."
@@ -153,22 +156,19 @@ done
 
 # If no arguments are provided, set the GUI flag
 if [ $# -eq 0 ]; then
-    gui_flag=1
+    flag_gui=1
 else 
-    gui_flag=0
+    flag_gui=0
 fi
 
-# Flag to check if a version was selected
-flag_version_selected=0
-
 # Check if test mode is active
-if [ "$test_flag" -eq 1 ]; then
+if [ "$flag_test" -eq 1 ]; then
     echo 'Test mode is enabled.'
 fi
 
-if [ $gui_flag -eq 0 ]; then 
+if [ $flag_gui -eq 0 ]; then 
     # If GUI is not requested
-    if [ "$test_flag" -eq 1 ]; then
+    if [ "$flag_test" -eq 1 ]; then
         echo "GUI is not requested, proceeding without GUI."
     fi
 else
@@ -189,11 +189,11 @@ else
         result_path="${strarr[2]}"
         selectedFolder="${strarr[3]}"
         selectedNotebook="${strarr[4]}"
-        gpu_flag="${strarr[5]}"
+        flag_gpu="${strarr[5]}"
         selectedVersion="${strarr[6]}"
         tag_aux="${strarr[7]}"
 
-        cache_gui "$data_path" "$result_path" "$selectedFolder" "$selectedNotebook" "" "" "" "$gpu_flag" "$selectedVersion" "$tag_aux" "$advanced_options"
+        cache_gui "$data_path" "$result_path" "$selectedFolder" "$selectedNotebook" "" "" "" "$flag_gpu" "$selectedVersion" "$tag_aux" "$advanced_options"
 
         if [ "$tag_aux" != "" ]; then
             docker_tag="$tag_aux"
@@ -212,11 +212,11 @@ else
         notebook_aux="${strarr[4]}"
         requirements_aux="${strarr[5]}"
         
-        gpu_flag="${strarr[6]}"
+        flag_gpu="${strarr[6]}"
         selectedVersion="${strarr[7]}"
         tag_aux="${strarr[8]}"
 
-        cache_gui "$data_path" "$result_path" "" "" "$config_path" "$notebook_aux" "$requirements_aux" "$gpu_flag" "" "$tag_aux" "$advanced_options"
+        cache_gui "$data_path" "$result_path" "" "" "$config_path" "$notebook_aux" "$requirements_aux" "$flag_gpu" "" "$tag_aux" "$advanced_options"
 
         if [ "$notebook_aux" != "-" ]; then
             notebook_path="$notebook_aux"
@@ -245,12 +245,12 @@ if [ -z "$config_path" ]; then
 else
     # If a configuration path has been specified, check if it is valid
     if [[ -d "$config_path" ]]; then
-        if [ "$test_flag" -eq 1 ]; then
+        if [ "$flag_test" -eq 1 ]; then
             echo "Path to the configuration folder: $config_path"
         fi
         config_path="$config_path/configuration.yaml"
     elif [[ -f "$config_path" ]]; then
-        if [ "$test_flag" -eq 1 ]; then
+        if [ "$flag_test" -eq 1 ]; then
             echo "Path to the configuration folder: $config_path"
         fi
     else
@@ -279,7 +279,7 @@ if [ -z "$data_path" ]; then
 else
     # Validate the specified data path
     if [[ -d "$data_path" ]]; then
-        if [ "$test_flag" -eq 1 ]; then
+        if [ "$flag_test" -eq 1 ]; then
             echo "Data path: $data_path"
         fi
     else
@@ -308,7 +308,7 @@ if [ -z "$result_path" ]; then
 else
     # Validate the specified result path
     if [[ -d "$result_path" ]]; then
-        if [ "$test_flag" -eq 1 ]; then
+        if [ "$flag_test" -eq 1 ]; then
             echo "Result path: $result_path"
         fi
     else
@@ -323,9 +323,9 @@ else
     fi
 fi 
 
-if [ "$test_flag" -eq 1 ]; then
+if [ "$flag_test" -eq 1 ]; then
     # If the test flag is set, print whether the GPU flag has been set
-    if [ "$gpu_flag" -eq 1 ]; then
+    if [ "$flag_gpu" -eq 1 ]; then
         echo 'GPU usage is enabled.'
     else
         echo 'GPU usage is disabled.'
@@ -369,7 +369,7 @@ if [ -z "$notebook_path" ]; then
         fi
     fi
 
-    if [ "$test_flag" -eq 1 ]; then
+    if [ "$flag_test" -eq 1 ]; then
         echo "Since no notebook was specified, the notebook URL from 'configuration.yaml' will be used."
     fi
 else
@@ -388,12 +388,12 @@ else
 
     if [ -f "$notebook_path" ]; then
     
-        if [ "$test_flag" -eq 1 ]; then
+        if [ "$flag_test" -eq 1 ]; then
             echo "Path to the notebook: $notebook_path"
         fi
         
         # If the notebook path is not valid, activate its flag for future processing
-        local_notebook_flag=1
+        flag_local_notebook=1
     else
         echo ""
         echo "------------------------------------"
@@ -408,18 +408,18 @@ fi
 if [ -z "$requirements_path" ]; then
     # If no local requirements path has been specified, then the URL from the configuration file will be used
     requirements_path="${requirements_url}"
-    local_requirements_flag=0
-    if [ "$test_flag" -eq 1 ]; then 
+    flag_local_requirements=0
+    if [ "$flag_test" -eq 1 ]; then 
         echo "No requirements file has been specified, therefore the requirements url specified on 'configuration.yaml' will be used."
     fi
 else
     # Otherwise check if the path is valid
     if [ -f "$requirements_path" ]; then
-        if [ "$test_flag" -eq 1 ]; then 
+        if [ "$flag_test" -eq 1 ]; then 
             echo "Path to the requirements file: $requirements_path"
         fi
         # If the notebook path is not valid, activate its flag for future processing
-        local_requirements_flag=1
+        flag_local_requirements=1
     else
         echo ""
         echo "------------------------------------"
@@ -434,7 +434,7 @@ fi
 if [ -z "$docker_tag" ]; then
     # If no tag has been specified for the docker image, then the default tag will be used (the name of the notebook)
     docker_tag=$aux_docker_tag
-    if [ "$test_flag" -eq 1 ]; then 
+    if [ "$flag_test" -eq 1 ]; then 
         echo "No tag has been specified for the docker image, therefore the default tag $docker_tag will be used."
     fi
 
@@ -473,7 +473,7 @@ if [ -z "$docker_tag" ]; then
     fi
 
     # Check if GPU has been requested and add it to the tag if necessary
-    if [ "$gpu_flag" -eq 1 ]; then
+    if [ "$flag_gpu" -eq 1 ]; then
         docker_tag=$docker_tag-gpu
     fi
 else
@@ -483,9 +483,7 @@ else
     echo ""
 fi
 
-
-# Set the docker's tag
-if [ "$test_flag" -eq 1 ]; then
+if [ "$flag_test" -eq 1 ]; then
     echo ""
     echo "ubuntu_version: $ubuntu_version"
     echo "cuda_version: $cuda_version"
@@ -504,12 +502,12 @@ notebook_name="$(basename "$notebook_path")"
 
 # Local files, if included, need to be remocreated in same folder as the dockerfile,
 # then they will be deleted
-if [ "$local_notebook_flag" -eq 1 ]; then
+if [ "$flag_local_notebook" -eq 1 ]; then
     cp "$notebook_path" "$BASEDIR/notebook.ipynb"
     notebook_path=./notebook.ipynb
 fi
 
-if [ "$local_requirements_flag" -eq 1 ]; then
+if [ "$flag_local_requirements" -eq 1 ]; then
    cp "$requirements_path" "$BASEDIR/requirements.txt"
    requirements_path=./requirements.txt
 fi
@@ -537,39 +535,41 @@ fi
 ###
 
 # Check if an image with that tag exists locally and ask if the user whants to replace it.
-build_flag=0
+flag_build=0
 
 # In case testing is chossing, the building is forced to be done, without questions
-if [ "$test_flag" -eq 1 ]; then
+if [ "$flag_test" -eq 1 ]; then
     # In case of testing, the building is always done
-    build_flag=2
+    flag_build=2
 else
-
     if [[ "$containerisation" == "Docker"* ]]; then
+        # Check if there is a docker image with that tag locally
         if docker image inspect $docker_tag >/dev/null 2>&1; then
-            if [ "$gui_flag" -eq 1 ]; then 
+            # If so, ask the user with GUI or CLI if the user wants to use local image or replace it
+            if [ "$flag_gui" -eq 1 ]; then 
                 # If the GUI flag has been specified, show a window for ansewring local question
-                build_flag=$(wish "$BASEDIR/.tools/tcl_tools/local_img_gui.tcl" $OSTYPE)
+                flag_build=$(wish "$BASEDIR/.tools/tcl_tools/local_img_gui.tcl" $OSTYPE)
             else
                 echo "Image exists locally. Do you want to build and replace the existing one?"
                 select yn in "Yes" "No"; do
                     case $yn in
-                        Yes ) build_flag=2; break;;
-                        No ) build_flag=1; break;;
+                        Yes ) flag_build=2; break;;
+                        No ) flag_build=1; break;;
                     esac
                 done
             fi
         fi
-    
-        if [ "$build_flag" -ne 1 ]; then
-            # In case the local image option has not been selected
 
+        # Check if flag_build is not 1 (docker image was not locally or the user wanted to replace it)
+        if [ "$flag_build" -ne 1 ]; then
+            # If so, check if there is a docker image with that tag on Docker Hub
             if docker manifest inspect "${docker_tag}" >/dev/null 2>&1; then
-                # In case the image is available on Docker Hub
+                # If so, check the architecture of running machine
 
                 # Get the architecture of the machine
                 local_arch=$(uname -m)
 
+                # It should be amd64 or arm64
                 if [ "$local_arch" == "x86_64" ]; then
                     local_arch="amd64"
                 fi
@@ -577,6 +577,7 @@ else
                 # Count the ocurrences of that architecture in the docker manifest of that image
                 arch_count=$(docker manifest inspect "${docker_tag}" -v | grep 'architecture' | grep -c $local_arch)
 
+                # Check if there was at least an ocurrence of that architecture
                 if [ "$arch_count" -gt 0 ]; then
                     # In case the architecture is available
 
@@ -587,17 +588,18 @@ else
                         title="Download from Docker Hub"
                         message="You chose ${docker_tag}, the image will be downloaded from Docker Hub."
                         eval $(wish "$BASEDIR/.tools/tcl_tools/oneline_done_gui.tcl" "$title" "$message")
+                        flag_build=3
                     else
                         # If the version was NOT specified
-                        if [ "$gui_flag" -eq 1 ]; then 
+                        if [ "$flag_gui" -eq 1 ]; then 
                             # If the GUI flag has been specified, show a window for ansewring hub question
-                            build_flag=$(wish "$BASEDIR/.tools/tcl_tools/hub_img_gui.tcl" "$OSTYPE")
+                            flag_build=$(wish "$BASEDIR/.tools/tcl_tools/hub_img_gui.tcl" "$OSTYPE")
                         else
                             echo "The image ${docker_tag} is already available on Docker Hub. Do you preffer to pull it (faster option) instead of building it?"
                             select yn in "Yes" "No"; do
                                 case $yn in
-                                    Yes ) build_flag=3; break;;
-                                    No )  build_flag=2; break;;
+                                    Yes ) flag_build=3; break;;
+                                    No )  flag_build=2; break;;
                                 esac
                             done
                         fi
@@ -613,7 +615,7 @@ else
                         # could not be found on Docker Hub
                         title="Error: Image not avilable"
                         error_message="Selected version of the image is not available in Docker Hub for your computer. Please try another version or do not chose any."
-                        if [ "$gui_flag" -eq 1 ]; then 
+                        if [ "$flag_gui" -eq 1 ]; then 
                             # If the GUI flag has been specified, show a window with the message
                             eval $(wish "$BASEDIR/.tools/tcl_tools/oneline_done_gui.tcl" "$title" "$error_message")
                         else
@@ -627,7 +629,7 @@ else
                     else
                         # If the architecture is not available on Docker Hub and the user didn't 
                         # ask for a specific version, try to build it locally
-                        build_flag=2
+                        flag_build=2
                     fi
                 fi
             else
@@ -638,7 +640,7 @@ else
                     # could not be found on Docker Hub
                     title="Error: Image not avilable"
                     error_message="Selected version of the image is not available in Docker Hub for your computer. Please try another version or do not chose any."
-                    if [ "$gui_flag" -eq 1 ]; then 
+                    if [ "$flag_gui" -eq 1 ]; then 
                         # If the GUI flag has been specified, show a window with the message
                         eval $(wish "$BASEDIR/.tools/tcl_tools/oneline_done_gui.tcl" "$title" "$error_message")
                     else
@@ -652,21 +654,32 @@ else
                 else
                     # If the architecture is not available on Docker Hub and the user didn't 
                     # ask for a specific version, try to build it locally
-                    build_flag=2
+                    flag_build=2
                 fi
             fi
         fi
     fi
 fi
 
-# Pull the docker image from docker hub
-if [ "$build_flag" -eq 3 ]; then
+if [ "$flag_build" -eq 3 ]; then
+    echo "The image will be pulled from Docker Hub."
+elif [ "$flag_build" -eq 2 ]; then
+    echo "The image will be built locally."
+elif [ "$flag_build" -eq 1 ]; then
+    echo "A local version of the image will be used."
+else
+    echo "SOMETHING WENT WRONG :("
+fi
+
+# If flag_build is 3 the pull the docker image from docker hub
+if [ "$flag_build" -eq 3 ]; then
+    # Pull the docker image
     docker pull "$docker_tag"
     DOCKER_OUT=$? # Gets if the docker image has been pulled
 else
     # Build the docker image without GUI
-    if [ "$build_flag" -eq 2 ]; then
-        if [ "$gpu_flag" -eq 1 ]; then
+    if [ "$flag_build" -eq 2 ]; then
+        if [ "$flag_gpu" -eq 1 ]; then
             echo "To build the docker image, you need to provide root access by entering your password."
             echo "Otherwise, you can choose the option of getting the image from Docker Hub or follow"
             echo "the steps in our documentation."
@@ -674,7 +687,7 @@ else
                 --build-arg UBUNTU_VERSION="${ubuntu_version}" \
                 --build-arg CUDA_VERSION="${cuda_version}" \
                 --build-arg CUDNN_VERSION="${cudnn_version}" \
-                --build-arg GPU_FLAG="${gpu_flag}" \
+                --build-arg flag_gpu="${flag_gpu}" \
                 --build-arg PYTHON_VERSION="${python_version}" \
                 --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
                 --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
@@ -687,7 +700,7 @@ else
             echo "the steps in our documentation."
             sudo docker build --file "$BASEDIR/Dockerfile" -t $docker_tag "$BASEDIR"\
                 --build-arg UBUNTU_VERSION="${ubuntu_version}" \
-                --build-arg GPU_FLAG="${gpu_flag}" \
+                --build-arg flag_gpu="${flag_gpu}" \
                 --build-arg PYTHON_VERSION="${python_version}" \
                 --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
                 --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
@@ -698,14 +711,14 @@ else
 
         DOCKER_OUT=$? # Gets if the docker image has been built
     else
-        if [ "$build_flag" -eq 1 ]; then
+        if [ "$flag_build" -eq 1 ]; then
             DOCKER_OUT=0 # In case that is already built, it is good to run
         else
             # build flag is still 0, an error ocurred
             echo ""
             echo "------------------------------------"
-            echo "Error looking for existing docker"
-            echo "image with the given tag: $docker_tag"
+            echo "Error looking for existing docker image with the given tag:"
+            echo "$docker_tag"
             read -p "Press enter to close the terminal."
             echo "------------------------------------" 
             # Close the terminal
@@ -714,23 +727,27 @@ else
     fi
 fi
 
+echo "Docker image correctly built/pulled"
+
 # Execute the post building tests
 /bin/bash "$BASEDIR/.tools/bash_tools/post_build_test.sh" || exit 1
 
 sleep 3
 
 # Local files, if included, need to be removed to avoid the overcrowding the folder
-if [ "$local_notebook_flag" -eq 1 ]; then
+if [ "$flag_local_notebook" -eq 1 ]; then
    rm "$BASEDIR/notebook.ipynb"
 fi
 
-if [ "$local_requirements_flag" -eq 1 ]; then
+if [ "$flag_local_requirements" -eq 1 ]; then
    rm "$BASEDIR/requirements.txt"
 fi
 
+echo "$DOCKER_OUT"
+
 # If it has been built, run the docker
 if [ "$DOCKER_OUT" -eq 0 ]; then
-    if [ $test_flag -eq 1 ]; then
+    if [ $flag_test -eq 1 ]; then
         # In case ,testing is done, only building is required, exit before running
         exit 0
     fi
@@ -788,7 +805,7 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     # Define the command that will be run when the docker image is launched
     docker_command="jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token; cp /home/docker_info.txt /home/results/docker_info.txt; cp /home/$notebook_name /home/results/$notebook_name;" 
 
-    if [ "$gpu_flag" -eq 1 ]; then
+    if [ "$flag_gpu" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
         docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
         echo -e "The command used to run this container has been:\n\tdocker run -it --gpus all -p $port:$port -v \"$data_path:/home/data\" -v \"$result_path:/home/results\" --shm-size=256m \"$docker_tag\"  /bin/bash -c \"$docker_command\"" >> "$result_path/docker_info.txt"
