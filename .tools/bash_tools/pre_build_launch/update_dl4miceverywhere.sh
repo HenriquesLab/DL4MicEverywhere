@@ -36,15 +36,20 @@ if [[ "$already_asked" == "1" ]]; then
     else
         # In case is needed, ask the user if they want to update
         update_flag=$(wish "$BASEDIR/../../tcl_tools/menubar/ask_update.tcl" "$already_asked")
+        
+        # In case the user closed the window, it will not be updated
+        if [ -z $update_flag ]; then
+            update_flag=1
+        fi
     fi
 elif [[ "$local_commit" != "$online_commit" && "$update" == "Ask first"* ]]; then
-    # It will enter on pre_build only if an update is needed and the user has "Ask first" as preference
-    update_flag=$(wish "$BASEDIR/../../tcl_tools/menubar/ask_update.tcl" "$already_asked")
-    
-    # In case the user closed the window, it will not be updated
-    if [ -z $update_flag ]; then
-        update_flag=1
-    fi
+        # It will enter on pre_build only if an update is needed and the user has "Ask first" as preference
+        update_flag=$(wish "$BASEDIR/../../tcl_tools/menubar/ask_update.tcl" "$already_asked")
+        
+        # In case the user closed the window, it will not be updated
+        if [ -z $update_flag ]; then
+            update_flag=1
+        fi
 else 
     # Otherwise, no udpate
     update_flag=1
