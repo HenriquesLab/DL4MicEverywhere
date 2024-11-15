@@ -1,11 +1,13 @@
 #!/bin/bash
-
+BASEDIR=$(dirname "$(readlink -f "$0")")
 echo "WARNING: Docker daemon is not running."
 
-# Launch the Windows asking the user to launch Docker Desktop
-docker_flag=$(wish "$BASEDIR/../tcl_tools/docker_desktop_gui.tcl")
+# Launch the window asking the user to launch Docker Desktop
+docker_flag=$(wish "$BASEDIR/../../tcl_tools/docker_desktop_gui.tcl")
+# docker_flag == 3 --> Yes, launch
+# docker_flag == 2 --> No, do not launch
 
-if [[ "$docker_flag" -ne 1 ]]; then
+if [[ "$docker_flag" -ne 2 ]]; then
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # Linux
         if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then

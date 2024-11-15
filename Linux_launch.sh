@@ -158,6 +158,9 @@ else
     gui_flag=0
 fi
 
+# Flag to check if a version was selected
+flag_version_selected=0
+
 # Check if test mode is active
 if [ "$test_flag" -eq 1 ]; then
     echo 'Test mode is enabled.'
@@ -195,6 +198,7 @@ else
         if [ "$tag_aux" != "" ]; then
             docker_tag="$tag_aux"
         elif [ "$selectedVersion" != "-" ]; then
+            flag_version_selected=1
             versioned_docker_tag=$(/bin/bash "$BASEDIR/.tools/bash_tools/get_docker_tag.sh" "$selectedNotebook" "$selectedVersion")
         fi
 
@@ -556,7 +560,7 @@ else
             # In case the local image option has not been selected
 
             if docker manifest inspect "${docker_tag}" >/dev/null 2>&1; then
-                # In case the image is available on docker hub
+                # In case the image is available on Docker Hub
 
                 # Get the architecture of the machine
                 local_arch=$(uname -m)
@@ -570,24 +574,81 @@ else
 
                 if [ "$arch_count" -gt 0 ]; then
                     # In case the architecture is available
-                    if [ "$gui_flag" -eq 1 ]; then 
-                        # If the GUI flag has been specified, show a window for ansewring hub question
-                        build_flag=$(wish "$BASEDIR/.tools/tcl_tools/hub_img_gui.tcl" "$OSTYPE")
+
+                    # First check if a version was specified, because in that case it can 
+                    # only pull from docker hub
+                    if [ "$flag_version_selected" -eq 1 ]; then
+                        # If the version was specified
+                        title="Download from Docker Hub"
+                        message="You chose ${docker_tag}, the image will be downloaded from Docker Hub."
+                        eval $(wish "$BASEDIR/.tools/tcl_tools/oneline_done_gui.tcl" "$title" "$message")
                     else
-                        echo "The image ${docker_tag} is already available on docker hub. Do you preffer to pull it (faster option) instead of building it?"
-                        select yn in "Yes" "No"; do
-                            case $yn in
-                                Yes ) build_flag=3; break;;
-                                No )  build_flag=2; break;;
-                            esac
-                        done
+                        # If the version was NOT specified
+                        if [ "$gui_flag" -eq 1 ]; then 
+                            # If the GUI flag has been specified, show a window for ansewring hub question
+                            build_flag=$(wish "$BASEDIR/.tools/tcl_tools/hub_img_gui.tcl" "$OSTYPE")
+                        else
+                            echo "The image ${docker_tag} is already available on Docker Hub. Do you preffer to pull it (faster option) instead of building it?"
+                            select yn in "Yes" "No"; do
+                                case $yn in
+                                    Yes ) build_flag=3; break;;
+                                    No )  build_flag=2; break;;
+                                esac
+                            done
+                        fi
                     fi
+
+                    
                 else
                     # In case the architecture is not available
-                    build_flag=2
+
+                    # First check if a version was given  
+                    if [ "$flag_version_selected" -eq 1 ]; then
+                        # If the version was specified, throug an error that this version 
+                        # could not be found on Docker Hub
+                        title="Error: Image not avilable"
+                        error_message="Selected version of the image is not available in Docker Hub for your computer. Please try another version or do not chose any."
+                        if [ "$gui_flag" -eq 1 ]; then 
+                            # If the GUI flag has been specified, show a window with the message
+                            eval $(wish "$BASEDIR/.tools/tcl_tools/oneline_done_gui.tcl" "$title" "$error_message")
+                        else
+                            echo "$error_message"
+                        fi
+                        echo ""
+                        echo "------------------------------------"
+                        read -p "Press enter to close the terminal."
+                        echo "------------------------------------" 
+                        exit 1
+                    else
+                        # If the architecture is not available on Docker Hub and the user didn't 
+                        # ask for a specific version, try to build it locally
+                        build_flag=2
+                    fi
                 fi
             else
-                build_flag=2
+                # In case the image is NOT available on Docker Hub
+                # First check if a version was given  
+                if [ "$flag_version_selected" -eq 1 ]; then
+                    # If the version was specified, throug an error that this version 
+                    # could not be found on Docker Hub
+                    title="Error: Image not avilable"
+                    error_message="Selected version of the image is not available in Docker Hub for your computer. Please try another version or do not chose any."
+                    if [ "$gui_flag" -eq 1 ]; then 
+                        # If the GUI flag has been specified, show a window with the message
+                        eval $(wish "$BASEDIR/.tools/tcl_tools/oneline_done_gui.tcl" "$title" "$error_message")
+                    else
+                        echo "$error_message"
+                    fi
+                    echo ""
+                    echo "------------------------------------"
+                    read -p "Press enter to close the terminal."
+                    echo "------------------------------------" 
+                    exit 1
+                else
+                    # If the architecture is not available on Docker Hub and the user didn't 
+                    # ask for a specific version, try to build it locally
+                    build_flag=2
+                fi
             fi
         fi
     fi

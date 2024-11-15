@@ -9,7 +9,7 @@ function get_yaml_args_from_file {
    local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
    sed -ne "s|^\($s\):|\1|" \
         -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
-        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  "$1" |
+        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" "$1" |
    awk -F$fs '{
       indent = length($1)/2;
       vname[indent] = $2;
@@ -26,17 +26,11 @@ function get_yaml_args_from_file {
    }'
 }
 
-notebook_name="$1"
-notebook_version="$2"
-
 # Extract information from the cached versionings
-eval $(get_yaml_args_from_file "$BASEDIR/../.cache/.cache_versioning" "var_")
-# Extract the version list from the cached versioning
-non_dot_notebook_name="$(echo "$notebook_name" | tr . _ | tr - _)"
-# The version might have `(latest)` at the end, if so remove it
-non_dot_notebook_version="$(echo "$notebook_version" | tr . _ | tr - _  | sed -e "s/(latest)$//")"
-notebook_variable="var_${non_dot_notebook_name}_${non_dot_notebook_version}"
+eval $(get_yaml_args_from_file "$BASEDIR/../../construct.yaml" "var_")
 
-notebook_tag=${!notebook_variable}
+# Extract dl4miceverywhere version
+dl4miceverywhere_version="$var_version"
 
-echo $notebook_tag
+# Return the version list
+echo $dl4miceverywhere_version

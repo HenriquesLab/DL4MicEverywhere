@@ -29,10 +29,13 @@ function get_yaml_args_from_file {
 function save_versioning {
     local notebook_name="$1"
 
-    local list_versions="latest"
-    local list_tag="${notebook_name}-latest"
+    local list_versions=""
+    local list_tag=""
 
-    local paired_version_tag="\tlatest: ${notebook_name}-latest\n"
+    local paired_version_tag=""
+
+    # Flag to control if its the first notebooks and a (latest) tag needs to be added
+    local flag_first_time=1
 
     local page=1
     # We will look through all the pages on docker hub
@@ -67,17 +70,26 @@ function save_versioning {
         for i in "${!version_arr[@]}"; do
             local version=${version_arr[i]:1}
             local tag=${tag_arr[i]}
+
             # Check if the version is already on the list
             if [[ $list_versions != *"${version}"* ]]; then
                 # It might happen that same notebook versions is available for 
                 # different DL4MicEverywhere versions, this way we will take the
                 # latest DL4MicEverywhere version 
-                local list_versions="${list_versions} ${version}"
-                local list_tag="${list_tag} ${tag}"
                 
                 # Bash variables cannot have dots, that is why the dots are replaced with '-'
                 local non_dot_version="$(echo "$version" | tr . _)"
 
+                # The firt time, initialize the lists and add latest to the version
+                if [ "$flag_first_time" -eq 1 ]; then
+                    local list_versions="${version}(latest)"
+                    local list_tag="${tag}"
+
+                    local flag_first_time=0
+                else
+                    local list_versions="${list_versions} ${version}"
+                    local list_tag="${list_tag} ${tag}"
+                fi
                 local paired_version_tag="${paired_version_tag}\t${non_dot_version}: ${tag}\n"
             fi
         done
