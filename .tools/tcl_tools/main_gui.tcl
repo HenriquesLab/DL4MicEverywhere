@@ -26,7 +26,7 @@ if {"$fexist" == "1"} {
     set cache_config_path ""
     set cache_notebook_path ""
     set cache_requirements_path ""
-    set cache_gpu_flag ""
+    set cache_flag_gpu ""
     set cache_selected_version ""
     set cache_tag ""
     set cache_advanced_options ""
@@ -107,7 +107,7 @@ proc onLoadCache {} {
     global cache_config_path
     global cache_notebook_path
     global cache_requirements_path
-    global cache_gpu_flag
+    global cache_flag_gpu
     global cache_selected_version
     global cache_tag
     global cache_advanced_options
@@ -154,8 +154,8 @@ proc onLoadCache {} {
     if  {"$cache_requirements_path" != ""} {
         set txt_path "$cache_requirements_path"
     }
-    if  {"$cache_gpu_flag" != ""} {
-        set gpu "$cache_gpu_flag"
+    if  {"$cache_flag_gpu" != ""} {
+        set gpu "$cache_flag_gpu"
     }
     if  {"$cache_tag" != ""} {
         set tag "$cache_tag"

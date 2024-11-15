@@ -1,4 +1,6 @@
 #!/bin/bash
+
+# Get the basedir
 BASEDIR=$(dirname "$(readlink -f "$0")")
             
 # Run pre_launch_test.sh, stop if it fails
@@ -85,28 +87,9 @@ tag : ${10}
 advanced_options : ${11}" > "$BASEDIR/.tools/.cache/.cache_gui"
 }
 
-# Function to parse and read the configuration yaml file
-function parse_yaml {
-   local prefix=$2
-   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
-   sed -ne "s|^\($s\):|\1|" \
-        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
-        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  "$1" |
-   awk -F$fs '{
-      indent = length($1)/2;
-      vname[indent] = $2;
-      value = $3;
 
-      # Remove inline comments only if they are at the beginning of a line or after whitespace
-      gsub(/[[:space:]]#.*/, "", value);
-      
-      for (i in vname) {if (i > indent) {delete vname[i]}}
-      if (length($3) > 0) {
-         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
-         printf("%s%s%s=\"%s\"\n", "'$prefix'", vn, $2, value);
-      }
-   }'
-}
+# Import get_yaml_args_from_file
+source "$BASEDIR/.tools/bash_tools/get_yaml_args.sh"
 
 # Let's define the default values for the flags
 flag_gpu=0
@@ -169,7 +152,7 @@ fi
 if [ $flag_gui -eq 0 ]; then 
     # If GUI is not requested
     if [ "$flag_test" -eq 1 ]; then
-        echo "GUI is not requested, proceeding without GUI."
+        echo "GUI is not requested, proceeding with CLI."
     fi
 else
     # If the GUI flag has been specified, run the function to show the GUI and read the arguments
@@ -333,7 +316,7 @@ if [ "$flag_test" -eq 1 ]; then
 fi
 
 # Read the variables from the yaml file
-eval $(parse_yaml "$config_path")
+eval $(get_yaml_args_from_file "$config_path")
 
 # Check the parsed variables
 check_parsed_argument notebook_url
@@ -743,6 +726,7 @@ if [ "$flag_local_requirements" -eq 1 ]; then
    rm "$BASEDIR/requirements.txt"
 fi
 
+echo "Docker output:"
 echo "$DOCKER_OUT"
 
 # If it has been built, run the docker
@@ -819,7 +803,7 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     # Read the variables from the yaml file
     echo -e "Used docker tag has been:\n\t$docker_tag" >> "$result_path/docker_info.txt"
 
-    eval $(parse_yaml "$BASEDIR/construct.yaml" "contruct_info_")
+    eval $(get_yaml_args_from_file "$BASEDIR/construct.yaml" "contruct_info_")
     echo -e "Used DL4MicEverywhere version has been:\n\t$contruct_info_version" >> "$result_path/docker_info.txt"
 
 else
