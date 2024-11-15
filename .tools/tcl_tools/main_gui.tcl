@@ -7,6 +7,7 @@ set basedir [lindex $argv 0]
 set filename "$basedir/.tools/.cache/.cache_gui"
 set fexist [file exist $filename]
 
+# Initialize the cache variables
 if {"$fexist" == "1"} {
     #  read the file one line at a time
     set fp [open "$filename" r]
@@ -29,6 +30,18 @@ if {"$fexist" == "1"} {
     set cache_selected_version ""
     set cache_tag ""
     set cache_advanced_options ""
+}
+
+# Check if the construct.yaml file is accessible
+set construct "$basedir/construct.yaml"
+set construct_exist [file exist $construct]
+
+# Get DL4MicEverywhere version if possible and define the window title
+if {"$construct_exist" == "1"} {
+    catch {exec /bin/bash "$basedir/.tools/bash_tools/get_dl4miceverywhere_version.sh"} output
+    set window_title "DL4MicEverywhere - v$output"
+} else {
+    set window_title "DL4MicEverywhere"
 }
 
 # Define the shape of the window
@@ -698,5 +711,5 @@ proc cmddoc {}   {
 ##### Create a window #####
 
 # Create the window, give a name to it and locate it in the middle of the screen
-wm title . "DL4MicEverywhere"
+wm title . "$window_title"
 wm geometry . ${width}x${height}+${width_offset}+${height_offset}
