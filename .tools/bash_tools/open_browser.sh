@@ -1,10 +1,12 @@
 #!/bin/bash
 
-# Get the url to launch.sh from the first argument
-url=$1
+# Get the sleep time to launch the browser
+sleep_time=$1
+# Get the url to launch.sh from the second argument
+url=$2
 
 # Wait 10 seconds to launch the browser
-sleep 5
+sleep $sleep_time
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # Linux
