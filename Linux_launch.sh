@@ -543,6 +543,17 @@ else
             fi
         fi
 
+        # Check if the window was closed and no option was chosen
+        if [ -z "$flag_build" ]; then
+            # If the window was closed, stop the program
+            echo ""
+            echo "------------------------------------"
+            echo "You should have choosen an option."
+            read -p "Press enter to close the terminal."
+            echo "------------------------------------" 
+            exit 1
+        fi
+
         # Check if flag_build is not 1 (docker image was not locally or the user wanted to replace it)
         if [ "$flag_build" -ne 1 ]; then
             # If so, check if there is a docker image with that tag on Docker Hub
@@ -585,6 +596,17 @@ else
                                     No )  flag_build=2; break;;
                                 esac
                             done
+                        fi
+
+                        # Check if the window was closed and no option was chosen
+                        if [ -z "$flag_build" ]; then
+                            # If the window was closed, stop the program
+                            echo ""
+                            echo "------------------------------------"
+                            echo "You should have choosen an option."
+                            read -p "Press enter to close the terminal."
+                            echo "------------------------------------" 
+                            exit 1
                         fi
                     fi
 

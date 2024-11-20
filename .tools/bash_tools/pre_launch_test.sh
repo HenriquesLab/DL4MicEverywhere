@@ -49,6 +49,14 @@ if [[ "$update" == "Automatically"* || "$update" == "Ask first"* ]]; then
 fi
 
 # Check if the clean option has been selected and run the script if so
-if [[ "$clean" == "Automatically"* ]]; then
-    /bin/bash "$BASEDIR/pre_build_launch/clean_docker.sh" || exit 1
+if [[ "$clean" == "Automatically"* || "$clean" == "Ask first"* ]]; then
+    if [[ "$clean" == "Ask first"* ]]; then
+        flag_clean=$(wish "$BASEDIR/../tcl_tools/oneline_yes_no_gui.tcl" "Clean Docker Dekstop" "Would you like to leverage space on Docker Desktop application?")
+        # flag_clean == 2 --> Yes
+        # flag_clean == 3 --> No
+    fi
+   
+    if [[ "$clean" == "Automatically"* || "$flag_clean" -eq 2 ]]; then
+        /bin/bash "$BASEDIR/pre_build_launch/clean_docker.sh" || exit 1
+    fi 
 fi
