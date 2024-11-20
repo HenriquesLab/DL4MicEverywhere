@@ -71,12 +71,17 @@ if [[ "$update" == "Automatically"* || "$update_flag" -eq 2 ]]; then
             curl -L -o update.pack https://github.com/HenriquesLab/DL4MicEverywhere.git/info/refs?service=git-upload-pack
         fi
 
-        if [[ "$already_asked" == "0" ]]; then 
-            echo "Succesfully udpated! The GUI will restart."
-        else
-            wish "$BASEDIR/../../tcl_tools/oneline_done_gui.tcl" "Succesfully updated" "Succesfully udpated! The GUI will restart."
-        fi
+        # if [[ "$already_asked" == "0" ]]; then 
+        #     echo ""
+        #     echo "------------------------------------"
+        #     echo "Succesfully udpated! The window will be closed, please open it again."
+        #     read -p "Press enter to close the terminal."
+        #     echo "------------------------------------" 
+        # else
+        #     wish "$BASEDIR/../../tcl_tools/oneline_done_gui.tcl" "Succesfully updated" "Succesfully udpated! The window will be closed, please open it again."
+        # fi
 
+        wish "$BASEDIR/../../tcl_tools/oneline_done_gui.tcl" "Succesfully updated" "Succesfully udpated! The window will be closed, please open it again."
         exit 1
     fi
 
