@@ -1,6 +1,7 @@
 #!/bin/bash
 
 BASEDIR=$(dirname "$(readlink -f "$0")")
+flag_gui="$1"
 
 # # This script checks for root access and Docker installation on Unix-like systems
 # if [[ "$OSTYPE" == "linux-gnu"* || "$OSTYPE" == "darwin"* ]]; then
@@ -45,7 +46,7 @@ fi
 
 # Check if the update option has been selected and run the script if so
 if [[ "$update" == "Automatically"* || "$update" == "Ask first"* ]]; then
-    /bin/bash "$BASEDIR/pre_build_launch/update_dl4miceverywhere.sh" "0" || exit 1
+    /bin/bash "$BASEDIR/pre_build_launch/update_dl4miceverywhere.sh" "0" "$flag_gui" || exit 1
 fi
 
 # Check if the clean option has been selected and run the script if so

@@ -2,9 +2,16 @@
 
 # Get the basedir
 BASEDIR=$(dirname "$(readlink -f "$0")")
-            
+
+# If no arguments are provided, set the GUI flag
+if [ $# -eq 0 ]; then
+    flag_gui=1
+else 
+    flag_gui=0
+fi
+
 # Run pre_launch_test.sh, stop if it fails
-/bin/bash "$BASEDIR/.tools/bash_tools/pre_launch_test.sh" || exit 1
+/bin/bash "$BASEDIR/.tools/bash_tools/pre_launch_test.sh" "$flag_gui" || exit 1
 
 # Function with the text to describe the usage of the bash script
 usage() {
@@ -136,13 +143,6 @@ while getopts :hc:d:o:gn:r:t:p:x flag;do
             exit 1 ;;
     esac
 done
-
-# If no arguments are provided, set the GUI flag
-if [ $# -eq 0 ]; then
-    flag_gui=1
-else 
-    flag_gui=0
-fi
 
 # Check if test mode is active
 if [ "$flag_test" -eq 1 ]; then
