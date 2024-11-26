@@ -46,7 +46,12 @@ fi
 
 # Check if the update option has been selected and run the script if so
 if [[ "$update" == "Automatically"* || "$update" == "Ask first"* ]]; then
-    /bin/bash "$BASEDIR/pre_build_launch/update_dl4miceverywhere.sh" "0" "$flag_gui" || exit 1
+    /bin/bash "$BASEDIR/pre_build_launch/update_dl4miceverywhere.sh" "0" "$flag_gui"
+    
+    updated=$? # Gets if the repository has been updated
+    if [[ "$updated" == "1" ]]; then
+        exit 1
+    fi
 fi
 
 # Check if the clean option has been selected and run the script if so

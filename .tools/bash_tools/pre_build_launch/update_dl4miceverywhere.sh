@@ -95,17 +95,33 @@ if [[ "$update" == "Automatically"* || "$update_flag" -eq 2 ]]; then
             # Otherwise update it using
             curl -L -o update.pack https://github.com/HenriquesLab/DL4MicEverywhere.git/info/refs?service=git-upload-pack
         fi
-
-        if [ "$flag_gui" -eq 1 ]; then 
-            wish "$BASEDIR/../../tcl_tools/oneline_done_gui.tcl" "Succesfully updated" "Succesfully udpated! DL4MicEverywhere will be closed, please open it again."
+        if [[ "$already_asked" == "1" ]]; then 
+            if [ "$flag_gui" -eq 1 ]; then 
+                wish "$BASEDIR/../../tcl_tools/oneline_done_gui.tcl" "Succesfully updated" "Succesfully udpated! DL4MicEverywhere will be closed, please open it again."
+            else
+                echo ""
+                echo "------------------------------------"
+                echo "Succesfully udpated! The script will stop, please launch it again."
+                read -p "Press enter to close the terminal."
+                echo "------------------------------------" 
+            fi
         else
-            echo ""
-            echo "------------------------------------"
-            echo "Succesfully udpated! The window will be closed, please open it again."
-            read -p "Press enter to close the terminal."
-            echo "------------------------------------" 
+            if [ "$flag_gui" -eq 1 ]; then 
+                echo "Succesfully udpated!"
+                wish "$BASEDIR/../../tcl_tools/oneline_done_gui.tcl" "Succesfully updated" "Succesfully udpated! DL4MicEverywhere will not be opened, please launch it again."
+                
+                echo ""
+                echo "################################"
+                echo ""
+            else
+                echo ""
+                echo "------------------------------------"
+                echo "Succesfully udpated! The script will stop, please launch it again."
+                read -p "Press enter to close the terminal."
+                echo "------------------------------------" 
+            fi
         fi
-        echo "updated"
+        exit 1
     fi
 
     if [[ "$already_asked" == "0" ]]; then 

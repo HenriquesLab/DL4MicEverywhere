@@ -701,9 +701,9 @@ proc cmdpref {}   {
 proc cmdpcheckupdates {}   {
     global basedir
     # Call the update script update_dl4miceverywhere.sh with argument already_asked=1 (true)
-    catch {exec /bin/bash "$basedir/.tools/bash_tools/pre_build_launch/update_dl4miceverywhere.sh" "1" "1"} updated
+    catch {exec /bin/bash "$basedir/.tools/bash_tools/pre_build_launch/update_dl4miceverywhere.sh" "1" "1" 2>@1} r
     # Check if an update has been made and close the window if so
-    if {"$updated" == "updated"} {
+    if {"$r" != ""} {
         exit 1
     }
 }
