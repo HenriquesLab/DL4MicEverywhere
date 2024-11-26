@@ -701,7 +701,7 @@ proc cmdpref {}   {
 proc cmdpcheckupdates {}   {
     global basedir
     # Call the update script update_dl4miceverywhere.sh with argument already_asked=1 (true)
-    exec /bin/bash "$basedir/.tools/bash_tools/pre_build_launch/update_dl4miceverywhere.sh" "1" "1" || exit 1 &
+    exec /bin/bash "$basedir/.tools/bash_tools/pre_build_launch/update_dl4miceverywhere.sh" "1" "1" || exit 1
 }
 proc cmddoc {}   {
     global basedir
