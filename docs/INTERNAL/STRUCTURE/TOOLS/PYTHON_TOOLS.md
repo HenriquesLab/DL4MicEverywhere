@@ -32,6 +32,15 @@ Creates a file and adds the following information:
 
 ## [dict_parser.py](../../../../.tools/python_tools/dict_parser.py) <a name="dict_parser.py"></a>
 
+On this file three dictionaries are defined:
+
+| Variables | Keys | Values |
+|---|---|---|
+| dict_manifest_to_version | Names of the notebooks on [manifest.bioimage.io.yaml](https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/master/manifest.bioimage.io.yaml#L411) | Names of the notebooks on [Latest_Notebook_versions.csv](https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/Latest_Notebook_versions.csv)  |
+| dict_dl4miceverywhere_to_manifest | Names of the notebooks on [DL4MicEverywhere](https://github.com/HenriquesLab/DL4MicEverywhere/tree/main/notebooks/ZeroCostDL4Mic_notebooks) | Names of the notebooks on [manifest.bioimage.io.yaml](https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/master/manifest.bioimage.io.yaml#L411) |
+| dict_dl4miceverywhere_to_version | Names of the notebooks on [DL4MicEverywhere](https://github.com/HenriquesLab/DL4MicEverywhere/tree/main/notebooks/ZeroCostDL4Mic_notebooks) | [Latest_Notebook_versions.csv](https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/Latest_Notebook_versions.csv) |
+
+
 
 ## [list_of_notebooks.py](../../../../.tools/python_tools/list_of_notebooks.py) <a name="list_of_notebooks.py"></a>
 
