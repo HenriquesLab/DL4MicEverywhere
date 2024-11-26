@@ -1,13 +1,5 @@
 
-import os
 import sys
-
-def add_docker_extra(filename_path):
-    f = open(filename_path, "a", encoding='utf8')
-    
-    f.write('\n')
-
-    f.close()
 
 def create_docker_arguments(filename_path, ubuntu_version, cuda_version, cudnn_version, 
                             path_to_notebook, path_to_requirements,
