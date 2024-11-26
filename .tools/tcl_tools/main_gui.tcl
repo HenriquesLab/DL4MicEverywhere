@@ -676,7 +676,7 @@ menu .mb -type menubar
 menu .mb.file -type normal -tearoff 0
 .mb.file add command -label About -underline 0 -command { cmdabout } -accelerator Ctrl-i
 .mb.file add command -label Preferences -underline 0 -command { cmdpref } -accelerator Ctrl-p
-.mb.file add command -label "Check For Updates" -underline 0 -command { cmdpcheckupdates || exit 1} -accelerator Ctrl-u
+.mb.file add command -label "Check For Updates" -underline 0 -command { cmdpcheckupdates } -accelerator Ctrl-u
 .mb.file add separator
 .mb.file add command -label Quit -underline 0 -command { exit } -accelerator Ctrl-x
 
@@ -701,7 +701,11 @@ proc cmdpref {}   {
 proc cmdpcheckupdates {}   {
     global basedir
     # Call the update script update_dl4miceverywhere.sh with argument already_asked=1 (true)
-    exec /bin/bash "$basedir/.tools/bash_tools/pre_build_launch/update_dl4miceverywhere.sh" "1" "1" || exit 1
+    catch {exec /bin/bash "$basedir/.tools/bash_tools/pre_build_launch/update_dl4miceverywhere.sh" "1" "1"} updated
+    # Check if an update has been made and close the window if so
+    if {"$updated" == "updated"} {
+        exit 1
+    }
 }
 proc cmddoc {}   {
     global basedir

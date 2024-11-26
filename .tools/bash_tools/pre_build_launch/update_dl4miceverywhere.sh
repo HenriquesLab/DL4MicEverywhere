@@ -105,7 +105,7 @@ if [[ "$update" == "Automatically"* || "$update_flag" -eq 2 ]]; then
             read -p "Press enter to close the terminal."
             echo "------------------------------------" 
         fi
-        exit 1
+        echo "updated"
     fi
 
     if [[ "$already_asked" == "0" ]]; then 
@@ -114,3 +114,4 @@ if [[ "$update" == "Automatically"* || "$update_flag" -eq 2 ]]; then
         echo ""
     fi
 fi
+
