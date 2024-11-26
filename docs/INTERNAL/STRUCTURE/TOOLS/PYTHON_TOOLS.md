@@ -56,4 +56,3 @@ Contains the information about the tested notebooks in a Panda's dataframe and p
 ## [update_zerocost_verison.py](../../../../.tools/python_tools/update_zerocost_verison.py) <a name="update_zerocost_verison.py"></a>
 
 ---
----
