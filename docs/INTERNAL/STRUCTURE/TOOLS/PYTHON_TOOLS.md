@@ -48,6 +48,8 @@ On this file three dictionaries are defined:
 
 ## [test_files.py](../../../../.tools/python_tools/test_files.py) <a name="test_files.py"></a>
 
+Contains the information about the tested notebooks in a Panda's dataframe and prints it. This information is used to generate [test-notebooks.md](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/.tools/test-notebooks.md).
+
 ## [update_configuration.py](../../../../.tools/python_tools/update_configuration.py) <a name="update_configuration.py"></a>
 
 ## [update_with_zc_nanifest.py](../../../../.tools/python_tools/update_with_zc_nanifest.py) <a name="update_with_zc_nanifest.py"></a>
