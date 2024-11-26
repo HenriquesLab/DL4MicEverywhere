@@ -674,11 +674,11 @@ menu .mb -type menubar
 
 .mb add cascade -label DL4MicEverywhere -underline 0 -menu .mb.file
 menu .mb.file -type normal -tearoff 0
-.mb.file add command -label About -underline 0 -command cmdabout -accelerator Ctrl-i
-.mb.file add command -label Preferences -underline 0 -command cmdpref -accelerator Ctrl-p
-.mb.file add command -label "Check For Updates" -underline 0 -command cmdpcheckupdates -accelerator Ctrl-u
+.mb.file add command -label About -underline 0 -command { cmdabout } -accelerator Ctrl-i
+.mb.file add command -label Preferences -underline 0 -command { cmdpref } -accelerator Ctrl-p
+.mb.file add command -label "Check For Updates" -underline 0 -command { cmdpcheckupdates || exit 1} -accelerator Ctrl-u
 .mb.file add separator
-.mb.file add command -label Quit -underline 0 -command exit -accelerator Ctrl-x
+.mb.file add command -label Quit -underline 0 -command { exit } -accelerator Ctrl-x
 
 bind .fr <Control-i> cmdabout
 bind .fr <Control-p> cmdpref
@@ -686,7 +686,7 @@ bind .fr <Control-u> cmdpcheckupdates
 
 .mb add cascade -label Help -underline 0 -menu .mb.edit
 menu .mb.edit -type normal -tearoff 0
-.mb.edit add command -label Documentation -underline 0 -command cmddoc -accelerator Ctrl-d
+.mb.edit add command -label Documentation -underline 0 -command { cmddoc } -accelerator Ctrl-d
 
 bind .fr <Control-d> cmddoc
 
