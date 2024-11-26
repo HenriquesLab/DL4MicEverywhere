@@ -12,7 +12,6 @@
 ---
 ## [check_zerocost_version.py](../../../../.tools/python_tools/check_zerocost_version.py) <a name="check_zerocost_version.py"></a>
 
-### main()
 Downloads [Latest_Notebook_versions.csv](https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/Latest_Notebook_versions.csv) from ZeroCostDL4Mic and compares the versions with the ones on the local repository. Returns the names of the notebooks which version's does not match the ones on ZeroCostDL4Mic.
 
 ## [create_docker_info.py](../../../../.tools/python_tools/create_docker_info.py) <a name="create_docker_info.py"></a>
