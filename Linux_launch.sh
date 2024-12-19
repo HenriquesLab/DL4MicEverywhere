@@ -178,7 +178,7 @@ else
 
         cache_gui "$data_path" "$result_path" "$selectedFolder" "$selectedNotebook" "" "" "" "$flag_gpu" "$selectedVersion" "$tag_aux" "$advanced_options"
 
-        if [ "$tag_aux" != "" ]; then
+        if [ "$tag_aux" != "-" ]; then
             docker_tag="$tag_aux"
         elif [ "$selectedVersion" != "-" ]; then
             flag_version_selected=1
@@ -207,7 +207,7 @@ else
         if [ "$requirements_aux" != "-" ]; then
             requirements_path="$requirements_aux"
         fi
-        if [ "$tag_aux" != "" ]; then
+        if [ "$tag_aux" != "-" ]; then
             docker_tag="$tag_aux"
         fi
     fi
