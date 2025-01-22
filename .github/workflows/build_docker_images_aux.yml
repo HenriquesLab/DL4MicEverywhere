@@ -197,7 +197,7 @@ jobs:
 
   build_only_arm64:
     name: Only push ARM64 to Docker Hub
-    if: ${{ always() && contains(needs.build_amd64.result, 'failure') }}
+    if: ${{ always() && contains(needs.build_amd64.result, 'failure') && contains(needs.build_arm64.result, 'success') }}
     needs:
       - get_arguments
       - build_amd64
@@ -231,7 +231,7 @@ jobs:
             
   build_only_amd64:
     name: Only push AMD64 to Docker Hub
-    if: ${{ always() && contains(needs.build_arm64.result, 'failure') }}
+    if: ${{ always() && contains(needs.build_arm64.result, 'failure') && contains(needs.build_amd64.result, 'success') }}
     needs:
       - get_arguments
       - build_amd64
@@ -265,6 +265,7 @@ jobs:
           
   build_multi_architecture:
     name: Both push AMD64 and ARM64 to Docker Hub
+    if: ${{ always() && contains(needs.build_arm64.result, 'success') && contains(needs.build_amd64.result, 'success') }}
     needs:
       - get_arguments
       - build_amd64
