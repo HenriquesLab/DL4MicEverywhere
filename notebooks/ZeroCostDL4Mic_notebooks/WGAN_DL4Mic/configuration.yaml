@@ -1,14 +1,14 @@
 authors:
-- Ivan Hidalgo, Estibaliz Gómez de Mariscal, Ignacio Arganda-Carreras and the ZeroCostDL4Mic Team
+  - Ivan Hidalgo, Estibaliz Gómez de Mariscal, Ignacio Arganda-Carreras and the ZeroCostDL4Mic Team
 badges:
-- icon: https://colab.research.google.com/assets/colab-badge.svg
-  label: Open in Colab
-  url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/WGAN_ZeroCostDL4Mic.ipynb
+  - icon: https://colab.research.google.com/assets/colab-badge.svg
+    label: Open in Colab
+    url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/WGAN_ZeroCostDL4Mic.ipynb
 cite:
-- doi: https://doi.org/10.1038/s41467-021-22518-0
-  text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
-- doi: https://doi.org/10.48550/arXiv.1704.00028
-  text: 'Gulrajani, I., Ahmed, F., Arjovsky, M., Dumoulin, V. and Courville, A. Improved Training of Wasserstein GANs. arXiv. 2017 doi: https://doi.org/10.48550/arXiv.1704.00028.'
+  - doi: https://doi.org/10.1038/s41467-021-22518-0
+    text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
+  - doi: https://doi.org/10.48550/arXiv.1704.00028
+    text: 'Gulrajani, I., Ahmed, F., Arjovsky, M., Dumoulin, V. and Courville, A. Improved Training of Wasserstein GANs. arXiv. 2017 doi: https://doi.org/10.48550/arXiv.1704.00028.'
 config:
   dl4miceverywhere:
     cuda_version: 11.8.0
@@ -23,22 +23,21 @@ config:
     sections_to_remove: 2. 6.3.
     ubuntu_version: '22.04'
 covers:
-- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/WGAN_notebook.png
+  - https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/WGAN_notebook.png
 description: Super-resolution via super-pixelisation. Wasserstein GAN (DFCAN) is a network created to transform low-resolution (LR) images to super-resolved (SR) images, published by Gulrajani I. et al. arXiv 2017. The training is done using LR-SR image pairs, taking the LR images as input and obtaining an output as close to SR as posible.
 documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/README.md
 download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/WGAN_ZeroCostDL4Mic.ipynb
 git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
-id: WGAN_ZeroCostDL4Mic.ipynb
+id: slinky-bikini
 license: MIT
-links:
-- Notebook Preview
+links: []
 name: WGAN - ZeroCostDL4Mic
 tags:
-- colab
-- notebook
-- WGAN
-- Super Resolution
-- ZeroCostDL4Mic
-- dl4miceverywhere
+  - colab
+  - notebook
+  - WGAN
+  - Super Resolution
+  - ZeroCostDL4Mic
+  - dl4miceverywhere
 type: application
 version: 1.15.1

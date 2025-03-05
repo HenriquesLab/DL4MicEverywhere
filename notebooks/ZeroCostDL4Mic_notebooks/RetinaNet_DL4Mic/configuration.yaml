@@ -1,14 +1,14 @@
 authors:
-- Erlantz Calvo, Ignacio Arganda-Carreras and the ZeroCostDL4Mic Team
+  - Erlantz Calvo, Ignacio Arganda-Carreras and the ZeroCostDL4Mic Team
 badges:
-- icon: https://colab.research.google.com/assets/colab-badge.svg
-  label: Open in Colab
-  url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/RetinaNet_ZeroCostDL4Mic.ipynb
+  - icon: https://colab.research.google.com/assets/colab-badge.svg
+    label: Open in Colab
+    url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/RetinaNet_ZeroCostDL4Mic.ipynb
 cite:
-- doi: https://doi.org/10.1038/s41467-021-22518-0
-  text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
-- text: Tsung-Yi Lin, Priya Goyal, Ross Girshick, Kaiming He, Piotr Dollár. Focal Loss for Dense Object Detection. arXiv:1708.02002
-  url: https://arxiv.org/abs/1708.02002
+  - doi: https://doi.org/10.1038/s41467-021-22518-0
+    text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
+  - text: Tsung-Yi Lin, Priya Goyal, Ross Girshick, Kaiming He, Piotr Dollár. Focal Loss for Dense Object Detection. arXiv:1708.02002
+    url: https://arxiv.org/abs/1708.02002
 config:
   dl4miceverywhere:
     cuda_version: 11.8.0
@@ -23,26 +23,25 @@ config:
     sections_to_remove: 2. 6.3.
     ubuntu_version: '22.04'
 covers:
-- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/yolo_notebook.png
-- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/yolo_notebook_2.png
+  - https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/yolo_notebook.png
+  - https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/yolo_notebook_2.png
 description: Object detection of 2D images. RetinaNet is a is an object detection network, which identifies objects in images and draws bounding boxes around them.
 documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/README.md
 download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/RetinaNet_ZeroCostDL4Mic.ipynb
 git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
-id: Notebook_RetinaNet_ZeroCostDL4Mic
+id: convenient-purse
 license: MIT
 links:
-- Notebook Preview
-- Dataset_YOLOv2_ZeroCostDL4Mic
-- Dataset_YOLOv2_coli_DeepBacs
-- Dataset_YOLOv2_antibiotic_DeepBacs
+  - splendid-pie
+  - indulgent-sandwich
+  - appealing-popcorn
 name: RetinaNet - ZeroCostDL4Mic
 tags:
-- colab
-- notebook
-- RetinaNet
-- object detection
-- ZeroCostDL4Mic
-- dl4miceverywhere
+  - colab
+  - notebook
+  - RetinaNet
+  - object detection
+  - ZeroCostDL4Mic
+  - dl4miceverywhere
 type: application
 version: 1.14.1

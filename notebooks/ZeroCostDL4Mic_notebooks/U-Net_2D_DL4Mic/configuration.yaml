@@ -1,14 +1,14 @@
 authors:
-- Romain Laine and the ZeroCostDL4Mic Team
+  - Romain Laine and the ZeroCostDL4Mic Team
 badges:
-- icon: https://colab.research.google.com/assets/colab-badge.svg
-  label: Open in Colab
-  url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/U-Net_2D_ZeroCostDL4Mic.ipynb
+  - icon: https://colab.research.google.com/assets/colab-badge.svg
+    label: Open in Colab
+    url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/U-Net_2D_ZeroCostDL4Mic.ipynb
 cite:
-- doi: https://doi.org/10.1038/s41467-021-22518-0
-  text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
-- text: 'Olaf Ronneberger, Philipp Fischer, Thomas Brox. U-Net: Convolutional Networks for Biomedical Image Segmentation. arXiv:1505.04597. https://arxiv.org/abs/1505.04597'
-  url: https://arxiv.org/abs/1505.04597
+  - doi: https://doi.org/10.1038/s41467-021-22518-0
+    text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
+  - text: 'Olaf Ronneberger, Philipp Fischer, Thomas Brox. U-Net: Convolutional Networks for Biomedical Image Segmentation. arXiv:1505.04597. https://arxiv.org/abs/1505.04597'
+    url: https://arxiv.org/abs/1505.04597
 config:
   dl4miceverywhere:
     cuda_version: 11.8.0
@@ -23,24 +23,23 @@ config:
     sections_to_remove: 1.1. 1.2. 2. 6.3.
     ubuntu_version: '22.04'
 covers:
-- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/2D_Unet_notebook.png
+  - https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/2D_Unet_notebook.png
 description: 2D binary segmentation. U-Net is an encoder-decoder architecture originally used for image segmentation. The first half of the U-Net architecture is a downsampling convolutional neural network which acts as a feature extractor from input images. The other half upsamples these results and restores an image by combining results from downsampling with the upsampled images. Note - visit the ZeroCostDL4Mic wiki to check the original publications this network is based on and make sure you cite these.
 documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/README.md
 download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/U-Net_2D_ZeroCostDL4Mic.ipynb
 git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
-id: Notebook_U-Net_2D_ZeroCostDL4Mic
+id: resplendent-ribbon
 license: MIT
 links:
-- Notebook Preview
-- Dataset_U-Net_2D_DeepBacs
+  - nutty-burrito
 name: U-Net (2D) - ZeroCostDL4Mic
 tags:
-- colab
-- notebook
-- U-Net
-- segmentation
-- ZeroCostDL4Mic
-- 2D
-- dl4miceverywhere
+  - colab
+  - notebook
+  - U-Net
+  - segmentation
+  - ZeroCostDL4Mic
+  - 2D
+  - dl4miceverywhere
 type: application
 version: 2.2.1

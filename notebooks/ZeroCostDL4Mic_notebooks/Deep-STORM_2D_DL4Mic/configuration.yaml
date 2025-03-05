@@ -1,14 +1,14 @@
 authors:
-- Romain Laine and the ZeroCostDL4Mic Team
+  - Romain Laine and the ZeroCostDL4Mic Team
 badges:
-- icon: https://colab.research.google.com/assets/colab-badge.svg
-  label: Open in Colab
-  url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/Deep-STORM_2D_ZeroCostDL4Mic.ipynb
+  - icon: https://colab.research.google.com/assets/colab-badge.svg
+    label: Open in Colab
+    url: https://colab.research.google.com/github/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/Deep-STORM_2D_ZeroCostDL4Mic.ipynb
 cite:
-- doi: https://doi.org/10.1038/s41467-021-22518-0
-  text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
-- doi: https://doi.org/10.1364/OPTICA.5.000458
-  text: 'Elias Nehme, Lucien E. Weiss, Tomer Michaeli, and Yoav Shechtman. Deep-STORM: super-resolution single-molecule microscopy by deep learning. Optica 5, 458-464 (2018)'
+  - doi: https://doi.org/10.1038/s41467-021-22518-0
+    text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
+  - doi: https://doi.org/10.1364/OPTICA.5.000458
+    text: 'Elias Nehme, Lucien E. Weiss, Tomer Michaeli, and Yoav Shechtman. Deep-STORM: super-resolution single-molecule microscopy by deep learning. Optica 5, 458-464 (2018)'
 config:
   dl4miceverywhere:
     cuda_version: 11.8.0
@@ -23,25 +23,24 @@ config:
     sections_to_remove: 2. 6.4.
     ubuntu_version: '22.04'
 covers:
-- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/DeepSTORM_notebook.png
-- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/DeepSTORM_notebook_2.png
+  - https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/DeepSTORM_notebook.png
+  - https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/DeepSTORM_notebook_2.png
 description: Single Molecule Localization Microscopy (SMLM) image reconstruction from high-density emitter data. Deep-STORM is a neural network capable of image reconstruction from high-density single-molecule localization microscopy (SMLM), first published in 2018 by Nehme et al. in Optica. This network allows image reconstruction of 2D super-resolution images, in a supervised training manner. The network is trained using simulated high-density SMLM data for which the ground-truth is available. These simulations are obtained from random distribution of single molecules in a field-of-view and therefore do not imprint structural priors during training. The network output a super-resolution image with increased pixel density (typically upsampling factor of 8 in each dimension). Note - visit the ZeroCostDL4Mic wiki to check the original publications this network is based on and make sure you cite these.
 documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/README.md
 download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/Deep-STORM_2D_ZeroCostDL4Mic.ipynb
 git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
-id: Notebook_Deep-STORM_2D_ZeroCostDL4Mic
+id: inspiring-sandal
 license: MIT
 links:
-- Notebook Preview
-- Dataset_Deep-STORM_ZeroCostDL4Mic
+  - exquisite-curry
 name: Deep-STORM (2D) - ZeroCostDL4Mic
 tags:
-- colab
-- notebook
-- Deep-STORM
-- labelling
-- ZeroCostDL4Mic
-- 2D
-- dl4miceverywhere
+  - colab
+  - notebook
+  - Deep-STORM
+  - labelling
+  - ZeroCostDL4Mic
+  - 2D
+  - dl4miceverywhere
 type: application
 version: 1.13.3
