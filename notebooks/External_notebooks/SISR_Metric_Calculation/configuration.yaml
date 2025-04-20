@@ -2,7 +2,9 @@ config:
   dl4miceverywhere:
     cuda_version: 11.8.0
     cudnn_version: 8.6.0.163
-    description: "Ready to use notebook for the calculation of SISR metrics: MSE, MAE, PSNR, SSIM, LPIPS, IL-NIQE, Decorrelation, RSE and RSP."
+    description: 'Ready to use notebook for the calculation of SISR metrics: MSE, MAE, PSNR, SSIM, LPIPS, IL-NIQE, Decorrelation, RSE and RSP.'
+    dl4miceverywhere_version: 2.1.0
+    docker_hub_image: sisr_metrics_calculation-e0.0.1-d2.1.0
     notebook_url: https://raw.githubusercontent.com/IvanHCenalmor/SISR_Benchmark/refs/heads/main/SISR_metrics_calculation.ipynb
     notebook_version: 0.0.1
     python_version: '3.9'
