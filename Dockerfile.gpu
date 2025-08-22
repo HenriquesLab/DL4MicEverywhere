@@ -80,7 +80,7 @@ RUN echo ${UBUNTU_VERSION%.*}${UBUNTU_VERSION#*.}
 # Install common packages and cuda libraries 
 RUN aux_cuda_version=${CUDA_VERSION%.*} && \
     apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu${UBUNTU_VERSION%.*}${UBUNTU_VERSION#*.}/x86_64/3bf863cc.pub && \
-    apt-get update && apt-get install -y --no-install-recommends \
+    apt-get update && apt-get install -y --no-install-recommends --allow-change-held-packages \
         ca-certificates \
         cuda-command-line-tools-${CUDA_VERSION%.*.*}-${aux_cuda_version#*.} \
         cuda-nvrtc-${CUDA_VERSION%.*.*}-${aux_cuda_version#*.} \
