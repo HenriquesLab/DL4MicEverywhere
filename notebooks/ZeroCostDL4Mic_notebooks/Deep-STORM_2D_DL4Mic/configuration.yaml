@@ -11,7 +11,7 @@ cite:
   text: 'Elias Nehme, Lucien E. Weiss, Tomer Michaeli, and Yoav Shechtman. Deep-STORM: super-resolution single-molecule microscopy by deep learning. Optica 5, 458-464 (2018)'
 config:
   dl4miceverywhere:
-    cuda_version: 12.2
+    cuda_version: 12.2.0
     cudnn_version: 8.9.4.25
     description: Deep-STORM_2D_DL4Mic is the conversion of the 2D Deep-STORM from ZeroCostDL4Mic.
     dl4miceverywhere_version: 2.1.0
