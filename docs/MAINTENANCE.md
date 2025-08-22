@@ -22,3 +22,8 @@ When updating a notebook in ZeroCostDL4Mic one should ensure that the version is
 
 These changes will trigger the GitHub action to update DL4MicEverywhere accordingly, which usually runs at night. Yet, one could run it manually with the [Check ZeroCost Versions action](https://github.com/HenriquesLab/DL4MicEverywhere/actions/workflows/check_zerocost_versions.yml)
 
+## Choosing an adequate CUDA-CUDnn combination
+- Decide an ubuntu version (e.g., `22.04`)
+- Decide an initial CUDA version (e.g., `12`)
+- Check among NVIDIA's Docker images, which are available for that CUDA and Ubuntu versions: https://hub.docker.com/r/nvidia/cuda (e.g., `12.2.0-devel-ubuntu22.04` will allow CUDA `12.2.0`)
+- Check a CUDnn version available based on the Ubuntu and CUDA version chosen: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ (e.g., CUDnn `8.9.6.50`)
