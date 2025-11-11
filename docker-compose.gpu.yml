@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  dl4mic:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: "all" 
+              capabilities: [gpu]
+    build:
+      context: . # Set the context to the parent directory
+      dockerfile: dood/Dockerfile # Specify the path to your Dockerfile
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.Xauthority:/root/.Xauthority
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    environment:
+      - DISPLAY=${DISPLAY}
+    network_mode: "host"
+    ports:
+      - "8888:8888"
