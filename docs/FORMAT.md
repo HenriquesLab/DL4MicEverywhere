@@ -28,7 +28,7 @@ config:
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/CARE_2D_ZeroCostDL4Mic.ipynb
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/CARE_2D_requirements_simple.txt
     cuda_version: 11.8.0
-    cuda_version:  8.6.0.163
+    cudnn_version:  8.6.0.163
     ubuntu_version: '22.04'
     python_version: '3.10'
     sections_to_remove: 1.1. 1.2. 2. 6.3.
