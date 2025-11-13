@@ -131,10 +131,14 @@ RUN echo "${CACHEBUST}"
 ADD $PATH_TO_REQUIREMENTS ./requirements.txt
 
 # Install the requirements and convert the notebook (remove some packages from requirements to avoid override and conflicts)
-RUN  grep -v -E '^(nbformat|ipywidgets|jupyterlab|matplotlib)' requirements.txt > tmp_requirements.txt && \
-    pip install --upgrade pip && \
-    pip install -r tmp_requirements.txt && \
-    rm requirements.txt tmp_requirements.txt
+# RUN  grep -v -E '^(nbformat|ipywidgets|jupyterlab|matplotlib)' requirements.txt > tmp_requirements.txt && \
+#     pip install --upgrade pip && \
+#     pip install -r tmp_requirements.txt && \
+#     rm requirements.txt tmp_requirements.txt
+# Install the requirements
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt && \
+    rm requirements.txt
 
 # Copy the converted notebook from stage 1
 COPY --from=notebook_autoconversion /home/${NOTEBOOK_NAME} /home/docker_info.txt /home
