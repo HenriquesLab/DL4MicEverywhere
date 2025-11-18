@@ -1,5 +1,6 @@
 authors:
 - Guillaume Jacquemet and the ZeroCostDL4Mic Team
+- Mariana G Ferreira
 badges:
 - icon: https://colab.research.google.com/assets/colab-badge.svg
   label: Open in Colab
@@ -42,4 +43,4 @@ tags:
 - 3D
 - dl4miceverywhere
 type: application
-version: 1.15.3
+version: 1.15.4
