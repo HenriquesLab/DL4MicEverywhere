@@ -21,7 +21,7 @@ config:
     notebook_version: 1.15.4
     python_version: '3.10'
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/StarDist_3D_requirements_simple.txt
-    sections_to_remove: 1.1. 1.2. 2. 6.2.
+    sections_to_remove: 1.1. 1.2. 2.
     ubuntu_version: '22.04'
 covers:
 - https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/StarDist_3D.png
