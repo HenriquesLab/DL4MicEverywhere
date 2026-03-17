@@ -10,7 +10,7 @@ on:
 jobs:
   get_arguments:
     name: Extract arguments from configuration
-    runs-on: [self-hosted, dl4miceverywhere-builder]
+    runs-on: [self-hosted, Ubuntu]
     outputs:
       notebook_url: ${{ steps.notebook_url.outputs.result }}
       requirements_url: ${{ steps.requirements_url.outputs.result }}
@@ -113,7 +113,7 @@ jobs:
 
   build_amd64:
     name: Build Docker image on AMD64
-    runs-on: [self-hosted, dl4miceverywhere-builder]
+    runs-on: [self-hosted, Ubuntu]
     needs: get_arguments
     steps:
       - name: Clone DL4MicEverywhere repository
@@ -211,7 +211,7 @@ jobs:
       - get_arguments
       - build_amd64
       - build_arm64
-    runs-on:  [self-hosted, dl4miceverywhere-builder]
+    runs-on:  [self-hosted, Ubuntu]
     permissions:
       id-token: write
       contents: read
@@ -245,7 +245,7 @@ jobs:
       - get_arguments
       - build_amd64
       - build_arm64
-    runs-on:  [self-hosted, dl4miceverywhere-builder]
+    runs-on:  [self-hosted, Ubuntu]
     permissions:
       id-token: write
       contents: read
@@ -278,7 +278,7 @@ jobs:
       - get_arguments
       - build_amd64
       - build_arm64
-    runs-on:  [self-hosted, dl4miceverywhere-builder]
+    runs-on:  [self-hosted, Ubuntu]
     permissions:
       id-token: write
       contents: read

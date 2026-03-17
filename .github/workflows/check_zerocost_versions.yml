@@ -11,7 +11,7 @@ jobs:
     name: Get the configurations from notebooks that need to be updated
     outputs:
       matrix: ${{ steps.create_json.outputs.matrix }}
-    runs-on: [self-hosted, dl4miceverywhere-builder]
+    runs-on: [self-hosted, Ubuntu]
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4

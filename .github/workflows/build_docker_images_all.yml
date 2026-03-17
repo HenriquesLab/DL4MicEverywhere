@@ -8,7 +8,7 @@ on:
 jobs:
   list_configs:
     name: Get the list of configuration files on the repository
-    runs-on: [self-hosted, dl4miceverywhere-builder]
+    runs-on: [self-hosted, Ubuntu]
     outputs: 
       matrix: ${{ steps.config_list.outputs.matrix }}
     steps:
