@@ -9,7 +9,7 @@ on:
 jobs:
   update_documentation:
     name: Update the documentation
-    runs-on: [self-hosted, Ubuntu]
+    runs-on: [self-hosted, Ubuntu, NotDocker]
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4

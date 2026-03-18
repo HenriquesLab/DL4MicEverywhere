@@ -6,7 +6,7 @@ on:
 jobs:
   extract_changed_files:
     name: Get the list of configuration files on the repository
-    runs-on: [self-hosted, Ubuntu]
+    runs-on: [self-hosted, Ubuntu, NotDocker]
     outputs: 
         matrix: ${{ steps.list_configs.outputs.matrix }}
     steps:
@@ -150,7 +150,7 @@ jobs:
   check_docker_build_without_gpu:  
     name: Check running 'docker build' for amd64 and arm64 WITHOUT GPU
     if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
-    runs-on: [self-hosted, Ubuntu]
+    runs-on: [self-hosted, Ubuntu, NotDocker]
     strategy:
       # super important if you want to see all results, even if one fails
       # fail-fast is true by default
@@ -195,7 +195,7 @@ jobs:
   check_docker_build_with_gpu:  
     name: Check running 'docker build' for amd64 WITH GPU
     if: ${{ needs.extract_changed_files.outputs.matrix != '' }} 
-    runs-on: [self-hosted, Ubuntu]
+    runs-on: [self-hosted, Ubuntu, NotDocker]
     strategy:
       # super important if you want to see all results, even if one fails
       # fail-fast is true by default

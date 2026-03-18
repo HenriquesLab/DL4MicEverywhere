@@ -8,7 +8,7 @@ on:
 jobs:
   update_configuration:
     name: Update configuration files with the manifest information from ZeroCostDL4Mic
-    runs-on: [self-hosted, Ubuntu]
+    runs-on: [self-hosted, Ubuntu, NotDocker]
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
