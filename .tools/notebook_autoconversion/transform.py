@@ -106,7 +106,7 @@ def main():
     for section in sections_to_remove:
         if " " in section:
             new_sections = section.split(" ")
-            processed_sections_to_remove.extend(new_sections)
+            processed_sections_to_remove.extend([e for e in new_sections if e])
         else:            
             processed_sections_to_remove.append(section)
 
