@@ -25,6 +25,8 @@ jobs:
       docker_tag: ${{ steps.docker_tag.outputs.result }}
       notebook_name: ${{ steps.notebook_name.outputs.value }}
       latest_tag: ${{ steps.latest_tag.outputs.value }}
+      dockerfile_regular: ${{ steps.select_dockerfiles.outputs.dockerfile_regular }}
+      dockerfile_gpu: ${{ steps.select_dockerfiles.outputs.dockerfile_gpu }}
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
@@ -89,6 +91,25 @@ jobs:
           latest_tag+="-latest"
           echo "$latest_tag"
           echo "value=$latest_tag" >> "$GITHUB_OUTPUT"
+      - name: Select Dockerfiles
+        id: select_dockerfiles
+        shell: bash
+        run: |
+          python_version='${{ steps.python_version.outputs.result }}'
+          case "$python_version" in
+            3.5|3.6)
+              echo "dockerfile_regular=docker/Dockerfile.legacy" >> "$GITHUB_OUTPUT"
+              echo "dockerfile_gpu=docker/Dockerfile.gpu.legacy" >> "$GITHUB_OUTPUT"
+              ;;
+            3.7|3.8|3.9|3.10|3.11|3.12|3.13)
+              echo "dockerfile_regular=docker/Dockerfile.modern" >> "$GITHUB_OUTPUT"
+              echo "dockerfile_gpu=docker/Dockerfile.gpu.modern" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "Unsupported python_version: $python_version" >&2
+              exit 1
+              ;;
+          esac
       - name: Print attributes
         run: |
           echo 'notebook_url: ${{ steps.notebook_url.outputs.result }}'
@@ -101,6 +122,8 @@ jobs:
           echo 'docker_tag: ${{ steps.docker_tag.outputs.result }}'
           echo 'notebook_name: ${{ steps.notebook_name.outputs.value }}'
           echo 'latest_tag: ${{ steps.latest_tag.outputs.value }}'
+          echo 'dockerfile_regular: ${{ steps.select_dockerfiles.outputs.dockerfile_regular }}'
+          echo 'dockerfile_gpu: ${{ steps.select_dockerfiles.outputs.dockerfile_gpu }}'
 
   build_amd64:
     name: Build Docker image on AMD64
@@ -126,12 +149,14 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: Dockerfile
+          file: ${{ needs.get_arguments.outputs.dockerfile_regular }}
           platforms: linux/amd64
           push: true
           tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64
           build-args: |
             UBUNTU_VERSION=${{ needs.get_arguments.outputs.ubuntu_version }}
+            CUDA_VERSION=${{ needs.get_arguments.outputs.cuda_version }}
+            CUDNN_VERSION=${{ needs.get_arguments.outputs.cudnn_version }}
             GPU_FLAG=0
             PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
             PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
@@ -143,7 +168,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: Dockerfile.gpu
+          file: ${{ needs.get_arguments.outputs.dockerfile_gpu }}
           platforms: linux/amd64
           push: true
           tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu
@@ -182,12 +207,14 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: Dockerfile
+          file: ${{ needs.get_arguments.outputs.dockerfile_regular }}
           platforms: linux/arm64
           push: true
           tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
           build-args: |
               UBUNTU_VERSION=${{ needs.get_arguments.outputs.ubuntu_version }}
+              CUDA_VERSION=${{ needs.get_arguments.outputs.cuda_version }}
+              CUDNN_VERSION=${{ needs.get_arguments.outputs.cudnn_version }}
               GPU_FLAG=0
               PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
               PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}

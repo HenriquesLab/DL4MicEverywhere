@@ -1,0 +1,263 @@
+ARG UBUNTU_VERSION=20.04
+ARG CUDA_VERSION=11.2.2
+ARG CUDNN_VERSION=8.1.1.33
+
+####
+## Stage 1 - Download and convert the notebook
+####
+FROM python:3.9-alpine3.19 AS notebook_autoconversion
+
+RUN apk update && \
+    apk add --no-cache git
+
+WORKDIR /home
+
+RUN python -m pip install --upgrade pip && \
+    python -m pip install nbformat==5.9.2
+
+# Read all the arguments
+ARG PATH_TO_NOTEBOOK
+ARG PATH_TO_REQUIREMENTS
+ARG SECTIONS_TO_REMOVE
+ARG NOTEBOOK_NAME
+ARG GPU_FLAG
+ARG PYTHON_VERSION
+ARG UBUNTU_VERSION
+ARG CUDA_VERSION
+ARG CUDNN_VERSION
+
+# Custom cache invalidation
+ARG CACHEBUST=1
+
+# All the layers below this will not be cached
+RUN echo "${CACHEBUST}"
+
+# Download the notebook
+ADD ${PATH_TO_NOTEBOOK} ./${NOTEBOOK_NAME}
+
+# Autoconvert the notebook
+RUN git clone --depth 1 https://github.com/HenriquesLab/DL4MicEverywhere.git && \
+    python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py \
+        -p . \
+        -n "${NOTEBOOK_NAME}" \
+        -s "${SECTIONS_TO_REMOVE}" && \
+    mv "colabless_${NOTEBOOK_NAME}" "${NOTEBOOK_NAME}" && \
+    python DL4MicEverywhere/.tools/python_tools/create_docker_info.py \
+        "/home/docker_info.txt" \
+        "${UBUNTU_VERSION}" \
+        "${CUDA_VERSION}" \
+        "${CUDNN_VERSION}" \
+        "${PATH_TO_NOTEBOOK}" \
+        "${PATH_TO_REQUIREMENTS}" \
+        "${SECTIONS_TO_REMOVE}" \
+        "${NOTEBOOK_NAME}" \
+        "${GPU_FLAG}" \
+        "${PYTHON_VERSION}"
+
+####
+## Stage 2 - Final legacy GPU image
+## Supported Python versions in this file: 3.5, 3.6
+## Interface build args accepted by all Dockerfiles:
+##   UBUNTU_VERSION, CUDA_VERSION, CUDNN_VERSION
+## Legacy Python is built from source so it can be used on any Ubuntu CUDA base.
+## GPU support now follows the same arg contract as the modern GPU Dockerfile.
+####
+FROM nvidia/cuda:${CUDA_VERSION}-devel-ubuntu${UBUNTU_VERSION} AS final
+ARG UBUNTU_VERSION
+ARG CUDA_VERSION
+ARG CUDNN_VERSION
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Read all the arguments
+ARG PATH_TO_NOTEBOOK=""
+ARG PATH_TO_REQUIREMENTS=""
+ARG SECTIONS_TO_REMOVE=""
+ARG NOTEBOOK_NAME=""
+ARG GPU_FLAG=""
+ARG PYTHON_VERSION=""
+ARG CACHEBUST=1
+
+# Environment
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+ENV TZ=Europe/Lisbon
+ENV DEBIAN_FRONTEND=noninteractive
+
+# GPU environment
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+ENV CUDA_HOME=/usr/local/cuda
+ENV OPENSSL_PREFIX=/opt/openssl
+ENV LD_LIBRARY_PATH="/usr/local/cuda/extras/CUPTI/lib64:/usr/local/cuda/lib64:${OPENSSL_PREFIX}/lib:${LD_LIBRARY_PATH}"
+ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/local/cuda
+
+# Legacy-safe Node version
+ENV NODE_VERSION=16.20.2
+ENV NVM_DIR=/root/.nvm
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="${VIRTUAL_ENV}/bin:/root/.nvm/versions/node/v${NODE_VERSION}/bin:/usr/local/cuda/bin:${PATH}"
+
+# Point EOL Ubuntu releases to old-releases when needed
+RUN case "${UBUNTU_VERSION}" in \
+        16.04|18.04) \
+            sed -i -E 's|http://(archive|security).ubuntu.com/ubuntu/?|http://old-releases.ubuntu.com/ubuntu/|g' /etc/apt/sources.list ;; \
+        *) \
+            true ;; \
+    esac
+
+# Base OS packages and Python build dependencies
+RUN ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime && \
+    echo "${TZ}" > /etc/timezone && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        wget \
+        unzip \
+        git \
+        build-essential \
+        software-properties-common \
+        gnupg \
+        dirmngr \
+        pkg-config \
+        tzdata \
+        ffmpeg \
+        libsm6 \
+        libxext6 \
+        libopenmpi-dev \
+        libfreetype6-dev \
+        libgomp1 \
+        zlib1g-dev \
+        libbz2-dev \
+        libreadline-dev \
+        libsqlite3-dev \
+        libffi-dev \
+        liblzma-dev \
+        libncurses5-dev \
+        libncursesw5-dev \
+        libgdbm-dev \
+        libnss3-dev \
+        tk-dev \
+        uuid-dev \
+        xz-utils \
+        perl \
+        make && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Node.js with NVM
+RUN curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && \
+    source "${NVM_DIR}/nvm.sh" && \
+    nvm install "${NODE_VERSION}" && \
+    nvm use "${NODE_VERSION}" && \
+    nvm alias default "${NODE_VERSION}"
+
+# Optional cuDNN install from the NVIDIA apt repo
+RUN set -eux; \
+    mkdir -p /etc/apt/keyrings; \
+    curl -fsSL "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu${UBUNTU_VERSION%.*}${UBUNTU_VERSION#*.}/x86_64/3bf863cc.pub" | \
+        gpg --dearmor -o /etc/apt/keyrings/nvidia-cuda.gpg; \
+    echo "deb [signed-by=/etc/apt/keyrings/nvidia-cuda.gpg] https://developer.download.nvidia.com/compute/cuda/repos/ubuntu${UBUNTU_VERSION%.*}${UBUNTU_VERSION#*.}/x86_64/ /" \
+        > /etc/apt/sources.list.d/nvidia-cuda.list; \
+    apt-get update; \
+    if [ -n "${CUDNN_VERSION}" ]; then \
+        apt-get install -y --no-install-recommends \
+            "libcudnn8=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*}" \
+            "libcudnn8-dev=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*}"; \
+    else \
+        apt-get install -y --no-install-recommends \
+            libcudnn8 \
+            libcudnn8-dev; \
+    fi; \
+    rm -rf /var/lib/apt/lists/*
+
+# Build OpenSSL 1.1 for legacy Python compatibility
+RUN set -eux; \
+    OPENSSL_VERSION=1.1.1w; \
+    mkdir -p /tmp/build-openssl; \
+    cd /tmp/build-openssl; \
+    curl -fsSLO "https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz"; \
+    tar -xzf "openssl-${OPENSSL_VERSION}.tar.gz"; \
+    cd "openssl-${OPENSSL_VERSION}"; \
+    ./config --prefix="${OPENSSL_PREFIX}" --openssldir="${OPENSSL_PREFIX}" shared zlib; \
+    make -j"$(nproc)"; \
+    make install_sw; \
+    rm -rf /tmp/build-openssl
+
+# Build legacy Python from source so 3.5 / 3.6 can run on any Ubuntu CUDA base
+RUN set -eux; \
+    case "${PYTHON_VERSION}" in \
+        3.5) \
+            PYTHON_FULL_VERSION=3.5.10; \
+            PIP_SPEC='pip<21'; \
+            SETUPTOOLS_SPEC='setuptools<50' \
+            ;; \
+        3.6) \
+            PYTHON_FULL_VERSION=3.6.15; \
+            PIP_SPEC='pip<22'; \
+            SETUPTOOLS_SPEC='setuptools<60' \
+            ;; \
+        *) \
+            echo "Unsupported PYTHON_VERSION=${PYTHON_VERSION}. Supported values in this Dockerfile: 3.5, 3.6." >&2; \
+            exit 1 \
+            ;; \
+    esac; \
+    mkdir -p /tmp/build-python; \
+    cd /tmp/build-python; \
+    curl -fsSLO "https://www.python.org/ftp/python/${PYTHON_FULL_VERSION}/Python-${PYTHON_FULL_VERSION}.tgz"; \
+    tar -xzf "Python-${PYTHON_FULL_VERSION}.tgz"; \
+    cd "Python-${PYTHON_FULL_VERSION}"; \
+    ./configure \
+        --prefix="/opt/python/${PYTHON_VERSION}" \
+        --with-ensurepip=install \
+        --with-openssl="${OPENSSL_PREFIX}" \
+        CPPFLAGS="-I${OPENSSL_PREFIX}/include" \
+        LDFLAGS="-Wl,-rpath,${OPENSSL_PREFIX}/lib -L${OPENSSL_PREFIX}/lib"; \
+    make -j"$(nproc)"; \
+    make altinstall; \
+    "/opt/python/${PYTHON_VERSION}/bin/python${PYTHON_VERSION}" -m venv "${VIRTUAL_ENV}"; \
+    "${VIRTUAL_ENV}/bin/python" -m ensurepip --upgrade; \
+    "${VIRTUAL_ENV}/bin/python" -m pip install --upgrade "${PIP_SPEC}" "${SETUPTOOLS_SPEC}" wheel; \
+    ln -sf "${VIRTUAL_ENV}/bin/python" /usr/local/bin/python; \
+    ln -sf "${VIRTUAL_ENV}/bin/python" /usr/local/bin/python3; \
+    ln -sf "${VIRTUAL_ENV}/bin/pip" /usr/local/bin/pip; \
+    ln -sf "${VIRTUAL_ENV}/bin/pip" /usr/local/bin/pip3; \
+    rm -rf /tmp/build-python
+
+WORKDIR /home
+
+# Install notebook runtime packages
+RUN set -eux; \
+    if [ "${PYTHON_VERSION}" = "3.5" ]; then \
+        python -m pip install --upgrade 'pip<21' 'setuptools<50'; \
+        python -m pip install nbformat==5.0.2; \
+        python -m pip install ipywidgets==7.8.1; \
+        python -m pip install jupyterlab==0.23.0; \
+        python -m pip install matplotlib==2.1.0; \
+    else \
+        python -m pip install --upgrade 'pip<22' 'setuptools<60'; \
+        python -m pip install nbformat==5.0.2; \
+        python -m pip install ipywidgets==8.0.0a0; \
+        python -m pip install jupyterlab==2.3.2; \
+        python -m pip install matplotlib==3.0.3; \
+    fi
+
+# Custom cache invalidation
+RUN echo "${CACHEBUST}"
+
+# Download requirements
+ADD ${PATH_TO_REQUIREMENTS} ./requirements.txt
+
+# Install requirements
+RUN if [ "${PYTHON_VERSION}" = "3.5" ]; then \
+        python -m pip install --upgrade 'pip<21' 'setuptools<50'; \
+    else \
+        python -m pip install --upgrade 'pip<22' 'setuptools<60'; \
+    fi && \
+    python -m pip install -r requirements.txt && \
+    rm requirements.txt
+
+# Copy the converted notebook from stage 1
+COPY --from=notebook_autoconversion /home/${NOTEBOOK_NAME} /home/docker_info.txt /home/
+
+CMD ["bash"]

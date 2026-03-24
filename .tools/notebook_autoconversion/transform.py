@@ -101,9 +101,18 @@ def main():
     parser.add_argument("-s", "--sections", help="List with the sections to remove", nargs='*') 
     args = vars(parser.parse_args())
 
+    sections_to_remove = args['sections'] if args['sections'] else []
+    processed_sections_to_remove = []
+    for section in sections_to_remove:
+        if " " in section:
+            new_sections = section.split(" ")
+            processed_sections_to_remove.extend(new_sections)
+        else:            
+            processed_sections_to_remove.append(section)
+
     path_original_nb = os.path.join(args["path"], args["name"])
     path_new_nb = os.path.join(args["path"], "colabless_" + args["name"])
-    transform_nb(path_original_nb, path_new_nb, remove_sections = args["sections"])
+    transform_nb(path_original_nb, path_new_nb, remove_sections = processed_sections_to_remove)
 
 if __name__ == "__main__":
     main()
