@@ -339,7 +339,7 @@ jobs:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
       - name: Update the repository with git pull
-        run: git pull
+        run: git pull origin main
       - uses: actions/setup-python@v5
         with:
           python-version: '3.9'

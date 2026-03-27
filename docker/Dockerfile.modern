@@ -157,12 +157,13 @@ RUN set -eux; \
     python -m pip install --upgrade pip; \
     if [ "$(printf '%s\n' "3.8" "${PYTHON_VERSION}" | sort -V | head -n1)" = "3.8" ]; then \
         python -m pip install nbformat==5.9.2; \
+        python -m pip install matplotlib==3.6.3; \
     else \
         python -m pip install nbformat==5.0.2; \
+        python -m pip install matplotlib==3.5.3; \
     fi; \
     python -m pip install ipywidgets==8.1.0; \
-    python -m pip install jupyterlab==3.6.0; \
-    python -m pip install matplotlib==3.6.3
+    python -m pip install jupyterlab==3.6.0
 
 # Custom cache invalidation
 RUN echo "${CACHEBUST}"
