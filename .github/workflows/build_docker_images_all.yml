@@ -4,11 +4,6 @@ on:
   release:
     types: [published]
   workflow_dispatch:
-             
-# This enables to run a single workflow at a time during release
-concurrency:
-  group: release-global-lock-${{ github.ref }}
-  cancel-in-progress: false
 
 jobs:
   list_configs:

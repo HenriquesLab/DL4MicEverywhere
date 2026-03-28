@@ -4,11 +4,6 @@ on:
     tags:
       - "*.*.*"
 
-# This enables to run a single workflow at a time during release
-concurrency:
-  group: release-global-lock-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
   build:
     uses: ./.github/workflows/build_workflow.yml
