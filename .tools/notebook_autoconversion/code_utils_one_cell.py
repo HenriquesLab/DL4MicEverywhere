@@ -81,7 +81,7 @@ def param_to_widget(code):
 
     else:
         # Extract the type of the @param
-        match_type = re.findall(r"{type:\s*\"(\w+)\".*}", post_param)
+        match_type = re.findall(r"{\"?type\"?:\s*\"(\w+)\".*}", post_param)
         param_type = match_type[0] if match_type else None
 
         # Extract and check if instead of a type, a list is defined 
@@ -124,7 +124,7 @@ def param_to_widget(code):
         elif param_type is not None:
             # If it is not a list a list of values, it would be one of the following types (adding ipywidgets based on the type)
             if param_type == "slider":
-                min, max, step = re.findall(f"\s*min:({float_regex}),\s*max:({float_regex}),\s*step:({float_regex})", post_param)[0]
+                min, max, step = re.findall(f"\s*\"?min\"?:({float_regex}),\s*\"?max\"?:({float_regex}),\s*\"?step\"?:({float_regex})", post_param)[0]
                 try:
                     min, max, step = int(min), int(max), int(step)
                     result = f'widget_{var_name} = widgets.IntSlider(value={default_value}, min={min}, max={max}, step={step}, style={ipywidget_style}, description="{var_name}:")\n'

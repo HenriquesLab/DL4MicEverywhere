@@ -1,0 +1,205 @@
+ARG UBUNTU_VERSION=22.04
+ARG CUDA_VERSION=12.3.2
+ARG CUDNN_VERSION=""
+
+####
+## Stage 1 - Download and convert the notebook
+####
+FROM python:3.9-alpine3.19 AS notebook_autoconversion
+
+RUN apk update && \
+    apk add --no-cache git
+
+WORKDIR /home
+
+RUN python -m pip install --upgrade pip && \
+    python -m pip install nbformat==5.9.2
+
+# Read all the arguments
+ARG PATH_TO_NOTEBOOK
+ARG PATH_TO_REQUIREMENTS
+ARG SECTIONS_TO_REMOVE
+ARG NOTEBOOK_NAME
+ARG GPU_FLAG
+ARG PYTHON_VERSION
+ARG UBUNTU_VERSION
+ARG CUDA_VERSION
+ARG CUDNN_VERSION
+
+# Custom cache invalidation
+ARG CACHEBUST=1
+
+# All the layers below this will not be cached
+RUN echo "${CACHEBUST}"
+
+# Download the notebook
+ADD ${PATH_TO_NOTEBOOK} ./${NOTEBOOK_NAME}
+
+# Autoconvert the notebook
+RUN git clone --depth 1 https://github.com/HenriquesLab/DL4MicEverywhere.git && \
+    python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py \
+        -p . \
+        -n "${NOTEBOOK_NAME}" \
+        -s "${SECTIONS_TO_REMOVE}" && \
+    mv "colabless_${NOTEBOOK_NAME}" "${NOTEBOOK_NAME}" && \
+    python DL4MicEverywhere/.tools/python_tools/create_docker_info.py \
+        "/home/docker_info.txt" \
+        "${UBUNTU_VERSION}" \
+        "${CUDA_VERSION}" \
+        "${CUDNN_VERSION}" \
+        "${PATH_TO_NOTEBOOK}" \
+        "${PATH_TO_REQUIREMENTS}" \
+        "${SECTIONS_TO_REMOVE}" \
+        "${NOTEBOOK_NAME}" \
+        "${GPU_FLAG}" \
+        "${PYTHON_VERSION}"
+
+####
+## Stage 2 - Final GPU image
+## Supported Python versions in this file: 3.7, 3.8, 3.9, 3.10, 3.11, 3.12, 3.13
+## Interface build args accepted by all Dockerfiles:
+##   UBUNTU_VERSION, CUDA_VERSION, CUDNN_VERSION
+####
+FROM nvidia/cuda:${CUDA_VERSION}-devel-ubuntu${UBUNTU_VERSION} AS final
+ARG UBUNTU_VERSION
+ARG CUDA_VERSION
+ARG CUDNN_VERSION
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Read all the arguments
+ARG PATH_TO_NOTEBOOK=""
+ARG PATH_TO_REQUIREMENTS=""
+ARG SECTIONS_TO_REMOVE=""
+ARG NOTEBOOK_NAME=""
+ARG GPU_FLAG=""
+ARG PYTHON_VERSION=""
+ARG CACHEBUST=1
+
+# Environment
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+ENV TZ=Europe/Lisbon
+ENV DEBIAN_FRONTEND=noninteractive
+
+# GPU environment
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+ENV CUDA_HOME=/usr/local/cuda
+ENV LD_LIBRARY_PATH=/usr/local/cuda/extras/CUPTI/lib64:/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
+ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/local/cuda
+
+# Node / Python environment
+ENV NODE_VERSION=20.10.0
+ENV NVM_DIR=/root/.nvm
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH=${VIRTUAL_ENV}/bin:/root/.nvm/versions/node/v${NODE_VERSION}/bin:/usr/local/cuda/bin:${PATH}
+
+# Base OS packages
+RUN ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime && \
+    echo "${TZ}" > /etc/timezone && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        wget \
+        unzip \
+        git \
+        build-essential \
+        software-properties-common \
+        gnupg \
+        dirmngr \
+        pkg-config \
+        tzdata \
+        ffmpeg \
+        libsm6 \
+        libxext6 \
+        libopenmpi-dev \
+        libfreetype6-dev \
+        libgomp1 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Node.js with NVM
+RUN curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && \
+    source "${NVM_DIR}/nvm.sh" && \
+    nvm install "${NODE_VERSION}" && \
+    nvm use "${NODE_VERSION}" && \
+    nvm alias default "${NODE_VERSION}"
+
+# Optional cuDNN install
+# The nvidia/cuda base image already provides the CUDA apt repository.
+# Do not add it again, or apt may fail with conflicting Signed-By settings.
+RUN set -eux; \
+    apt-get update; \
+    if [ -n "${CUDNN_VERSION}" ]; then \
+        apt-get install -y --no-install-recommends \
+            "libcudnn8=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*}" \
+            "libcudnn8-dev=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*}"; \
+    else \
+        apt-get install -y --no-install-recommends \
+            libcudnn8 \
+            libcudnn8-dev; \
+    fi; \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Python
+RUN set -eux; \
+    add-apt-repository -y ppa:deadsnakes/ppa; \
+    apt-get update; \
+    case "${PYTHON_VERSION}" in \
+        3.10) \
+            apt-get install -y --no-install-recommends \
+                python3.10 \
+                python3.10-dev \
+                python3.10-venv \
+            ;; \
+        3.7|3.8|3.9|3.11|3.12|3.13) \
+            apt-get install -y --no-install-recommends \
+                "python${PYTHON_VERSION}" \
+                "python${PYTHON_VERSION}-dev" \
+                "python${PYTHON_VERSION}-venv" \
+            ;; \
+        *) \
+            echo "Unsupported PYTHON_VERSION=${PYTHON_VERSION}. Supported values in this Dockerfile: 3.7, 3.8, 3.9, 3.10, 3.11, 3.12, 3.13." >&2; \
+            exit 1 \
+            ;; \
+    esac; \
+    "python${PYTHON_VERSION}" -m venv "${VIRTUAL_ENV}"; \
+    "${VIRTUAL_ENV}/bin/python" -m ensurepip --upgrade; \
+    "${VIRTUAL_ENV}/bin/python" -m pip install --upgrade pip setuptools wheel; \
+    ln -sf "${VIRTUAL_ENV}/bin/python" /usr/local/bin/python; \
+    ln -sf "${VIRTUAL_ENV}/bin/python" /usr/local/bin/python3; \
+    ln -sf "${VIRTUAL_ENV}/bin/pip" /usr/local/bin/pip; \
+    ln -sf "${VIRTUAL_ENV}/bin/pip" /usr/local/bin/pip3; \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /home
+
+# Install notebook runtime packages
+RUN set -eux; \
+    python -m pip install --upgrade pip; \
+    if [ "$(printf '%s\n' "3.8" "${PYTHON_VERSION}" | sort -V | head -n1)" = "3.8" ]; then \
+        python -m pip install nbformat==5.9.2; \
+        python -m pip install matplotlib==3.6.3; \
+    else \
+        python -m pip install nbformat==5.0.2; \
+        python -m pip install matplotlib==3.5.3; \
+    fi; \
+    python -m pip install ipywidgets==8.1.0; \
+    python -m pip install jupyterlab==3.6.0
+
+# Custom cache invalidation
+RUN echo "${CACHEBUST}"
+
+# Download requirements
+ADD ${PATH_TO_REQUIREMENTS} ./requirements.txt
+
+# Install requirements
+RUN python -m pip install --upgrade pip && \
+    python -m pip install -r requirements.txt && \
+    rm requirements.txt
+
+# Copy the converted notebook from stage 1
+COPY --from=notebook_autoconversion /home/${NOTEBOOK_NAME} /home/docker_info.txt /home/
+
+CMD ["bash"]

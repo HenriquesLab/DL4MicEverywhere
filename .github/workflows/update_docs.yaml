@@ -9,14 +9,14 @@ on:
 jobs:
   update_documentation:
     name: Update the documentation
-    runs-on: [self-hosted, dl4miceverywhere-builder]
+    runs-on: [self-hosted, Ubuntu, NotDocker]
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-          cache: 'pip' # caching pip dependencies
+          # cache: 'pip' # caching pip dependencies
       - name: Install requirements
         run: pip install -r .tools/requirements.txt
       - name: Generate notebooks list

@@ -52,7 +52,13 @@ This process requires you to restart your computer, enter the BIOS and enabling 
 - Verify Nvidia drivers are properly installed for your GPU.
 - Ensure `nvidia-docker` is installed and runtime is enabled in Docker.
 - Consider updating Nvidia driver and CUDA to latest compatible versions.
+- Ensure that you have checked `Enable GPU-backend inference`:
 
+<img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TROUBLESHOOTING/DockerDesktop_GPU_Enable.png" 
+     alt="Docker Desktop Enable GPU backed"
+     width="50%" 
+     height="50%" />
+     
 ### **Docker fails to detect GPU** 
 
 - Check `nvidia-smi` works outside Docker. If not, reinstall Nvidia driver.

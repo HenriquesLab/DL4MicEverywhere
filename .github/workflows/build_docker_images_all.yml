@@ -4,11 +4,11 @@ on:
   release:
     types: [published]
   workflow_dispatch:
-                  
+
 jobs:
   list_configs:
     name: Get the list of configuration files on the repository
-    runs-on: [self-hosted, dl4miceverywhere-builder]
+    runs-on: [self-hosted, Ubuntu, NotDocker]
     outputs: 
       matrix: ${{ steps.config_list.outputs.matrix }}
     steps:
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-          cache: 'pip' # caching pip dependencies
+          # cache: 'pip' # caching pip dependencies
       - name: Install requirements
         run: pip install -r .tools/requirements.txt
       - name: Update all the configurations

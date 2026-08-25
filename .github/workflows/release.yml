@@ -2,7 +2,8 @@ name: Build and publish ZIPs when release
 on:
   push:
     tags:
-      - "*"
+      - "*.*.*"
+
 jobs:
   build:
     uses: ./.github/workflows/build_workflow.yml
@@ -10,11 +11,18 @@ jobs:
     needs: build
     permissions:
       contents: write
-    runs-on: [self-hosted, dl4miceverywhere-builder]
+    runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Download all artifacts
         uses: actions/download-artifact@v4
+        with:
+          path: artifact_folder
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "**/*"
+          artifacts: "artifact_folder/**/*" # Add the downloaded artifact
+          makeLatest: true
+          name: "${{ github.event.head_commit.message }}" # Set the release name as the commit message
+          bodyFile: "./docs/CHANGELOG/${{ github.ref_name }}.md" # Look for the markdown file with the version name and use it as release message

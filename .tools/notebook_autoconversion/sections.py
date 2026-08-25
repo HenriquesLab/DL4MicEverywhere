@@ -137,6 +137,7 @@ def remove_section_list(cells, section_localizer, section_list):
     """
     sorted_sections = sorted(section_list, key=lambda x: [int(num) for num in x.split('.')[:-1]], reverse=True)
     for section in sorted_sections:
-        cells, section_localizer = remove_section(cells.copy(), section_localizer.copy(), section)
+        if section:
+            cells, section_localizer = remove_section(cells.copy(), section_localizer.copy(), section)
 
     return cells, section_localizer 

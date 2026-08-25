@@ -98,6 +98,36 @@ advanced_options : ${11}" > "$BASEDIR/.tools/.cache/.cache_gui"
 # Import get_yaml_args_from_file
 source "$BASEDIR/.tools/bash_tools/get_yaml_args.sh"
 
+is_legacy_python() {
+    case "$1" in
+        3.5|3.6)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+select_dockerfile() {
+    local gpu_enabled="$1"
+    local python_version="$2"
+
+    if [ "$gpu_enabled" -eq 1 ]; then
+        if is_legacy_python "$python_version"; then
+            echo "$BASEDIR/docker/Dockerfile.gpu.legacy"
+        else
+            echo "$BASEDIR/docker/Dockerfile.gpu.modern"
+        fi
+    else
+        if is_legacy_python "$python_version"; then
+            echo "$BASEDIR/docker/Dockerfile.legacy"
+        else
+            echo "$BASEDIR/docker/Dockerfile.modern"
+        fi
+    fi
+}
+
 # Let's define the default values for the flags
 flag_gpu=0
 flag_test=0
@@ -466,7 +496,21 @@ else
     echo ""
 fi
 
-if [ "$flag_test" -eq 1 ]; then
+
+selected_dockerfile=$(select_dockerfile "$gpu_flag" "$python_version")
+
+if [ ! -f "$selected_dockerfile" ]; then
+    echo "" 
+    echo "------------------------------------"
+    echo "The selected Dockerfile does not exist: $selected_dockerfile"
+    echo "Please make sure the repository contains the split modern/legacy Dockerfiles under the docker/ folder."
+    read -p "Press enter to close the terminal."
+    echo "------------------------------------" 
+    exit 1
+fi
+
+# Set the docker's tag
+if [ "$test_flag" -eq 1 ]; then
     echo ""
     echo "ubuntu_version: $ubuntu_version"
     echo "cuda_version: $cuda_version"
@@ -478,12 +522,13 @@ if [ "$flag_test" -eq 1 ]; then
     echo "notebook_version: $notebook_version"
     echo "description: $description"
     echo "docker_tag: $docker_tag"
+    echo "selected_dockerfile: $selected_dockerfile"
     echo ""
 fi
 
 notebook_name="$(basename "$notebook_path")"
 
-# Local files, if included, need to be remocreated in same folder as the dockerfile,
+# Local files, if included, need to be recreated in the repository root (the Docker build context),
 # then they will be deleted
 if [ "$flag_local_notebook" -eq 1 ]; then
     cp "$notebook_path" "$BASEDIR/notebook.ipynb"
@@ -683,12 +728,12 @@ if [ "$flag_build" -eq 3 ]; then
     DOCKER_OUT=$? # Gets if the docker image has been pulled
 else
     # Build the docker image without GUI
-    if [ "$flag_build" -eq 2 ]; then
-        if [ "$flag_gpu" -eq 1 ]; then
-            echo "To build the docker image, you need to provide root access by entering your password."
-            echo "Otherwise, you can choose the option of getting the image from Docker Hub or follow"
-            echo "the steps in our documentation."
-            sudo docker build --file "$BASEDIR/Dockerfile.gpu" -t $docker_tag "$BASEDIR"\
+    if [ "$build_flag" -eq 2 ]; then
+        echo "To build the docker image, you need to provide root access by entering your password."
+        echo "Otherwise, you can choose the option of getting the image from Docker Hub or follow"
+        echo "the steps in our documentation."
+        if [ "$gpu_flag" -eq 1 ]; then
+            sudo docker build --file "$selected_dockerfile" -t "$docker_tag" "$BASEDIR" \
                 --build-arg UBUNTU_VERSION="${ubuntu_version}" \
                 --build-arg CUDA_VERSION="${cuda_version}" \
                 --build-arg CUDNN_VERSION="${cudnn_version}" \
@@ -700,12 +745,11 @@ else
                 --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" \
                 --build-arg CACHEBUST=$(date +%s)
         else
-            echo "To build the docker image, you need to provide root access by entering your password."
-            echo "Otherwise, you can choose the option of getting the image from Docker Hub or follow"
-            echo "the steps in our documentation."
-            sudo docker build --file "$BASEDIR/Dockerfile" -t $docker_tag "$BASEDIR"\
+            sudo docker build --file "$selected_dockerfile" -t "$docker_tag" "$BASEDIR" \
                 --build-arg UBUNTU_VERSION="${ubuntu_version}" \
-                --build-arg flag_gpu="${flag_gpu}" \
+                --build-arg CUDA_VERSION="${cuda_version}" \
+                --build-arg CUDNN_VERSION="${cudnn_version}" \
+                --build-arg GPU_FLAG="${gpu_flag}" \
                 --build-arg PYTHON_VERSION="${python_version}" \
                 --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
                 --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \

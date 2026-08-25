@@ -1,25 +1,88 @@
 name: Update repository version and docker tag on configuration files
+
 on:
   release:
     types: [published]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   update_configuration:
     name: Update repository version and docker tag on configuration
-    runs-on: [self-hosted, dl4miceverywhere-builder]
+    runs-on: [self-hosted, Ubuntu, NotDocker]
+
     steps:
-      - name: Clone DL4MicEverywhere repository
+      - name: Resolve target branch
+        id: resolve_branch
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "${{ github.event_name }}" = "release" ]; then
+            candidate="${{ github.event.release.target_commitish }}"
+          elif [ "${{ github.ref_type }}" = "branch" ]; then
+            candidate="${{ github.ref_name }}"
+          else
+            candidate="${{ github.event.repository.default_branch }}"
+          fi
+
+          if [ -z "$candidate" ]; then
+            candidate="${{ github.event.repository.default_branch }}"
+          fi
+
+          # Releases can carry a commit SHA in target_commitish. Pushing requires a branch.
+          if [[ "$candidate" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
+            candidate="${{ github.event.repository.default_branch }}"
+          fi
+
+          echo "Using target branch: $candidate"
+          echo "branch=$candidate" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout repository branch
         uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+        with:
+          ref: ${{ steps.resolve_branch.outputs.branch }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-          cache: 'pip' # caching pip dependencies
+
       - name: Install requirements
-        run: pip install -r .tools/requirements.txt
-      - name: Update all the configurations
-        run: python3 .tools/python_tools/update_configuration.py
-      - name: Commit the changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: GitHub Action - Update repository version and docker tag on configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install -r .tools/requirements.txt
+
+      - name: Update all configurations
+        shell: bash
+        run: |
+          set -euo pipefail
+          python .tools/python_tools/update_configuration.py
+
+      - name: Commit and push changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A notebooks
+
+          if git diff --cached --quiet; then
+            echo "No staged changes to commit."
+            exit 0
+          fi
+
+          git commit -m "GitHub Action - Update repository version and docker tag on configuration"
+          git push origin "HEAD:${{ steps.resolve_branch.outputs.branch }}"
