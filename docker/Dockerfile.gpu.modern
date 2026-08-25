@@ -143,9 +143,25 @@ RUN set -eux; \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python
+# Configure the Deadsnakes PPA directly instead of calling add-apt-repository.
+# This avoids the Launchpad API request that can fail with transient TLS errors.
 RUN set -eux; \
-    add-apt-repository -y ppa:deadsnakes/ppa; \
-    apt-get update; \
+    . /etc/os-release; \
+    DEADSNAKES_FINGERPRINT="F23C5A6CF475977595C89F51BA6932366A755776"; \
+    curl -fsSL \
+        --retry 5 \
+        --retry-delay 2 \
+        --retry-all-errors \
+        "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x${DEADSNAKES_FINGERPRINT}" \
+        -o /tmp/deadsnakes.asc; \
+    gpg --show-keys --with-colons /tmp/deadsnakes.asc \
+        | grep -q "^fpr:::::::::${DEADSNAKES_FINGERPRINT}:$"; \
+    gpg --batch --yes --dearmor \
+        --output /usr/share/keyrings/deadsnakes-ppa.gpg \
+        /tmp/deadsnakes.asc; \
+    echo "deb [signed-by=/usr/share/keyrings/deadsnakes-ppa.gpg] https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu ${VERSION_CODENAME} main" \
+        > /etc/apt/sources.list.d/deadsnakes-ppa.list; \
+    apt-get -o Acquire::Retries=5 update; \
     case "${PYTHON_VERSION}" in \
         3.10) \
             apt-get install -y --no-install-recommends \
@@ -171,6 +187,7 @@ RUN set -eux; \
     ln -sf "${VIRTUAL_ENV}/bin/python" /usr/local/bin/python3; \
     ln -sf "${VIRTUAL_ENV}/bin/pip" /usr/local/bin/pip; \
     ln -sf "${VIRTUAL_ENV}/bin/pip" /usr/local/bin/pip3; \
+    rm -f /tmp/deadsnakes.asc; \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /home
