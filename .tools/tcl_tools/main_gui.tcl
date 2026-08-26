@@ -44,11 +44,12 @@ if {"$construct_exist" == "1"} {
     set window_title "DL4MicEverywhere"
 }
 
-# Define the shape of the window
-set width 600
-set height 750
-set width_offset [expr { ( [winfo vrootwidth  .] - $width  ) / 2 }]
-set height_offset [expr { ( [winfo vrootheigh .] - $height ) / 2 }]
+# Define preferred and minimum window sizes. These are starting/layout hints only:
+# the window and its contents remain fully resizable.
+set preferred_width 720
+set preferred_height 760
+set minimum_width 600
+set minimum_height 620
 
 # Define the types for the file searching 
 set yaml_types {
@@ -252,80 +253,50 @@ proc onDone {} {
 
 proc onAdvanced {} {
     global advanced_options
-    global is_mac
+    global min_width
+    global min_height
 
     if {"$advanced_options" == 0} {
         set advanced_options 1
-        pack .fr.advanced -fill both -expand 1 
-        
-        .fr.principal.notebooks configure -state disable
-        .fr.principal.notebooks_folders configure -state disable
-        .fr.principal.versions configure -state disable
 
-        place .fr.principal.notebooks_folders -relx 0.02 -rely [expr 0.55 / ( 2 - $advanced_options ) ]
-        place .fr.principal.notebooks -relx 0.02 -rely [expr 0.55 / ( 2 - $advanced_options ) ]
+        # Reveal the advanced section. Grid handles the vertical reflow, so no
+        # widgets in the principal section need to be manually repositioned.
+        grid .fr.advanced -row 1 -column 0 -columnspan 3 -sticky ew -padx 0 -pady 0
 
-        place .fr.principal.data_label -relx 0.02 -rely [expr 0.625 / ( 2 - $advanced_options ) ]
-        place .fr.principal.data_entry -relx 0.02 -rely [expr 0.685 / ( 2 - $advanced_options ) ]
-        place .fr.principal.data_btn -relx 0.85 -rely [expr 0.68 / ( 2 - $advanced_options ) ]
+        .fr.principal.notebooks configure -state disabled
+        .fr.principal.notebooks_folders configure -state disabled
+        .fr.principal.versions configure -state disabled
 
-        place .fr.principal.result_label -relx 0.02 -rely [expr 0.76 / ( 2 - $advanced_options ) ]
-        place .fr.principal.result_entry -relx 0.02 -rely [expr 0.82 / ( 2 - $advanced_options ) ]
-        place .fr.principal.result_btn -relx 0.85 -rely [expr 0.825 / ( 2 - $advanced_options ) ]
-        
-        place .fr.principal.gpu -relx 0.07 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
-        place .fr.principal.version_label -relx 0.29 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
-        place .fr.principal.versions -relx 0.39 -rely [expr 0.915 / ( 2 - $advanced_options ) ]
-        place .fr.principal.cache_btn -relx 0.63 -rely [expr 0.905 / ( 2 - $advanced_options ) ]
-
-        .fr.principal.notebook_description configure -height [expr 1 + ($is_mac * 2)] 
-        .fr.principal.notebook_description delete 0.0 end
+        .fr.principal.notebook_description configure -state normal
+        .fr.principal.notebook_description delete 1.0 end
         .fr.principal.notebook_description tag configure highlight -foreground DarkOrange2 -font {courier 12 bold}
         .fr.principal.notebook_description insert end "On advanced mode, default notebooks are disabled." highlight
+        .fr.principal.notebook_description configure -state disabled
 
+        # Advanced mode needs additional vertical room. Prevent controls from
+        # being clipped by raising the minimum height up to the screen limit.
+        update idletasks
+        set screen_limit [expr {max(500, [winfo vrootheight .] - 80)}]
+        set advanced_min_height [expr {min([winfo reqheight .fr], $screen_limit)}]
+        wm minsize . $min_width $advanced_min_height
     } else {
         set advanced_options 0
-        pack .fr.advanced -fill both -expand 0
-        
-        .fr.principal.notebooks configure -state normal
-        .fr.principal.notebooks_folders configure -state normal
-        .fr.principal.versions configure -state normal
+        grid remove .fr.advanced
+        wm minsize . $min_width $min_height
 
-        place .fr.principal.notebooks_folders -relx 0.02 -rely [expr 0.55 / ( 2 - $advanced_options ) ]
-        place .fr.principal.notebooks -relx 0.02 -rely [expr 0.63 / ( 2 - $advanced_options ) ]
-        
-        place .fr.principal.data_label -relx 0.02 -rely [expr 0.705 / ( 2 - $advanced_options ) ]
-        place .fr.principal.data_entry -relx 0.02 -rely [expr 0.765 / ( 2 - $advanced_options ) ]
-        place .fr.principal.data_btn -relx 0.85 -rely [expr 0.76 / ( 2 - $advanced_options ) ]
+        # Comboboxes are selectors, not free-text fields. Restore readonly
+        # rather than normal when leaving advanced mode.
+        .fr.principal.notebooks configure -state readonly
+        .fr.principal.notebooks_folders configure -state readonly
+        .fr.principal.versions configure -state readonly
 
-        place .fr.principal.result_label -relx 0.02 -rely [expr 0.845 / ( 2 - $advanced_options ) ]
-        place .fr.principal.result_entry -relx 0.02 -rely [expr 0.905 / ( 2 - $advanced_options ) ]
-        place .fr.principal.result_btn -relx 0.85 -rely [expr 0.90 / ( 2 - $advanced_options ) ]
-        
-        place .fr.principal.gpu -relx 0.07 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
-        place .fr.principal.version_label -relx 0.29 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
-        place .fr.principal.versions -relx 0.39 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
-        place .fr.principal.cache_btn -relx 0.63 -rely [expr 0.989 / ( 2 - $advanced_options ) ]
-
-        .fr.principal.notebook_description configure -height [expr 4 + ($is_mac * 2)] 
-        .fr.principal.notebook_description delete 0.0 end
+        .fr.principal.notebook_description configure -state normal
+        .fr.principal.notebook_description delete 1.0 end
         global selectedNotebook
         if {"$selectedNotebook" != "-"} {
             onComboboxSelectedNotebook $selectedNotebook
         }
     }
-
-    place .fr.principal.intro_2 -relx 0.02 -rely [expr 0.06 / ( 2 - $advanced_options ) ]
-    place .fr.principal.intro_3 -relx 0.02 -rely [expr 0.12 / ( 2 - $advanced_options ) ]
-    place .fr.principal.intro_4 -relx 0.02 -rely [expr 0.18 / ( 2 - $advanced_options ) ]
-    place .fr.principal.intro_5 -relx 0.02 -rely [expr 0.24 / ( 2 - $advanced_options ) ]
-    place .fr.principal.intro_6 -relx 0.02 -rely [expr 0.30 / ( 2 - $advanced_options ) ]
-    place .fr.principal.intro_7 -relx 0.02 -rely [expr 0.36 / ( 2 - $advanced_options ) ]
-    place .fr.principal.intro_8 -relx 0.02 -rely [expr 0.42 / ( 2 - $advanced_options ) ]
-
-    place .fr.principal.notebook_label -relx 0.02 -rely [expr 0.49 / ( 2 - $advanced_options ) ]
-    place .fr.principal.notebook_description -relx 0.375 -rely [expr 0.495 / ( 2 - $advanced_options ) ]
-
 }
 
 proc onComboboxSelectedFolder {notebook_folder} {
@@ -439,233 +410,249 @@ if {[string match linux-gnu* $operative_system]} {
 
 ##### Define the frames of the window #####
 
-# Define the frames to display the information
-# It will be divided in three sections (mandatory arguments, advanced and "Run" and "Cancel" buttons.)
-
+# Use grid for the main layout so controls follow the available window size.
+# Principal content grows with the window; the advanced section is inserted
+# between it and the action buttons when requested.
 frame .fr
-pack .fr -fill both -expand 1
+
+grid .fr -row 0 -column 0 -sticky nsew
+grid columnconfigure . 0 -weight 1
+grid rowconfigure . 0 -weight 1
+
+grid columnconfigure .fr 0 -weight 1
+grid columnconfigure .fr 1 -weight 0
+grid columnconfigure .fr 2 -weight 0
+grid rowconfigure .fr 0 -weight 1
 
 frame .fr.principal -relief raised -borderwidth 1
-pack .fr.principal -fill both -expand 1
+grid .fr.principal -row 0 -column 0 -columnspan 3 -sticky nsew
+
+# The first two columns receive extra horizontal space. The last column is
+# reserved for buttons and stays at its natural width.
+grid columnconfigure .fr.principal 0 -weight 1
+# Give the description area more of the extra horizontal space.
+grid columnconfigure .fr.principal 1 -weight 2
+grid columnconfigure .fr.principal 2 -weight 0
+# Extra vertical space is assigned to the notebook/description area.
+grid rowconfigure .fr.principal 11 -weight 1
 
 frame .fr.advanced -relief raised -borderwidth 1
-pack .fr.advanced -fill both -expand 0
+grid columnconfigure .fr.advanced 0 -weight 1
+grid columnconfigure .fr.advanced 1 -weight 0
 
 ##### Buttons section #####
 
-# Define the buttons to submit the information or close the program
-
-ttk::button .fr.cb -text "Close" -command { exit 1 }
-pack .fr.cb -padx 5 -pady 5 -side right 
+# Define the buttons to submit the information or close the program.
+ttk::button .fr.advance -text "Advanced options" -command { onAdvanced }
+grid .fr.advance -row 2 -column 0 -sticky w -padx 8 -pady 8
 
 ttk::button .fr.ok -text "Run" -command { onDone }
-pack .fr.ok -side right
+grid .fr.ok -row 2 -column 1 -sticky e -padx 5 -pady 8
 
-ttk::button .fr.advance -text "Advanced options" -command { onAdvanced }
-pack .fr.advance -padx 5 -side left 
+ttk::button .fr.cb -text "Close" -command { exit 1 }
+grid .fr.cb -row 2 -column 2 -sticky e -padx {0 8} -pady 8
 
-#### Manadatory argument section ######
+#### Mandatory argument section ######
+
 image create photo img1 -file "${basedir}/docs/logo/dl4miceverywhere-logo-small.png"
 label .fr.principal.logo -image img1
-place .fr.principal.logo -x 450 -y 5
+grid .fr.principal.logo -row 0 -column 2 -rowspan 4 -sticky ne -padx 12 -pady 8
 
-# Define the text that will be the introduction to the window
+# Define the text that will be the introduction to the window.
+label .fr.principal.intro_1 -text "Welcome to DL4MicEverywhere!" -anchor w
+grid .fr.principal.intro_1 -row 0 -column 0 -columnspan 2 -sticky ew -padx 12 -pady {8 0}
 
-label .fr.principal.intro_1 -text "Welcome to DL4MicEverywhere!"
-place .fr.principal.intro_1 -relx 0.02 -rely 0.0
-label .fr.principal.intro_2 -text "Providing an easy way to apply deep learning to microscopy"
-place .fr.principal.intro_2 -relx 0.02 -rely [expr 0.06 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_3 -text "using interactive Jupyter notebooks."
-place .fr.principal.intro_3 -relx 0.02 -rely [expr 0.12 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_4 -text "To get started, specify:"
-place .fr.principal.intro_4 -relx 0.02 -rely [expr 0.18 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_5 -text "    - Notebook: Select from the available deep learning workflows"
-place .fr.principal.intro_5 -relx 0.02 -rely [expr 0.24 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_6 -text "    - Data folder: Location of your input microscopy images"
-place .fr.principal.intro_6 -relx 0.02 -rely [expr 0.30 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_7 -text "    - Output folder: Where to save your results"
-place .fr.principal.intro_7 -relx 0.02 -rely [expr 0.36 / ( 2 - $advanced_options ) ]
-label .fr.principal.intro_8 -text "    - Checkbox for setting up a GPU-enabled Docker container image"
-place .fr.principal.intro_8 -relx 0.02 -rely [expr 0.42 / ( 2 - $advanced_options ) ]
+label .fr.principal.intro_2 -text "Providing an easy way to apply deep learning to microscopy" -anchor w
+grid .fr.principal.intro_2 -row 1 -column 0 -columnspan 2 -sticky ew -padx 12
 
-# Define the list with possible default notebooks
+label .fr.principal.intro_3 -text "using interactive Jupyter notebooks." -anchor w
+grid .fr.principal.intro_3 -row 2 -column 0 -columnspan 2 -sticky ew -padx 12
 
+label .fr.principal.intro_4 -text "To get started, specify:" -anchor w
+grid .fr.principal.intro_4 -row 3 -column 0 -columnspan 2 -sticky ew -padx 12 -pady {4 0}
+
+label .fr.principal.intro_5 -text "    - Notebook: Select from the available deep learning workflows" -anchor w
+grid .fr.principal.intro_5 -row 4 -column 0 -columnspan 3 -sticky ew -padx 12
+
+label .fr.principal.intro_6 -text "    - Data folder: Location of your input microscopy images" -anchor w
+grid .fr.principal.intro_6 -row 5 -column 0 -columnspan 3 -sticky ew -padx 12
+
+label .fr.principal.intro_7 -text "    - Output folder: Where to save your results" -anchor w
+grid .fr.principal.intro_7 -row 6 -column 0 -columnspan 3 -sticky ew -padx 12
+
+label .fr.principal.intro_8 -text "    - Checkbox for setting up a GPU-enabled Docker container image" -anchor w
+grid .fr.principal.intro_8 -row 7 -column 0 -columnspan 3 -sticky ew -padx 12 -pady {0 8}
+
+# Define the list with possible default notebooks.
 set folderList "-"
 
-# Get the number of folders
+# Get the number of folders.
 catch {eval exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | wc -l} num_folders
 
-# Flag to indicate if there are no_folders_flag
+# Flag to indicate if there are no folders.
 set no_folders_flag 0
 
-# Check the number of folders
+# Check the number of folders.
 if {"$num_folders" == 0} {
-    # If it is 0, then there are no folders
+    # If it is 0, then there are no folders.
     set no_folders_flag_flag 1
 } else {
-    # Otherwise, check the depth on the folders
+    # Otherwise, check the depth on the folders.
     catch {eval exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0} folder_name
-    # Check if there are no subfolders 
+    # Check if there are no subfolders.
     if {"$folder_name" == "."} {
-        # If the folder_name is ".", this means that there are no subfolders on the notebooks folder
+        # If the folder_name is ".", this means that there are no subfolders on the notebooks folder.
         set no_folders_flag 1
     }
 }
 
-# In case there are subfolders (flag of NO folders is off)
+# In case there are subfolders (flag of NO folders is off).
 if {"$no_folders_flag" == 0} {
     catch {eval exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | xargs -0 -n 1 basename | sort} aux_notebok_folder_list
     append folderList " " "$aux_notebok_folder_list"
 }
 
 set selectedFolder "-"
-
 set notebookList "-"
 set selectedNotebook "-"
 
 font create myFont -family Helvetica -size 10
 
-label .fr.principal.notebook_label -text "List of default notebooks:"
-place .fr.principal.notebook_label -relx 0.02 -rely [expr 0.49 / ( 2 - $advanced_options ) ]
+label .fr.principal.notebook_label -text "List of default notebooks:" -anchor w
+grid .fr.principal.notebook_label -row 8 -column 0 -columnspan 3 -sticky ew -padx 12 -pady {4 3}
 
 ttk::combobox .fr.principal.notebooks_folders -values $folderList -textvariable selectedFolder -state readonly
-place .fr.principal.notebooks_folders -relx 0.02 -rely [expr 0.55 / ( 2 - $advanced_options ) ]
+grid .fr.principal.notebooks_folders -row 9 -column 0 -sticky ew -padx {12 8} -pady 2
 bind .fr.principal.notebooks_folders <<ComboboxSelected>> { onComboboxSelectedFolder [%W get]}
 
 ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable selectedNotebook -state readonly
-place .fr.principal.notebooks -relx 0.02 -rely [expr 0.63 / ( 2 - $advanced_options ) ]
+grid .fr.principal.notebooks -row 10 -column 0 -sticky new -padx {12 8} -pady 2
 bind .fr.principal.notebooks <<ComboboxSelected>> { onComboboxSelectedNotebook [%W get]}
 
-text .fr.principal.notebook_description -width [expr 35 + ($is_mac * 15) + ($is_linux * 10) ] -height [expr 4 + ($is_mac * 2)] -borderwidth 1 -relief sunken
-place .fr.principal.notebook_description -relx 0.375 -rely [expr 0.495 / ( 2 - $advanced_options ) ]
+# Width and height are initial requests only. sticky=nsew plus row/column weights
+# make this widget grow and shrink with the window.
+text .fr.principal.notebook_description -width 30 -height 4 -wrap word -borderwidth 1 -relief sunken
+grid .fr.principal.notebook_description -row 9 -column 1 -rowspan 3 -columnspan 2 -sticky nsew -padx {8 12} -pady 2
 
-# Define the button and display to load the path to the data folder
+# Define the button and display to load the path to the data folder.
+label .fr.principal.data_label -text "Path to data folder:" -anchor w
+grid .fr.principal.data_label -row 12 -column 0 -columnspan 3 -sticky ew -padx 12 -pady {8 2}
 
-label .fr.principal.data_label -text "Path to data folder:"
-place .fr.principal.data_label -relx 0.02 -rely [expr 0.705 / ( 2 - $advanced_options ) ]
+entry .fr.principal.data_entry -textvariable data_path
+grid .fr.principal.data_entry -row 13 -column 0 -columnspan 2 -sticky ew -padx {12 6} -pady 2
 
-entry .fr.principal.data_entry -textvariable data_path -width [expr 58 + ($is_mac * -5) + ($is_linux * 2)]
-place .fr.principal.data_entry -relx 0.02 -rely [expr 0.765 / ( 2 - $advanced_options ) ]
-
-button .fr.principal.data_btn -text "Select" \
-        -command "onSelectData"
-place .fr.principal.data_btn -relx 0.85 -rely [expr 0.76 / ( 2 - $advanced_options ) ]
+button .fr.principal.data_btn -text "Select" -command "onSelectData"
+grid .fr.principal.data_btn -row 13 -column 2 -sticky e -padx {6 12} -pady 2
 
 set data_path ""
 
-# Define the button and display to load the path to the result folder
+# Define the button and display to load the path to the result folder.
+label .fr.principal.result_label -text "Path to output folder:" -anchor w
+grid .fr.principal.result_label -row 14 -column 0 -columnspan 3 -sticky ew -padx 12 -pady {8 2}
 
-label .fr.principal.result_label -text "Path to output folder:"
-place .fr.principal.result_label -relx 0.02 -rely [expr 0.845 / ( 2 - $advanced_options ) ]
+entry .fr.principal.result_entry -textvariable result_path
+grid .fr.principal.result_entry -row 15 -column 0 -columnspan 2 -sticky ew -padx {12 6} -pady 2
 
-entry .fr.principal.result_entry -textvariable result_path -width [expr 58 + ($is_mac * -5) + ($is_linux * 2)]
-place .fr.principal.result_entry -relx 0.02 -rely [expr 0.905 / ( 2 - $advanced_options ) ]
-
-button .fr.principal.result_btn -text "Select" \
-        -command "onSelectResult"
-place .fr.principal.result_btn -relx 0.85 -rely [expr 0.90 / ( 2 - $advanced_options ) ]
+button .fr.principal.result_btn -text "Select" -command "onSelectResult"
+grid .fr.principal.result_btn -row 15 -column 2 -sticky e -padx {6 12} -pady 2
 
 set result_path ""
 
-# Define the checkbutton for the GPU usage
+# Define the GPU, version and cache controls in a nested row. The middle
+# spacer grows, keeping the cache button aligned to the right.
+frame .fr.principal.options
+grid .fr.principal.options -row 16 -column 0 -columnspan 3 -sticky ew -padx 8 -pady {8 6}
+grid columnconfigure .fr.principal.options 1 -weight 1
 
+set gpu 0
 checkbutton .fr.principal.gpu -text "Allow GPU" -variable gpu
-place .fr.principal.gpu -relx 0.07 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+grid .fr.principal.gpu -in .fr.principal.options -row 0 -column 0 -sticky w -padx 4
 
-# Disable the GPU option in case 'nvidia-smi' command is not found
+# Disable the GPU option in case 'nvidia-smi' command is not found.
 if { [catch { exec nvidia-smi } msg] } {
     .fr.principal.gpu configure -state disable
 }
 
-# Define the version number
-
+# Define the version number.
 set versionList "-"
 set selectedVersion "-"
 
 label .fr.principal.version_label -text "Version:"
-place .fr.principal.version_label -relx 0.29 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+grid .fr.principal.version_label -in .fr.principal.options -row 0 -column 2 -sticky e -padx {8 4}
 
 ttk::combobox .fr.principal.versions -values $versionList -textvariable selectedVersion -width 10 -state readonly
-place .fr.principal.versions -relx 0.39 -rely [expr 0.999 / ( 2 - $advanced_options ) ]
+grid .fr.principal.versions -in .fr.principal.options -row 0 -column 3 -sticky e -padx 4
 
-# Define a button to load cached data if there is so
+# Define a button to load cached data if there is so.
+button .fr.principal.cache_btn -text "Load previous settings" -command "onLoadCache"
+grid .fr.principal.cache_btn -in .fr.principal.options -row 0 -column 4 -sticky e -padx 4
 
-button .fr.principal.cache_btn -text "Load previous settings" \
-        -command "onLoadCache"
-place .fr.principal.cache_btn -relx 0.63 -rely [expr 0.989 / ( 2 - $advanced_options ) ]
-
-# Disable the cache if no cache file is found
-
+# Disable the cache if no cache file is found.
 if {"$fexist" == "0"} {
     .fr.principal.cache_btn configure -state disable
 }
 
 ##### Advanced arguments section #####
 
-# Define the text of the advanced option
+# Keep the advanced form compact so opening it does not force the main form
+# off screen. Labels stay at their natural size, file entries grow, and Select
+# buttons stay fixed.
+grid columnconfigure .fr.advanced 0 -weight 0
+grid columnconfigure .fr.advanced 1 -weight 1
+grid columnconfigure .fr.advanced 2 -weight 0
 
-label .fr.advanced.intro_1 -text "Advanced options allow you to specify:"
-place .fr.advanced.intro_1 -relx 0.02 -rely 0.0
-label .fr.advanced.intro_2 -text "    - Path to a local 'configuration.yaml' file for Docker container image construction"
-place .fr.advanced.intro_2 -relx 0.02 -rely 0.06
-label .fr.advanced.intro_3 -text "    - Path to a local notebook file to be loaded into the Docker container"
-place .fr.advanced.intro_3 -relx 0.02 -rely 0.12
-label .fr.advanced.intro_4 -text "    - Path to the local 'requirements.txt' file for Docker container image setup"
-place .fr.advanced.intro_4 -relx 0.02 -rely 0.18
-label .fr.advanced.intro_6 -text "    - Tag for naming the generated Docker image"
-place .fr.advanced.intro_6 -relx 0.02 -rely 0.24
+label .fr.advanced.intro_1 \
+    -text "Advanced options: choose local files to override the default notebook configuration." \
+    -anchor w
+grid .fr.advanced.intro_1 -row 0 -column 0 -columnspan 3 -sticky ew -padx 12 -pady {8 6}
 
-# Define the button and display to load the path to the 'configuration.yaml' file
+# configuration.yaml
+label .fr.advanced.yaml_label -text "Configuration (.yaml):" -anchor w
+grid .fr.advanced.yaml_label -row 1 -column 0 -sticky w -padx {12 6} -pady 3
 
-label .fr.advanced.yaml_label -text "Path to the configuration.yaml:"
-place .fr.advanced.yaml_label -relx 0.02 -rely 0.32
+entry .fr.advanced.yaml_entry -textvariable yaml_path
+grid .fr.advanced.yaml_entry -row 1 -column 1 -sticky ew -padx 6 -pady 3
 
-entry .fr.advanced.yaml_entry -textvariable yaml_path -width [expr 58 + ($is_mac * -5) + ($is_linux * 2)]
-place .fr.advanced.yaml_entry -relx 0.02 -rely 0.39
-
-button .fr.advanced.byp -text "Select" \
-        -command "onSelectYaml"
-place .fr.advanced.byp -relx 0.85 -rely 0.385
+button .fr.advanced.byp -text "Select" -command "onSelectYaml"
+grid .fr.advanced.byp -row 1 -column 2 -sticky e -padx {6 12} -pady 3
 
 set yaml_path ""
 
-# Define the button and display to load the path to the local notebook
+# Optional local notebook.
+label .fr.advanced.ipynb_label -text "Notebook (.ipynb):" -anchor w
+grid .fr.advanced.ipynb_label -row 2 -column 0 -sticky w -padx {12 6} -pady 3
 
-label .fr.advanced.ipynb_label -text "Path to the local notebook:"
-place .fr.advanced.ipynb_label -relx 0.02 -rely 0.47
+entry .fr.advanced.ipynb_entry -textvariable ipynb_path
+grid .fr.advanced.ipynb_entry -row 2 -column 1 -sticky ew -padx 6 -pady 3
 
-entry .fr.advanced.ipynb_entry -textvariable ipynb_path -width [expr 58 + ($is_mac * -5) + ($is_linux * 2)]
-place .fr.advanced.ipynb_entry -relx 0.02 -rely 0.54
-
-button .fr.advanced.bnp -text "Select" \
-        -command "onSelectIpynb"
-place .fr.advanced.bnp -relx 0.85 -rely 0.535
+button .fr.advanced.bnp -text "Select" -command "onSelectIpynb"
+grid .fr.advanced.bnp -row 2 -column 2 -sticky e -padx {6 12} -pady 3
 
 set ipynb_path ""
 
-# Define the button and display to load the path to the data folder
+# Optional requirements file.
+label .fr.advanced.txt_label -text "Requirements (.txt):" -anchor w
+grid .fr.advanced.txt_label -row 3 -column 0 -sticky w -padx {12 6} -pady 3
 
-label .fr.advanced.txt_label -text "Path to the requirements.txt:"
-place .fr.advanced.txt_label -relx 0.02 -rely 0.62
+entry .fr.advanced.txt_entry -textvariable txt_path
+grid .fr.advanced.txt_entry -row 3 -column 1 -sticky ew -padx 6 -pady 3
 
-entry .fr.advanced.txt_entry -textvariable txt_path -width [expr 58 + ($is_mac * -5) + ($is_linux * 2)]
-place .fr.advanced.txt_entry -relx 0.02 -rely 0.69
-
-button .fr.advanced.btp -text "Select" \
-        -command "onSelectTxt"
-place .fr.advanced.btp -relx 0.85 -rely 0.685
+button .fr.advanced.btp -text "Select" -command "onSelectTxt"
+grid .fr.advanced.btp -row 3 -column 2 -sticky e -padx {6 12} -pady 3
 
 set txt_path ""
 
-# Define the docker tag text entry
+# Optional Docker image tag.
+label .fr.advanced.tag_label -text "Docker tag:" -anchor w
+grid .fr.advanced.tag_label -row 4 -column 0 -sticky w -padx {12 6} -pady {3 8}
 
-label .fr.advanced.tag_label -text "Docker tag:"
-place .fr.advanced.tag_label -relx 0.02 -rely 0.77
-
-entry .fr.advanced.tag -textvariable tag -width [expr 40  + ($is_linux * 2)]
-place .fr.advanced.tag -relx 0.02 -rely 0.84
+entry .fr.advanced.tag -textvariable tag
+grid .fr.advanced.tag -row 4 -column 1 -sticky ew -padx 6 -pady {3 8}
 
 set tag ""
+
+# The frame itself is intentionally not managed here. onAdvanced adds/removes
+# it from .fr while grid automatically reflows the rest of the interface.
 
 ##### Create the menu #####
 
@@ -677,6 +664,8 @@ menu .mb.file -type normal -tearoff 0
 .mb.file add command -label About -underline 0 -command { cmdabout } -accelerator Ctrl-i
 .mb.file add command -label Preferences -underline 0 -command { cmdpref } -accelerator Ctrl-p
 .mb.file add command -label "Check For Updates" -underline 0 -command { cmdpcheckupdates } -accelerator Ctrl-u
+.mb.file add separator
+.mb.file add command -label "Uninstall DL4MicEverywhere..." -command { cmduninstall }
 .mb.file add separator
 .mb.file add command -label Quit -underline 0 -command { exit } -accelerator Ctrl-x
 
@@ -707,6 +696,32 @@ proc cmdpcheckupdates {}   {
         exit 1
     }
 }
+proc cmduninstall {} {
+    global basedir
+
+    # The confirmation dialog returns:
+    #   0 = cancel
+    #   1 = uninstall application files only
+    #   2 = uninstall application files and DL4MicEverywhere Docker resources
+    if {[catch {exec wish "$basedir/.tools/tcl_tools/menubar/uninstall.tcl"} result]} {
+        tk_messageBox -type ok -icon error -title "Uninstall error" \
+            -message "The uninstall confirmation window could not be opened."
+        return
+    }
+
+    set result [string trim $result]
+    if {$result == "1" || $result == "2"} {
+        set clean_docker [expr {$result == "2" ? 1 : 0}]
+
+        # Use a marker that cannot be confused with the normal 8/9-line GUI
+        # protocol. Linux_launch.sh performs the destructive work only after
+        # this GUI process has closed.
+        puts "__DL4ME_UNINSTALL__"
+        puts "$clean_docker"
+        flush stdout
+        exit 0
+    }
+}
 proc cmddoc {}   {
     global basedir
     exec /bin/bash "$basedir/.tools/bash_tools/open_browser.sh" 1 "https://github.com/HenriquesLab/DL4MicEverywhere?tab=readme-ov-file#dl4miceverywhere" &
@@ -714,6 +729,21 @@ proc cmddoc {}   {
 
 ##### Create a window #####
 
-# Create the window, give a name to it and locate it in the middle of the screen
+# Create the window, give it a name, make it resizable and center its initial size.
 wm title . "$window_title"
-wm geometry . ${width}x${height}+${width_offset}+${height_offset}
+wm resizable . 1 1
+
+set screen_width [winfo vrootwidth .]
+set screen_height [winfo vrootheight .]
+
+# Keep the initial window inside the available display. The minimum is also
+# capped for unusually small virtual displays (for example some WSL setups).
+set initial_width [expr {min($preferred_width, max(480, $screen_width - 80))}]
+set initial_height [expr {min($preferred_height, max(500, $screen_height - 100))}]
+set min_width [expr {min($minimum_width, $initial_width)}]
+set min_height [expr {min($minimum_height, $initial_height)}]
+wm minsize . $min_width $min_height
+
+set width_offset [expr {max(0, ($screen_width - $initial_width) / 2)}]
+set height_offset [expr {max(0, ($screen_height - $initial_height) / 2)}]
+wm geometry . ${initial_width}x${initial_height}+${width_offset}+${height_offset}

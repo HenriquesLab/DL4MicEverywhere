@@ -303,11 +303,25 @@ echo Starting DL4MicEverywhere using %UBUNTU_DISTRO%...
 echo ============================================================
 echo.
 
-wsl.exe -d %UBUNTU_DISTRO% --exec /bin/bash -E Linux_launch.sh
+wsl.exe -d %UBUNTU_DISTRO% --exec /usr/bin/env DL4ME_WINDOWS_WRAPPER=1 /bin/bash -E Linux_launch.sh
 set "LAUNCH_RESULT=%ERRORLEVEL%"
 
 if "%LAUNCH_RESULT%"=="0" exit /b 0
+if "%LAUNCH_RESULT%"=="42" goto :complete_uninstall
 goto :launch_failed
+
+:complete_uninstall
+echo.
+echo DL4MicEverywhere is ready to be removed.
+echo The DL4MicEverywhere application folder will now be deleted.
+
+rem The running batch file lives inside the folder being deleted. Change to a
+rem neutral directory and let a short-lived PowerShell child remove the folder
+rem after this batch process exits.
+set "DL4ME_UNINSTALL_DIR=%BASEDIR%"
+cd /d "%TEMP%"
+start "" /b powershell -NoProfile -WindowStyle Hidden -Command "Start-Sleep -Milliseconds 750; Remove-Item -LiteralPath $env:DL4ME_UNINSTALL_DIR -Recurse -Force" >nul 2>&1
+exit /b 0
 
 
 rem =============================================================================

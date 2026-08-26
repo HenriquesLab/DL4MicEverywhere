@@ -94,6 +94,24 @@ tag : ${10}
 advanced_options : ${11}" > "$BASEDIR/.tools/.cache/.cache_gui"
 }
 
+# Record images created/downloaded through this launcher. The ID+tag pair lets
+# the uninstaller remove custom tags safely without deleting an unrelated image
+# that may later reuse the same tag.
+track_managed_docker_image() {
+    local image_ref="$1"
+    local image_id
+    local cache_file="$BASEDIR/.tools/.cache/.managed_docker_images"
+    local tmp_file
+
+    image_id=$(docker image inspect --format '{{.Id}}' "$image_ref" 2>/dev/null) || return 0
+
+    mkdir -p "$BASEDIR/.tools/.cache"
+    echo "$image_id|$image_ref" >> "$cache_file"
+
+    tmp_file="${cache_file}.tmp"
+    awk '!seen[$0]++' "$cache_file" > "$tmp_file" && mv "$tmp_file" "$cache_file"
+}
+
 
 # Import get_yaml_args_from_file
 source "$BASEDIR/.tools/bash_tools/get_yaml_args.sh"
@@ -194,6 +212,14 @@ else
     fi
 
     IFS=$'\n' read -d '' -r -a strarr <<<"$gui_arguments"
+
+    # The GUI uses a separate marker for uninstall so it cannot be mistaken for
+    # the normal simple/advanced launch protocol.
+    if [ "${strarr[0]}" = "__DL4ME_UNINSTALL__" ]; then
+        clean_docker_images="${strarr[1]:-0}"
+        /bin/bash "$BASEDIR/.tools/bash_tools/uninstall_dl4miceverywhere.sh" "$clean_docker_images"
+        exit $?
+    fi
 
     advanced_options=${strarr[0]}
 
@@ -733,7 +759,8 @@ else
         echo "Otherwise, you can choose the option of getting the image from Docker Hub or follow"
         echo "the steps in our documentation."
         if [ "$gpu_flag" -eq 1 ]; then
-            sudo docker build --file "$selected_dockerfile" -t "$docker_tag" "$BASEDIR" \
+            sudo docker build --file "$selected_dockerfile" -t "$docker_tag" \
+                --label "org.dl4miceverywhere.managed=true" \
                 --build-arg UBUNTU_VERSION="${ubuntu_version}" \
                 --build-arg CUDA_VERSION="${cuda_version}" \
                 --build-arg CUDNN_VERSION="${cudnn_version}" \
@@ -743,9 +770,11 @@ else
                 --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
                 --build-arg NOTEBOOK_NAME="${notebook_name}" \
                 --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" \
-                --build-arg CACHEBUST=$(date +%s)
+                --build-arg CACHEBUST=$(date +%s) \
+                "$BASEDIR"
         else
-            sudo docker build --file "$selected_dockerfile" -t "$docker_tag" "$BASEDIR" \
+            sudo docker build --file "$selected_dockerfile" -t "$docker_tag" \
+                --label "org.dl4miceverywhere.managed=true" \
                 --build-arg UBUNTU_VERSION="${ubuntu_version}" \
                 --build-arg CUDA_VERSION="${cuda_version}" \
                 --build-arg CUDNN_VERSION="${cudnn_version}" \
@@ -755,7 +784,8 @@ else
                 --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
                 --build-arg NOTEBOOK_NAME="${notebook_name}" \
                 --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" \
-                --build-arg CACHEBUST=$(date +%s)
+                --build-arg CACHEBUST=$(date +%s) \
+                "$BASEDIR"
         fi
 
         DOCKER_OUT=$? # Gets if the docker image has been built
@@ -794,6 +824,10 @@ fi
 
 echo "Docker output:"
 echo "$DOCKER_OUT"
+
+if [ "$DOCKER_OUT" -eq 0 ] && [ "$flag_build" -ne 1 ]; then
+    track_managed_docker_image "$docker_tag"
+fi
 
 # If it has been built, run the docker
 if [ "$DOCKER_OUT" -eq 0 ]; then
@@ -857,12 +891,12 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
 
     if [ "$flag_gpu" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
-        docker run -it --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
-        echo -e "The command used to run this container has been:\n\tdocker run -it --gpus all -p $port:$port -v \"$data_path:/home/data\" -v \"$result_path:/home/results\" --shm-size=256m \"$docker_tag\"  /bin/bash -c \"$docker_command\"" >> "$result_path/docker_info.txt"
+        docker run -it --label org.dl4miceverywhere.managed=true --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
+        echo -e "The command used to run this container has been:\n\tdocker run -it --label org.dl4miceverywhere.managed=true --gpus all -p $port:$port -v \"$data_path:/home/data\" -v \"$result_path:/home/results\" --shm-size=256m \"$docker_tag\"  /bin/bash -c \"$docker_command\"" >> "$result_path/docker_info.txt"
     else
         # Run the docker image without activating the GPU
-        docker run -it -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
-        echo -e "The command used to run this container has been:\n\tdocker run -it -p $port:$port -v \"$data_path:/home/data\" -v \"$result_path:/home/results\" --shm-size=256m \"$docker_tag\"  /bin/bash -c \"$docker_command\"" >> "$result_path/docker_info.txt"
+        docker run -it --label org.dl4miceverywhere.managed=true -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
+        echo -e "The command used to run this container has been:\n\tdocker run -it --label org.dl4miceverywhere.managed=true -p $port:$port -v \"$data_path:/home/data\" -v \"$result_path:/home/results\" --shm-size=256m \"$docker_tag\"  /bin/bash -c \"$docker_command\"" >> "$result_path/docker_info.txt"
     fi
 
 
