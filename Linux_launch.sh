@@ -819,7 +819,7 @@ fi
 echo "Docker image is ready."
 
 # Execute the post building tests against the image that will be launched.
-/bin/bash "$BASEDIR/.tools/bash_tools/post_build_test.sh" "$docker_tag" || exit 1
+/bin/bash "$BASEDIR/.tools/bash_tools/post_build_test.sh" "$docker_tag" "$flag_gpu" || exit 1
 
 sleep 3
 
@@ -925,9 +925,10 @@ else
     exit 1 
 fi
 
-# Close the terminal when user press enter
-echo ""
+# A user stopping the interactive notebook session is a normal completion.
+echo "------------------------------------"
+echo "DL4MicEverywhere session finished."
 echo "------------------------------------"
 read -p "Press enter to close the terminal."
-echo "------------------------------------" 
-exit 1
+
+exit 0
