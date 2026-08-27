@@ -1,11 +1,15 @@
-
 # Function to parse and read the configuration from a local yaml file
 function get_yaml_args_from_file {
    local prefix=$2
    local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
+
+   # Normalize Windows CRLF line endings before parsing. This keeps trailing
+   # carriage returns out of values such as Docker image tags when the
+   # repository has been downloaded or edited on Windows.
+   tr -d '\r' < "$1" |
    sed -ne "s|^\($s\):|\1|" \
         -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
-        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" "$1" |
+        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" |
    awk -F$fs '{
       indent = length($1)/2;
       vname[indent] = $2;
@@ -26,7 +30,11 @@ function get_yaml_args_from_file {
 function get_yaml_args_from_url {
    local prefix=$2
    local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
-   curl -s $1 | 
+
+   # Remote configuration files can also use Windows line endings, so apply
+   # the same normalization as for local files before parsing.
+   curl -s "$1" |
+   tr -d '\r' |
    sed -ne "s|^\($s\):|\1|" \
         -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
         -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" |

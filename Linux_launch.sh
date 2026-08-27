@@ -575,7 +575,7 @@ if grep -q credsStore ~/.docker/config.json; then
 fi
 
 # Execute the pre building tests
-/bin/bash "$BASEDIR/.tools/bash_tools/pre_build_test.sh" || exit 1
+/bin/bash "$BASEDIR/.tools/bash_tools/pre_build_test.sh" "$docker_tag" || exit 1
 
 ###
 # Get what is the containerisation system that will be used
@@ -806,10 +806,20 @@ else
     fi
 fi
 
-echo "Docker image correctly built/pulled"
+# Do not report success or run post-build checks if the pull/build failed.
+if [ "$DOCKER_OUT" -ne 0 ]; then
+    echo ""
+    echo "------------------------------------"
+    echo "Docker image build/pull failed."
+    echo "Please review the Docker output above for details."
+    echo "------------------------------------"
+    exit "$DOCKER_OUT"
+fi
 
-# Execute the post building tests
-/bin/bash "$BASEDIR/.tools/bash_tools/post_build_test.sh" || exit 1
+echo "Docker image is ready."
+
+# Execute the post building tests against the image that will be launched.
+/bin/bash "$BASEDIR/.tools/bash_tools/post_build_test.sh" "$docker_tag" || exit 1
 
 sleep 3
 

@@ -1,5 +1,7 @@
-# Keep scripts executable in their native environments without requiring a
-# line-ending conversion step during every Windows launch.
+# Keep scripts and configuration files in their native environments without
+# requiring line-ending conversion during normal Windows launches.
 *.sh text eol=lf
 *.command text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
 *.bat text eol=crlf
