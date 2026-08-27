@@ -5,3 +5,4 @@
 *.yaml text eol=lf
 *.yml text eol=lf
 *.bat text eol=crlf
+*.ps1 text eol=crlf
