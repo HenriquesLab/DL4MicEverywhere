@@ -1,0 +1,5 @@
+# Keep scripts executable in their native environments without requiring a
+# line-ending conversion step during every Windows launch.
+*.sh text eol=lf
+*.command text eol=lf
+*.bat text eol=crlf

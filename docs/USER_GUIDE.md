@@ -76,6 +76,8 @@ The automatic installation on Windows guides you through the following steps. Yo
 
 6. **The GUI will pop up, and you can start using DL4MicEverywhere** (if the GUI is not displayed correctly, please restart your computer once more to fix the issue).
 
+> ℹ️ **NOTE:** After Windows setup completes successfully, DL4MicEverywhere remembers the detected Ubuntu distribution in a local setup cache. Normal launches reuse that setup and skip the longer WSL discovery and shell-script preparation steps. If the cached setup becomes invalid, the launcher automatically returns to the setup checks.
+
 </details>
 
 <details>

@@ -1,6 +1,7 @@
 # DL4MicEverywhere
 .tools/.cache/.cache_gui
 .tools/.cache/.cache_preferences
+.tools/.cache/.windows_setup
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

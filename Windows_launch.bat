@@ -4,43 +4,37 @@ setlocal EnableExtensions
 rem =============================================================================
 rem DL4MicEverywhere - Windows launcher
 rem
-rem Simple design:
-rem   - Detect Docker Desktop.
-rem   - Detect Windows Subsystem for Linux.
-rem   - Detect an installed distribution whose registered name contains Ubuntu.
-rem   - Use the exact detected Ubuntu name.
+rem Fast-start design:
+rem   - Docker Desktop is checked quickly on every launch.
+rem   - WSL/Ubuntu discovery and shell-script preparation are first-run setup.
+rem   - Successful setup is cached inside .tools\.cache\.windows_setup.
+rem   - Normal launches reuse the cached Ubuntu distribution.
+rem   - A short WSL readiness probe prevents multi-minute hangs.
+rem   - Detailed WSL restart/recovery is only offered when the quick probe fails.
+rem   - Linux shell scripts are normalized only when CRLF is actually detected.
 rem   - Never change the user's default WSL distribution.
-rem   - Ask before every installation or file modification.
 rem
-rem IMPORTANT:
-rem On the tested WSL version, passing the distribution as:
-rem     -d "Ubuntu-26.04"
-rem returns WSL_E_DISTRO_NOT_FOUND, while:
-rem     -d Ubuntu-26.04
-rem works correctly. Therefore the detected standard Ubuntu name is deliberately
-rem passed to wsl.exe without quotes.
+rem Bump WINDOWS_SETUP_VERSION whenever a future release needs to repeat Windows
+rem setup. Existing caches with an older version will then be ignored safely.
 rem =============================================================================
 
+set "WINDOWS_SETUP_VERSION=2"
 set "SCRIPT_PATH=%~dp0"
 if "%SCRIPT_PATH:~-1%"=="\" set "SCRIPT_PATH=%SCRIPT_PATH:~0,-1%"
 set "BASEDIR=%SCRIPT_PATH%"
+set "SETUP_CACHE=%BASEDIR%\.tools\.cache\.windows_setup"
 set "WSL_UTF8=1"
 
-echo.
-echo ============================================================
-echo DL4MicEverywhere
-echo ============================================================
-echo This launcher checks the software needed by DL4MicEverywhere.
-echo It will explain what it wants to do and ask permission before
-echo installing software or modifying DL4MicEverywhere files.
-echo.
-
 rem =============================================================================
-rem 1. Docker Desktop
+rem 1. Docker Desktop - this filesystem check is intentionally kept on every run.
 rem =============================================================================
 
 if exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" goto :docker_ready
 
+echo.
+echo ============================================================
+echo DL4MicEverywhere - Windows setup
+echo ============================================================
 echo Docker Desktop was not found.
 echo.
 echo DL4MicEverywhere needs Docker Desktop to run its microscopy notebooks.
@@ -71,12 +65,38 @@ pause
 exit /b 0
 
 :docker_ready
+
+rem =============================================================================
+rem 2. Fast path - reuse a successful setup from this Windows computer.
+rem =============================================================================
+
+call :load_setup_cache
+if errorlevel 1 goto :first_run_setup
+
+set "UBUNTU_DISTRO=%CACHED_UBUNTU_DISTRO%"
+
+echo.
+echo ============================================================
+echo DL4MicEverywhere
+echo ============================================================
+echo Windows setup: ready.
+echo Ubuntu: %UBUNTU_DISTRO%
+
+goto :fast_wsl_start
+
+rem =============================================================================
+rem 3. First-run / invalidated-cache setup
+rem =============================================================================
+
+:first_run_setup
+echo.
+echo ============================================================
+echo DL4MicEverywhere - Windows setup
+echo ============================================================
+echo This setup is normally needed only once on this computer.
+echo Future launches will reuse the successful setup automatically.
+echo.
 echo Docker Desktop: found.
-
-rem =============================================================================
-rem 2. Windows Subsystem for Linux
-rem =============================================================================
-
 echo.
 echo Checking Windows Subsystem for Linux...
 
@@ -116,7 +136,7 @@ pause
 exit /b 0
 
 rem =============================================================================
-rem 3. Find an installed Ubuntu distribution
+rem 4. Find an installed Ubuntu distribution once and remember its exact name.
 rem =============================================================================
 
 :find_ubuntu
@@ -124,7 +144,6 @@ echo.
 echo Looking for an installed Ubuntu distribution...
 
 set "UBUNTU_DISTRO="
-
 for /f "delims=" %%D in ('wsl.exe --list --quiet 2^>nul ^| findstr /i /c:"Ubuntu"') do if not defined UBUNTU_DISTRO set "UBUNTU_DISTRO=%%D"
 
 if defined UBUNTU_DISTRO goto :ubuntu_found
@@ -164,143 +183,84 @@ echo Ubuntu distribution found: %UBUNTU_DISTRO%
 echo DL4MicEverywhere will use this exact distribution name.
 echo Your default WSL distribution will not be changed.
 
-rem =============================================================================
-rem 4. Verify Ubuntu
-rem =============================================================================
-
 echo.
 echo Checking that %UBUNTU_DISTRO% can start...
-
-rem Keep stderr visible so Windows can show the real WSL error.
-wsl.exe -d %UBUNTU_DISTRO% --exec /bin/echo DL4ME_WSL_OK >nul
+call :probe_wsl_with_retry
 set "WSL_RESULT=%ERRORLEVEL%"
-
 if "%WSL_RESULT%"=="0" goto :ubuntu_ready
+
+set "AFTER_WSL_RECOVERY=ubuntu_ready"
 goto :offer_wsl_restart
-
-:offer_wsl_restart
-echo.
-echo %UBUNTU_DISTRO% is installed, but Windows Subsystem for Linux
-echo did not respond correctly to a simple command.
-echo.
-echo This can happen when the WSL virtual machine gets stuck temporarily.
-echo DL4MicEverywhere can restart Windows Subsystem for Linux and try again.
-echo.
-echo Restarting WSL will temporarily stop all WSL distributions.
-echo This can also temporarily stop Docker Desktop because Docker uses WSL.
-echo No Ubuntu files or DL4MicEverywhere files will be deleted.
-echo.
-
-call :ask_yes_no "Restart Windows Subsystem for Linux and try again now?"
-if errorlevel 1 goto :cancelled_wsl_restart
-
-echo.
-echo Restarting Windows Subsystem for Linux...
-wsl.exe --shutdown
-set "WSL_SHUTDOWN_RESULT=%ERRORLEVEL%"
-
-if "%WSL_SHUTDOWN_RESULT%"=="0" goto :wait_after_wsl_shutdown
-goto :wsl_restart_failed
-
-:wait_after_wsl_shutdown
-echo Waiting 10 seconds for WSL to stop completely...
-timeout /t 10 /nobreak >nul
-
-echo.
-echo Trying %UBUNTU_DISTRO% again...
-wsl.exe -d %UBUNTU_DISTRO% --exec /bin/echo DL4ME_WSL_OK >nul
-set "WSL_RETRY_RESULT=%ERRORLEVEL%"
-
-if "%WSL_RETRY_RESULT%"=="0" goto :ubuntu_recovered
-goto :ubuntu_still_unavailable
-
-:ubuntu_recovered
-echo Ubuntu: ready.
-echo Windows Subsystem for Linux recovered successfully.
-goto :after_ubuntu_health_check
 
 :ubuntu_ready
 echo Ubuntu: ready.
 
-:after_ubuntu_health_check
-
 rem =============================================================================
-rem 5. Check dos2unix
+rem 5. Prepare Linux shell scripts only if Windows line endings are detected.
+rem
+rem This replaces the old unconditional dos2unix prompt. The repository also
+rem includes .gitattributes so Git checkouts keep *.sh files as LF in the first
+rem place. GNU sed is part of Ubuntu, so no extra dos2unix package is required.
 rem =============================================================================
 
 cd /d "%BASEDIR%"
+echo.
+echo Checking DL4MicEverywhere shell-script line endings...
 
-wsl.exe -d %UBUNTU_DISTRO% --exec /bin/bash -c "command -v dos2unix >/dev/null 2>&1"
-set "DOS2UNIX_CHECK=%ERRORLEVEL%"
+wsl.exe -d %UBUNTU_DISTRO% --exec /bin/bash -c "if find . -type f -name '*.sh' -print0 | xargs -0 -r grep -Il $'\r' | grep -q .; then exit 10; else exit 0; fi"
+set "LINE_ENDING_CHECK=%ERRORLEVEL%"
 
-if "%DOS2UNIX_CHECK%"=="0" goto :dos2unix_ready
-if "%DOS2UNIX_CHECK%"=="1" goto :offer_dos2unix
+if "%LINE_ENDING_CHECK%"=="0" goto :scripts_ready
+if "%LINE_ENDING_CHECK%"=="10" goto :normalize_scripts
 goto :wsl_command_failed
 
-:offer_dos2unix
-echo.
-echo DL4MicEverywhere needs a small Ubuntu utility called dos2unix.
-echo It is used to make Windows text files compatible with Linux.
-echo.
-echo If you agree, the launcher will update Ubuntu's package list and
-echo install dos2unix inside %UBUNTU_DISTRO%.
-echo.
+:normalize_scripts
+echo Windows line endings were detected in one or more shell scripts.
+echo Normalizing only *.sh files to Linux line endings...
 
-call :ask_yes_no "Install dos2unix now?"
-if errorlevel 1 goto :cancelled_dos2unix
-
-echo.
-echo Installing dos2unix...
-wsl.exe -d %UBUNTU_DISTRO% --user root --exec /bin/bash -c "apt-get -y update && apt-get -y install dos2unix"
-set "DOS2UNIX_INSTALL=%ERRORLEVEL%"
-
-if "%DOS2UNIX_INSTALL%"=="0" goto :dos2unix_ready
-goto :dos2unix_install_failed
-
-:dos2unix_ready
-echo dos2unix: ready.
-
-rem =============================================================================
-rem 6. Prepare Linux shell scripts
-rem =============================================================================
-
-echo.
-echo DL4MicEverywhere contains shell scripts that will run inside Ubuntu.
-echo Windows and Linux use different text line endings, and Windows line
-echo endings can prevent these scripts from running correctly.
-echo.
-echo If you agree, DL4MicEverywhere will run dos2unix on its .sh files.
-echo This only normalizes text line endings; it does not change what the
-echo scripts do.
-echo.
-echo It is safe to run this even when the files already use Linux line endings.
-echo.
-
-call :ask_yes_no "Prepare the DL4MicEverywhere shell scripts for Linux now?"
-if errorlevel 1 goto :cancelled_conversion
-
-echo.
-echo Preparing DL4MicEverywhere shell scripts for Linux...
-
-rem Convert only shell scripts. Avoid touching notebooks, images, YAML files,
-rem Docker files, or other repository content unnecessarily.
-wsl.exe -d %UBUNTU_DISTRO% --exec /bin/bash -c "find . -type f -name '*.sh' -print0 | xargs -0 -r dos2unix -q"
+wsl.exe -d %UBUNTU_DISTRO% --exec /bin/bash -c "find . -type f -name '*.sh' -print0 | xargs -0 -r sed -i 's/\r$//'"
 set "CONVERSION_RESULT=%ERRORLEVEL%"
+if not "%CONVERSION_RESULT%"=="0" goto :file_conversion_failed
 
-if "%CONVERSION_RESULT%"=="0" goto :files_ready
-goto :file_conversion_failed
-
-:files_ready
+:scripts_ready
 echo Shell scripts: ready.
+
+call :write_setup_cache
+
+goto :launch_application
+
+rem =============================================================================
+rem 6. Cached startup - no setup/discovery/dos2unix work.
+rem
+rem A short readiness probe is retained to avoid the old multi-minute WSL hang.
+rem It is normally nearly instantaneous. If a cold WSL start is a little slow,
+rem it gets one quiet retry before asking the user about restarting WSL.
+rem =============================================================================
+
+:fast_wsl_start
+where wsl.exe >nul 2>&1
+if not "%ERRORLEVEL%"=="0" goto :cached_wsl_missing
+
+cd /d "%BASEDIR%"
+call :probe_wsl_with_retry
+set "WSL_RESULT=%ERRORLEVEL%"
+if "%WSL_RESULT%"=="0" goto :launch_application
+
+set "AFTER_WSL_RECOVERY=launch_application"
+goto :offer_wsl_restart
+
+:cached_wsl_missing
+echo The cached Windows setup is no longer valid because wsl.exe was not found.
+del /q "%SETUP_CACHE%" >nul 2>&1
+goto :offer_wsl_install
 
 rem =============================================================================
 rem 7. Start DL4MicEverywhere
 rem =============================================================================
 
+:launch_application
 echo.
-echo ============================================================
 echo Starting DL4MicEverywhere using %UBUNTU_DISTRO%...
-echo ============================================================
 echo.
 
 wsl.exe -d %UBUNTU_DISTRO% --exec /usr/bin/env DL4ME_WINDOWS_WRAPPER=1 /bin/bash -E Linux_launch.sh
@@ -323,10 +283,120 @@ cd /d "%TEMP%"
 start "" /b powershell -NoProfile -WindowStyle Hidden -Command "Start-Sleep -Milliseconds 750; Remove-Item -LiteralPath $env:DL4ME_UNINSTALL_DIR -Recurse -Force" >nul 2>&1
 exit /b 0
 
+rem =============================================================================
+rem Cache helpers
+rem =============================================================================
+
+:load_setup_cache
+set "CACHED_SETUP_VERSION="
+set "CACHED_COMPUTER_NAME="
+set "CACHED_UBUNTU_DISTRO="
+set "CACHED_SCRIPTS_PREPARED="
+
+if not exist "%SETUP_CACHE%" exit /b 1
+
+for /f "usebackq tokens=1,* delims==" %%A in ("%SETUP_CACHE%") do (
+    if /I "%%A"=="setup_version" set "CACHED_SETUP_VERSION=%%B"
+    if /I "%%A"=="computer_name" set "CACHED_COMPUTER_NAME=%%B"
+    if /I "%%A"=="ubuntu_distro" set "CACHED_UBUNTU_DISTRO=%%B"
+    if /I "%%A"=="scripts_prepared" set "CACHED_SCRIPTS_PREPARED=%%B"
+)
+
+if not "%CACHED_SETUP_VERSION%"=="%WINDOWS_SETUP_VERSION%" exit /b 1
+if /I not "%CACHED_COMPUTER_NAME%"=="%COMPUTERNAME%" exit /b 1
+if not defined CACHED_UBUNTU_DISTRO exit /b 1
+if not "%CACHED_SCRIPTS_PREPARED%"=="1" exit /b 1
+exit /b 0
+
+:write_setup_cache
+if not exist "%BASEDIR%\.tools\.cache" mkdir "%BASEDIR%\.tools\.cache" >nul 2>&1
+
+(
+    echo setup_version=%WINDOWS_SETUP_VERSION%
+    echo computer_name=%COMPUTERNAME%
+    echo ubuntu_distro=%UBUNTU_DISTRO%
+    echo scripts_prepared=1
+) > "%SETUP_CACHE%"
+
+if errorlevel 1 (
+    echo.
+    echo Warning: Windows setup completed, but its cache could not be saved.
+    echo DL4MicEverywhere can still run, but setup checks may repeat next time.
+    exit /b 0
+)
+
+echo Windows setup cached. Future launches will use the fast startup path.
+exit /b 0
 
 rem =============================================================================
-rem Reusable yes/no question
-rem Pressing Enter means No.
+rem Timed WSL readiness probe
+rem
+rem The old launcher let wsl.exe wait for Windows' own long timeout. This helper
+rem caps each probe at 7 seconds. A timed-out wsl.exe client is terminated; the
+rem WSL virtual machine itself is not shut down unless the user explicitly
+rem agrees to the recovery step below.
+rem =============================================================================
+
+:quick_wsl_probe
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; try { $p=Start-Process -FilePath 'wsl.exe' -ArgumentList @('-d','%UBUNTU_DISTRO%','--exec','/bin/true') -NoNewWindow -PassThru; if ($p.WaitForExit(7000)) { exit $p.ExitCode } else { try { $p.Kill() } catch {}; exit 124 } } catch { exit 125 }" >nul 2>&1
+exit /b %ERRORLEVEL%
+
+:probe_wsl_with_retry
+call :quick_wsl_probe
+if not errorlevel 1 exit /b 0
+
+rem A cold WSL VM can need a moment. Give it one quiet retry before presenting
+rem any recovery UI to the user.
+timeout /t 2 /nobreak >nul
+call :quick_wsl_probe
+exit /b %ERRORLEVEL%
+
+rem =============================================================================
+rem WSL recovery - reached only after the short readiness probes fail.
+rem =============================================================================
+
+:offer_wsl_restart
+echo.
+echo %UBUNTU_DISTRO% is installed, but Windows Subsystem for Linux
+echo is not responding quickly enough to start DL4MicEverywhere.
+echo.
+echo DL4MicEverywhere can restart Windows Subsystem for Linux and try again.
+echo Restarting WSL will temporarily stop all WSL distributions.
+echo This can also temporarily stop Docker Desktop because Docker uses WSL.
+echo No Ubuntu files or DL4MicEverywhere files will be deleted.
+echo.
+
+call :ask_yes_no "Restart Windows Subsystem for Linux and try again now?"
+if errorlevel 1 goto :cancelled_wsl_restart
+
+echo.
+echo Restarting Windows Subsystem for Linux...
+wsl.exe --shutdown
+set "WSL_SHUTDOWN_RESULT=%ERRORLEVEL%"
+if not "%WSL_SHUTDOWN_RESULT%"=="0" goto :wsl_restart_failed
+
+rem Do not impose the old fixed 10-second wait. Start checking after two seconds
+rem and continue as soon as Ubuntu is actually ready.
+timeout /t 2 /nobreak >nul
+set "WSL_RECOVERY_ATTEMPT=1"
+
+:wsl_recovery_retry
+call :quick_wsl_probe
+set "WSL_RETRY_RESULT=%ERRORLEVEL%"
+if "%WSL_RETRY_RESULT%"=="0" goto :ubuntu_recovered
+
+if "%WSL_RECOVERY_ATTEMPT%"=="3" goto :ubuntu_still_unavailable
+set /a WSL_RECOVERY_ATTEMPT+=1
+timeout /t 2 /nobreak >nul
+goto :wsl_recovery_retry
+
+:ubuntu_recovered
+echo Ubuntu: ready.
+echo Windows Subsystem for Linux recovered successfully.
+goto :%AFTER_WSL_RECOVERY%
+
+rem =============================================================================
+rem Reusable yes/no question. Pressing Enter means No.
 rem =============================================================================
 
 :ask_yes_no
@@ -334,7 +404,6 @@ set "ANSWER="
 set /p "ANSWER=%~1 (y/N): "
 if /I "%ANSWER%"=="Y" exit /b 0
 exit /b 1
-
 
 rem =============================================================================
 rem Friendly exits
@@ -357,20 +426,6 @@ exit /b 1
 :cancelled_ubuntu
 echo.
 echo Ubuntu was not installed because you selected No.
-echo Nothing else will be changed.
-pause
-exit /b 1
-
-:cancelled_dos2unix
-echo.
-echo dos2unix was not installed because you selected No.
-echo Nothing else will be changed.
-pause
-exit /b 1
-
-:cancelled_conversion
-echo.
-echo The DL4MicEverywhere files were not modified because you selected No.
 echo Nothing else will be changed.
 pause
 exit /b 1
@@ -419,27 +474,18 @@ exit /b 1
 :ubuntu_still_unavailable
 echo.
 echo %UBUNTU_DISTRO% is still not responding after restarting WSL.
-echo WSL returned exit code %WSL_RETRY_RESULT%.
+echo Last readiness probe returned exit code %WSL_RETRY_RESULT%.
 echo.
-echo DL4MicEverywhere will not reinstall Ubuntu because the distribution
-echo is already present. No Ubuntu files or DL4MicEverywhere files were changed.
-echo.
+echo No Ubuntu files or DL4MicEverywhere files were changed.
 echo The safest next step is to restart Windows and then run
 echo Windows_launch.bat again.
 pause
 exit /b 1
 
-:dos2unix_install_failed
-echo.
-echo dos2unix could not be installed inside %UBUNTU_DISTRO%.
-echo No additional changes will be made.
-pause
-exit /b 1
-
 :file_conversion_failed
 echo.
-echo DL4MicEverywhere could not prepare the files for Linux.
-echo No additional changes will be made.
+echo DL4MicEverywhere detected Windows line endings but could not normalize
+echo the shell scripts for Linux. No additional changes will be made.
 pause
 exit /b 1
 

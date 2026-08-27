@@ -541,7 +541,10 @@ grid .fr.principal.data_label -row 12 -column 0 -columnspan 3 -sticky ew -padx 1
 entry .fr.principal.data_entry -textvariable data_path
 grid .fr.principal.data_entry -row 13 -column 0 -columnspan 2 -sticky ew -padx {12 6} -pady 2
 
-button .fr.principal.data_btn -text "Select" -command "onSelectData"
+button .fr.principal.data_btn \
+    -text "Select" \
+    -width 10\
+    -command "onSelectData"
 grid .fr.principal.data_btn -row 13 -column 2 -sticky e -padx {6 12} -pady 2
 
 set data_path ""
@@ -553,7 +556,10 @@ grid .fr.principal.result_label -row 14 -column 0 -columnspan 3 -sticky ew -padx
 entry .fr.principal.result_entry -textvariable result_path
 grid .fr.principal.result_entry -row 15 -column 0 -columnspan 2 -sticky ew -padx {12 6} -pady 2
 
-button .fr.principal.result_btn -text "Select" -command "onSelectResult"
+button .fr.principal.result_btn \
+    -text "Select" \
+    -width 10\
+    -command "onSelectResult"
 grid .fr.principal.result_btn -row 15 -column 2 -sticky e -padx {6 12} -pady 2
 
 set result_path ""
@@ -580,7 +586,11 @@ set selectedVersion "-"
 label .fr.principal.version_label -text "Version:"
 grid .fr.principal.version_label -in .fr.principal.options -row 0 -column 2 -sticky e -padx {8 4}
 
-ttk::combobox .fr.principal.versions -values $versionList -textvariable selectedVersion -width 10 -state readonly
+ttk::combobox .fr.principal.versions \
+    -values $versionList \
+    -textvariable selectedVersion \
+    -width 18 \
+    -state readonly
 grid .fr.principal.versions -in .fr.principal.options -row 0 -column 3 -sticky e -padx 4
 
 # Define a button to load cached data if there is so.
@@ -744,6 +754,4 @@ set min_width [expr {min($minimum_width, $initial_width)}]
 set min_height [expr {min($minimum_height, $initial_height)}]
 wm minsize . $min_width $min_height
 
-set width_offset [expr {max(0, ($screen_width - $initial_width) / 2)}]
-set height_offset [expr {max(0, ($screen_height - $initial_height) / 2)}]
-wm geometry . ${initial_width}x${initial_height}+${width_offset}+${height_offset}
+wm geometry . ${initial_width}x${initial_height}

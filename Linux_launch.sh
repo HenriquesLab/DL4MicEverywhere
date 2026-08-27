@@ -523,7 +523,7 @@ else
 fi
 
 
-selected_dockerfile=$(select_dockerfile "$gpu_flag" "$python_version")
+selected_dockerfile=$(select_dockerfile "$flag_gpu" "$python_version")
 
 if [ ! -f "$selected_dockerfile" ]; then
     echo "" 
@@ -536,7 +536,7 @@ if [ ! -f "$selected_dockerfile" ]; then
 fi
 
 # Set the docker's tag
-if [ "$test_flag" -eq 1 ]; then
+if [ "$flag_test" -eq 1 ]; then
     echo ""
     echo "ubuntu_version: $ubuntu_version"
     echo "cuda_version: $cuda_version"
@@ -754,17 +754,17 @@ if [ "$flag_build" -eq 3 ]; then
     DOCKER_OUT=$? # Gets if the docker image has been pulled
 else
     # Build the docker image without GUI
-    if [ "$build_flag" -eq 2 ]; then
+    if [ "$flag_build" -eq 2 ]; then
         echo "To build the docker image, you need to provide root access by entering your password."
         echo "Otherwise, you can choose the option of getting the image from Docker Hub or follow"
         echo "the steps in our documentation."
-        if [ "$gpu_flag" -eq 1 ]; then
+        if [ "$flag_gpu" -eq 1 ]; then
             sudo docker build --file "$selected_dockerfile" -t "$docker_tag" \
                 --label "org.dl4miceverywhere.managed=true" \
                 --build-arg UBUNTU_VERSION="${ubuntu_version}" \
                 --build-arg CUDA_VERSION="${cuda_version}" \
                 --build-arg CUDNN_VERSION="${cudnn_version}" \
-                --build-arg flag_gpu="${flag_gpu}" \
+                --build-arg GPU_FLAG="${flag_gpu}" \
                 --build-arg PYTHON_VERSION="${python_version}" \
                 --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
                 --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
@@ -778,7 +778,7 @@ else
                 --build-arg UBUNTU_VERSION="${ubuntu_version}" \
                 --build-arg CUDA_VERSION="${cuda_version}" \
                 --build-arg CUDNN_VERSION="${cudnn_version}" \
-                --build-arg GPU_FLAG="${gpu_flag}" \
+                --build-arg GPU_FLAG="${flag_gpu}" \
                 --build-arg PYTHON_VERSION="${python_version}" \
                 --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
                 --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
