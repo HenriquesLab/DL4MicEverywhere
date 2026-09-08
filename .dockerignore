@@ -1,0 +1,6 @@
+.git
+.git/**
+**/__pycache__
+**/*.pyc
+**/*.pyo
+.tools/.cache*

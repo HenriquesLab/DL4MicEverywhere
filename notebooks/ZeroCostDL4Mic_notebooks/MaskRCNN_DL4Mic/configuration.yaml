@@ -16,17 +16,17 @@ config:
     description: MaskRCNN_DL4Mic is the conversion of the MaskRCNN notebook from ZeroCostDL4Mic.
     dl4miceverywhere_version: 2.2.0
     docker_hub_image: maskrcnn_zerocostdl4mic-z1.14.2-d2.2.0
-    notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/MaskRCNN_ZeroCostDL4Mic.ipynb
+    notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/Colab_notebooks/MaskRCNN_ZeroCostDL4Mic.ipynb
     notebook_version: 1.14.2
     python_version: '3.9'
-    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/MaskRCNN_requirements_simple.txt
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/MaskRCNN_requirements_simple.txt
     sections_to_remove: 1.2. 2. 6.3.
     ubuntu_version: '22.04'
 covers:
-- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/maskRCNN_notebook.png
+- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/BioimageModelZoo/Images/maskRCNN_notebook.png
 description: Instance segmentation of 2D images. MaskRCNN is a is an object detection and segmentation network, which identifies objects in images and draws bounding boxes around them.
-documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/README.md
-download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/MaskRCNN_ZeroCostDL4Mic.ipynb
+documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/BioimageModelZoo/README.md
+download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/Colab_notebooks/MaskRCNN_ZeroCostDL4Mic.ipynb
 git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
 id: Notebook_MaskRCNN_ZeroCostDL4Mic
 license: MIT

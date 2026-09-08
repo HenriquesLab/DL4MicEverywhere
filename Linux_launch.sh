@@ -387,6 +387,18 @@ rename_parsed_argument sections_to_remove # Not required to be present and there
 rename_parsed_argument dl4miceverywhere_version # Not required to be present and therefore the cheking is skipped
 rename_parsed_argument docker_hub_image # Not required to be present and therefore the cheking is skipped
 
+# GitHub build inputs are deterministic when the immutable commit is encoded
+# directly in the URL. Local requirement lock files are also accepted.
+for pinned_url in "$notebook_url" "$requirements_url"; do
+    if [[ "$pinned_url" == https://raw.githubusercontent.com/* ]] && \
+       ! [[ "$pinned_url" =~ ^https://raw\.githubusercontent\.com/[^/]+/[^/]+/[0-9a-fA-F]{40}/.+$ ]]; then
+        echo "Configuration reproducibility check failed." >&2
+        echo "GitHub build URLs must contain a full 40-character commit SHA:" >&2
+        echo "  $pinned_url" >&2
+        exit 1
+    fi
+done
+
 # Check if the notebook path is missing (SIMPLE USECASE) 
 if [ -z "$notebook_path" ]; then
     # Then the URL from the configuration file is used as notebook path
@@ -770,7 +782,6 @@ else
                 --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
                 --build-arg NOTEBOOK_NAME="${notebook_name}" \
                 --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" \
-                --build-arg CACHEBUST=$(date +%s) \
                 "$BASEDIR"
         else
             sudo docker build --file "$selected_dockerfile" -t "$docker_tag" \
@@ -784,7 +795,6 @@ else
                 --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
                 --build-arg NOTEBOOK_NAME="${notebook_name}" \
                 --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" \
-                --build-arg CACHEBUST=$(date +%s) \
                 "$BASEDIR"
         fi
 
@@ -831,9 +841,6 @@ fi
 if [ "$flag_local_requirements" -eq 1 ]; then
    rm "$BASEDIR/requirements.txt"
 fi
-
-echo "Docker output:"
-echo "$DOCKER_OUT"
 
 if [ "$DOCKER_OUT" -eq 0 ] && [ "$flag_build" -ne 1 ]; then
     track_managed_docker_image "$docker_tag"

@@ -16,18 +16,18 @@ config:
     description: Detectron2_2D_DL4Mic is the conversion of the Detectron2 2D notebook from ZeroCostDL4Mic.
     dl4miceverywhere_version: 2.2.0
     docker_hub_image: detectron2_2d_zerocostdl4mic-z1.15.1-d2.2.0
-    notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/Detectron2_2D_ZeroCostDL4Mic.ipynb
+    notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/Colab_notebooks/Detectron2_2D_ZeroCostDL4Mic.ipynb
     notebook_version: 1.15.1
     python_version: '3.9'
-    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/Detectron2_2D_requirements_simple.txt
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/Detectron2_2D_requirements_simple.txt
     sections_to_remove: 1.2. 2. 4.2. 6.2.
     ubuntu_version: '22.04'
 covers:
-- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/yolo_notebook.png
-- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/Images/yolo_notebook_2.png
+- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/BioimageModelZoo/Images/yolo_notebook.png
+- https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/BioimageModelZoo/Images/yolo_notebook_2.png
 description: Object detection of 2D images. Detectron2 is an object detection network developed by Facebook AI Research, which identifies objects in images and draws bounding boxes around them.
-documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/BioimageModelZoo/README.md
-download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/Detectron2_2D_ZeroCostDL4Mic.ipynb
+documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/BioimageModelZoo/README.md
+download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/Colab_notebooks/Detectron2_2D_ZeroCostDL4Mic.ipynb
 git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
 id: Notebook_Detectron2_ZeroCostDL4Mic
 license: MIT

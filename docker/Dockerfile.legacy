@@ -5,15 +5,11 @@ ARG CUDNN_VERSION=""
 ####
 ## Stage 1 - Download and convert the notebook
 ####
-FROM python:3.9-alpine3.19 AS notebook_autoconversion
-
-RUN apk update && \
-    apk add --no-cache git
+FROM python:3.9.20-alpine3.19 AS notebook_autoconversion
 
 WORKDIR /home
 
-RUN python -m pip install --upgrade pip && \
-    python -m pip install nbformat==5.9.2
+RUN python -m pip install --disable-pip-version-check nbformat==5.9.2
 
 # Read all the arguments
 ARG PATH_TO_NOTEBOOK
@@ -26,18 +22,16 @@ ARG UBUNTU_VERSION
 ARG CUDA_VERSION
 ARG CUDNN_VERSION
 
-# Custom cache invalidation
-ARG CACHEBUST=1
-
-# All the layers below this will not be cached
-RUN echo "${CACHEBUST}"
-
 # Download the notebook
 ADD ${PATH_TO_NOTEBOOK} ./${NOTEBOOK_NAME}
 
+# Use the converter from the exact local DL4MicEverywhere build context.
+# Docker fingerprints COPY inputs, so no self-referential Git commit pin is needed.
+COPY .tools/notebook_autoconversion/ /home/DL4MicEverywhere/.tools/notebook_autoconversion/
+COPY .tools/python_tools/create_docker_info.py /home/DL4MicEverywhere/.tools/python_tools/create_docker_info.py
+
 # Autoconvert the notebook
-RUN git clone --depth 1 https://github.com/HenriquesLab/DL4MicEverywhere.git && \
-    python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py \
+RUN python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py \
         -p . \
         -n "${NOTEBOOK_NAME}" \
         -s "${SECTIONS_TO_REMOVE}" && \
@@ -76,13 +70,14 @@ ARG SECTIONS_TO_REMOVE=""
 ARG NOTEBOOK_NAME=""
 ARG GPU_FLAG=""
 ARG PYTHON_VERSION=""
-ARG CACHEBUST=1
 
 # Environment
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV TZ=Europe/Lisbon
 ENV DEBIAN_FRONTEND=noninteractive
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV PIP_NO_CACHE_DIR=1
 
 # Legacy-safe Node version
 ENV NODE_VERSION=16.20.2
@@ -137,7 +132,7 @@ RUN ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Node.js with NVM
-RUN curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && \
+RUN curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/bab86d5de571015b63fd8fc30b47bbe072a1290e/install.sh | bash && \
     source "${NVM_DIR}/nvm.sh" && \
     nvm install "${NODE_VERSION}" && \
     nvm use "${NODE_VERSION}" && \
@@ -161,13 +156,15 @@ RUN set -eux; \
     case "${PYTHON_VERSION}" in \
         3.5) \
             PYTHON_FULL_VERSION=3.5.10; \
-            PIP_SPEC='pip<21'; \
-            SETUPTOOLS_SPEC='setuptools<50' \
+            PIP_VERSION=20.3.4; \
+            SETUPTOOLS_VERSION=49.6.0; \
+            WHEEL_VERSION=0.37.1 \
             ;; \
         3.6) \
             PYTHON_FULL_VERSION=3.6.15; \
-            PIP_SPEC='pip<22'; \
-            SETUPTOOLS_SPEC='setuptools<60' \
+            PIP_VERSION=21.3.1; \
+            SETUPTOOLS_VERSION=59.6.0; \
+            WHEEL_VERSION=0.37.1 \
             ;; \
         *) \
             echo "Unsupported PYTHON_VERSION=${PYTHON_VERSION}. Supported values in this Dockerfile: 3.5, 3.6." >&2; \
@@ -188,8 +185,10 @@ RUN set -eux; \
     make -j"$(nproc)"; \
     make altinstall; \
     "/opt/python/${PYTHON_VERSION}/bin/python${PYTHON_VERSION}" -m venv "${VIRTUAL_ENV}"; \
-    "${VIRTUAL_ENV}/bin/python" -m ensurepip --upgrade; \
-    "${VIRTUAL_ENV}/bin/python" -m pip install --upgrade "${PIP_SPEC}" "${SETUPTOOLS_SPEC}" wheel; \
+    "${VIRTUAL_ENV}/bin/python" -m pip install \
+        "pip==${PIP_VERSION}" \
+        "setuptools==${SETUPTOOLS_VERSION}" \
+        "wheel==${WHEEL_VERSION}"; \
     ln -sf "${VIRTUAL_ENV}/bin/python" /usr/local/bin/python; \
     ln -sf "${VIRTUAL_ENV}/bin/python" /usr/local/bin/python3; \
     ln -sf "${VIRTUAL_ENV}/bin/pip" /usr/local/bin/pip; \
@@ -201,31 +200,26 @@ WORKDIR /home
 # Install notebook runtime packages
 RUN set -eux; \
     if [ "${PYTHON_VERSION}" = "3.5" ]; then \
-        python -m pip install --upgrade 'pip<21' 'setuptools<50'; \
         python -m pip install nbformat==5.0.2; \
         python -m pip install ipywidgets==7.8.1; \
         python -m pip install jupyterlab==0.23.0; \
         python -m pip install matplotlib==2.1.0; \
     else \
-        python -m pip install --upgrade 'pip<22' 'setuptools<60'; \
         python -m pip install nbformat==5.0.2; \
         python -m pip install ipywidgets==8.0.0a0; \
         python -m pip install jupyterlab==2.3.2; \
         python -m pip install matplotlib==3.0.3; \
     fi
 
-# Custom cache invalidation
-RUN echo "${CACHEBUST}"
 
-# Download requirements
+# Validate deterministic Python package specifications
+COPY docker/validate_requirements_pins.py /usr/local/bin/dl4me-validate-requirements
+
+# Load deterministic requirements input
 ADD ${PATH_TO_REQUIREMENTS} ./requirements.txt
 
 # Install requirements
-RUN if [ "${PYTHON_VERSION}" = "3.5" ]; then \
-        python -m pip install --upgrade 'pip<21' 'setuptools<50'; \
-    else \
-        python -m pip install --upgrade 'pip<22' 'setuptools<60'; \
-    fi && \
+RUN python /usr/local/bin/dl4me-validate-requirements requirements.txt && \
     python -m pip install -r requirements.txt && \
     rm requirements.txt
 

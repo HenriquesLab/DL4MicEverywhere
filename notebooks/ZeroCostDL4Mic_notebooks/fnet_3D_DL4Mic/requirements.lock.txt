@@ -1,0 +1,13 @@
+# Deterministic lock derived from ZeroCostDL4Mic fnet_3D requirements
+jupyter==1.0.0
+matplotlib==2.2.3
+numpy==1.18.0
+pandas==0.25.3
+tifffile==2019.7.26
+tqdm==4.19.5
+scikit-image==0.18.0
+argschema==1.17.5
+scipy==1.4.1
+torch==1.4.0
+astropy==3.2.3
+fpdf2==2.7.4
