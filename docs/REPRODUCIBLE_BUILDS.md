@@ -1,45 +1,50 @@
 # Reproducible Docker builds
 
-DL4MicEverywhere treats notebook image inputs as immutable build inputs while keeping notebook metadata separate from build-infrastructure metadata.
+DL4MicEverywhere treats notebook sources, Python dependencies, and its own conversion tooling as explicit build inputs.
 
-## What is pinned
+## Notebook sources
 
-- `notebook_url` and remote `requirements_url` values point directly to immutable 40-character Git commit SHAs rather than `main` or `master`.
-- The launcher validates `raw.githubusercontent.com` build URLs and rejects them when the URL does not contain a full commit SHA.
-- The Docker templates do not clone DL4MicEverywhere from GitHub. They `COPY` the notebook-conversion package and `create_docker_info.py` directly from the local repository used as the Docker build context.
-- This means the converter automatically matches the exact local DL4MicEverywhere source being run, including release ZIPs that do not contain `.git` metadata. Docker fingerprints these copied files as build inputs.
-- The notebook conversion stage uses a Python patch-version tag (`python:3.9.20-alpine3.19`).
-- NVM's installer is fetched from the immutable commit behind NVM v0.39.7.
-- pip/setuptools/wheel bootstrap versions are exact and Python-version compatible.
-- Notebook requirements are checked before installation; floating requirements such as `numpy>=1.20`, `numpy`, VCS URLs, and direct URLs are rejected.
-- The three bundled upstream requirement files that contained floating specifications (`CycleGAN`, `pix2pix`, and `fnet_3D`) use repository-local `requirements.lock.txt` files. Their immutable upstream requirement URL is retained as `requirements_source_url` for provenance.
-- Timestamp-based `CACHEBUST` invalidation is removed, and pip's online version check is disabled.
+Remote `raw.githubusercontent.com` notebook URLs used for bundled builds must contain a full 40-character Git commit SHA. The launcher rejects floating GitHub notebook build URLs such as `main` or `master`.
+
+DL4MicEverywhere itself is not cloned during the image build. The notebook converter and Docker-info writer are copied from the local repository used as Docker build context, so a release ZIP and a Git checkout use the exact converter code that launched the build without maintaining a self-referential commit value.
+
+## Python dependencies
+
+Every bundled notebook stores a local, human-editable `requirements.txt` beside `configuration.yaml`. The YAML keeps the immutable dependency source URL, for example:
+
+```yaml
+requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/<40-char-commit>/requirements_files/CARE_2D_requirements_simple.txt
+```
+
+The committed sibling `requirements.txt` is the deterministic build input; the URL is retained as source/provenance. The input is never installed directly. DL4MicEverywhere automatically derives the sibling `requirements.lock.txt`, containing exact transitive versions and package hashes, and Docker installs only that lock with `pip --require-hashes`.
+
+DL4MicEverywhere runtime packages are incorporated into the same resolution, with notebook-specific constraints taking precedence. The converter stage has an independent lock. See [DEPENDENCY_LOCKS.md](DEPENDENCY_LOCKS.md) for the complete workflow.
+
+## Other deterministic inputs
+
+- The notebook-conversion stage uses a Python patch-version base tag (`python:3.9.20-alpine3.19`).
+- NVM's installer is fetched from an immutable commit.
+- pip, setuptools, and wheel bootstrap versions are explicit and Python-version compatible.
+- Timestamp-based Docker cache busting is not used.
+- pip's online version check is disabled in image builds.
 
 ## Updating a notebook intentionally
 
-When a notebook source is updated:
+1. Review and select the new upstream notebook commit.
+2. Put its full 40-character SHA in `notebook_url`.
+3. Set `requirements_url` to the immutable dependency source associated with that notebook revision.
+4. Edit the local `requirements.txt` to match that source/environment.
+5. Commit the configuration and dependency input.
+6. Let the lock workflow regenerate `requirements.lock.txt` and the image workflow build/test the resulting image.
 
-1. Choose and review the new upstream Git commit.
-2. Put its full 40-character SHA directly in `notebook_url` and, when requirements are remote, `requirements_url`.
-3. Verify every requirement used for the build has an exact version.
-4. Build and run the pre/post-build checks.
-5. Only then publish a new DL4MicEverywhere notebook/image version.
-
-There is no separate `source_commit` or `source_repository` field to keep synchronized with these URLs.
-
-## Updating DL4MicEverywhere build infrastructure intentionally
-
-No self-referential commit value needs to be maintained. The Docker build uses the converter files directly from the local DL4MicEverywhere repository that launched the build.
-
-Therefore, updating the build infrastructure is simply a normal code change to `.tools/notebook_autoconversion/` or `.tools/python_tools/create_docker_info.py`. Once that repository state is checked out or distributed as a release ZIP, builds automatically use that exact local implementation.
+There is no duplicated source-repository field, source-commit field, lock URL, or DL4MicEverywhere self-commit field to synchronize.
 
 ## Remaining sources of variability
 
-This pins Git inputs and declared Python package versions, but it is not yet a bit-for-bit image lock. The following can still change over time:
+Python dependencies are locked, but the complete image is not yet bit-for-bit reproducible because:
 
-- Ubuntu and NVIDIA CUDA base-image tags are not yet pinned by digest.
+- Ubuntu and NVIDIA CUDA base-image tags are not pinned by digest.
 - `apt-get install` obtains package revisions from repositories available at build time.
-- Python packages can have transitive dependencies whose own version ranges are defined in package metadata even when the top-level requirement is exact.
-- CPU architecture and Docker builder implementation can affect binary artifacts.
+- CPU architecture and Docker/BuildKit implementation can affect binary artifacts.
 
-For a stronger next phase, pin base images by digest, use Ubuntu snapshot repositories (or exact `.deb` artifacts), and generate per-notebook Python lock files with hashes for the complete transitive dependency graph.
+A future reproducibility layer can pin base images by digest and use snapshot/immutable OS package repositories.

@@ -6,3 +6,10 @@
 *.yml text eol=lf
 *.bat text eol=crlf
 *.ps1 text eol=crlf
+*.in text eol=lf
+*.lock text eol=lf
+*.lock.txt text eol=lf
+
+# Deterministic human-edited dependency inputs.
+requirements.txt text eol=lf
+converter-requirements.txt text eol=lf

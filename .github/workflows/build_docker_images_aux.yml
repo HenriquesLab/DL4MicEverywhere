@@ -133,6 +133,24 @@ jobs:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
 
+      - name: Set up Python for dependency lock validation
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Ensure deterministic dependency locks
+        id: dependency_lock
+        shell: bash
+        run: |
+          python3 .tools/python_tools/requirements_lock.py ensure --config '${{ inputs.config_file }}' --repo-root .
+          python3 .tools/python_tools/requirements_lock.py ensure \
+            --source docker/converter-requirements.txt \
+            --python-version 3.9 \
+            --lock docker/converter-requirements.lock.txt \
+            --profile none \
+            --repo-root .
+          echo "path=$(dirname '${{ inputs.config_file }}')/requirements.lock.txt" >> "$GITHUB_OUTPUT"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -161,6 +179,7 @@ jobs:
             PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
             PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
             PATH_TO_REQUIREMENTS=${{ needs.get_arguments.outputs.requirements_url }}
+            PATH_TO_REQUIREMENTS_LOCK=${{ steps.dependency_lock.outputs.path }}
             NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
             SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
       
@@ -180,6 +199,7 @@ jobs:
             PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
             PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
             PATH_TO_REQUIREMENTS=${{ needs.get_arguments.outputs.requirements_url }}
+            PATH_TO_REQUIREMENTS_LOCK=${{ steps.dependency_lock.outputs.path }}
             NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
             SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
 
@@ -190,6 +210,24 @@ jobs:
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
+
+      - name: Set up Python for dependency lock validation
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Ensure deterministic dependency locks
+        id: dependency_lock
+        shell: bash
+        run: |
+          python3 .tools/python_tools/requirements_lock.py ensure --config '${{ inputs.config_file }}' --repo-root .
+          python3 .tools/python_tools/requirements_lock.py ensure \
+            --source docker/converter-requirements.txt \
+            --python-version 3.9 \
+            --lock docker/converter-requirements.lock.txt \
+            --profile none \
+            --repo-root .
+          echo "path=$(dirname '${{ inputs.config_file }}')/requirements.lock.txt" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -219,6 +257,7 @@ jobs:
               PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
               PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
               PATH_TO_REQUIREMENTS=${{ needs.get_arguments.outputs.requirements_url }}
+              PATH_TO_REQUIREMENTS_LOCK=${{ steps.dependency_lock.outputs.path }}
               NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
               SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
 
@@ -236,6 +275,7 @@ jobs:
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
+
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -271,6 +311,7 @@ jobs:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
 
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -304,6 +345,7 @@ jobs:
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
+
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3

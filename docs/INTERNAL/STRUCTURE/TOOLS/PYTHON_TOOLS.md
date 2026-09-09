@@ -3,6 +3,7 @@
 - [create_docker_info.py](#create_docker_info.py)
 - [dict_parser.py](#dict_parser.py)
 - [list_of_notebooks.py](#list_of_notebooks.py)
+- [requirements_lock.py](#requirements_lock.py)
 - [test_files.py](#test_files.py)
 - [update_configuration.py](#update_configuration.py)
 - [update_with_zc_nanifest.py](#update_with_zc_nanifest.py)
@@ -23,7 +24,9 @@ Creates a file and adds the following information:
         CUDA_VERSION="{cuda_version}"
         CUDNN_VERSION="{cudnn_version}"
         PATH_TO_NOTEBOOK="{path_to_notebook}"
-        PATH_TO_REQUIREMENTS="{path_to_requirements}"
+        PATH_TO_REQUIREMENTS_INPUT="{path_to_requirements}"
+        PATH_TO_REQUIREMENTS_LOCK="{path_to_requirements_lock}"
+        REQUIREMENTS_LOCK_SHA256="{requirements_lock_sha256}"
         SECTIONS_TO_REMOVE="{sections_to_remove}"
         NOTEBOOK_NAME="{notebook_name}"
         GPU_FLAG="{gpu_flag}"
@@ -44,6 +47,10 @@ On this file three dictionaries are defined:
 ## [list_of_notebooks.py](../../../../.tools/python_tools/list_of_notebooks.py) <a name="list_of_notebooks.py"></a>
 
 
+
+## [requirements_lock.py](../../../../.tools/python_tools/requirements_lock.py) <a name="requirements_lock.py"></a>
+
+Generates and validates the sibling `requirements.lock.txt` files used by deterministic Docker builds. It combines a notebook's local `requirements.txt` with the runtime profile for the configured Python version, resolves with a pinned `uv` version, and writes exact transitive dependencies with hashes. See [Dependency Locks](../../../DEPENDENCY_LOCKS.md).
 
 ## [test_files.py](../../../../.tools/python_tools/test_files.py) <a name="test_files.py"></a>
 

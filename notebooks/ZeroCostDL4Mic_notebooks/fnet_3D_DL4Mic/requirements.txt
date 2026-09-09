@@ -1,0 +1,15 @@
+# Migrated from immutable upstream dependency input:
+# https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/fnet_3D_requirements_simple.txt
+
+jupyter==1.0.0
+matplotlib==2.2.3
+numpy==1.18.0
+pandas>=0.21.1
+tifffile==2019.7.26
+tqdm==4.19.5
+scikit-image==0.18.0
+argschema
+scipy==1.4.1
+torch==1.4.0
+astropy==3.2.3
+fpdf2==2.7.4

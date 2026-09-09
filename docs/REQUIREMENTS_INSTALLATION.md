@@ -5,6 +5,7 @@ You can double-click the launcher in the DL4MicEverywhere folder (which has the 
 ### Requirements
 
 - Docker installed on your system.
+- Python 3 with `venv` support when a missing/stale dependency lock must be generated for a local image build. DL4MicEverywhere installs this host-side helper automatically when needed.
 - For GPU usage - NVIDIA GPU + CUDA drivers.
 - If you want to run the graphical user interface (GUI), [Tcl/Tk](https://www.tcl.tk/) must be installed on your computer. 
 

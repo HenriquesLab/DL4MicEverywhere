@@ -1,0 +1,16 @@
+# Migrated from immutable upstream dependency input:
+# https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/MaskRCNN_requirements_simple.txt
+
+# Requirements for MaskRCNN_ZeroCostDL4Mic.ipynb
+
+fpdf2==2.7.4
+h5py==3.10.0
+imgaug==0.4.0
+ipython==8.4.0
+matplotlib==3.5.0
+numpy==1.22.4
+pandas==1.5.3
+Pillow==8.4.0
+pip==21.2.4
+scikit-image==0.19.3
+tensorflow==2.12.0

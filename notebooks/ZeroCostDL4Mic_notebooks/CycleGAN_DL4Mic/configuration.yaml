@@ -19,8 +19,7 @@ config:
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/Colab_notebooks/CycleGAN_ZeroCostDL4Mic.ipynb
     notebook_version: 1.13.5
     python_version: '3.8'
-    requirements_source_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/CycleGAN_requirements_simple.txt
-    requirements_url: notebooks/ZeroCostDL4Mic_notebooks/CycleGAN_DL4Mic/requirements.lock.txt
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/CycleGAN_requirements_simple.txt
     sections_to_remove: 2. 6.3.
     ubuntu_version: '22.04'
 covers:

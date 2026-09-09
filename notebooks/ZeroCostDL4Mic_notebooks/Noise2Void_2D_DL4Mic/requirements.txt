@@ -1,0 +1,24 @@
+# Migrated from immutable upstream dependency input:
+# https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/Noise2Void_2D_requirements_simple.txt
+
+# Requirements for Noise2Void_2D_ZeroCostDL4Mic.ipynb
+astropy==5.2.2
+csbdeep==0.7.3
+fpdf2==2.7.4
+google==2.0.3
+h5py==3.10.0
+keras==2.12.0
+matplotlib==3.7.1
+memory-profiler==0.61.0
+n2v==0.3.2
+numexpr==2.8.4
+numpy==1.22.4
+pandas==1.5.3
+pathlib==1.0.1
+pip==23.1.2
+scikit-image==0.19.3
+scikit-learn==1.2.2
+scipy==1.10.1
+tensorflow==2.12.0
+tifffile==2023.7.4
+wget==3.2

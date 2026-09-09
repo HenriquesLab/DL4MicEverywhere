@@ -31,7 +31,11 @@ If you wish to contribute a new Jupyter notebook to DL4MicEverywhere, kindly adh
 - The notebooks should be self-explanatory and do not require end users to have coding expertise to run them. They should include a graphical user interface (GUI) for easy parameter configuration by users. You can refer to the [U-Net 2D](https://github.com/HenriquesLab/ZeroCostDL4Mic/blob/master/Colab_notebooks/U-Net_2D_ZeroCostDL4Mic.ipynb) notebook as an example.
 - The notebooks should include comprehensive documentation and instructions. They should also acknowledge and cite any related publications.
 
-Once you have a working notebook, create a YAML config file under `notebooks/configs` using existing files as a template. Specify the notebook URL, resource requirements, and other metadata. Open a PR with your config - once merged, an automated workflow will handle building and testing the notebook Docker image.
+Once you have a working notebook, create a notebook directory under the appropriate `notebooks/` category and use an existing `configuration.yaml` as a template. Specify an immutable notebook URL and the Python/Ubuntu/CUDA metadata. Add a sibling `requirements.txt` containing the direct dependencies and intentional constraints. Set `requirements_url` to the real immutable source URL for that dependency specification (prefer a full Git commit SHA for GitHub raw URLs); do not hand-maintain transitive dependency pins. DL4MicEverywhere uses the committed sibling `requirements.txt` as the deterministic build input while retaining the URL as provenance.
+
+DL4MicEverywhere stores the generated `requirements.lock.txt` beside `configuration.yaml`. The lock location is automatic and must not be added as another YAML URL. The dependency-lock workflow resolves exact transitive versions and hashes and commits the generated lock. See [Dependency Locks](docs/DEPENDENCY_LOCKS.md) for the maintenance model.
+
+Open a PR with the notebook configuration and dependency input changes. Automated workflows handle lock maintenance, image building, and testing.
 
 Consider first contributing the base notebook to [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) and then benefit from our automated conversion process.
 

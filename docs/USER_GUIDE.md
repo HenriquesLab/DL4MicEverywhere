@@ -325,7 +325,7 @@ Clicking on the **Advanced options** button at the bottom will display a new sec
      width="40%" 
      height="40%" />
 
-When you choose this option, the **default notebooks** section will be disabled and will not consider the information you provide there. The rest of the arguments you provided will remain intact. In the advanced options, you can provide paths to local files of the `configuration.yaml`, `notebook.ipynb`, and `requirements.txt`.
+When you choose this option, the **default notebooks** section will be disabled and will not consider the information you provide there. The rest of the arguments you provided will remain intact. In the advanced options, you can provide paths to local files of the `configuration.yaml`, `notebook.ipynb`, and a dependency input such as `requirements.txt`.
 
 ### Select a local `configuration.yaml`:
 
@@ -364,7 +364,7 @@ After selecting the file, the window should look like this:
 
 ### Select a local requirements file:
 
-You can also select a `requirements.txt` file instead of the one provided in the `configuration.yaml`. This file should contain the Python libraries that you want to be installed in the container:
+You can also select a local dependency input instead of the one provided in `configuration.yaml`. Use `requirements.txt` as the human-edited dependency file. List the direct Python dependencies and constraints you want; DL4MicEverywhere automatically generates or reuses a sibling `requirements.lock.txt` and installs the lock rather than the input directly:
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_requ_select.png" 
      alt="Select the local requirements"

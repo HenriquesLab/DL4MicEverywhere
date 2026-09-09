@@ -23,11 +23,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
-      - name: Get changed configuration.yaml on the commint
+      - name: Get changed configuration or requirements input on the commit
         id: changed-files
         uses: tj-actions/changed-files@v41
         with:
-         files: '**/configuration.yaml'
+         files: |
+           **/configuration.yaml
+           **/requirements.txt
       - if: ${{ steps.changed-files.outputs.all_changed_files != '' }}
         name: List and extract all changed files
         id: create-json
@@ -36,8 +38,16 @@ jobs:
           files_json="{\"include\":[{\"notebook\":\""
           echo "$files_json"
           first=true
+          declare -A seen_configs=()
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             echo "$file was changed"
+            if [ "$(basename "$file")" = "requirements.txt" ]; then
+              file="$(dirname "$file")/configuration.yaml"
+            fi
+            if [ -n "${seen_configs[$file]:-}" ]; then
+              continue
+            fi
+            seen_configs[$file]=1
             if [ "$first" = true ]; then
               files_json+=$file
               first=false
@@ -189,10 +199,21 @@ jobs:
         uses: filiph/linkcheck@2.0.23
         with:
           arguments: ${{ needs.check_keys.outputs.notebook_url }}
-      - name: Check that requirements' URL exists
+      - name: Check that remote requirements input exists
+        if: ${{ startsWith(needs.check_keys.outputs.requirements_url, 'http://') || startsWith(needs.check_keys.outputs.requirements_url, 'https://') }}
         uses: filiph/linkcheck@2.0.23
         with:
           arguments: ${{ needs.check_keys.outputs.requirements_url }}
+      - name: Check that local requirements input exists
+        if: ${{ !startsWith(needs.check_keys.outputs.requirements_url, 'http://') && !startsWith(needs.check_keys.outputs.requirements_url, 'https://') }}
+        shell: bash
+        run: |
+          input='${{ needs.check_keys.outputs.requirements_url }}'
+          config='${{ matrix.notebook }}'
+          if [ -f "$(dirname "$config")/$input" ]; then
+            exit 0
+          fi
+          test -f "$input"
 
   configuration_matrix:  
     name: Call the building and pushing

@@ -1,0 +1,32 @@
+# Migrated from immutable upstream dependency input:
+# https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/StarDist_2D_requirements_simple.txt
+
+# Requirements for StarDist_2D_ZeroCostDL4Mic.ipynb
+Pillow==11.0.0
+astropy==6.1.7
+csbdeep==0.8.1
+fpdf2==2.8.2
+future==1.0.0
+h5py==3.12.1
+ipywidgets==8.1.8
+matplotlib==3.8.0
+numcodecs==0.15.1
+numpy==1.26.4
+opencv-python==4.10.0.84
+pandas==2.2.2
+pathlib==1.0.1
+pip==24.1.2
+requests==2.32.3
+scikit-image==0.24.0
+scikit-learn==1.5.2
+scipy==1.13.1
+stardist==0.9.1
+tabulate==0.9.0
+tensorflow==2.19.0
+tifffile==2024.9.20
+tqdm==4.66.6
+wget==3.2
+zarr==2.18.3
+bioimageio.core==0.5.11
+tf-keras==2.19.0
+h5py==3.12.1

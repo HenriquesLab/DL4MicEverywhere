@@ -9,7 +9,7 @@ The structure of these YAML file is the same as in the BioImage Model Zoo with a
 * **`config`**:
     * **`dl4miceveryhwere`**:
         * **`notebook_url`**: The URL to the Jupyter notebook that is stored in the Docker image.
-        * **`requirements_url`**: The URL Python dependencies that are installed in the Docker image.
+        * **`requirements_url`**: The real URL of the human-readable dependency specification used as source/provenance. For GitHub raw URLs, bundled configurations should use an immutable full commit SHA. DL4MicEverywhere keeps a sibling committed `requirements.txt` as the deterministic build input and automatically derives `requirements.lock.txt` beside it; the lock is not listed in the YAML and is the only dependency file installed in the Docker image.
         * **`cuda_version`**: The CUDA version in the Docker image. The CUDA version is used to pull the Ubuntu image from Docker Hub (from [Nvidia](https://hub.docker.com/r/nvidia/cuda) if GPU is selected). Its version (and the `ubuntu_version`) should be one from the following [list](https://gitlab.com/nvidia/container-images/cuda/blob/master/doc/supported-tags.md).
         * **`cudnn_version`**: The cuDNN (CUDA Deep Neural Network) library's version in the Docker image. The cuDNN version is used for the installation of libraries that will allow the training of Deep Neural Networks(if GPU is selected). The version of cuDNN is related with the CUDA version, therefore it will need to be a specific version that is determined by the libcudnn library in [Ubuntu 20.04](https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/) or [Ubuntu 22.04](https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/).
         * **`ubuntu_version`**: The Ubuntu version for the operating system in the Docker image. This version is used to pull the base image from Docker Hub (from [Nvidia](https://hub.docker.com/r/nvidia/cuda) if GPU is selected and from [Ubuntu](https://hub.docker.com/_/ubuntu) otherwise). The selected Ubuntu version must be between among the supported tags.
@@ -25,8 +25,8 @@ As an example, here is the specific DL4MicEverywhere `config` field for the `con
 ```
 config:
   dl4miceverywhere:
-    notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/Colab_notebooks/CARE_2D_ZeroCostDL4Mic.ipynb
-    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/master/requirements_files/CARE_2D_requirements_simple.txt
+    notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/Colab_notebooks/CARE_2D_ZeroCostDL4Mic.ipynb
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/CARE_2D_requirements_simple.txt
     cuda_version: 11.8.0
     cudnn_version:  8.6.0.163
     ubuntu_version: '22.04'
@@ -37,4 +37,6 @@ config:
     dl4miceverywhere_version: 1.0.0
     docker_hub_image: care_2d_zerocostdl4mic-z1.15.2-d1.0.0
 ```
+The generated lock is stored beside this configuration by convention; there is no lock URL to maintain. See [Dependency Locks](DEPENDENCY_LOCKS.md).
+
 Find the complete file [here](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/ZeroCostDL4Mic_notebooks/CARE_2D_DL4Mic/configuration.yaml). 

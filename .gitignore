@@ -137,3 +137,7 @@ cython_debug/
 # MAC DS_Store
 *.DS_Store
 cheatsheet*.txt
+# Ephemeral deterministic lock staged inside the Docker build context
+.tools/docker_build_inputs/
+
+.tools/.cache/uv/

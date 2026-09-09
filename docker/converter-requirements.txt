@@ -1,0 +1,2 @@
+# Dependencies used only while converting a notebook during the Docker build.
+nbformat==5.9.2

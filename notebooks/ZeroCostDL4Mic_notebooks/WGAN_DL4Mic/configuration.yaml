@@ -19,7 +19,7 @@ config:
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/Colab_notebooks/WGAN_ZeroCostDL4Mic.ipynb
     notebook_version: 1.15.1
     python_version: '3.9'
-    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/SplineDist_2D_requirements_simple.txt
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/WGAN_requirements_simple.txt
     sections_to_remove: 2. 6.3.
     ubuntu_version: '22.04'
 covers:

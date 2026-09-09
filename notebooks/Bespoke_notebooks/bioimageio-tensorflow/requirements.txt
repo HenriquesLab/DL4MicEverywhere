@@ -1,3 +1,6 @@
+# Migrated from immutable upstream dependency input:
+# https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/c98433a07a54f5aba65888fa9a5fed216af93c3c/notebooks/Bespoke_notebooks/bioimageio-tensorflow/requirements.txt
+
 # Requirements for load_model_and_create_your_own.ipynb placid-llama
 bioimageio.core==0.5.11
 matplotlib==3.5.3

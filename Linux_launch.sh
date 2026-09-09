@@ -38,7 +38,7 @@ Here is a list of all available arguments:
  -o      Path to the folder where you wish to save your notebook's results.
  -g      Flag to indicate if GPU should be used. (optional)
  -n      Path to a local notebook file 'notebook.ipynb'. (optional)
- -r      Path to a local requirements file 'requirements.txt'. (optional)
+ -r      Path to a local requirements input file 'requirements.txt'. (optional)
  -t      Tag to be added to the docker image during building. (optional)
  -p      Port number where to open the notebook.
  -x      Flag to indicate if it is a test run. This allows for the printing of useful debugging information. (optional)
@@ -387,17 +387,15 @@ rename_parsed_argument sections_to_remove # Not required to be present and there
 rename_parsed_argument dl4miceverywhere_version # Not required to be present and therefore the cheking is skipped
 rename_parsed_argument docker_hub_image # Not required to be present and therefore the cheking is skipped
 
-# GitHub build inputs are deterministic when the immutable commit is encoded
-# directly in the URL. Local requirement lock files are also accepted.
-for pinned_url in "$notebook_url" "$requirements_url"; do
-    if [[ "$pinned_url" == https://raw.githubusercontent.com/* ]] && \
-       ! [[ "$pinned_url" =~ ^https://raw\.githubusercontent\.com/[^/]+/[^/]+/[0-9a-fA-F]{40}/.+$ ]]; then
-        echo "Configuration reproducibility check failed." >&2
-        echo "GitHub build URLs must contain a full 40-character commit SHA:" >&2
-        echo "  $pinned_url" >&2
-        exit 1
-    fi
-done
+# Remote GitHub notebook build inputs are deterministic only when the immutable
+# commit is encoded directly in the URL. Bundled dependency inputs are local.
+if [[ "$notebook_url" == https://raw.githubusercontent.com/* ]] && \
+   ! [[ "$notebook_url" =~ ^https://raw\.githubusercontent\.com/[^/]+/[^/]+/[0-9a-fA-F]{40}/.+$ ]]; then
+    echo "Configuration reproducibility check failed." >&2
+    echo "GitHub notebook URLs must contain a full 40-character commit SHA:" >&2
+    echo "  $notebook_url" >&2
+    exit 1
+fi
 
 # Check if the notebook path is missing (SIMPLE USECASE) 
 if [ -z "$notebook_path" ]; then
@@ -456,25 +454,44 @@ else
     fi
 fi
 
+requirements_override=0
+requirements_input_path=""
+
 if [ -z "$requirements_path" ]; then
-    # If no local requirements path has been specified, then the URL from the configuration file will be used
+    # requirements_url is a real source/provenance URL. Bundled notebooks also
+    # carry a committed sibling requirements.txt, which is the authoritative
+    # deterministic input used to generate requirements.lock.txt.
     requirements_path="${requirements_url}"
-    flag_local_requirements=0
-    if [ "$flag_test" -eq 1 ]; then 
-        echo "No requirements file has been specified, therefore the requirements url specified on 'configuration.yaml' will be used."
+    bundled_requirements_path="$(dirname "$config_path")/requirements.txt"
+    if [ -f "$bundled_requirements_path" ]; then
+        requirements_input_path="$bundled_requirements_path"
+        flag_local_requirements=1
+        if [ "$flag_test" -eq 1 ]; then
+            echo "Requirements source URL: $requirements_url"
+            echo "Using bundled dependency input: $requirements_input_path"
+        fi
+    else
+        # Custom/legacy configurations without a bundled mirror may resolve the
+        # URL declared in configuration.yaml when a local build is required.
+        requirements_input_path="$requirements_url"
+        flag_local_requirements=0
+        if [ "$flag_test" -eq 1 ]; then
+            echo "Using dependency input declared by configuration.yaml: $requirements_input_path"
+        fi
     fi
 else
-    # Otherwise check if the path is valid
+    requirements_override=1
+    # Advanced/CLI mode explicitly supplied a local requirements file.
     if [ -f "$requirements_path" ]; then
+        requirements_input_path="$requirements_path"
         if [ "$flag_test" -eq 1 ]; then 
             echo "Path to the requirements file: $requirements_path"
         fi
-        # If the notebook path is not valid, activate its flag for future processing
         flag_local_requirements=1
     else
         echo ""
         echo "------------------------------------"
-        echo "The give path to the requirementes.txt is not valid: $requirements_path"
+        echo "The given path to the requirements input is not valid: $requirements_path"
         echo "Please, check that this path is correct and exists."
         read -p "Press enter to close the terminal."
         echo "------------------------------------" 
@@ -573,10 +590,6 @@ if [ "$flag_local_notebook" -eq 1 ]; then
     notebook_path=./notebook.ipynb
 fi
 
-if [ "$flag_local_requirements" -eq 1 ]; then
-   cp "$requirements_path" "$BASEDIR/requirements.txt"
-   requirements_path=./requirements.txt
-fi
 
 # Check if there is the errata in ~/.docker/config.json where credsStore should be credStore
 if grep -q credsStore ~/.docker/config.json; then
@@ -759,6 +772,90 @@ else
     echo "SOMETHING WENT WRONG :("
 fi
 
+# Deterministic dependency locks are needed only when an image is actually built.
+# Pulling or reusing an existing image never resolves or updates Python dependencies.
+requirements_lock_path=""
+requirements_lock_context_path=""
+converter_lock_path="$BASEDIR/docker/converter-requirements.lock.txt"
+build_input_dir="$BASEDIR/.tools/docker_build_inputs"
+
+cleanup_lock_build_input() {
+    if [ -n "$requirements_lock_context_path" ]; then
+        rm -f "$BASEDIR/$requirements_lock_context_path"
+    fi
+    rmdir "$build_input_dir" 2>/dev/null || true
+}
+
+if [ "$flag_build" -eq 2 ]; then
+    echo "Checking deterministic Python dependency lock..."
+
+    # Lock validation itself only needs Python. The venv/pinned resolver is
+    # required only when a missing or stale lock actually needs regeneration.
+    if ! command -v python3 >/dev/null 2>&1; then
+        /bin/bash "$BASEDIR/.tools/bash_tools/requirements_installation/python3_lock_tools.sh" || exit 1
+    fi
+    if ! command -v python3 >/dev/null 2>&1; then
+        echo "Python 3 is required to maintain deterministic dependency locks." >&2
+        exit 1
+    fi
+
+    if [ "$requirements_override" -eq 1 ]; then
+        requirements_lock_path="$(dirname "$(readlink -f "$requirements_input_path")")/requirements.lock.txt"
+        notebook_lock_args=(
+            --config "$config_path"
+            --source "$requirements_input_path"
+            --python-version "$python_version"
+            --lock "$requirements_lock_path"
+            --repo-root "$BASEDIR"
+        )
+    else
+        requirements_lock_path="$(dirname "$(readlink -f "$config_path")")/requirements.lock.txt"
+        notebook_lock_args=(--config "$config_path" --repo-root "$BASEDIR")
+    fi
+
+    converter_lock_args=(
+        --source "$BASEDIR/docker/converter-requirements.txt"
+        --python-version "3.9"
+        --lock "$converter_lock_path"
+        --profile none
+        --repo-root "$BASEDIR"
+    )
+
+    lock_needs_resolver=0
+    python3 "$BASEDIR/.tools/python_tools/requirements_lock.py" check "${notebook_lock_args[@]}" --quiet >/dev/null 2>&1 || lock_needs_resolver=1
+    python3 "$BASEDIR/.tools/python_tools/requirements_lock.py" check "${converter_lock_args[@]}" --quiet >/dev/null 2>&1 || lock_needs_resolver=1
+
+    if [ "$lock_needs_resolver" -eq 1 ]; then
+        lock_venv_test_dir="$(mktemp -d 2>/dev/null || true)"
+        lock_venv_ready=0
+        if [ -n "$lock_venv_test_dir" ] && python3 -m venv "$lock_venv_test_dir/test" >/dev/null 2>&1; then
+            lock_venv_ready=1
+        fi
+        [ -n "$lock_venv_test_dir" ] && rm -rf "$lock_venv_test_dir"
+        if [ "$lock_venv_ready" -ne 1 ]; then
+            /bin/bash "$BASEDIR/.tools/bash_tools/requirements_installation/python3_lock_tools.sh" || exit 1
+        fi
+    fi
+
+    python3 "$BASEDIR/.tools/python_tools/requirements_lock.py" ensure "${notebook_lock_args[@]}" || exit 1
+
+    # The notebook converter has its own small deterministic lock and does not
+    # inherit the notebook runtime profile.
+    python3 "$BASEDIR/.tools/python_tools/requirements_lock.py" ensure "${converter_lock_args[@]}" || exit 1
+
+    if [ ! -f "$requirements_lock_path" ]; then
+        echo "Dependency lock was not created: $requirements_lock_path" >&2
+        exit 1
+    fi
+
+    # Docker COPY sources must live inside the build context. Stage only the
+    # generated lock; the human-facing requirements input is never installed.
+    mkdir -p "$build_input_dir"
+    requirements_lock_context_path=".tools/docker_build_inputs/requirements-$$.lock.txt"
+    cp "$requirements_lock_path" "$BASEDIR/$requirements_lock_context_path" || exit 1
+    trap cleanup_lock_build_input EXIT
+fi
+
 # If flag_build is 3 the pull the docker image from docker hub
 if [ "$flag_build" -eq 3 ]; then
     # Pull the docker image
@@ -780,6 +877,7 @@ else
                 --build-arg PYTHON_VERSION="${python_version}" \
                 --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
                 --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
+                --build-arg PATH_TO_REQUIREMENTS_LOCK="${requirements_lock_context_path}" \
                 --build-arg NOTEBOOK_NAME="${notebook_name}" \
                 --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" \
                 "$BASEDIR"
@@ -793,12 +891,15 @@ else
                 --build-arg PYTHON_VERSION="${python_version}" \
                 --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
                 --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
+                --build-arg PATH_TO_REQUIREMENTS_LOCK="${requirements_lock_context_path}" \
                 --build-arg NOTEBOOK_NAME="${notebook_name}" \
                 --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" \
                 "$BASEDIR"
         fi
 
         DOCKER_OUT=$? # Gets if the docker image has been built
+        cleanup_lock_build_input
+        trap - EXIT
     else
         if [ "$flag_build" -eq 1 ]; then
             DOCKER_OUT=0 # In case that is already built, it is good to run
@@ -838,9 +939,6 @@ if [ "$flag_local_notebook" -eq 1 ]; then
    rm "$BASEDIR/notebook.ipynb"
 fi
 
-if [ "$flag_local_requirements" -eq 1 ]; then
-   rm "$BASEDIR/requirements.txt"
-fi
 
 if [ "$DOCKER_OUT" -eq 0 ] && [ "$flag_build" -ne 1 ]; then
     track_managed_docker_image "$docker_tag"

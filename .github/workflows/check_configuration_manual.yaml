@@ -164,6 +164,24 @@ jobs:
         with:
             fetch-depth: 0
 
+      - name: Set up Python for dependency lock validation
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Ensure deterministic dependency locks
+        id: dependency_lock
+        shell: bash
+        run: |
+          python3 .tools/python_tools/requirements_lock.py ensure --config '${{ matrix.notebook }}' --repo-root .
+          python3 .tools/python_tools/requirements_lock.py ensure \
+            --source docker/converter-requirements.txt \
+            --python-version 3.9 \
+            --lock docker/converter-requirements.lock.txt \
+            --profile none \
+            --repo-root .
+          echo "path=$(dirname '${{ matrix.notebook }}')/requirements.lock.txt" >> "$GITHUB_OUTPUT"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -188,6 +206,7 @@ jobs:
               PYTHON_VERSION=${{ needs.check_keys.outputs.python_version }}
               PATH_TO_NOTEBOOK=${{ needs.check_keys.outputs.notebook_url }}
               PATH_TO_REQUIREMENTS=${{ needs.check_keys.outputs.requirements_url }}
+              PATH_TO_REQUIREMENTS_LOCK=${{ steps.dependency_lock.outputs.path }}
               NOTEBOOK_NAME=${{ needs.check_keys.outputs.notebook_name }}
               SECTIONS_TO_REMOVE=${{ needs.check_keys.outputs.sections_to_remove }}
             
@@ -208,6 +227,24 @@ jobs:
         uses: actions/checkout@v4
         with:
             fetch-depth: 0
+      - name: Set up Python for dependency lock validation
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Ensure deterministic dependency locks
+        id: dependency_lock
+        shell: bash
+        run: |
+          python3 .tools/python_tools/requirements_lock.py ensure --config '${{ matrix.notebook }}' --repo-root .
+          python3 .tools/python_tools/requirements_lock.py ensure \
+            --source docker/converter-requirements.txt \
+            --python-version 3.9 \
+            --lock docker/converter-requirements.lock.txt \
+            --profile none \
+            --repo-root .
+          echo "path=$(dirname '${{ matrix.notebook }}')/requirements.lock.txt" >> "$GITHUB_OUTPUT"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -227,6 +264,7 @@ jobs:
             PYTHON_VERSION=${{ needs.check_keys.outputs.python_version }}
             PATH_TO_NOTEBOOK=${{ needs.check_keys.outputs.notebook_url }}
             PATH_TO_REQUIREMENTS=${{ needs.check_keys.outputs.requirements_url }}
+            PATH_TO_REQUIREMENTS_LOCK=${{ steps.dependency_lock.outputs.path }}
             NOTEBOOK_NAME=${{ needs.check_keys.outputs.notebook_name }}
             SECTIONS_TO_REMOVE=${{ needs.check_keys.outputs.sections_to_remove }}
     

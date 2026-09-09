@@ -1,0 +1,6 @@
+# DL4MicEverywhere notebook runtime defaults for Python 3.6.
+# Notebook requirements override a default simply by naming the same package.
+nbformat==5.0.2
+ipywidgets==8.0.0a0
+jupyterlab==2.3.2
+matplotlib==3.0.3

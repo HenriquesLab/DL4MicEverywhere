@@ -9,11 +9,15 @@ FROM python:3.9.20-alpine3.19 AS notebook_autoconversion
 
 WORKDIR /home
 
-RUN python -m pip install --disable-pip-version-check nbformat==5.9.2
+COPY docker/converter-requirements.lock.txt /tmp/converter-requirements.lock.txt
+RUN python -m pip install --disable-pip-version-check --require-hashes \
+        -r /tmp/converter-requirements.lock.txt && \
+    rm /tmp/converter-requirements.lock.txt
 
 # Read all the arguments
 ARG PATH_TO_NOTEBOOK
 ARG PATH_TO_REQUIREMENTS
+ARG PATH_TO_REQUIREMENTS_LOCK
 ARG SECTIONS_TO_REMOVE
 ARG NOTEBOOK_NAME
 ARG GPU_FLAG
@@ -30,6 +34,8 @@ ADD ${PATH_TO_NOTEBOOK} ./${NOTEBOOK_NAME}
 COPY .tools/notebook_autoconversion/ /home/DL4MicEverywhere/.tools/notebook_autoconversion/
 COPY .tools/python_tools/create_docker_info.py /home/DL4MicEverywhere/.tools/python_tools/create_docker_info.py
 
+COPY ${PATH_TO_REQUIREMENTS_LOCK} /tmp/notebook-requirements.lock.txt
+
 # Autoconvert the notebook
 RUN python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py \
         -p . \
@@ -43,6 +49,8 @@ RUN python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py \
         "${CUDNN_VERSION}" \
         "${PATH_TO_NOTEBOOK}" \
         "${PATH_TO_REQUIREMENTS}" \
+        "${PATH_TO_REQUIREMENTS_LOCK}" \
+        "$(sha256sum /tmp/notebook-requirements.lock.txt | awk '{print $1}')" \
         "${SECTIONS_TO_REMOVE}" \
         "${NOTEBOOK_NAME}" \
         "${GPU_FLAG}" \
@@ -66,6 +74,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Read all the arguments
 ARG PATH_TO_NOTEBOOK=""
 ARG PATH_TO_REQUIREMENTS=""
+ARG PATH_TO_REQUIREMENTS_LOCK=""
 ARG SECTIONS_TO_REMOVE=""
 ARG NOTEBOOK_NAME=""
 ARG GPU_FLAG=""
@@ -197,31 +206,12 @@ RUN set -eux; \
 
 WORKDIR /home
 
-# Install notebook runtime packages
-RUN set -eux; \
-    if [ "${PYTHON_VERSION}" = "3.5" ]; then \
-        python -m pip install nbformat==5.0.2; \
-        python -m pip install ipywidgets==7.8.1; \
-        python -m pip install jupyterlab==0.23.0; \
-        python -m pip install matplotlib==2.1.0; \
-    else \
-        python -m pip install nbformat==5.0.2; \
-        python -m pip install ipywidgets==8.0.0a0; \
-        python -m pip install jupyterlab==2.3.2; \
-        python -m pip install matplotlib==3.0.3; \
-    fi
-
-
-# Validate deterministic Python package specifications
-COPY docker/validate_requirements_pins.py /usr/local/bin/dl4me-validate-requirements
-
-# Load deterministic requirements input
-ADD ${PATH_TO_REQUIREMENTS} ./requirements.txt
-
-# Install requirements
-RUN python /usr/local/bin/dl4me-validate-requirements requirements.txt && \
-    python -m pip install -r requirements.txt && \
-    rm requirements.txt
+# Install the complete, pre-resolved notebook environment.
+# The lock includes transitive dependencies, hashes, and DL4MicEverywhere's
+# runtime defaults for packages not explicitly supplied by the notebook input.
+COPY ${PATH_TO_REQUIREMENTS_LOCK} /tmp/requirements.lock.txt
+RUN python -m pip install --require-hashes -r /tmp/requirements.lock.txt && \
+    rm /tmp/requirements.lock.txt
 
 # Copy the converted notebook from stage 1
 COPY --from=notebook_autoconversion /home/${NOTEBOOK_NAME} /home/docker_info.txt /home/

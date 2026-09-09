@@ -59,7 +59,8 @@ set ipynb_types {
     {"All ipynb files"     {.ipynb } }
 }
 set txt_types {
-    {"All txt files"     {.txt } }
+    {"Requirements input"     {.txt} }
+    {"All files"              {*} }
 }
 
 # Define the selection functions (yaml, folder, ipynb and txt) 
@@ -641,7 +642,7 @@ grid .fr.advanced.bnp -row 2 -column 2 -sticky e -padx {6 12} -pady 3
 set ipynb_path ""
 
 # Optional requirements file.
-label .fr.advanced.txt_label -text "Requirements (.txt):" -anchor w
+label .fr.advanced.txt_label -text "Requirements input (.txt):" -anchor w
 grid .fr.advanced.txt_label -row 3 -column 0 -sticky w -padx {12 6} -pady 3
 
 entry .fr.advanced.txt_entry -textvariable txt_path

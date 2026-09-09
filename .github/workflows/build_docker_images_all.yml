@@ -3,6 +3,12 @@ name: Build and push all Docker Images
 on:
   release:
     types: [published]
+  push:
+    branches: [main]
+    paths:
+      - '.tools/lock_profiles/**'
+      - '.tools/python_tools/requirements_lock.py'
+      - 'docker/converter-requirements.txt'
   workflow_dispatch:
 
 jobs:
