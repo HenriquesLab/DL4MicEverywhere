@@ -2,8 +2,8 @@
 
 set docker_tag [lindex $argv 0]
 
-set width 540
-set height 210
+set width 720
+set height 175
 set width_offset [expr {([winfo vrootwidth .] - $width) / 2}]
 set height_offset [expr {([winfo vrootheight .] - $height) / 2}]
 
@@ -15,7 +15,7 @@ proc finish {code} {
 wm protocol . WM_DELETE_WINDOW {finish 0}
 wm title . "Download older Docker image"
 wm geometry . ${width}x${height}+${width_offset}+${height_offset}
-wm minsize . 480 190
+wm minsize . 620 160
 
 frame .fr -padx 16 -pady 14
 pack .fr -fill both -expand 1
@@ -26,12 +26,12 @@ label .fr.title -font {TkDefaultFont 10 bold} \
     -text "For older versions, only downloading from Docker Hub is available."
 grid .fr.title -row 0 -column 0 -sticky w
 
-label .fr.tag -text "Image: $docker_tag" -anchor w -wraplength 500 -justify left
+label .fr.tag -text "Image: $docker_tag" -anchor w -wraplength 680 -justify left
 grid .fr.tag -row 1 -column 0 -sticky ew -pady {10 0}
 
 label .fr.question \
     -text "Do you agree to continue and download this published image?" \
-    -anchor w -wraplength 500 -justify left
+    -anchor w -wraplength 680 -justify left
 grid .fr.question -row 2 -column 0 -sticky ew -pady {12 14}
 
 frame .fr.buttons

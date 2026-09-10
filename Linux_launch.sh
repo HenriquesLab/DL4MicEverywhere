@@ -152,7 +152,7 @@ flag_test=0
 flag_local_notebook=0
 flag_local_requirements=0
 
-# Flag to check if a version was selected
+# Flag to check if an explicitly selected version is historical (older than latest).
 flag_version_selected=0
 
 # Let's parse the arguments
@@ -234,11 +234,21 @@ else
 
         cache_gui "$data_path" "$result_path" "$selectedFolder" "$selectedNotebook" "" "" "" "$flag_gpu" "$selectedVersion" "$tag_aux" "$advanced_options"
 
-        if [ "$tag_aux" != "-" ]; then
+        # A custom Docker tag takes precedence, but an empty GUI field is not
+        # a tag override. Older-version selection must still be processed when
+        # the custom-tag field is blank.
+        if [ -n "$tag_aux" ] && [ "$tag_aux" != "-" ]; then
             docker_tag="$tag_aux"
         elif [ "$selectedVersion" != "-" ]; then
-            flag_version_selected=1
             versioned_docker_tag=$(/bin/bash "$BASEDIR/.tools/bash_tools/get_docker_tag.sh" "$selectedNotebook" "$selectedVersion")
+
+            # The version list marks the current release with "(latest)". Only
+            # genuinely older releases are historical/pull-only; explicitly
+            # choosing the current (latest) release keeps normal build options.
+            case "$selectedVersion" in
+                *"(latest)") flag_version_selected=0 ;;
+                *) flag_version_selected=1 ;;
+            esac
         fi
 
         config_path="$BASEDIR/notebooks/$selectedFolder/$selectedNotebook/configuration.yaml"
@@ -263,7 +273,7 @@ else
         if [ "$requirements_aux" != "-" ]; then
             requirements_path="$requirements_aux"
         fi
-        if [ "$tag_aux" != "-" ]; then
+        if [ -n "$tag_aux" ] && [ "$tag_aux" != "-" ]; then
             docker_tag="$tag_aux"
         fi
     fi
@@ -640,7 +650,7 @@ historical_image_unavailable() {
     fi
 }
 
-# Explicitly selected older versions can never enter the local-build path.
+# Explicitly selected historical versions can never enter the local-build path.
 if [ "$flag_version_selected" -eq 1 ] && [[ "$containerisation" == "Docker"* ]]; then
     historical_download_requested=0
 

@@ -203,6 +203,12 @@ proc onDone {} {
                     tk_messageBox -type ok -icon error -title Error \
                     -message "SIMPLE MODE: You need to specify a notebook."
                 } else {
+                    # Keep the line-oriented launcher protocol unambiguous. An
+                    # empty custom tag means "no override", represented by "-".
+                    if {"$tag" == ""} {
+                        set tag "-"
+                    }
+
                     puts "$advanced_options"
                     puts "$data_path"
                     puts "$result_path"
@@ -434,8 +440,10 @@ grid columnconfigure .fr.principal 0 -weight 1
 # Give the description area more of the extra horizontal space.
 grid columnconfigure .fr.principal 1 -weight 2
 grid columnconfigure .fr.principal 2 -weight 0
-# Extra vertical space is assigned to the notebook/description area.
-grid rowconfigure .fr.principal 11 -weight 1
+# Extra vertical space is assigned to the notebook selection/description area.
+# The selectors themselves stay packed at the top of that area while the
+# description grows with the window.
+grid rowconfigure .fr.principal 9 -weight 1
 
 frame .fr.advanced -relief raised -borderwidth 1
 grid columnconfigure .fr.advanced 0 -weight 1
@@ -522,18 +530,48 @@ font create myFont -family Helvetica -size 10
 label .fr.principal.notebook_label -text "List of default notebooks:" -anchor w
 grid .fr.principal.notebook_label -row 8 -column 0 -columnspan 3 -sticky ew -padx 12 -pady {4 3}
 
+# Keep Folder -> Notebook -> Version together in one selector column and let
+# the description occupy the flexible space beside them. This prevents window
+# resizing from inserting large vertical gaps between the three selectors.
+frame .fr.principal.notebook_area
+grid .fr.principal.notebook_area -row 9 -column 0 -rowspan 3 -columnspan 3 -sticky nsew -padx 12 -pady 2
+grid columnconfigure .fr.principal.notebook_area 0 -weight 1
+grid columnconfigure .fr.principal.notebook_area 1 -weight 2
+grid rowconfigure .fr.principal.notebook_area 0 -weight 1
+
+frame .fr.principal.notebook_selectors
+grid .fr.principal.notebook_selectors -in .fr.principal.notebook_area -row 0 -column 0 -sticky new -padx {0 8}
+grid columnconfigure .fr.principal.notebook_selectors 0 -weight 1
+
 ttk::combobox .fr.principal.notebooks_folders -values $folderList -textvariable selectedFolder -state readonly
-grid .fr.principal.notebooks_folders -row 9 -column 0 -sticky ew -padx {12 8} -pady 2
+grid .fr.principal.notebooks_folders -in .fr.principal.notebook_selectors -row 0 -column 0 -sticky ew -pady 2
 bind .fr.principal.notebooks_folders <<ComboboxSelected>> { onComboboxSelectedFolder [%W get]}
 
 ttk::combobox .fr.principal.notebooks -values $notebookList -textvariable selectedNotebook -state readonly
-grid .fr.principal.notebooks -row 10 -column 0 -sticky new -padx {12 8} -pady 2
+grid .fr.principal.notebooks -in .fr.principal.notebook_selectors -row 1 -column 0 -sticky ew -pady 2
 bind .fr.principal.notebooks <<ComboboxSelected>> { onComboboxSelectedNotebook [%W get]}
 
-# Width and height are initial requests only. sticky=nsew plus row/column weights
-# make this widget grow and shrink with the window.
+# Define the version selector directly below the notebook selector.
+set versionList "-"
+set selectedVersion "-"
+
+frame .fr.principal.version_row
+grid .fr.principal.version_row -in .fr.principal.notebook_selectors -row 2 -column 0 -sticky ew -pady 2
+grid columnconfigure .fr.principal.version_row 1 -weight 1
+
+label .fr.principal.version_label -text "Version:"
+grid .fr.principal.version_label -in .fr.principal.version_row -row 0 -column 0 -sticky w -padx {0 6}
+
+ttk::combobox .fr.principal.versions \
+    -values $versionList \
+    -textvariable selectedVersion \
+    -state readonly
+grid .fr.principal.versions -in .fr.principal.version_row -row 0 -column 1 -sticky ew
+
+# Width and height are initial requests only. The description grows and
+# shrinks with the window without spreading out the selector controls.
 text .fr.principal.notebook_description -width 30 -height 4 -wrap word -borderwidth 1 -relief sunken
-grid .fr.principal.notebook_description -row 9 -column 1 -rowspan 3 -columnspan 2 -sticky nsew -padx {8 12} -pady 2
+grid .fr.principal.notebook_description -in .fr.principal.notebook_area -row 0 -column 1 -sticky nsew -padx {8 0}
 
 # Define the button and display to load the path to the data folder.
 label .fr.principal.data_label -text "Path to data folder:" -anchor w
@@ -565,8 +603,8 @@ grid .fr.principal.result_btn -row 15 -column 2 -sticky e -padx {6 12} -pady 2
 
 set result_path ""
 
-# Define the GPU, version and cache controls in a nested row. The middle
-# spacer grows, keeping the cache button aligned to the right.
+# Keep the remaining execution controls in a simple row: GPU on the left and
+# cached settings on the right.
 frame .fr.principal.options
 grid .fr.principal.options -row 16 -column 0 -columnspan 3 -sticky ew -padx 8 -pady {8 6}
 grid columnconfigure .fr.principal.options 1 -weight 1
@@ -580,23 +618,9 @@ if { [catch { exec nvidia-smi } msg] } {
     .fr.principal.gpu configure -state disable
 }
 
-# Define the version number.
-set versionList "-"
-set selectedVersion "-"
-
-label .fr.principal.version_label -text "Version:"
-grid .fr.principal.version_label -in .fr.principal.options -row 0 -column 2 -sticky e -padx {8 4}
-
-ttk::combobox .fr.principal.versions \
-    -values $versionList \
-    -textvariable selectedVersion \
-    -width 18 \
-    -state readonly
-grid .fr.principal.versions -in .fr.principal.options -row 0 -column 3 -sticky e -padx 4
-
 # Define a button to load cached data if there is so.
 button .fr.principal.cache_btn -text "Load previous settings" -command "onLoadCache"
-grid .fr.principal.cache_btn -in .fr.principal.options -row 0 -column 4 -sticky e -padx 4
+grid .fr.principal.cache_btn -in .fr.principal.options -row 0 -column 2 -sticky e -padx 4
 
 # Disable the cache if no cache file is found.
 if {"$fexist" == "0"} {
