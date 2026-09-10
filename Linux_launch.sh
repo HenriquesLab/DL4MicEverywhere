@@ -554,16 +554,6 @@ fi
 
 selected_dockerfile=$(select_dockerfile "$flag_gpu" "$python_version")
 
-if [ ! -f "$selected_dockerfile" ]; then
-    echo "" 
-    echo "------------------------------------"
-    echo "The selected Dockerfile does not exist: $selected_dockerfile"
-    echo "Please make sure the repository contains the split modern/legacy Dockerfiles under the docker/ folder."
-    read -p "Press enter to close the terminal."
-    echo "------------------------------------" 
-    exit 1
-fi
-
 # Set the docker's tag
 if [ "$flag_test" -eq 1 ]; then
     echo ""
@@ -613,153 +603,197 @@ else
 fi
 ###
 
-# Check if an image with that tag exists locally and ask if the user whants to replace it.
+# Decide whether to reuse, pull, or build the image.
+# Historical versions are deliberately pull/reuse-only: building them with the
+# current configuration would create a new image with an old-looking tag.
 flag_build=0
 
-# In case testing is chossing, the building is forced to be done, without questions
-if [ "$flag_test" -eq 1 ]; then
-    # In case of testing, the building is always done
-    flag_build=2
+historical_image_available_for_arch() {
+    local image_tag="$1"
+    local local_arch
+    local arch_count
+
+    if ! docker manifest inspect "$image_tag" >/dev/null 2>&1; then
+        return 1
+    fi
+
+    local_arch=$(uname -m)
+    if [ "$local_arch" = "x86_64" ]; then
+        local_arch="amd64"
+    elif [ "$local_arch" = "aarch64" ]; then
+        local_arch="arm64"
+    fi
+
+    arch_count=$(docker manifest inspect "$image_tag" -v 2>/dev/null \
+        | grep 'architecture' \
+        | grep -c "$local_arch")
+    [ "$arch_count" -gt 0 ]
+}
+
+historical_image_unavailable() {
+    local error_message="The selected older version is not available on Docker Hub for this computer. Please choose another version or use the current version."
+    if [ "$flag_gui" -eq 1 ]; then
+        wish "$BASEDIR/.tools/tcl_tools/oneline_done_gui.tcl" \
+            "Older image not available" "$error_message"
+    else
+        echo "$error_message"
+    fi
+}
+
+# Explicitly selected older versions can never enter the local-build path.
+if [ "$flag_version_selected" -eq 1 ] && [[ "$containerisation" == "Docker"* ]]; then
+    historical_download_requested=0
+
+    if docker image inspect "$docker_tag" >/dev/null 2>&1; then
+        # The exact historical image already exists locally. Offer reuse or a
+        # fresh download of the published image, but never offer Build.
+        if [ "$flag_gui" -eq 1 ]; then
+            flag_build=$(wish "$BASEDIR/.tools/tcl_tools/historical_local_img_gui.tcl" "$docker_tag")
+        else
+            echo "The selected older image already exists locally:"
+            echo "  $docker_tag"
+            echo "Older versions cannot be rebuilt from the current configuration."
+            select action in "Use existing image" "Download from Docker Hub" "Cancel"; do
+                case "$action" in
+                    "Use existing image") flag_build=1; break ;;
+                    "Download from Docker Hub") flag_build=3; break ;;
+                    "Cancel") flag_build=0; break ;;
+                esac
+            done
+        fi
+
+        if [ -z "$flag_build" ] || [ "$flag_build" -eq 0 ]; then
+            echo "Older-version launch cancelled."
+            exit 0
+        fi
+
+        if [ "$flag_build" -eq 3 ]; then
+            historical_download_requested=1
+        fi
+    else
+        # There is no local copy. For a historical version the only valid
+        # action is to download the published image from Docker Hub.
+        if ! historical_image_available_for_arch "$docker_tag"; then
+            historical_image_unavailable
+            exit 1
+        fi
+
+        if [ "$flag_gui" -eq 1 ]; then
+            flag_build=$(wish "$BASEDIR/.tools/tcl_tools/historical_download_gui.tcl" "$docker_tag")
+        else
+            echo "For older versions, only downloading from Docker Hub is available."
+            echo "Selected image: $docker_tag"
+            read -r -p "Continue with the download? [y/N]: " historical_answer
+            case "$historical_answer" in
+                y|Y|yes|YES|Yes) flag_build=3 ;;
+                *) flag_build=0 ;;
+            esac
+        fi
+
+        if [ -z "$flag_build" ] || [ "$flag_build" -eq 0 ]; then
+            echo "Older-version download cancelled."
+            exit 0
+        fi
+
+        historical_download_requested=1
+    fi
+
+    # If the user requested a fresh download for a local historical image,
+    # validate Docker Hub availability and architecture before pulling.
+    if [ "$historical_download_requested" -eq 1 ]; then
+        if ! historical_image_available_for_arch "$docker_tag"; then
+            historical_image_unavailable
+            exit 1
+        fi
+        flag_build=3
+    fi
 else
-    if [[ "$containerisation" == "Docker"* ]]; then
-        # Check if there is a docker image with that tag locally
-        if docker image inspect $docker_tag >/dev/null 2>&1; then
-            # If so, ask the user with GUI or CLI if the user wants to use local image or replace it
-            if [ "$flag_gui" -eq 1 ]; then 
-                # If the GUI flag has been specified, show a window for ansewring local question
-                flag_build=$(wish "$BASEDIR/.tools/tcl_tools/local_img_gui.tcl" $OSTYPE)
+    # Current/default versions keep the existing build/pull/reuse choices.
+    # In testing mode, force a local build only for the current configuration.
+    if [ "$flag_test" -eq 1 ]; then
+        flag_build=2
+    elif [[ "$containerisation" == "Docker"* ]]; then
+        # Check if there is a docker image with that tag locally.
+        if docker image inspect "$docker_tag" >/dev/null 2>&1; then
+            if [ "$flag_gui" -eq 1 ]; then
+                flag_build=$(wish "$BASEDIR/.tools/tcl_tools/local_img_gui.tcl" "$OSTYPE")
             else
                 echo "Image exists locally. Do you want to build and replace the existing one?"
                 select yn in "Yes" "No"; do
-                    case $yn in
-                        Yes ) flag_build=2; break;;
-                        No ) flag_build=1; break;;
+                    case "$yn" in
+                        Yes) flag_build=2; break ;;
+                        No) flag_build=1; break ;;
                     esac
                 done
             fi
         fi
 
-        # Check if the window was closed and no option was chosen
         if [ -z "$flag_build" ]; then
-            # If the window was closed, stop the program
             echo ""
             echo "------------------------------------"
-            echo "You should have choosen an option."
-            read -p "Press enter to close the terminal."
-            echo "------------------------------------" 
+            echo "You should have chosen an option."
+            read -r -p "Press enter to close the terminal."
+            echo "------------------------------------"
             exit 1
         fi
 
-        # Check if flag_build is not 1 (docker image was not locally or the user wanted to replace it)
+        # If the local image is not being reused, see whether Docker Hub has it.
         if [ "$flag_build" -ne 1 ]; then
-            # If so, check if there is a docker image with that tag on Docker Hub
-            if docker manifest inspect "${docker_tag}" >/dev/null 2>&1; then
-                # If so, check the architecture of running machine
-
-                # Get the architecture of the machine
+            if docker manifest inspect "$docker_tag" >/dev/null 2>&1; then
                 local_arch=$(uname -m)
-
-                # It should be amd64 or arm64
-                if [ "$local_arch" == "x86_64" ]; then
+                if [ "$local_arch" = "x86_64" ]; then
                     local_arch="amd64"
+                elif [ "$local_arch" = "aarch64" ]; then
+                    local_arch="arm64"
                 fi
 
-                # Count the ocurrences of that architecture in the docker manifest of that image
-                arch_count=$(docker manifest inspect "${docker_tag}" -v | grep 'architecture' | grep -c $local_arch)
+                arch_count=$(docker manifest inspect "$docker_tag" -v 2>/dev/null \
+                    | grep 'architecture' \
+                    | grep -c "$local_arch")
 
-                # Check if there was at least an ocurrence of that architecture
                 if [ "$arch_count" -gt 0 ]; then
-                    # In case the architecture is available
-
-                    # First check if a version was specified, because in that case it can 
-                    # only pull from docker hub
-                    if [ "$flag_version_selected" -eq 1 ]; then
-                        # If the version was specified
-                        title="Download from Docker Hub"
-                        message="You chose ${docker_tag}, the image will be downloaded from Docker Hub."
-                        eval $(wish "$BASEDIR/.tools/tcl_tools/oneline_done_gui.tcl" "$title" "$message")
-                        flag_build=3
+                    if [ "$flag_gui" -eq 1 ]; then
+                        flag_build=$(wish "$BASEDIR/.tools/tcl_tools/hub_img_gui.tcl" "$OSTYPE")
                     else
-                        # If the version was NOT specified
-                        if [ "$flag_gui" -eq 1 ]; then 
-                            # If the GUI flag has been specified, show a window for ansewring hub question
-                            flag_build=$(wish "$BASEDIR/.tools/tcl_tools/hub_img_gui.tcl" "$OSTYPE")
-                        else
-                            echo "The image ${docker_tag} is already available on Docker Hub. Do you preffer to pull it (faster option) instead of building it?"
-                            select yn in "Yes" "No"; do
-                                case $yn in
-                                    Yes ) flag_build=3; break;;
-                                    No )  flag_build=2; break;;
-                                esac
-                            done
-                        fi
-
-                        # Check if the window was closed and no option was chosen
-                        if [ -z "$flag_build" ]; then
-                            # If the window was closed, stop the program
-                            echo ""
-                            echo "------------------------------------"
-                            echo "You should have choosen an option."
-                            read -p "Press enter to close the terminal."
-                            echo "------------------------------------" 
-                            exit 1
-                        fi
+                        echo "The image $docker_tag is already available on Docker Hub. Do you prefer to pull it (faster option) instead of building it?"
+                        select yn in "Yes" "No"; do
+                            case "$yn" in
+                                Yes) flag_build=3; break ;;
+                                No) flag_build=2; break ;;
+                            esac
+                        done
                     fi
 
-                    
-                else
-                    # In case the architecture is not available
-
-                    # First check if a version was given  
-                    if [ "$flag_version_selected" -eq 1 ]; then
-                        # If the version was specified, throug an error that this version 
-                        # could not be found on Docker Hub
-                        title="Error: Image not avilable"
-                        error_message="Selected version of the image is not available in Docker Hub for your computer. Please try another version or do not chose any."
-                        if [ "$flag_gui" -eq 1 ]; then 
-                            # If the GUI flag has been specified, show a window with the message
-                            eval $(wish "$BASEDIR/.tools/tcl_tools/oneline_done_gui.tcl" "$title" "$error_message")
-                        else
-                            echo "$error_message"
-                        fi
+                    if [ -z "$flag_build" ]; then
                         echo ""
                         echo "------------------------------------"
-                        read -p "Press enter to close the terminal."
-                        echo "------------------------------------" 
+                        echo "You should have chosen an option."
+                        read -r -p "Press enter to close the terminal."
+                        echo "------------------------------------"
                         exit 1
-                    else
-                        # If the architecture is not available on Docker Hub and the user didn't 
-                        # ask for a specific version, try to build it locally
-                        flag_build=2
                     fi
-                fi
-            else
-                # In case the image is NOT available on Docker Hub
-                # First check if a version was given  
-                if [ "$flag_version_selected" -eq 1 ]; then
-                    # If the version was specified, throug an error that this version 
-                    # could not be found on Docker Hub
-                    title="Error: Image not avilable"
-                    error_message="Selected version of the image is not available in Docker Hub for your computer. Please try another version or do not chose any."
-                    if [ "$flag_gui" -eq 1 ]; then 
-                        # If the GUI flag has been specified, show a window with the message
-                        eval $(wish "$BASEDIR/.tools/tcl_tools/oneline_done_gui.tcl" "$title" "$error_message")
-                    else
-                        echo "$error_message"
-                    fi
-                    echo ""
-                    echo "------------------------------------"
-                    read -p "Press enter to close the terminal."
-                    echo "------------------------------------" 
-                    exit 1
                 else
-                    # If the architecture is not available on Docker Hub and the user didn't 
-                    # ask for a specific version, try to build it locally
+                    # No compatible published image: current versions may still
+                    # be built locally.
                     flag_build=2
                 fi
+            else
+                # No published image: current versions may still be built locally.
+                flag_build=2
             fi
         fi
     fi
+fi
+
+# Safety invariant: an explicitly selected historical version must never be
+# built from the current configuration, even if future decision logic changes.
+if [ "$flag_version_selected" -eq 1 ] && [ "$flag_build" -eq 2 ]; then
+    echo ""
+    echo "------------------------------------"
+    echo "Older Docker image versions cannot be built from the current configuration."
+    echo "Please use an existing local copy or download the published image from Docker Hub."
+    echo "------------------------------------"
+    exit 1
 fi
 
 if [ "$flag_build" -eq 3 ]; then
@@ -787,6 +821,16 @@ cleanup_lock_build_input() {
 }
 
 if [ "$flag_build" -eq 2 ]; then
+    if [ ! -f "$selected_dockerfile" ]; then
+        echo ""
+        echo "------------------------------------"
+        echo "The selected Dockerfile does not exist: $selected_dockerfile"
+        echo "Please make sure the repository contains the split modern/legacy Dockerfiles under the docker/ folder."
+        read -r -p "Press enter to close the terminal."
+        echo "------------------------------------"
+        exit 1
+    fi
+
     echo "Checking deterministic Python dependency lock..."
 
     # Lock validation itself only needs Python. The venv/pinned resolver is

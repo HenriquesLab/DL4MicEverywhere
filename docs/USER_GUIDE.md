@@ -387,3 +387,13 @@ You can enter the tag you want in the **Tag** textbox. In the following example,
      width="40%" 
      height="40%" />
  
+
+### Using older Docker image versions
+
+When a specific older version is selected from the **Version** list, DL4MicEverywhere treats that version as a published artifact. It will never rebuild an older tag from the current `configuration.yaml`.
+
+- If the exact image already exists locally, you can **Use Existing Image**, **Download from Docker Hub** to refresh/replace it, or **Cancel**.
+- If the image is not local, the only available action is **Download from Docker Hub** (or **Cancel**).
+- If Docker Hub does not provide that historical image for the current architecture, DL4MicEverywhere reports that the selected version is unavailable instead of attempting a local build.
+
+The normal **Build Locally** option remains available only for the current/default notebook version.
