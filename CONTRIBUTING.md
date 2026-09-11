@@ -37,7 +37,7 @@ DL4MicEverywhere stores the generated `requirements.lock.txt` beside `configurat
 
 Base-image digests are maintained centrally in `.tools/base_images.lock.yaml`. Contributors continue to edit only the modular Ubuntu/CUDA values in `configuration.yaml`; automation adds any newly required immutable image digests. Existing base-image pins are refreshed only through the explicit maintenance workflow. See [Base Image Locks](docs/BASE_IMAGE_LOCKS.md).
 
-Open a PR with the notebook configuration and dependency input changes. Automated workflows handle lock maintenance, image building, and testing.
+Open a PR with the notebook configuration and dependency input changes. Automated workflows handle lock maintenance, image building, and testing. Publishing workflows refuse to overwrite an existing versioned Docker Hub tag: if the calculated `docker_hub_image` is already published, update the notebook/DL4MicEverywhere version so a new tag is generated before rebuilding.
 
 Consider first contributing the base notebook to [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) and then benefit from our automated conversion process.
 

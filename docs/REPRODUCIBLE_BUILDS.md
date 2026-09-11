@@ -24,6 +24,12 @@ DL4MicEverywhere runtime packages are incorporated into the same resolution, wit
 
 The modular Ubuntu/CUDA settings in `configuration.yaml` are resolved through the committed [`base_images.lock.yaml`](../.tools/base_images.lock.yaml). The lock maps the logical CPU, GPU, and notebook-converter image tags to immutable registry index digests. All Dockerfiles receive pre-resolved `CONVERTER_BASE_IMAGE` and `FINAL_BASE_IMAGE` references and use those values directly in `FROM`. See [BASE_IMAGE_LOCKS.md](BASE_IMAGE_LOCKS.md).
 
+## Published image tags
+
+Versioned Docker Hub tags are treated as immutable release identifiers. Before any AMD64, ARM64, or GPU build starts, the publishing workflows query Docker Hub for the exact `docker_hub_image` tag calculated from `configuration.yaml`. If that tag already exists, the workflow fails immediately with an informative error and asks the maintainer to update the notebook/DL4MicEverywhere version so a new tag is generated. This prevents an existing published version from being silently overwritten and avoids spending time rebuilding it.
+
+The `*-latest` aliases remain intentionally mutable so they can continue to point to the newest published version. Architecture-specific `-amd64`, `-arm64`, and `-gpu` tags are build intermediates; the pre-build guard protects the final versioned release tag.
+
 ## Other deterministic inputs
 
 - NVM's installer is fetched from an immutable commit.

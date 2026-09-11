@@ -11,7 +11,21 @@ else
 fi
 
 # Run pre_launch_test.sh, stop if it fails
-/bin/bash "$BASEDIR/.tools/bash_tools/pre_launch_test.sh" "$flag_gui" || exit 1
+/bin/bash "$BASEDIR/.tools/bash_tools/pre_launch_test.sh" "$flag_gui"
+prelaunch_result=$?
+case "$prelaunch_result" in
+    0) ;;
+    90|91)
+        # The Windows wrapper needs the intentional restart status so it can
+        # present the right completion message.  Native Linux/macOS launches
+        # have no outer wrapper, so treat the same state as a clean exit.
+        if [[ "${DL4ME_WINDOWS_WRAPPER:-0}" == "1" ]]; then
+            exit "$prelaunch_result"
+        fi
+        exit 0
+        ;;
+    *) exit 1 ;;
+esac
 
 # Function with the text to describe the usage of the bash script
 usage() {

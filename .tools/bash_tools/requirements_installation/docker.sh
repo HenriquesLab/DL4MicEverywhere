@@ -18,8 +18,8 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     sudo apt-get -y update
     
-    # Install the latest Docker version
-    sudo apt-get -y update
+    # Install the latest Docker version. Package metadata was refreshed just
+    # above after adding Docker's repository, so another update is unnecessary.
     sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
     ## Allow to run Docker as a non-root user
@@ -51,7 +51,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 
     # Install latest Docker Desktop version
     curl https://desktop.docker.com/linux/main/$(dpkg --print-architecture)/docker-desktop-$(dpkg --print-architecture).deb -o /tmp/DockerDesktop.deb
-    sudo apt-get -y update
+    # The package lists are already current from the Docker repository setup.
     sudo apt-get -y install /tmp/DockerDesktop.deb
 
     # Download the Docker Desktop .deb file v4.27.1 and install it

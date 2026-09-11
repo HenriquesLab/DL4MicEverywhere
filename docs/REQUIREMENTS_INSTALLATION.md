@@ -1,6 +1,6 @@
 # DL4MicEverywhere Requirements Installation Guidelines
 
-You can double-click the launcher in the DL4MicEverywhere folder (which has the same name as your system, e.g., Windows_launch for Windows operating systems) to launch the GUI, but it also does some requirements checking. At the beginning of the process, the launcher checks if the requirements listed below are installed; otherwise, they are installed automatically. It can happen that the installation is not successfully done; in that case, please follow the guidelines provided on this page.
+You can double-click the launcher in the DL4MicEverywhere folder (which has the same name as your system, e.g., Windows_launch for Windows operating systems) to launch the GUI, but it also does some requirements checking. At the beginning of the process, the launcher checks if the requirements listed below are installed; otherwise, they are installed automatically. On Debian/Ubuntu systems, DL4MicEverywhere installs only the missing packages it needs; it does not perform a full operating-system upgrade as part of application setup. It can happen that the installation is not successfully done; in that case, please follow the guidelines provided on this page.
 
 ### Requirements
 
@@ -68,10 +68,10 @@ TCL/TK is required for the graphical user interface (GUI) of DL4MicEverywhere, a
 
 This requires running the following commands in the Command Line or PowerShell window:
 ```
-wsl sudo apt-get -y update
+wsl sudo apt-get update
 ```
 ```
-wsl sudo apt-get -y install tk
+wsl sudo apt-get install -y tcl tk
 ```
 
 Now TCL/TK should be installed inside WSL's Ubuntu.
@@ -98,9 +98,8 @@ The only requirement to use the graphical user interface (GUI) is to have [Tcl/T
 Most Unix / Linux operating system distributions include Tcl and Tk. If not already installed, use your system's package manager to install the appropriate packages. For Ubuntu, use the following commands:
 
 ```
-sudo apt-get -y update
-sudo apt-get -y install tcl
-sudo apt-get -y install tk
+sudo apt-get update
+sudo apt-get install -y tcl tk
 ```
 
 </details>
@@ -124,9 +123,8 @@ DEPRECATION WARNING: The system version of Tk is deprecated and may be removed i
 you can install or update the appropriate packages in two different ways:
 
  * Option 1: Using Homebrew:
-   Reinstall your tcl-tk packages
+   Install or update the `tcl-tk` package:
    ```
-   brew uninstall tcl-tk
    brew install tcl-tk
    ```
 
@@ -219,3 +217,7 @@ you can install or update the appropriate packages in two different ways:
 &nbsp;
 
 Once you have followed all these steps, you are ready to run DL4MicEverywhere - the last step to continue is [downloading the DL4MicEverywhere repository](USER_GUIDE.md#download-dl4miceverywhere-repository) on the **User Guide**.
+
+### Restart after prerequisite installation
+
+When DL4MicEverywhere installs missing host prerequisites, it may recommend a restart before continuing. On Windows/WSL, **Restart Now** requests a restart of the Windows host (not only the WSL distribution), while **Restart Later** exits the launcher cleanly so Windows can be restarted manually. Neither choice is treated as an installation failure.

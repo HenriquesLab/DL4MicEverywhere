@@ -2,8 +2,8 @@
 
 set docker_tag [lindex $argv 0]
 
-set width 520
-set height 125
+set width 720
+set height 175
 set width_offset [expr {([winfo vrootwidth .] - $width) / 2}]
 set height_offset [expr {([winfo vrootheight .] - $height) / 2}]
 
@@ -15,7 +15,7 @@ proc finish {code} {
 wm protocol . WM_DELETE_WINDOW {finish 0}
 wm title . "Download older Docker image"
 wm geometry . ${width}x${height}+${width_offset}+${height_offset}
-wm minsize . 570 150
+wm minsize . 620 160
 
 frame .fr -padx 16 -pady 14
 pack .fr -fill both -expand 1

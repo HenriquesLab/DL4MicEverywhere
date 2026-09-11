@@ -1,8 +1,8 @@
 #!/bin/bash
+set -e
 
 echo "Installing net-tools..."
 
-sudo apt-get -y update
-sudo apt -y update
-sudo apt -y upgrade
-sudo apt -y install net-tools
+# Refresh package metadata, but do not upgrade the operating system.
+sudo apt-get update
+sudo apt-get install -y net-tools

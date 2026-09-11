@@ -17,7 +17,6 @@ on:
 
 permissions:
   contents: write
-  actions: write
 
 concurrency:
   group: base-image-locks-${{ github.ref }}
@@ -71,8 +70,8 @@ jobs:
           git commit -m "Update deterministic base-image lock"
           git push
 
-      - name: Rebuild published images after intentional refresh
+      - name: Explain publishing step after intentional refresh
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.refresh_existing && steps.changes.outputs.changed == 'true' }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run build_docker_images_all.yml --ref main
+        shell: bash
+        run: |
+          echo "::notice title=Base-image lock refreshed::Base-image digests changed. Existing published Docker tags are immutable and will not be overwritten. Update the appropriate DL4MicEverywhere/image version before running the publishing workflow so a new Docker tag is generated."

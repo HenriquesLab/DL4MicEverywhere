@@ -9,9 +9,10 @@ bash actions-runner/run.sh
 ```
 The output of these actions can be seen here: https://github.com/HenriquesLab/DL4MicEverywhere/settings/actions/runners
 
-## Manually updating a specfic Docker Image in Docker Hub
-Run the following GitHub action by clicking on **Run workflow** and adding the path to the specific configuration `yaml` of the notebook: https://github.com/HenriquesLab/DL4MicEverywhere/actions/workflows/build_docker_images_aux.yml
-(for `pix2pix` it would be `https://github.com/HenriquesLab/DL4MicEverywhere/actions/workflows/build_docker_images_aux.yml`)
+## Manually publishing a specific Docker Image to Docker Hub
+Run the following GitHub action by clicking on **Run workflow** and adding the path to the specific notebook `configuration.yaml`: https://github.com/HenriquesLab/DL4MicEverywhere/actions/workflows/build_docker_images_aux.yml
+
+Published versioned tags are treated as immutable. The workflow performs a Docker Hub pre-build check before any image build starts. If the exact `docker_hub_image` tag already exists, the workflow stops immediately rather than overwriting it. Update the notebook version or DL4MicEverywhere version first so `configuration.yaml` produces a new tag, then run the publishing workflow again. The `*-latest` alias is intentionally allowed to move to the newest published version.
 
 ## Keep ZeroCostDL4Mic synchronised with DL4MicEverywhere
 When updating a notebook in ZeroCostDL4Mic one should ensure that the version is updated in the following files: 

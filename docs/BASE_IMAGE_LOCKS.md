@@ -64,10 +64,11 @@ required tags, validates that all bundled configurations are covered, and
 commits the generated lock file.
 
 Existing pins are updated only through the workflow's explicit
-`refresh_existing` option. An intentional refresh updates the digests, commits
-the new lock, and dispatches the repository's full Docker-image rebuild
-workflow so the new base images are validated and published as a deliberate
-change rather than silently entering an old build recipe.
+`refresh_existing` option. An intentional refresh updates the digests and
+commits the new lock. It does **not** automatically republish images under their
+old version tags: published versioned Docker tags are treated as immutable.
+After a base-image refresh, update the appropriate DL4MicEverywhere/image
+version first so the publishing workflow generates a new Docker tag.
 
 ## Local commands
 

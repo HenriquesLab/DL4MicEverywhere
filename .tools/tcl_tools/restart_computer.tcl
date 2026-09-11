@@ -25,14 +25,15 @@ place .fr.principal.text_4 -relx 0.02 -rely 0.81
 
 # Define the buttons to submit the information or close the program
 
-ttk::button .fr.yes -text "Restart Now" -command { puts 2; exit 0 }
+ttk::button .fr.yes -text "Restart Now" -command { puts "restart_now"; exit 0 }
 pack .fr.yes -padx 30 -side left 
 
-ttk::button .fr.no -text "Restart Later" -command { puts 3; exit 0 }
+ttk::button .fr.no -text "Restart Later" -command { puts "restart_later"; exit 0 }
 pack .fr.no -padx 30 -side right
 
 ##### Create a window #####
 
 # Create the window, give a name to it and locate it in the middle of the screen
+wm protocol . WM_DELETE_WINDOW { puts "restart_later"; exit 0 }
 wm title . "Installation Complete"
 wm geometry . ${width}x${height}+${width_offset}+${height_offset}

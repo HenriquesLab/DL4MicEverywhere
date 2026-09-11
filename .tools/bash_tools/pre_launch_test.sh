@@ -20,7 +20,13 @@ echo "Checking requirements ..."
 echo "################################"
 echo ""
 
-/bin/bash "$BASEDIR/requirements_installation.sh" || exit 1
+/bin/bash "$BASEDIR/requirements_installation.sh"
+requirements_result=$?
+case "$requirements_result" in
+    0) ;;
+    90|91) exit "$requirements_result" ;;
+    *) exit 1 ;;
+esac
 
 echo ""
 echo "################################"

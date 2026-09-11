@@ -1,21 +1,20 @@
 #!/bin/bash
+set -e
 
 echo "Installing TCL/TK..."
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    # Linux
-    sudo apt-get -y update
-    sudo apt -y update
-    sudo apt -y upgrade
-    sudo apt-get -y install tcl
-    sudo apt-get -y install tk
+    # Linux: install only the packages DL4MicEverywhere needs. Do not perform
+    # a full distribution upgrade as part of application setup.
+    sudo apt-get update
+    sudo apt-get install -y tcl tk
 
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    # Mac OSX
-    brew uninstall tcl-tk
+    # Mac OSX: Homebrew can install or update the formula without first
+    # uninstalling the user's existing Tcl/Tk installation.
     brew install tcl-tk
 
-elif [[ "$OSTYPE" == "msys*" ]]; then
+elif [[ "$OSTYPE" == "msys"* ]]; then
     # Windows
     echo "This is a Windows machine"
 else
@@ -24,6 +23,6 @@ else
     echo "Unsupported OS: $OSTYPE"
     echo "We only provide support for Windows, MacOS and Linux."
     read -p "Press enter to close the terminal."
-    echo "------------------------------------" 
+    echo "------------------------------------"
     exit 1
 fi

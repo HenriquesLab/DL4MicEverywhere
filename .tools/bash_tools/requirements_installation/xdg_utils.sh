@@ -1,8 +1,8 @@
 #!/bin/bash
+set -e
 
 echo "Installing xdg-utils..."
 
-sudo apt-get -y update
-sudo apt -y update
-sudo apt -y upgrade
-sudo apt-get -y install xdg-utils
+# Refresh package metadata, but do not upgrade the operating system.
+sudo apt-get update
+sudo apt-get install -y xdg-utils

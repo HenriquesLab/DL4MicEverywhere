@@ -82,6 +82,13 @@ jobs:
         id: docker_tag
         with:
           cmd: yq '.config.dl4miceverywhere.docker_hub_image' '${{ inputs.config_file }}'  
+      - name: Refuse to overwrite an existing Docker Hub release tag
+        shell: bash
+        run: |
+          python3 .tools/python_tools/dockerhub_tag_guard.py \
+            --namespace henriqueslab \
+            --repository dl4miceverywhere \
+            --tag '${{ steps.docker_tag.outputs.result }}'
       - name: Get notebook_name
         id: notebook_name
         run: |

@@ -180,12 +180,48 @@ if [[ "$any_installation_flag" -ne 0 ]]; then
     echo "It's recommended to restart your computer to apply all changes."
     echo "------------------------------------" 
 
-    # Show the window with the option to restart
+    # Show the window with the option to restart.  The dialog returns explicit
+    # semantic values rather than numeric magic values so the shell and Tcl
+    # sides cannot silently drift out of sync.
     requirements_flag=$(wish "$BASEDIR/../tcl_tools/restart_computer.tcl")
-    if [[ "$requirements_flag" == s2 ]]; then
-        # Restart the computer at the moment of clicking
-        sudo shutdown -r now
-    else
+
+    if [[ "$requirements_flag" == "restart_now" ]]; then
+        # Inside WSL, restarting Linux is not the same thing as restarting the
+        # Windows host.  Ask Windows itself to reboot directly so
+        # WSL does not merely restart its own Linux environment.
+        if [[ -n "${WSL_DISTRO_NAME:-}" ]] || grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null; then
+            if command -v shutdown.exe >/dev/null 2>&1; then
+                echo "Restarting Windows now..."
+                if shutdown.exe /r /t 0 /c "DL4MicEverywhere installation completed. Restarting to apply changes." >/dev/null 2>&1; then
+                    # Special success status: restart was intentionally scheduled.
+                    exit 91
+                fi
+            fi
+
+            echo ""
+            echo "------------------------------------"
+            echo "Could not schedule the Windows restart automatically."
+            echo "Please restart Windows manually before running DL4MicEverywhere again."
+            echo "------------------------------------"
+            exit 1
+        fi
+
+        # Native Linux/macOS path.  If shutdown returns successfully before the
+        # session disappears, propagate the same intentional-restart status.
+        if sudo shutdown -r now; then
+            exit 91
+        fi
+
+        echo "Automatic restart failed. Please restart your computer manually."
         exit 1
+
+    elif [[ "$requirements_flag" == "restart_later" ]]; then
+        echo "Restart postponed. Please restart your computer before running DL4MicEverywhere again."
+        # Special success status: installation completed and the user chose to
+        # restart later.  Stop here rather than continuing into the application.
+        exit 90
+    else
+        echo "Restart dialog closed. Please restart your computer before running DL4MicEverywhere again."
+        exit 90
     fi
 fi

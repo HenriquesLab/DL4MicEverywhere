@@ -112,6 +112,8 @@ set "LAUNCH_RESULT=%ERRORLEVEL%"
 
 if "%LAUNCH_RESULT%"=="0" exit /b 0
 if "%LAUNCH_RESULT%"=="42" goto :complete_uninstall
+if "%LAUNCH_RESULT%"=="90" goto :restart_later
+if "%LAUNCH_RESULT%"=="91" goto :restart_scheduled
 
 goto :launch_failed
 
@@ -237,6 +239,22 @@ echo No Docker Desktop settings were changed by DL4MicEverywhere.
 echo.
 pause
 exit /b 1
+
+:restart_later
+echo.
+echo DL4MicEverywhere dependencies were installed successfully.
+echo You chose to restart later. Please restart Windows before running
+echo DL4MicEverywhere again.
+echo.
+pause
+exit /b 0
+
+:restart_scheduled
+echo.
+echo DL4MicEverywhere dependencies were installed successfully.
+echo A Windows restart was requested successfully.
+echo.
+exit /b 0
 
 :launch_failed
 echo.
