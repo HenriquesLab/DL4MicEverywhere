@@ -897,6 +897,23 @@ if [ "$flag_build" -eq 2 ]; then
     # inherit the notebook runtime profile.
     python3 "$BASEDIR/.tools/python_tools/requirements_lock.py" ensure "${converter_lock_args[@]}" || exit 1
 
+    echo "Checking immutable Docker base-image lock..."
+    base_image_assignments="$(
+        python3 "$BASEDIR/.tools/python_tools/base_image_lock.py" \
+            --repo-root "$BASEDIR" \
+            ensure-for-build \
+            --config "$config_path" \
+            --gpu "$flag_gpu" \
+            --shell
+    )" || exit 1
+    eval "$base_image_assignments"
+    if [ -z "${CONVERTER_BASE_IMAGE:-}" ] || [ -z "${FINAL_BASE_IMAGE:-}" ]; then
+        echo "Could not resolve immutable Docker base images." >&2
+        exit 1
+    fi
+    echo "Converter base: $CONVERTER_BASE_IMAGE"
+    echo "Final base:     $FINAL_BASE_IMAGE"
+
     if [ ! -f "$requirements_lock_path" ]; then
         echo "Dependency lock was not created: $requirements_lock_path" >&2
         exit 1
@@ -924,6 +941,8 @@ else
         if [ "$flag_gpu" -eq 1 ]; then
             sudo docker build --file "$selected_dockerfile" -t "$docker_tag" \
                 --label "org.dl4miceverywhere.managed=true" \
+                --build-arg CONVERTER_BASE_IMAGE="${CONVERTER_BASE_IMAGE}" \
+                --build-arg FINAL_BASE_IMAGE="${FINAL_BASE_IMAGE}" \
                 --build-arg UBUNTU_VERSION="${ubuntu_version}" \
                 --build-arg CUDA_VERSION="${cuda_version}" \
                 --build-arg CUDNN_VERSION="${cudnn_version}" \
@@ -938,6 +957,8 @@ else
         else
             sudo docker build --file "$selected_dockerfile" -t "$docker_tag" \
                 --label "org.dl4miceverywhere.managed=true" \
+                --build-arg CONVERTER_BASE_IMAGE="${CONVERTER_BASE_IMAGE}" \
+                --build-arg FINAL_BASE_IMAGE="${FINAL_BASE_IMAGE}" \
                 --build-arg UBUNTU_VERSION="${ubuntu_version}" \
                 --build-arg CUDA_VERSION="${cuda_version}" \
                 --build-arg CUDNN_VERSION="${cudnn_version}" \

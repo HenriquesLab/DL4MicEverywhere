@@ -20,9 +20,12 @@ The committed sibling `requirements.txt` is the deterministic build input; the U
 
 DL4MicEverywhere runtime packages are incorporated into the same resolution, with notebook-specific constraints taking precedence. The converter stage has an independent lock. See [DEPENDENCY_LOCKS.md](DEPENDENCY_LOCKS.md) for the complete workflow.
 
+## Docker base images
+
+The modular Ubuntu/CUDA settings in `configuration.yaml` are resolved through the committed [`base_images.lock.yaml`](../.tools/base_images.lock.yaml). The lock maps the logical CPU, GPU, and notebook-converter image tags to immutable registry index digests. All Dockerfiles receive pre-resolved `CONVERTER_BASE_IMAGE` and `FINAL_BASE_IMAGE` references and use those values directly in `FROM`. See [BASE_IMAGE_LOCKS.md](BASE_IMAGE_LOCKS.md).
+
 ## Other deterministic inputs
 
-- The notebook-conversion stage uses a Python patch-version base tag (`python:3.9.20-alpine3.19`).
 - NVM's installer is fetched from an immutable commit.
 - pip, setuptools, and wheel bootstrap versions are explicit and Python-version compatible.
 - Timestamp-based Docker cache busting is not used.
@@ -41,10 +44,9 @@ There is no duplicated source-repository field, source-commit field, lock URL, o
 
 ## Remaining sources of variability
 
-Python dependencies are locked, but the complete image is not yet bit-for-bit reproducible because:
+Python dependencies and Docker base images are now locked, but the complete image is not yet bit-for-bit reproducible because:
 
-- Ubuntu and NVIDIA CUDA base-image tags are not pinned by digest.
 - `apt-get install` obtains package revisions from repositories available at build time.
 - CPU architecture and Docker/BuildKit implementation can affect binary artifacts.
 
-A future reproducibility layer can pin base images by digest and use snapshot/immutable OS package repositories.
+A future reproducibility layer can use snapshot/immutable OS package repositories for the `apt` layer.

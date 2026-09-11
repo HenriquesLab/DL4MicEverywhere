@@ -35,6 +35,8 @@ Once you have a working notebook, create a notebook directory under the appropri
 
 DL4MicEverywhere stores the generated `requirements.lock.txt` beside `configuration.yaml`. The lock location is automatic and must not be added as another YAML URL. The dependency-lock workflow resolves exact transitive versions and hashes and commits the generated lock. See [Dependency Locks](docs/DEPENDENCY_LOCKS.md) for the maintenance model.
 
+Base-image digests are maintained centrally in `.tools/base_images.lock.yaml`. Contributors continue to edit only the modular Ubuntu/CUDA values in `configuration.yaml`; automation adds any newly required immutable image digests. Existing base-image pins are refreshed only through the explicit maintenance workflow. See [Base Image Locks](docs/BASE_IMAGE_LOCKS.md).
+
 Open a PR with the notebook configuration and dependency input changes. Automated workflows handle lock maintenance, image building, and testing.
 
 Consider first contributing the base notebook to [ZeroCostDL4Mic](https://github.com/HenriquesLab/ZeroCostDL4Mic) and then benefit from our automated conversion process.

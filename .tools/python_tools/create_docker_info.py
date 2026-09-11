@@ -14,6 +14,8 @@ def create_docker_arguments(
     notebook_name,
     gpu_flag,
     python_version,
+    converter_base_image,
+    final_base_image,
 ):
     with open(filename_path, "w", encoding="utf8") as f:
         f.write("The arguments that have been used to build the Docker image are:\n")
@@ -28,9 +30,11 @@ def create_docker_arguments(
         f.write(f'\tNOTEBOOK_NAME="{notebook_name}"\n')
         f.write(f'\tGPU_FLAG="{gpu_flag}"\n')
         f.write(f'\tPYTHON_VERSION="{python_version}"\n')
+        f.write(f'\tCONVERTER_BASE_IMAGE="{converter_base_image}"\n')
+        f.write(f'\tFINAL_BASE_IMAGE="{final_base_image}"\n')
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 13:
+    if len(sys.argv) == 15:
         sys.exit(create_docker_arguments(*sys.argv[1:]))
     sys.exit(1)

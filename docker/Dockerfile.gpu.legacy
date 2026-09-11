@@ -1,3 +1,5 @@
+ARG CONVERTER_BASE_IMAGE
+ARG FINAL_BASE_IMAGE
 ARG UBUNTU_VERSION=20.04
 ARG CUDA_VERSION=11.2.2
 ARG CUDNN_VERSION=8.1.1.33
@@ -5,7 +7,7 @@ ARG CUDNN_VERSION=8.1.1.33
 ####
 ## Stage 1 - Download and convert the notebook
 ####
-FROM python:3.9.20-alpine3.19 AS notebook_autoconversion
+FROM ${CONVERTER_BASE_IMAGE} AS notebook_autoconversion
 
 WORKDIR /home
 
@@ -15,6 +17,8 @@ RUN python -m pip install --disable-pip-version-check --require-hashes \
     rm /tmp/converter-requirements.lock.txt
 
 # Read all the arguments
+ARG CONVERTER_BASE_IMAGE
+ARG FINAL_BASE_IMAGE
 ARG PATH_TO_NOTEBOOK
 ARG PATH_TO_REQUIREMENTS
 ARG PATH_TO_REQUIREMENTS_LOCK
@@ -54,17 +58,19 @@ RUN python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py \
         "${SECTIONS_TO_REMOVE}" \
         "${NOTEBOOK_NAME}" \
         "${GPU_FLAG}" \
-        "${PYTHON_VERSION}"
+        "${PYTHON_VERSION}" \
+        "${CONVERTER_BASE_IMAGE}" \
+        "${FINAL_BASE_IMAGE}"
 
 ####
 ## Stage 2 - Final legacy GPU image
 ## Supported Python versions in this file: 3.5, 3.6
 ## Interface build args accepted by all Dockerfiles:
-##   UBUNTU_VERSION, CUDA_VERSION, CUDNN_VERSION
+##   CONVERTER_BASE_IMAGE, FINAL_BASE_IMAGE, UBUNTU_VERSION, CUDA_VERSION, CUDNN_VERSION
 ## Legacy Python is built from source so it can be used on any Ubuntu CUDA base.
 ## GPU support now follows the same arg contract as the modern GPU Dockerfile.
 ####
-FROM nvidia/cuda:${CUDA_VERSION}-devel-ubuntu${UBUNTU_VERSION} AS final
+FROM ${FINAL_BASE_IMAGE} AS final
 ARG UBUNTU_VERSION
 ARG CUDA_VERSION
 ARG CUDNN_VERSION

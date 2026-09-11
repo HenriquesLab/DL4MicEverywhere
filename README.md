@@ -88,7 +88,7 @@ We welcome contributions! Please check out the [contributing guidelines](CONTRIB
 
 ## Documentation
 
-For deterministic Docker environments, see [Python dependency locks](docs/DEPENDENCY_LOCKS.md) and [reproducible builds](docs/REPRODUCIBLE_BUILDS.md).
+For deterministic Docker environments, see [Python dependency locks](docs/DEPENDENCY_LOCKS.md), [immutable base-image locks](docs/BASE_IMAGE_LOCKS.md), and [reproducible builds](docs/REPRODUCIBLE_BUILDS.md).
 - [Step-by-step "How to" guide](docs/USER_GUIDE.md)
   - [Manual Installation of the Requirements](docs/REQUIREMENTS_INSTALLATION.md)
   - [Contianerise your own pipeline](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/USER_GUIDE.md#5-containerise-your-own-pipelines-advanced-options)

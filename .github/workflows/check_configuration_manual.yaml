@@ -188,6 +188,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3   
 
+      - name: Resolve immutable Docker base images
+        shell: bash
+        run: |
+          eval "$(python3 .tools/python_tools/base_image_lock.py --repo-root . ensure-config --config '${{ matrix.notebook }}' --shell)"
+          echo "CONVERTER_BASE_IMAGE=$CONVERTER_BASE_IMAGE" >> "$GITHUB_ENV"
+          echo "CPU_BASE_IMAGE=$CPU_BASE_IMAGE" >> "$GITHUB_ENV"
+          echo "GPU_BASE_IMAGE=$GPU_BASE_IMAGE" >> "$GITHUB_ENV"
+
       - name: Get notebook_name
         id: notebook_name
         run: |
@@ -201,6 +209,8 @@ jobs:
           push: false
           platforms: linux/amd64,linux/arm64
           build-args: |
+              CONVERTER_BASE_IMAGE=${{ env.CONVERTER_BASE_IMAGE }}
+              FINAL_BASE_IMAGE=${{ env.CPU_BASE_IMAGE }}
               UBUNTU_VERSION=${{ needs.check_keys.outputs.ubuntu_version }}
               GPU_FLAG=0
               PYTHON_VERSION=${{ needs.check_keys.outputs.python_version }}
@@ -251,12 +261,22 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3   
 
+      - name: Resolve immutable Docker base images
+        shell: bash
+        run: |
+          eval "$(python3 .tools/python_tools/base_image_lock.py --repo-root . ensure-config --config '${{ matrix.notebook }}' --shell)"
+          echo "CONVERTER_BASE_IMAGE=$CONVERTER_BASE_IMAGE" >> "$GITHUB_ENV"
+          echo "CPU_BASE_IMAGE=$CPU_BASE_IMAGE" >> "$GITHUB_ENV"
+          echo "GPU_BASE_IMAGE=$GPU_BASE_IMAGE" >> "$GITHUB_ENV"
+
       - name: Build with GPU
         uses: docker/build-push-action@v5
         with:
           push: false
           platforms: linux/amd64
           build-args: |
+            CONVERTER_BASE_IMAGE=${{ env.CONVERTER_BASE_IMAGE }}
+            FINAL_BASE_IMAGE=${{ env.GPU_BASE_IMAGE }}
             UBUNTU_VERSION=${{ needs.check_keys.outputs.ubuntu_version }}
             CUDA_VERSION=${{ needs.check_keys.outputs.cuda_version }}
             CUDNN_VERSION=${{ needs.check_keys.outputs.cudnn_version }}

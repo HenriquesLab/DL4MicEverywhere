@@ -112,4 +112,4 @@ No lock URL or manual lock update is required.
 
 ## Scope of reproducibility
 
-These locks freeze the Python dependency graph and package artifacts selected for the target Python/Linux environment. Full bit-for-bit Docker reproducibility additionally requires immutable base-image digests and deterministic OS package sources; those are a separate reproducibility layer.
+These locks freeze the Python dependency graph and package artifacts selected for the target Python/Linux environment. Docker base images are pinned separately through `.tools/base_images.lock.yaml`; full bit-for-bit Docker reproducibility still additionally requires deterministic/snapshot OS package sources for `apt`.
