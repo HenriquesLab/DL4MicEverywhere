@@ -27,7 +27,7 @@ DL4MicEverywhere is a user-friendly platform that allows you to run deep learnin
 
 ## Run DL4MicEverywhere for the first time:
 
-To run DL4MicEverywhere for the first time you need to have root/admin permissions as the program will check for the presence of the requirements and will attempt to install any that are missing. 
+On the first run, DL4MicEverywhere checks the required host software and installs supported missing components when possible. Administrator privileges are not always required. In particular, current Docker Desktop versions support a per-user Windows installation without elevation. Enabling WSL 2 for the first time remains a Windows machine-level operation and may require Administrator privileges.
 
 DL4MicEverywhere comes packaged with an executable for each operating system. Double-click on the one that has the same name as your system (e.g., `Windows_launch` for Windows operating systems). This automatic requirements installation will be different on each operative system:
 
@@ -50,33 +50,31 @@ The automatic installation on MacOs guides you through these steps:
 <details>
 <summary>On Windows:</summary>
 
-The automatic installation on Windows guides you through the following steps. You can also [watch a video tutorial](https://youtu.be/aUoZ4b3B9qU).
+The Windows launcher now performs the checks in a safe order: WSL/Ubuntu first, Docker Desktop second, Docker-to-WSL integration third, then DL4MicEverywhere.
 
-1. **Docker Desktop installation:**
+1. **WSL 2 and Ubuntu:**
 
-   1.1. During installation, ensure that the **"Use WSL 2 instead of Hyper-V"** option is selected ☑️.
+   DL4MicEverywhere checks that a current WSL installation and an Ubuntu WSL 2 distribution are already available. Docker Desktop currently requires WSL 2.1.5 or later. If WSL must be enabled or updated, the launcher stops and provides the corresponding Windows command instead of elevating itself silently.
 
-   1.2. After succesfull installation, the terminal will close. Please restart your computer.
+2. **Docker Desktop:**
 
-2. **Windows Subsystem for Linux (WSL) installation:**
+   If Docker Desktop is already installed, both Docker's current per-user path and the traditional all-users path are detected automatically. If Docker Desktop is missing, DL4MicEverywhere offers to install it in Docker's supported **per-user** mode using the WSL 2 backend.
 
-   2.1. Go to your DL4MicEverywhere folder and click again on the `Windows_launch` file.
+   - The per-user installation is stored under `%LOCALAPPDATA%\Programs\DockerDesktop`.
+   - It does not require Windows Administrator privileges.
+   - Before the download, DL4MicEverywhere displays Docker's Subscription Service Agreement and requires explicit consent.
+   - The installer is downloaded from Docker's official HTTPS endpoint and its Windows Authenticode signature is checked before execution.
+   - Windows containers are disabled because DL4MicEverywhere uses Linux containers only.
 
-   2.2 You need to enter a username and a password, these can be different from the credentials on your computer (**IMPORTANT:** remember the password for the future) (when entering the password, it will not be displayed).
+3. **Docker Desktop WSL integration:**
 
-   2.3. After installation, you will need to type `logout` and press **ENTER**.
+   Once Docker Desktop is running, DL4MicEverywhere checks directly that the selected Ubuntu distribution can execute `docker info`. If Docker Desktop has not enabled that distribution, the launcher provides the short manual **Settings > Resources > WSL Integration** instructions. DL4MicEverywhere does not modify Docker Desktop's settings file automatically.
 
-   2.4. Then press **ENTER** to clsoe the terminal. Please restart your computer.
+4. **Ubuntu-side requirements:**
 
-3. **Ubuntu libraries installation and starting DL4MicEverywhere:**
+   After the Windows preflight succeeds, the Linux launcher installs only missing Ubuntu-side packages needed by DL4MicEverywhere (for example Tcl/Tk). It does not perform a full Ubuntu system upgrade. If those host packages require a restart, DL4MicEverywhere offers **Restart Now** or **Restart Later** and treats either choice as a normal completion state.
 
-   3.1. Go to your DL4MicEverywhere folder and click again on the `Windows_launch` file.
-
-   3.2. If Docker Desktop is not already running, it will ask you to start it. If in 10 seconds Docker Desktop is not opened, you will need to open it manually and click again on the `Windows_launch` file.
-
-6. **The GUI will pop up, and you can start using DL4MicEverywhere** (if the GUI is not displayed correctly, please restart your computer once more to fix the issue).
-
-> ℹ️ **NOTE:** After Windows setup completes successfully, DL4MicEverywhere remembers the detected Ubuntu distribution in a local setup cache. Normal launches reuse that setup and skip the longer WSL discovery and shell-script preparation steps. If the cached setup becomes invalid, the launcher automatically returns to the setup checks.
+5. **The GUI opens and DL4MicEverywhere is ready to use.**
 
 </details>
 

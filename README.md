@@ -75,9 +75,9 @@ Reproduce the demo in the video with the `U-Net (2D) multilabel` notebook and [B
 [![alt text](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/STEP_BY_STEP.gif)](https://youtu.be/rUt1aG_AXh8?si=cz1j0rwVZbfDbCXG)
 
 #### Requirements
-DL4MicEverywhere rely on the following external software that is automatically installed when launching the tool.
-- Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop)).
-- For the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/).
+DL4MicEverywhere relies on the following external software. The launchers check these prerequisites and install supported missing components when possible.
+- Docker Desktop ([download](https://www.docker.com/products/docker-desktop)). On Windows, if WSL 2 is already available, DL4MicEverywhere can install Docker Desktop automatically in Docker's per-user mode without Windows Administrator privileges, after explicit license consent.
+- For the graphical user interface (GUI), [Tcl/Tk](https://www.tcl.tk/).
 
 If GPU acceleration is desired, the following needs to be installed:
 - NVIDIA GPU + CUDA drivers ([setup](https://docs.nvidia.com/cuda/)).

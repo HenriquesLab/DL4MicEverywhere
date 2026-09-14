@@ -16,18 +16,28 @@ The installation guidelines will be different depending on your operative system
 
 ## Intro
 Windows operating systems require a slightly more complicated installation process. Also, beware there might be differences between Windows 10 and 11.
-- Install Docker Desktop.
-- Install Ubuntu inside WSL. 
+- Install/enable WSL 2 and Ubuntu.
+- Docker Desktop can then be installed automatically by DL4MicEverywhere in per-user mode, or installed manually if preferred. 
 - Install TCL/TK in WSL's Ubuntu.
 
 ## Requirements
 - WSL (Windows Subsystem for Linux) - Pre-installed on most Windows 10/11 systems, otherwise it is available on the Microsoft store.
 - Install and/or update all the GPU [NVIDIA drivers](https://www.nvidia.com/download/index.aspx), [cudatoolkit](https://developer.nvidia.com/cuda-toolkit), and [cuDNN](https://developer.nvidia.com/cudnn) necessary for your GPU.  
 
-## 1. Docker Desktop installation
-Firstly, Docker Desktop needs to be installed on your computer. Follow the official guidelines: https://docs.docker.com/desktop/install/windows-install/:
- - During installation tick the recommended **WLS2** option.
- - To finalize the installation **Restart** the computer.
+## 1. WSL 2 prerequisite and Docker Desktop installation
+
+DL4MicEverywhere uses Docker Desktop's WSL 2 backend on Windows. Current Docker Desktop versions support a **per-user installation** to `%LOCALAPPDATA%\Programs\DockerDesktop`, which does not require Windows Administrator privileges. The `Windows_launch.bat` launcher offers this installation automatically when Docker Desktop is missing.
+
+The launcher deliberately checks WSL first because enabling WSL 2 for the first time is a Windows machine-level operation that may require Administrator privileges. Docker Desktop currently requires WSL 2.1.5 or later. Once WSL 2 and Ubuntu are available, the automatic Docker path is:
+
+1. Ask for explicit acceptance of Docker's Subscription Service Agreement.
+2. Download Docker Desktop from Docker's official HTTPS endpoint.
+3. Validate the downloaded installer's Windows Authenticode signature and Docker signer identity.
+4. Install Docker Desktop with Docker's `--user --backend=wsl-2 --no-windows-containers` options.
+5. Start Docker Desktop and wait for the Docker engine.
+6. Verify Docker directly from the selected Ubuntu WSL 2 distribution.
+
+If you prefer to install Docker Desktop manually, follow Docker's official Windows instructions: https://docs.docker.com/desktop/setup/install/windows-install/ and choose the WSL 2 backend.
 
 ## 2. Setup the WSL (Windows Subsystem for Linux)
 
