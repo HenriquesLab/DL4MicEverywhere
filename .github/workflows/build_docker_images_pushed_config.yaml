@@ -8,6 +8,9 @@ on:
       - '**.md'
       - '**.txt'
       
+permissions:
+  contents: write
+
 jobs:
   extract_changed_files:
     name: Find changed configurations

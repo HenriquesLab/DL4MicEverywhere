@@ -11,6 +11,9 @@ on:
       - 'docker/converter-requirements.txt'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   list_configs:
     name: Get the list of configuration files on the repository

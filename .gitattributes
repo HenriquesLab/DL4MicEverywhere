@@ -13,3 +13,8 @@
 # Deterministic human-edited dependency inputs.
 requirements.txt text eol=lf
 converter-requirements.txt text eol=lf
+# Automatically maintained notebook image status.
+.tools/notebook-build-status.json text eol=lf
+.tools/test-notebooks.md text eol=lf
+.tools/test-notebooks-legacy.md text eol=lf
+

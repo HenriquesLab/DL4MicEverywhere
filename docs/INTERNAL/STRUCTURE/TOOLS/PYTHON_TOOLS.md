@@ -4,6 +4,7 @@
 - [dict_parser.py](#dict_parser.py)
 - [list_of_notebooks.py](#list_of_notebooks.py)
 - [requirements_lock.py](#requirements_lock.py)
+- [notebook_status.py](#notebook_status.py)
 - [test_files.py](#test_files.py)
 - [update_configuration.py](#update_configuration.py)
 - [update_with_zc_nanifest.py](#update_with_zc_nanifest.py)
@@ -52,9 +53,13 @@ On this file three dictionaries are defined:
 
 Generates and validates the sibling `requirements.lock.txt` files used by deterministic Docker builds. It combines a notebook's local `requirements.txt` with the runtime profile for the configured Python version, resolves with a pinned `uv` version, and writes exact transitive dependencies with hashes. See [Dependency Locks](../../../DEPENDENCY_LOCKS.md).
 
+## [notebook_status.py](../../../../.tools/python_tools/notebook_status.py) <a name="notebook_status.py"></a>
+
+Maintains the machine-readable Docker image build/smoke-test history in `.tools/notebook-build-status.json` and renders the automatically generated `.tools/test-notebooks.md` report. It can also synchronize existing configured image tags and publication timestamps from Docker Hub. See [Automated notebook Docker-image status](../../../AUTOMATED_NOTEBOOK_STATUS.md).
+
 ## [test_files.py](../../../../.tools/python_tools/test_files.py) <a name="test_files.py"></a>
 
-Contains the information about the tested notebooks in a Panda's dataframe and prints it. This information is used to generate [test-notebooks.md](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/.tools/test-notebooks.md).
+Backwards-compatible wrapper for the new `notebook_status.py` report renderer. The notebook test matrix is no longer maintained manually in this Python file.
 
 ## [update_configuration.py](../../../../.tools/python_tools/update_configuration.py) <a name="update_configuration.py"></a>
 

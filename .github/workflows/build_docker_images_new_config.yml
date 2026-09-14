@@ -7,6 +7,9 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: write
+
 jobs:
   get_arguments:
     name: Extract arguments from configuration
@@ -145,6 +148,13 @@ jobs:
     name: Build Docker image on AMD64
     runs-on: [self-hosted, Ubuntu, NotDocker]
     needs: get_arguments
+    outputs:
+      amd64_build: ${{ steps.build_amd64.outcome }}
+      amd64_smoke: ${{ steps.smoke_amd64.outcome }}
+      amd64_generated_at: ${{ steps.amd64_generated.outputs.timestamp }}
+      gpu_build: ${{ steps.build_gpu.outcome }}
+      gpu_smoke: ${{ steps.smoke_gpu.outcome }}
+      gpu_generated_at: ${{ steps.gpu_generated.outputs.timestamp }}
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
@@ -187,7 +197,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Ubuntu-Runner
+      - name: Build and push AMD64 image
+        id: build_amd64
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -209,7 +220,22 @@ jobs:
             NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
             SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
       
-      - name: Build and push Ubuntu-Runner
+      - name: Record AMD64 generation time
+        id: amd64_generated
+        shell: bash
+        run: echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke-test generated AMD64 image
+        id: smoke_amd64
+        continue-on-error: true
+        shell: bash
+        run: |
+          image="henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64"
+          docker pull "$image"
+          bash .tools/bash_tools/post_build_test.sh "$image" 0
+
+      - name: Build and push GPU image
+        id: build_gpu
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -231,10 +257,31 @@ jobs:
             NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
             SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
 
+      - name: Record GPU-image generation time
+        id: gpu_generated
+        shell: bash
+        run: echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke-test generated GPU image
+        id: smoke_gpu
+        continue-on-error: true
+        shell: bash
+        run: |
+          image="henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu"
+          docker pull "$image"
+          # This validates container integrity. GPU execution is intentionally
+          # not claimed here because this build runner is not guaranteed to
+          # expose an NVIDIA device to Docker.
+          bash .tools/bash_tools/post_build_test.sh "$image" 0
+
   build_arm64:
     name: Build Docker image on ARM64
     runs-on: [self-hosted, macOS, ARM64]
     needs: get_arguments
+    outputs:
+      arm64_build: ${{ steps.build_arm64.outcome }}
+      arm64_smoke: ${{ steps.smoke_arm64.outcome }}
+      arm64_generated_at: ${{ steps.arm64_generated.outputs.timestamp }}
     steps:
       - name: Clone DL4MicEverywhere repository
         uses: actions/checkout@v4
@@ -277,7 +324,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Ubuntu-Runner
+      - name: Build and push ARM64 image
+        id: build_arm64
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -298,6 +346,20 @@ jobs:
               PATH_TO_REQUIREMENTS_LOCK=${{ steps.dependency_lock.outputs.path }}
               NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
               SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
+
+      - name: Record ARM64 generation time
+        id: arm64_generated
+        shell: bash
+        run: echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke-test generated ARM64 image
+        id: smoke_arm64
+        continue-on-error: true
+        shell: bash
+        run: |
+          image="henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64"
+          docker pull "$image"
+          bash .tools/bash_tools/post_build_test.sh "$image" 0
 
   build_only_arm64:
     name: Only push ARM64 to Docker Hub 
@@ -432,3 +494,32 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: GitHub Action - Update the notebook version on the configuration
+
+  update_test_notebook_status:
+    name: Update automated notebook image status
+    if: ${{ always() && needs.get_arguments.result == 'success' }}
+    needs:
+      - get_arguments
+      - build_amd64
+      - build_arm64
+      - build_only_arm64
+      - build_only_amd64
+      - build_multi_architecture
+      - update_config
+    uses: ./.github/workflows/update_test_notebooks.yml
+    with:
+      config_file: ${{ inputs.config_file }}
+      docker_tag: ${{ needs.get_arguments.outputs.docker_tag }}
+      amd64_build: ${{ needs.build_amd64.outputs.amd64_build }}
+      amd64_smoke: ${{ needs.build_amd64.outputs.amd64_smoke }}
+      amd64_generated_at: ${{ needs.build_amd64.outputs.amd64_generated_at }}
+      gpu_build: ${{ needs.build_amd64.outputs.gpu_build }}
+      gpu_smoke: ${{ needs.build_amd64.outputs.gpu_smoke }}
+      gpu_generated_at: ${{ needs.build_amd64.outputs.gpu_generated_at }}
+      arm64_build: ${{ needs.build_arm64.outputs.arm64_build }}
+      arm64_smoke: ${{ needs.build_arm64.outputs.arm64_smoke }}
+      arm64_generated_at: ${{ needs.build_arm64.outputs.arm64_generated_at }}
+      multi_manifest: ${{ needs.build_multi_architecture.result }}
+      amd64_manifest: ${{ needs.build_only_amd64.result }}
+      arm64_manifest: ${{ needs.build_only_arm64.result }}
+

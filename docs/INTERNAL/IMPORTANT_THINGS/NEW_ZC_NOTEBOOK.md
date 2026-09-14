@@ -34,6 +34,6 @@ There are a few steps to follow when adding a new ZeroCostDL4Mic notebook. The s
 
 5. **Update the name parser** in `.tools/python_tools/dict_parser.py` if the new notebook naming requires a new mapping.
 
-6. **Add the notebook to tests** in `.tools/python_tools/test_files.py` as appropriate.
+6. **No manual test-table entry is required.** Once the image publishing workflow runs, `.tools/notebook-build-status.json` and `.tools/test-notebooks.md` are updated automatically. See `docs/AUTOMATED_NOTEBOOK_STATUS.md`.
 
 See [Dependency Locks](../../DEPENDENCY_LOCKS.md) and [Configuration Format](../../FORMAT.md) for the current deterministic build model.
