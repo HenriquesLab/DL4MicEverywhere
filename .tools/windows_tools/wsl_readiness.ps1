@@ -29,7 +29,7 @@ if ($Action -eq 'direct') {
     try {
         # Pass every argument natively. This mirrors a normal interactive WSL
         # command and avoids Start-Process command-line reconstruction entirely.
-        & wsl.exe --distribution $Distro --user root --exec /bin/true 1> $StdoutPath 2> $StderrPath
+        & wsl.exe --distribution $Distro --user root --cd / --exec /bin/true 1> $StdoutPath 2> $StderrPath
         if ($LASTEXITCODE -eq 0) { exit 0 }
         exit 1
     } catch {
@@ -48,7 +48,7 @@ try {
         $distroToken = $Distro
     }
 
-    $arguments = "--distribution $distroToken --user root --exec /bin/true"
+    $arguments = "--distribution $distroToken --user root --cd / --exec /bin/true"
 
     $process = Start-Process -FilePath 'wsl.exe' `
         -ArgumentList $arguments `

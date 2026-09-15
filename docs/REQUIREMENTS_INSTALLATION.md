@@ -16,19 +16,48 @@ The installation guidelines will be different depending on your operative system
 
 ## Intro
 Windows operating systems require a slightly more complicated installation process. Also, beware there might be differences between Windows 10 and 11.
-- Install/enable WSL 2 and Ubuntu.
-- Docker Desktop can then be installed automatically by DL4MicEverywhere in per-user mode, or installed manually if preferred. 
-- Install TCL/TK in WSL's Ubuntu.
+- WSL 2 is checked first. If WSL is missing or outdated, DL4MicEverywhere can install/update it automatically using Microsoft's official WSL commands, requesting Administrator permission only for the machine-level WSL step when needed. If no Ubuntu distribution is present afterwards, DL4MicEverywhere can install Ubuntu 24.04 LTS automatically.
+- Docker Desktop can then be installed automatically by DL4MicEverywhere in per-user mode, or installed manually if preferred.
+- DL4MicEverywhere installs missing Linux-side runtime utilities such as Tcl/Tk inside the selected Ubuntu distribution.
 
 ## Requirements
 - WSL (Windows Subsystem for Linux) - Pre-installed on most Windows 10/11 systems, otherwise it is available on the Microsoft store.
 - Install and/or update all the GPU [NVIDIA drivers](https://www.nvidia.com/download/index.aspx), [cudatoolkit](https://developer.nvidia.com/cuda-toolkit), and [cuDNN](https://developer.nvidia.com/cudnn) necessary for your GPU.  
 
-## 1. WSL 2 prerequisite and Docker Desktop installation
+## 1. WSL 2 prerequisite and automatic Ubuntu installation
+
+DL4MicEverywhere requires a current WSL 2 installation on Windows. Docker Desktop currently requires WSL 2.1.5 or later. `Windows_launch.bat` now distinguishes a missing WSL runtime from a legacy/outdated installation instead of reporting both states as a version error.
+
+If WSL is missing, the launcher offers to run Microsoft's official `wsl --install --no-distribution` command. Because first-time WSL 2 enablement can activate machine-level Windows virtualization components, Windows may show a UAC prompt. The launcher itself stays non-elevated; only Microsoft's `wsl.exe` prerequisite command is launched with Administrator permission. If the normal Store-backed path fails, the helper offers WSL's `--web-download` fallback. If Windows must restart to finish enabling WSL, DL4MicEverywhere offers to restart automatically or lets the user restart later.
+
+If WSL is installed but older than the required version, the launcher first attempts Microsoft's `wsl --update` as the normal Windows user. Only if that update cannot complete without elevation does it retry the WSL command with UAC. The `--web-download` fallback and restart handling are available for updates as well.
+
+Once WSL is current, `Windows_launch.bat` searches for an installed Ubuntu distribution. It prefers **Ubuntu-24.04** when several Ubuntu distributions are present, while continuing to support an existing Ubuntu installation rather than forcing a duplicate install.
+
+If no Ubuntu distribution is found, the launcher offers to install **Ubuntu-24.04** automatically. The installation flow:
+
+1. Confirms that `Ubuntu-24.04` is present in the WSL online distribution catalog.
+2. Asks for explicit user consent before installing anything.
+3. Uses Microsoft's supported `wsl --install --distribution Ubuntu-24.04 --no-launch` command.
+4. If the normal installation fails, offers a retry using WSL's `--web-download` mode.
+5. Starts Ubuntu once so the user can complete the standard Linux username/password creation.
+6. Verifies that the distribution can start and then returns to the normal DL4MicEverywhere preflight.
+
+DL4MicEverywhere does **not** create or store Linux credentials and does not change the user's global default WSL distribution.
+
+If automatic installation fails, the equivalent manual command is:
+
+```
+wsl --install -d Ubuntu-24.04
+```
+
+After installation, complete Ubuntu's normal first-run username/password setup.
+
+## 2. Docker Desktop installation
 
 DL4MicEverywhere uses Docker Desktop's WSL 2 backend on Windows. Current Docker Desktop versions support a **per-user installation** to `%LOCALAPPDATA%\Programs\DockerDesktop`, which does not require Windows Administrator privileges. The `Windows_launch.bat` launcher offers this installation automatically when Docker Desktop is missing.
 
-The launcher deliberately checks WSL first because enabling WSL 2 for the first time is a Windows machine-level operation that may require Administrator privileges. Docker Desktop currently requires WSL 2.1.5 or later. Once WSL 2 and Ubuntu are available, the automatic Docker path is:
+Once WSL 2 and Ubuntu are available, the automatic Docker path is:
 
 1. Ask for explicit acceptance of Docker's Subscription Service Agreement.
 2. Download Docker Desktop from Docker's official HTTPS endpoint.
@@ -39,58 +68,9 @@ The launcher deliberately checks WSL first because enabling WSL 2 for the first 
 
 If you prefer to install Docker Desktop manually, follow Docker's official Windows instructions: https://docs.docker.com/desktop/setup/install/windows-install/ and choose the WSL 2 backend.
 
-## 2. Setup the WSL (Windows Subsystem for Linux)
+## 3. Linux-side runtime requirements
 
-### 2.1. Install Ubuntu inside WSL
-Open a Command Line (cmd.exe) or PowerShell window and run:
- 
-```
-wsl --install -d Ubuntu
-```
-
-This will install Ubuntu inside WSL.
-
-Once the installation ends it will ask for a username and a password. This is not necessary, exit the installation by using **Ctrl+C** or by closing the window.
-
-Re-open the Command Line or PowerShell window and run the command **again**, if the installation was sucessfull you should see the following message:
-
-![Ubuntu is sucessfully installed](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/WSL_UBUNTU_IS_INSTALLED.png)
-
-### 2.2. Make Ubuntu the default configuration
-
-Run the following command in the Command Line or PowerShell window to check what is the current default configuration.
-```
-wsl --list --verbose
-```
-
-The one with * is the default configuration. 
-
-![Ubuntu is the default configuration](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/WSL_UBUNTU.png)
-
-If it is not Ubuntu, it can be changed by using the command: 
-```
-wsl --set-default Ubuntu
-```
-
-### 2.3. TCL/TK installation 
-
-TCL/TK is required for the graphical user interface (GUI) of DL4MicEverywhere, and it must be installed inside WSL's Ubuntu.
-
-This requires running the following commands in the Command Line or PowerShell window:
-```
-wsl sudo apt-get update
-```
-```
-wsl sudo apt-get install -y tcl tk
-```
-
-Now TCL/TK should be installed inside WSL's Ubuntu.
-
-To check if TCL/TK is correctly installed run:
-```
-wsl wish
-```
-This should open a new window named Wish. If it fails repeat the previous steps again or create a [Issue](https://github.com/HenriquesLab/DL4MicEverywhere/issues/new/choose) letting us know your problem. 
+After the Windows preflight succeeds, DL4MicEverywhere launches its normal Linux-side requirements checks inside the selected Ubuntu distribution. Missing utilities required by the GUI and launcher, including Tcl/Tk and `net-tools`, are installed there by the existing requirements installation flow.
 
 </details>
 

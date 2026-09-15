@@ -54,7 +54,7 @@ The Windows launcher now performs the checks in a safe order: WSL/Ubuntu first, 
 
 1. **WSL 2 and Ubuntu:**
 
-   DL4MicEverywhere checks that a current WSL installation and an Ubuntu WSL 2 distribution are already available. Docker Desktop currently requires WSL 2.1.5 or later. If WSL must be enabled or updated, the launcher stops and provides the corresponding Windows command instead of elevating itself silently.
+   DL4MicEverywhere checks WSL before Ubuntu and Docker Desktop. Docker Desktop currently requires WSL 2.1.5 or later. If WSL is missing, the launcher offers Microsoft's official `wsl --install --no-distribution` flow; if WSL is outdated, it offers `wsl --update`. The launcher itself stays non-elevated. A UAC prompt is requested only when the Windows-level WSL command actually needs Administrator permission, and WSL updates are attempted as the normal user first. If a restart is required, the launcher offers to schedule it. After WSL is ready, the existing Ubuntu-24.04 automatic installation flow continues.
 
 2. **Docker Desktop:**
 
