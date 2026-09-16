@@ -9,6 +9,11 @@ ARG CUDNN_VERSION=8.1.1.33
 ####
 FROM ${CONVERTER_BASE_IMAGE} AS notebook_autoconversion
 
+# PyPI downloads can briefly stall on Docker Desktop/WSL networks.
+# Keep deterministic installs resilient without changing package resolution.
+ENV PIP_DEFAULT_TIMEOUT=120
+ENV PIP_RETRIES=10
+
 WORKDIR /home
 
 COPY docker/converter-requirements.lock.txt /tmp/converter-requirements.lock.txt
@@ -93,6 +98,9 @@ ENV TZ=Europe/Lisbon
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV PIP_NO_CACHE_DIR=1
+# Allow large hashed wheels to survive short network stalls during Docker builds.
+ENV PIP_DEFAULT_TIMEOUT=120
+ENV PIP_RETRIES=10
 
 # GPU environment
 ENV NVIDIA_VISIBLE_DEVICES=all
