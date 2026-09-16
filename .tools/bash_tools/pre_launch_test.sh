@@ -46,6 +46,18 @@ fi
 # Check if the Docker daemon is running, if Docker option is chose
 if [[ "$containerisation" == "Docker"* ]]; then
     if ! docker info &> /dev/null; then
+        if [[ "${DL4ME_WINDOWS_WRAPPER:-0}" == "1" ]]; then
+            echo ""
+            echo "------------------------------------"
+            echo "Docker Desktop was verified as running by the Windows preflight, but"
+            echo "Docker is not accessible to the current Ubuntu user."
+            echo ""
+            echo "This is a WSL Docker-access/integration problem, not a stopped Docker daemon."
+            echo "Run Windows_launch.bat again so its Docker user-access check can diagnose"
+            echo "and, for the standard docker-group case, repair the Linux socket permission."
+            echo "------------------------------------"
+            exit 1
+        fi
         /bin/bash "$BASEDIR/pre_build_launch/check_docker_daemon.sh" || exit 1
     fi
 fi

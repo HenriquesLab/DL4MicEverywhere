@@ -66,9 +66,9 @@ The Windows launcher now performs the checks in a safe order: WSL/Ubuntu first, 
    - The installer is downloaded from Docker's official HTTPS endpoint and its Windows Authenticode signature is checked before execution.
    - Windows containers are disabled because DL4MicEverywhere uses Linux containers only.
 
-3. **Docker Desktop WSL integration:**
+3. **Docker Desktop WSL integration and Ubuntu-user access:**
 
-   Once Docker Desktop is running, DL4MicEverywhere checks directly that the selected Ubuntu distribution can execute `docker info`. If Docker Desktop has not enabled that distribution, the launcher provides the short manual **Settings > Resources > WSL Integration** instructions. DL4MicEverywhere does not modify Docker Desktop's settings file automatically.
+   Once Docker Desktop is running, DL4MicEverywhere first checks the selected Ubuntu distribution at the distribution level. It then verifies that the resolved non-root Ubuntu account can execute `docker info`, because that is the account used to run DL4MicEverywhere. If the Docker socket uses the standard `root:docker` group permissions and the Ubuntu account is not yet a member of that group, the launcher explains the privilege and asks for consent before adding the account to the Linux `docker` group. No Windows Administrator permission is required for this WSL-local change. If Docker Desktop has not enabled the distribution at all, the launcher instead provides the short manual **Settings > Resources > WSL Integration** instructions. DL4MicEverywhere does not modify Docker Desktop's settings file automatically and does not broaden Docker socket permissions.
 
 4. **Ubuntu-side requirements:**
 

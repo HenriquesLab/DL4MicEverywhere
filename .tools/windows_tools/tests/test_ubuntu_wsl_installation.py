@@ -9,6 +9,9 @@ DISCOVERY_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "discover_ubuntu_wsl
 READINESS_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "wsl_readiness.ps1"
 VERSION_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "check_wsl_distribution_version.ps1"
 CONVERSION_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "convert_wsl_distribution_to_v2.ps1"
+USER_DISCOVERY_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "discover_ubuntu_user.ps1"
+DOCKER_USER_ACCESS_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "ensure_ubuntu_docker_user_access.ps1"
+PRE_LAUNCH_TEST = REPO_ROOT / ".tools" / "bash_tools" / "pre_launch_test.sh"
 
 
 class UbuntuWslInstallationTests(unittest.TestCase):
@@ -108,6 +111,85 @@ class UbuntuWslInstallationTests(unittest.TestCase):
         self.assertIn('-Distro %UBUNTU_DISTRO%', launcher)
         self.assertIn('-Distribution %UBUNTU_DISTRO%', launcher)
         self.assertIn('-d %UBUNTU_DISTRO%', launcher)
+
+
+    def test_launcher_resolves_and_explicitly_uses_non_root_ubuntu_user(self):
+        launcher = WINDOWS_LAUNCH.read_text(encoding="utf-8")
+        helper = USER_DISCOVERY_HELPER.read_text(encoding="utf-8")
+
+        self.assertIn('set "UBUNTU_USER="', launcher)
+        self.assertIn("discover_ubuntu_user.ps1", launcher)
+        self.assertIn("Ubuntu user: %UBUNTU_USER%", launcher)
+        self.assertIn("wsl.exe -d %UBUNTU_DISTRO% -u root --cd / --exec /usr/bin/env docker info", launcher)
+        self.assertIn("wsl.exe -d %UBUNTU_DISTRO% -u %UBUNTU_USER% --exec /usr/bin/env DL4ME_WINDOWS_WRAPPER=1", launcher)
+        self.assertNotIn("wsl.exe -d %UBUNTU_DISTRO% -u %UBUNTU_USER% --exec /usr/bin/env docker info", launcher)
+        self.assertNotIn("wsl.exe -d %UBUNTU_DISTRO% --exec /usr/bin/env docker info", launcher)
+        self.assertNotIn("wsl.exe -d %UBUNTU_DISTRO% --exec /usr/bin/env DL4ME_WINDOWS_WRAPPER=1", launcher)
+
+        self.assertIn("/etc/wsl.conf", helper)
+        self.assertIn("/etc/passwd", helper)
+        self.assertIn("--exec /usr/bin/id -u $Name", helper)
+        self.assertIn("return ($uid -gt 0)", helper)
+        self.assertNotIn("getent passwd 1000", helper)
+        self.assertNotIn("$uid -eq 1000", helper)
+
+    def test_docker_integration_probe_is_root_then_user_access_is_verified(self):
+        launcher = WINDOWS_LAUNCH.read_text(encoding="utf-8")
+
+        integration_start = launcher.index("\n:check_docker_integration\n")
+        launch_start = launcher.index("\n:launch_application\n")
+        integration_block = launcher[integration_start:launch_start]
+        launch_block = launcher[launch_start:]
+
+        self.assertIn("-u root --cd / --exec /usr/bin/env docker info", integration_block)
+        self.assertIn("ensure_ubuntu_docker_user_access.ps1", integration_block)
+        self.assertIn("-Distribution %UBUNTU_DISTRO% -User %UBUNTU_USER%", integration_block)
+        self.assertIn('DOCKER_USER_ACCESS_RESULT=%ERRORLEVEL%', integration_block)
+        self.assertIn("-u %UBUNTU_USER% --exec /usr/bin/env DL4ME_WINDOWS_WRAPPER=1", launch_block)
+
+    def test_docker_user_access_helper_treats_native_permission_denied_as_exit_code(self):
+        helper = DOCKER_USER_ACCESS_HELPER.read_text(encoding="utf-8")
+
+        # The first docker-info probe is expected to fail for a user that lacks
+        # socket access. Native stderr must not trip the script-wide
+        # ErrorActionPreference=Stop before LASTEXITCODE can be classified.
+        self.assertIn("$previousErrorActionPreference = $ErrorActionPreference", helper)
+        self.assertGreaterEqual(helper.count("$ErrorActionPreference = 'Continue'"), 2)
+        self.assertGreaterEqual(helper.count("$exitCode = $LASTEXITCODE"), 2)
+        self.assertGreaterEqual(helper.count("$ErrorActionPreference = $previousErrorActionPreference"), 2)
+
+    def test_docker_user_access_helper_repairs_only_standard_docker_group_case(self):
+        helper = DOCKER_USER_ACCESS_HELPER.read_text(encoding="utf-8")
+
+        self.assertIn("Test-DockerAccess -RunAs $User", helper)
+        self.assertIn("Test-DockerAccess -RunAs 'root'", helper)
+        self.assertIn("/var/run/docker.sock", helper)
+        self.assertIn("$socketGroup -ne 'docker'", helper)
+        self.assertIn("'/usr/sbin/usermod', '-aG', 'docker', $User", helper)
+        self.assertIn("Show-DockerAccessConsentDialog", helper)
+        self.assertIn("Grant Docker Access", helper)
+        self.assertNotIn("chmod 666", helper)
+        self.assertNotIn("usermod -aG root", helper)
+
+    def test_windows_wrapped_linux_prelaunch_does_not_offer_to_restart_desktop(self):
+        text = PRE_LAUNCH_TEST.read_text(encoding="utf-8")
+
+        self.assertIn('DL4ME_WINDOWS_WRAPPER:-0', text)
+        self.assertIn("not a stopped Docker daemon", text)
+        wrapper_block = text[text.index('if [[ "${DL4ME_WINDOWS_WRAPPER:-0}"'):text.index('fi\n        /bin/bash "$BASEDIR/pre_build_launch/check_docker_daemon.sh"')]
+        self.assertNotIn("docker_desktop_gui.tcl", wrapper_block)
+
+
+    def test_user_discovery_prefers_wsl_conf_and_only_falls_back_unambiguously(self):
+        helper = USER_DISCOVERY_HELPER.read_text(encoding="utf-8")
+
+        self.assertIn("Get-ConfiguredDefaultUser", helper)
+        self.assertIn("Get-OnlyRegularHomeUser", helper)
+        self.assertIn("-ieq 'user'", helper)
+        self.assertIn("(?i:default)", helper)
+        self.assertIn("$uniqueUsers.Count -eq 1", helper)
+        self.assertIn("$uid -lt 1000 -or $uid -ge 65534", helper)
+        self.assertIn("$home.StartsWith('/home/')", helper)
 
 
     def test_install_helper_normalizes_listed_distro_and_probes_from_root(self):

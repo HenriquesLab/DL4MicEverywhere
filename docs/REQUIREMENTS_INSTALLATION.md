@@ -57,6 +57,8 @@ After installation, complete Ubuntu's normal first-run username/password setup.
 
 DL4MicEverywhere uses Docker Desktop's WSL 2 backend on Windows. Current Docker Desktop versions support a **per-user installation** to `%LOCALAPPDATA%\Programs\DockerDesktop`, which does not require Windows Administrator privileges. The `Windows_launch.bat` launcher offers this installation automatically when Docker Desktop is missing.
 
+After the distribution-level integration check succeeds, the Windows launcher also verifies Docker access as the actual non-root Ubuntu account that will run DL4MicEverywhere. If `/var/run/docker.sock` uses the standard `root:docker` group permissions and that account is not a member of `docker`, DL4MicEverywhere can add the account to the Linux `docker` group after explicit consent. The launcher never makes the socket world-writable and never adds the account to an unrelated privileged group.
+
 Once WSL 2 and Ubuntu are available, the automatic Docker path is:
 
 1. Ask for explicit acceptance of Docker's Subscription Service Agreement.

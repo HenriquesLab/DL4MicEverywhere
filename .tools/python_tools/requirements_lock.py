@@ -43,6 +43,17 @@ def utc_cutoff_for_today() -> str:
     return _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT23:59:59Z")
 
 
+def git_repo_command(repo_root: Path, *args: str) -> list[str]:
+    """Build a Git command trusted only for this exact checkout.
+
+    Git 2.35+ can flag Windows-mounted WSL checkouts as dubious because DrvFs
+    ownership does not necessarily match the Linux UID running DL4MicEverywhere.
+    Use command-scoped safe.directory instead of modifying global Git config.
+    """
+    resolved = str(repo_root.resolve())
+    return ["git", "-c", f"safe.directory={resolved}", "-C", resolved, *args]
+
+
 def deterministic_cutoff(
     repo_root: Path,
     source: str,
@@ -72,7 +83,7 @@ def deterministic_cutoff(
         except ValueError:
             return utc_cutoff_for_today()
         status = subprocess.run(
-            ["git", "-C", str(repo_root), "status", "--porcelain", "--", rel],
+            git_repo_command(repo_root, "status", "--porcelain", "--", rel),
             text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
@@ -82,7 +93,7 @@ def deterministic_cutoff(
             return utc_cutoff_for_today()
         try:
             stamp = subprocess.check_output(
-                ["git", "-C", str(repo_root), "log", "-1", "--format=%cI", "--", rel],
+                git_repo_command(repo_root, "log", "-1", "--format=%cI", "--", rel),
                 text=True,
                 stderr=subprocess.DEVNULL,
             ).strip()

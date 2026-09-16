@@ -1,6 +1,17 @@
 #!/bin/bash
 
 BASEDIR=$(dirname "$(readlink -f "$0")")
+REPO_ROOT=$(readlink -f "$BASEDIR/../../..")
+
+# Git 2.35+ rejects repositories whose filesystem ownership does not match the
+# current Linux UID. Windows checkouts mounted through WSL (/mnt/c/...) can
+# legitimately trigger that protection even though this launcher is operating
+# on its own checkout. Scope the exception to this exact checkout and to each
+# individual Git command; never change the user's global Git configuration.
+repo_git() {
+    git -c safe.directory="$REPO_ROOT" -C "$REPO_ROOT" "$@"
+}
+
 already_asked=$1
 flag_gui="$2"
 
@@ -15,9 +26,9 @@ fi
 # Check if Git is installed
 if command -v git &> /dev/null; then
     # Get the name of the local branch
-    branch_name=$(git branch --show-current)
+    branch_name=$(repo_git branch --show-current)
     # Get the latest commit locally
-    local_commit=$(git rev-parse HEAD)
+    local_commit=$(repo_git rev-parse HEAD)
 else
     # Get the name of the local branch
     branch_name=$(cat .git/HEAD | sed -n 's|^ref: refs/heads/||p')
@@ -90,7 +101,7 @@ if [[ "$update" == "Automatically"* || "$update_flag" -eq 2 ]]; then
         if [[ "$already_asked" == "0" ]]; then echo "DL4MicEverywhere will be updated ..."; fi
         if command -v git &> /dev/null; then
             # In case they don't match, update it with git pull if you have git installed
-            git pull
+            repo_git pull
         else
             # Otherwise update it using
             curl -L -o update.pack https://github.com/HenriquesLab/DL4MicEverywhere.git/info/refs?service=git-upload-pack

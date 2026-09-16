@@ -24,6 +24,7 @@ set "WSL_UTF8=1"
 set "DOCKER_DESKTOP_EXE="
 set "DOCKER_EXE="
 set "UBUNTU_DISTRO="
+set "UBUNTU_USER="
 set "PREFERRED_UBUNTU_DISTRO=Ubuntu-24.04"
 
 cd /d "%BASEDIR%"
@@ -79,6 +80,14 @@ set "UBUNTU_WSL_VERSION_RESULT=%ERRORLEVEL%"
 if "%UBUNTU_WSL_VERSION_RESULT%"=="2" goto :ubuntu_convert_to_wsl2
 if not "%UBUNTU_WSL_VERSION_RESULT%"=="0" goto :ubuntu_wsl_version_unknown
 
+rem Resolve the configured non-root Linux account explicitly. Some WSL states
+rem can retain a stale UID-1000 default even when the valid Ubuntu user has a
+rem different UID (for example 1001), which can produce stale default-user relay errors.
+if not exist "%BASEDIR%\.tools\windows_tools\discover_ubuntu_user.ps1" goto :ubuntu_user_helper_missing
+call :discover_ubuntu_user
+if not "%ERRORLEVEL%"=="0" goto :ubuntu_user_not_ready
+
+echo       Ubuntu user: %UBUNTU_USER%
 echo       Ubuntu: ready (WSL 2).
 goto :check_docker
 
@@ -119,6 +128,16 @@ rem producing a visually correct but invalid distribution name.  Normalize it
 rem in PowerShell before returning a single ASCII-safe name to this launcher.
 if not exist "%BASEDIR%\.tools\windows_tools\discover_ubuntu_wsl.ps1" exit /b 1
 for /f "usebackq delims=" %%D in (`powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\discover_ubuntu_wsl.ps1" -PreferredDistribution %PREFERRED_UBUNTU_DISTRO%`) do if not defined UBUNTU_DISTRO set "UBUNTU_DISTRO=%%D"
+exit /b 0
+
+:discover_ubuntu_user
+set "UBUNTU_USER="
+
+rem Resolve the Linux username in PowerShell while probing the distribution as
+rem root. The helper validates /etc/wsl.conf first and deliberately does not
+rem assume that the normal account has UID 1000. It returns one ASCII-safe token.
+for /f "usebackq delims=" %%U in (`powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\discover_ubuntu_user.ps1" -Distribution %UBUNTU_DISTRO%`) do if not defined UBUNTU_USER set "UBUNTU_USER=%%U"
+if not defined UBUNTU_USER exit /b 1
 exit /b 0
 
 :discover_docker
@@ -190,13 +209,23 @@ rem ============================================================================
 echo.
 echo [3/4] Checking Docker Desktop integration with %UBUNTU_DISTRO%...
 
-rem Important: invoke Docker directly. Do not go through sh -lc / bash -lc.
-rem This avoids shell quoting, login-shell configuration, and systemd-user-session
-rem side effects from being mistaken for a Docker Desktop integration failure.
-wsl.exe -d %UBUNTU_DISTRO% --exec /usr/bin/env docker info >nul 2>&1
+rem Docker Desktop WSL integration is installed at the distribution level. Probe
+rem it as root first so this check is independent of the distro's normal-user UID
+rem and avoids WSL's stale implicit-UID relay path. Then verify that the resolved
+rem non-root account can also use Docker; the application itself runs as that user.
+wsl.exe -d %UBUNTU_DISTRO% -u root --cd / --exec /usr/bin/env docker info >nul 2>&1
 if not "%ERRORLEVEL%"=="0" goto :docker_wsl_integration_missing
 
-echo       Docker integration: ready.
+if not exist "%BASEDIR%\.tools\windows_tools\ensure_ubuntu_docker_user_access.ps1" goto :docker_user_access_helper_missing
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\ensure_ubuntu_docker_user_access.ps1" -Distribution %UBUNTU_DISTRO% -User %UBUNTU_USER%
+set "DOCKER_USER_ACCESS_RESULT=%ERRORLEVEL%"
+if "%DOCKER_USER_ACCESS_RESULT%"=="0" goto :docker_integration_ready
+if "%DOCKER_USER_ACCESS_RESULT%"=="2" goto :docker_user_access_cancelled
+if "%DOCKER_USER_ACCESS_RESULT%"=="3" goto :docker_wsl_integration_missing
+goto :docker_user_access_failed
+
+:docker_integration_ready
+echo       Docker integration: ready for %UBUNTU_USER%.
 
 rem =============================================================================
 rem 4. Launch DL4MicEverywhere
@@ -207,7 +236,7 @@ echo.
 echo [4/4] Starting DL4MicEverywhere using %UBUNTU_DISTRO%...
 echo.
 
-wsl.exe -d %UBUNTU_DISTRO% --exec /usr/bin/env DL4ME_WINDOWS_WRAPPER=1 /bin/bash -E Linux_launch.sh
+wsl.exe -d %UBUNTU_DISTRO% -u %UBUNTU_USER% --exec /usr/bin/env DL4ME_WINDOWS_WRAPPER=1 /bin/bash -E Linux_launch.sh
 set "LAUNCH_RESULT=%ERRORLEVEL%"
 
 if "%LAUNCH_RESULT%"=="0" exit /b 0
@@ -533,6 +562,34 @@ echo.
 pause
 exit /b 1
 
+:ubuntu_user_not_ready
+echo.
+echo The Ubuntu distribution %UBUNTU_DISTRO% is installed, but DL4MicEverywhere
+echo could not resolve a usable non-root Linux account for it.
+echo.
+echo DL4MicEverywhere does not assume that the account must have UID 1000. It first
+echo checks the [user] default entry in /etc/wsl.conf and then validates the account.
+echo.
+echo Inspect the configured account with:
+echo.
+echo     wsl -d %UBUNTU_DISTRO% -u root -- cat /etc/wsl.conf
+echo     wsl -d %UBUNTU_DISTRO% -u root -- cat /etc/passwd
+echo.
+echo If /etc/wsl.conf names a valid user, confirm it can start with:
+echo.
+echo     wsl -d %UBUNTU_DISTRO% -u YOUR_USERNAME -- id
+echo.
+pause
+exit /b 1
+
+:ubuntu_user_helper_missing
+echo.
+echo The DL4MicEverywhere Ubuntu user-discovery helper is missing from this copy of
+echo the repository. Please download a complete DL4MicEverywhere release and try again.
+echo.
+pause
+exit /b 1
+
 :ubuntu_convert_to_wsl2
 echo.
 echo The Ubuntu distribution %UBUNTU_DISTRO% is registered as WSL 1.
@@ -679,6 +736,46 @@ echo two minutes.
 echo.
 echo Please open Docker Desktop and review any message it displays. Once Docker
 echo reports that the engine is running, run Windows_launch.bat again.
+echo.
+pause
+exit /b 1
+
+:docker_user_access_cancelled
+echo.
+echo Docker Desktop and WSL integration are running, but the Ubuntu account
+echo %UBUNTU_USER% does not currently have permission to use the Docker socket.
+echo.
+echo No Linux group membership was changed. Run Windows_launch.bat again if you
+echo want DL4MicEverywhere to offer the Docker access repair again.
+echo.
+pause
+exit /b 0
+
+:docker_user_access_failed
+echo.
+echo Docker Desktop is running and works inside %UBUNTU_DISTRO% as root, but
+echo DL4MicEverywhere could not safely make Docker available to Ubuntu user:
+echo.
+echo     %UBUNTU_USER%
+echo.
+echo The automatic repair only handles the standard Docker socket configuration
+echo where /var/run/docker.sock is owned by group "docker". It does not broaden
+echo socket permissions or add your account to unrelated privileged groups.
+echo.
+echo From PowerShell, these commands can help diagnose the current state:
+echo.
+echo     wsl -d %UBUNTU_DISTRO% -u root -- ls -l /var/run/docker.sock
+echo     wsl -d %UBUNTU_DISTRO% -u root -- getent group docker
+echo     wsl -d %UBUNTU_DISTRO% -u %UBUNTU_USER% -- id
+echo     wsl -d %UBUNTU_DISTRO% -u %UBUNTU_USER% -- docker info
+echo.
+pause
+exit /b 1
+
+:docker_user_access_helper_missing
+echo.
+echo The DL4MicEverywhere Docker user-access helper is missing from this copy of
+echo the repository. Please download a complete DL4MicEverywhere release and try again.
 echo.
 pause
 exit /b 1
