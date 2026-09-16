@@ -243,6 +243,18 @@ if "%LAUNCH_RESULT%"=="0" exit /b 0
 if "%LAUNCH_RESULT%"=="42" goto :complete_uninstall
 if "%LAUNCH_RESULT%"=="90" goto :restart_later
 if "%LAUNCH_RESULT%"=="91" goto :restart_scheduled
+if "%LAUNCH_RESULT%"=="92" goto :gui_closed
+if "%LAUNCH_RESULT%"=="93" goto :update_complete
+if "%LAUNCH_RESULT%"=="94" goto :operation_cancelled
+if "%LAUNCH_RESULT%"=="95" goto :historical_image_unavailable
+if "%LAUNCH_RESULT%"=="96" goto :input_invalid
+if "%LAUNCH_RESULT%"=="97" goto :dependency_failed
+if "%LAUNCH_RESULT%"=="98" goto :docker_image_failed
+if "%LAUNCH_RESULT%"=="99" goto :post_build_failed
+if "%LAUNCH_RESULT%"=="100" goto :container_runtime_failed
+if "%LAUNCH_RESULT%"=="101" goto :update_failed
+if "%LAUNCH_RESULT%"=="102" goto :uninstall_failed
+if "%LAUNCH_RESULT%"=="103" goto :linux_prerequisite_failed
 
 goto :launch_failed
 
@@ -802,6 +814,196 @@ echo.
 echo No Docker Desktop settings were changed automatically by DL4MicEverywhere.
 echo.
 pause
+exit /b 1
+
+:gui_closed
+echo.
+echo ============================================================
+echo DL4MicEverywhere closed normally
+echo ============================================================
+echo.
+echo You closed the DL4MicEverywhere graphical interface.
+echo No error occurred, and the Windows, WSL, and Docker preflight checks
+echo completed successfully.
+echo.
+echo Docker Desktop is left running intentionally. Closing DL4MicEverywhere
+echo does not stop Docker Desktop or remove Docker images, containers, volumes,
+echo or other Docker data.
+echo.
+echo You can start DL4MicEverywhere again at any time by launching it normally.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 0
+
+:update_complete
+echo.
+echo ============================================================
+echo DL4MicEverywhere updated successfully
+echo ============================================================
+echo.
+echo The application files were updated successfully.
+echo DL4MicEverywhere stopped intentionally so the new version can start from
+echo a clean process on the next launch.
+echo.
+echo No Windows, WSL, or Docker error occurred.
+echo Please launch DL4MicEverywhere again when you are ready.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 0
+
+:operation_cancelled
+echo.
+echo ============================================================
+echo DL4MicEverywhere operation cancelled
+echo ============================================================
+echo.
+echo You cancelled the current launch or closed one of its choice dialogs.
+echo No error occurred and no further action is required.
+echo.
+echo Docker Desktop is left running intentionally, and existing Docker images,
+echo containers, volumes, and your data were not removed by this cancellation.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 0
+
+:historical_image_unavailable
+echo.
+echo ============================================================
+echo Selected Docker image is not available
+echo ============================================================
+echo.
+echo DL4MicEverywhere could not use the older image version you selected for
+echo this computer. The detailed reason was shown above by the Linux launcher.
+echo.
+echo Choose another published version or return to the current notebook version.
+echo The Windows, WSL, and Docker Desktop preflight checks completed normally.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:input_invalid
+echo.
+echo ============================================================
+echo DL4MicEverywhere needs an input or configuration change
+echo ============================================================
+echo.
+echo The launch stopped because a selected path, configuration value, notebook,
+echo requirements file, or reproducibility input was missing or invalid.
+echo.
+echo Review the specific message shown above, correct that item, and launch again.
+echo This is a handled input problem, not a Windows/WSL/Docker preflight failure.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:dependency_failed
+echo.
+echo ============================================================
+echo Dependency preparation failed
+echo ============================================================
+echo.
+echo DL4MicEverywhere could not prepare or validate the deterministic Python or
+echo base-image locks required for this local build.
+echo.
+echo Review the resolver/lock details shown above. Your existing Docker images
+echo were not reported as successfully replaced by this failed build attempt.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:docker_image_failed
+echo.
+echo ============================================================
+echo Docker image preparation failed
+echo ============================================================
+echo.
+echo DL4MicEverywhere could not validate, download, or build the selected Docker
+echo image. Review the Docker output shown above for the specific cause.
+echo.
+echo Docker Desktop itself passed the Windows preflight; this message refers to
+echo the notebook image operation inside the Linux launcher.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:post_build_failed
+echo.
+echo ============================================================
+echo Docker image validation failed
+echo ============================================================
+echo.
+echo The Docker image exists, but one or more post-build checks failed.
+echo This can include Python startup, package consistency, Jupyter, or GPU checks.
+echo.
+echo Review the detailed post-build check output shown above before using the image.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:container_runtime_failed
+echo.
+echo ============================================================
+echo Notebook container stopped with an error
+echo ============================================================
+echo.
+echo The Docker image passed preparation, but the interactive notebook container
+echo returned an unexpected non-zero runtime status.
+echo.
+echo Review the container/Jupyter output shown above. A normal Ctrl+C/SIGTERM
+echo shutdown is handled separately and is not reported through this message.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:update_failed
+echo.
+echo ============================================================
+echo DL4MicEverywhere update did not complete
+echo ============================================================
+echo.
+echo The update operation stopped safely. Review the Git/update details above.
+echo The current installation remains the version to use until an update succeeds.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:uninstall_failed
+echo.
+echo ============================================================
+echo DL4MicEverywhere was not uninstalled
+echo ============================================================
+echo.
+echo The uninstall operation could not complete safely, so the application folder
+echo was kept in place. Review the specific uninstall message shown above and retry.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:linux_prerequisite_failed
+echo.
+echo ============================================================
+echo Linux-side prerequisite check failed
+echo ============================================================
+echo.
+echo Windows, WSL, and Docker Desktop reached the Linux launcher, but a required
+echo Linux-side tool or Docker access check could not be completed.
+echo.
+echo Review the detailed message shown above. This is a known prerequisite state,
+echo not an unclassified launcher crash.
+echo.
+echo Press any key to close this window...
+pause >nul
 exit /b 1
 
 :restart_later

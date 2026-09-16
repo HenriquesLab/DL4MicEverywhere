@@ -2,6 +2,7 @@
 
 BASEDIR=$(dirname "$(readlink -f "$0")")
 flag_gui="$1"
+source "$BASEDIR/launcher_status.sh"
 
 # # This script checks for root access and Docker installation on Unix-like systems
 # if [[ "$OSTYPE" == "linux-gnu"* || "$OSTYPE" == "darwin"* ]]; then
@@ -25,7 +26,7 @@ requirements_result=$?
 case "$requirements_result" in
     0) ;;
     90|91) exit "$requirements_result" ;;
-    *) exit 1 ;;
+    *) exit "$DL4ME_STATUS_PREREQUISITE_FAILED" ;;
 esac
 
 echo ""
@@ -56,9 +57,9 @@ if [[ "$containerisation" == "Docker"* ]]; then
             echo "Run Windows_launch.bat again so its Docker user-access check can diagnose"
             echo "and, for the standard docker-group case, repair the Linux socket permission."
             echo "------------------------------------"
-            exit 1
+            exit "$DL4ME_STATUS_PREREQUISITE_FAILED"
         fi
-        /bin/bash "$BASEDIR/pre_build_launch/check_docker_daemon.sh" || exit 1
+        /bin/bash "$BASEDIR/pre_build_launch/check_docker_daemon.sh" || exit "$DL4ME_STATUS_PREREQUISITE_FAILED"
     fi
 fi
 
@@ -66,9 +67,9 @@ fi
 if [[ "$update" == "Automatically"* || "$update" == "Ask first"* ]]; then
     /bin/bash "$BASEDIR/pre_build_launch/update_dl4miceverywhere.sh" "0" "$flag_gui"
     
-    updated=$? # Gets if the repository has been updated
-    if [[ "$updated" == "1" ]]; then
-        exit 1
+    updated=$?
+    if [ "$updated" -eq "$DL4ME_STATUS_UPDATE_COMPLETE" ]; then
+        exit "$DL4ME_STATUS_UPDATE_COMPLETE"
     fi
 fi
 
@@ -80,7 +81,13 @@ if [[ "$clean" == "Automatically"* || "$clean" == "Ask first"* ]]; then
         # flag_clean == 3 --> No
     fi
    
-    if [[ "$clean" == "Automatically"* || "$flag_clean" -eq 2 ]]; then
-        /bin/bash "$BASEDIR/pre_build_launch/clean_docker.sh" || exit 1
+    if [[ "$clean" == "Automatically"* || "${flag_clean:-0}" -eq 2 ]]; then
+        if ! /bin/bash "$BASEDIR/pre_build_launch/clean_docker.sh"; then
+            echo ""
+            echo "WARNING: Docker space cleanup could not be completed."
+            echo "This cleanup is optional, so DL4MicEverywhere will continue normally."
+            echo "No Docker volumes are removed by this cleanup policy."
+            echo ""
+        fi
     fi 
 fi

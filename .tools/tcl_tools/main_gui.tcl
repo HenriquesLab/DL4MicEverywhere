@@ -451,6 +451,15 @@ grid columnconfigure .fr.advanced 1 -weight 0
 
 ##### Buttons section #####
 
+# Closing the GUI is a normal user cancellation.  Emit an explicit marker so
+# Linux_launch.sh can distinguish it from a Tcl/wish failure or malformed GUI
+# output, then exit successfully.
+proc onCancel {} {
+    puts "__DL4ME_CANCEL__"
+    flush stdout
+    exit 0
+}
+
 # Define the buttons to submit the information or close the program.
 ttk::button .fr.advance -text "Advanced options" -command { onAdvanced }
 grid .fr.advance -row 2 -column 0 -sticky w -padx 8 -pady 8
@@ -458,7 +467,7 @@ grid .fr.advance -row 2 -column 0 -sticky w -padx 8 -pady 8
 ttk::button .fr.ok -text "Run" -command { onDone }
 grid .fr.ok -row 2 -column 1 -sticky e -padx 5 -pady 8
 
-ttk::button .fr.cb -text "Close" -command { exit 1 }
+ttk::button .fr.cb -text "Close" -command { onCancel }
 grid .fr.cb -row 2 -column 2 -sticky e -padx {0 8} -pady 8
 
 #### Mandatory argument section ######
@@ -698,15 +707,18 @@ menu .mb -type menubar
 menu .mb.file -type normal -tearoff 0
 .mb.file add command -label About -underline 0 -command { cmdabout } -accelerator Ctrl-i
 .mb.file add command -label Preferences -underline 0 -command { cmdpref } -accelerator Ctrl-p
+.mb.file add command -label "Reclaim Docker Space..." -underline 0 -command { cmdcleandocker } -accelerator Ctrl-r
 .mb.file add command -label "Check For Updates" -underline 0 -command { cmdpcheckupdates } -accelerator Ctrl-u
 .mb.file add separator
 .mb.file add command -label "Uninstall DL4MicEverywhere..." -command { cmduninstall }
 .mb.file add separator
-.mb.file add command -label Quit -underline 0 -command { exit } -accelerator Ctrl-x
+.mb.file add command -label Quit -underline 0 -command { onCancel } -accelerator Ctrl-x
 
 bind .fr <Control-i> cmdabout
 bind .fr <Control-p> cmdpref
+bind .fr <Control-r> cmdcleandocker
 bind .fr <Control-u> cmdpcheckupdates
+bind .fr <Control-x> onCancel
 
 .mb add cascade -label Help -underline 0 -menu .mb.edit
 menu .mb.edit -type normal -tearoff 0
@@ -722,14 +734,79 @@ proc cmdpref {}   {
     global basedir
     exec /bin/bash "$basedir/.tools/bash_tools/cache_preferences.sh"
 }
-proc cmdpcheckupdates {}   {
+proc cmdcleandocker {} {
     global basedir
-    # Call the update script update_dl4miceverywhere.sh with argument already_asked=1 (true)
-    catch {exec /bin/bash "$basedir/.tools/bash_tools/pre_build_launch/update_dl4miceverywhere.sh" "1" "1" 2>@1} r
-    # Check if an update has been made and close the window if so
-    if {"$r" != ""} {
-        exit 1
+
+    set answer [tk_messageBox -type yesno -icon warning -default no \
+        -title "Reclaim Docker Space" \
+        -message "Remove unused Docker resources older than 24 hours?" \
+        -detail "This uses the same cleanup policy as the optional startup cleanup. It can remove stopped containers, unused networks, dangling images, and unused build cache older than 24 hours. Docker volumes are not removed."]
+
+    if {$answer ne "yes"} {
+        return
     }
+
+    . configure -cursor watch
+    update idletasks
+
+    set cleanup_script "$basedir/.tools/bash_tools/pre_build_launch/clean_docker.sh"
+    set failed [catch {exec /bin/bash "$cleanup_script" 2>@1} result]
+
+    . configure -cursor ""
+    update idletasks
+
+    if {$failed} {
+        set detail [string trim $result]
+        if {[string length $detail] > 1400} {
+            set detail "[string range $detail 0 1396]..."
+        }
+        tk_messageBox -type ok -icon error -title "Docker cleanup failed" \
+            -message "Docker space could not be reclaimed." \
+            -detail $detail
+        return
+    }
+
+    set reclaimed ""
+    if {[regexp -nocase {Total reclaimed space:[[:space:]]*([^\r\n]+)} $result -> amount]} {
+        set reclaimed [string trim $amount]
+    }
+
+    if {$reclaimed ne ""} {
+        set detail "Docker reported reclaimed space: $reclaimed"
+    } else {
+        set detail "The Docker cleanup command completed successfully."
+    }
+
+    tk_messageBox -type ok -icon info -title "Docker cleanup complete" \
+        -message "Docker space cleanup completed." \
+        -detail $detail
+}
+proc cmdpcheckupdates {} {
+    global basedir
+
+    # A successful self-update intentionally returns launcher status 93. Tcl's
+    # exec reports any non-zero child status through catch, so inspect the child
+    # status explicitly instead of treating every non-zero result as a GUI error.
+    set failed [catch {
+        exec /bin/bash "$basedir/.tools/bash_tools/pre_build_launch/update_dl4miceverywhere.sh" "1" "1" 2>@1
+    } result options]
+
+    if {!$failed} {
+        return
+    }
+
+    set errorcode [dict get $options -errorcode]
+    if {[llength $errorcode] >= 3 &&
+        [lindex $errorcode 0] eq "CHILDSTATUS" &&
+        [lindex $errorcode 2] == 93} {
+        puts "__DL4ME_UPDATED__"
+        flush stdout
+        exit 0
+    }
+
+    tk_messageBox -type ok -icon error -title "Update check failed" \
+        -message "DL4MicEverywhere could not complete the update check." \
+        -detail [string trim $result]
 }
 proc cmduninstall {} {
     global basedir
@@ -766,6 +843,7 @@ proc cmddoc {}   {
 
 # Create the window, give it a name, make it resizable and center its initial size.
 wm title . "$window_title"
+wm protocol . WM_DELETE_WINDOW onCancel
 wm resizable . 1 1
 
 set screen_width [winfo vrootwidth .]

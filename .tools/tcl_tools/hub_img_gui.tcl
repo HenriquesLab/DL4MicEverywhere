@@ -23,6 +23,12 @@ if {[string match linux-gnu* $operative_system]} {
 frame .fr
 pack .fr -fill both -expand 1
 
+proc finish {code} {
+    puts $code
+    flush stdout
+    exit 0
+}
+
 ##### Buttons section #####
 
 frame .fr.principal -relief raised -borderwidth 1
@@ -52,14 +58,15 @@ place .fr.principal.text_9 -relx 0.02 -rely 0.87
 
 # Define the buttons to submit the information or close the program
 
-ttk::button .fr.yes -text "Download Image" -command { puts 3; exit 0 }
+ttk::button .fr.yes -text "Download Image" -command { finish 3 }
 pack .fr.yes -padx [expr 50 - ($is_mac * 30) + ($is_linux * 1)] -side left 
 
-ttk::button .fr.no -text "Build Locally" -command { puts 2; exit 0 }
+ttk::button .fr.no -text "Build Locally" -command { finish 2 }
 pack .fr.no -padx [expr 50 - ($is_mac * 30) + ($is_linux * 1)] -side right
 
 ##### Create a window #####
 
 # Create the window, give a name to it and locate it in the middle of the screen
+wm protocol . WM_DELETE_WINDOW {finish 0}
 wm title . "There is an online Docker image"
 wm geometry . ${width}x${height}+${width_offset}+${height_offset}

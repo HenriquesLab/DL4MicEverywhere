@@ -2,6 +2,26 @@
 
 # Get the basedir
 BASEDIR=$(dirname "$(readlink -f "$0")")
+source "$BASEDIR/.tools/bash_tools/launcher_status.sh"
+
+# Controlled outcomes are successful user-driven stops. Windows receives the
+# dedicated code so its wrapper can explain what happened; native Linux/macOS
+# keep conventional exit code 0.
+controlled_exit() {
+    local status="$1"
+    if [ "${DL4ME_WINDOWS_WRAPPER:-0}" = "1" ]; then
+        exit "$status"
+    fi
+    exit 0
+}
+
+# Avoid stacking an inner "press Enter" prompt with the Windows wrapper's
+# tailored message. Native CLI launches still get their traditional pause.
+pause_native_cli() {
+    if [ "$flag_gui" -eq 0 ] && [ "${DL4ME_WINDOWS_WRAPPER:-0}" != "1" ]; then
+        read -r -p "Press enter to close the terminal."
+    fi
+}
 
 # If no arguments are provided, set the GUI flag
 if [ $# -eq 0 ]; then
@@ -15,14 +35,11 @@ fi
 prelaunch_result=$?
 case "$prelaunch_result" in
     0) ;;
-    90|91)
-        # The Windows wrapper needs the intentional restart status so it can
-        # present the right completion message.  Native Linux/macOS launches
-        # have no outer wrapper, so treat the same state as a clean exit.
-        if [[ "${DL4ME_WINDOWS_WRAPPER:-0}" == "1" ]]; then
-            exit "$prelaunch_result"
-        fi
-        exit 0
+    90|91|93)
+        controlled_exit "$prelaunch_result"
+        ;;
+    103)
+        exit "$DL4ME_STATUS_PREREQUISITE_FAILED"
         ;;
     *) exit 1 ;;
 esac
@@ -84,9 +101,9 @@ check_parsed_argument() {
             echo "Please specify the $variable_name parameter on the configuration yaml."
             echo "If the problem persists, please create an issue on GitHub:"
             echo "  https://github.com/HenriquesLab/DL4MicEverywhere/issues"
-            read -p "Press enter to close the terminal."
+            pause_native_cli
             echo "------------------------------------" 
-            exit 1
+            exit "$DL4ME_STATUS_INPUT_INVALID"
         fi
     else
         rename_parsed_argument $variable_name
@@ -201,8 +218,7 @@ while getopts :hc:d:o:gn:r:t:p:x flag;do
         \?)
             echo "Invalid option: -$OPTARG"
             echo "Try bash ./launch.sh -h for more information."
-            # Close the terminal
-            exit 1 ;;
+            exit "$DL4ME_STATUS_INPUT_INVALID" ;;
     esac
 done
 
@@ -217,22 +233,50 @@ if [ $flag_gui -eq 0 ]; then
         echo "GUI is not requested, proceeding with CLI."
     fi
 else
-    # If the GUI flag has been specified, run the function to show the GUI and read the arguments
+    # If the GUI flag has been specified, run the function to show the GUI and read the arguments.
+    # A normal user close is represented explicitly by __DL4ME_CANCEL__.  Keep
+    # wish/Tcl failures distinct so an empty/crashed GUI cannot be mistaken for
+    # a successful cancellation.
     gui_arguments=$(wish "$BASEDIR/.tools/tcl_tools/main_gui.tcl" "$BASEDIR" "$OSTYPE")
+    gui_result=$?
+
+    if [ "$gui_result" -ne 0 ]; then
+        echo "DL4MicEverywhere GUI exited unexpectedly (wish exit code $gui_result)." >&2
+        exit "$gui_result"
+    fi
 
     if [ -z "$gui_arguments" ]; then
-        # No arguments were provided, this means that the GUI has been closed, so close the terminal
+        echo "DL4MicEverywhere GUI exited without returning a launcher result." >&2
         exit 1
     fi
 
     IFS=$'\n' read -d '' -r -a strarr <<<"$gui_arguments"
+
+    # Closing the GUI is a normal user cancellation, not a launcher failure.
+    # On Windows, return a dedicated control code so the outer batch wrapper can
+    # keep its console open long enough to explain that the close was intentional.
+    # Native Linux/macOS launches still finish with the conventional success code.
+    if [ "${strarr[0]}" = "__DL4ME_CANCEL__" ]; then
+        controlled_exit "$DL4ME_STATUS_GUI_CLOSED"
+    fi
+
+    if [ "${strarr[0]}" = "__DL4ME_UPDATED__" ]; then
+        controlled_exit "$DL4ME_STATUS_UPDATE_COMPLETE"
+    fi
 
     # The GUI uses a separate marker for uninstall so it cannot be mistaken for
     # the normal simple/advanced launch protocol.
     if [ "${strarr[0]}" = "__DL4ME_UNINSTALL__" ]; then
         clean_docker_images="${strarr[1]:-0}"
         /bin/bash "$BASEDIR/.tools/bash_tools/uninstall_dl4miceverywhere.sh" "$clean_docker_images"
-        exit $?
+        uninstall_result=$?
+        if [ "$uninstall_result" -eq "$DL4ME_STATUS_UNINSTALL_HANDOFF" ]; then
+            exit "$DL4ME_STATUS_UNINSTALL_HANDOFF"
+        fi
+        if [ "$uninstall_result" -eq 0 ]; then
+            exit 0
+        fi
+        exit "$DL4ME_STATUS_UNINSTALL_FAILED"
     fi
 
     advanced_options=${strarr[0]}
@@ -301,10 +345,10 @@ if [ -z "$config_path" ]; then
     echo "No path to the configuration.yaml file has been specified."
     echo "If you are using the CLI, please make sure to use -c argument and give a value to it."
     echo "If you are using the GUI, please make sure to use that you have selected a default"
-    echo "notebook or a local oath to a configuration."
-    read -p "Press enter to close the terminal."
+    echo "notebook or a local path to a configuration."
+    pause_native_cli
     echo "------------------------------------" 
-    exit 1
+    exit "$DL4ME_STATUS_INPUT_INVALID"
 else
     # If a configuration path has been specified, check if it is valid
     if [[ -d "$config_path" ]]; then
@@ -322,9 +366,9 @@ else
         echo "------------------------------------"
         echo "The give path to the configuration is not valid: $config_path"
         echo "Please, check that this path is correct and exists."
-        read -p "Press enter to close the terminal."
+        pause_native_cli
         echo "------------------------------------" 
-        exit 1
+        exit "$DL4ME_STATUS_INPUT_INVALID"
     fi
 fi 
 
@@ -336,9 +380,9 @@ if [ -z "$data_path" ]; then
     echo "No path to the data folder has been specified."
     echo "If you are using the CLI, please make sure to use -d argument and give a value to it."
     echo "If you are using the GUI, please make sure to use that you have selected a path to the data folder."
-    read -p "Press enter to close the terminal."
+    pause_native_cli
     echo "------------------------------------" 
-    exit 1
+    exit "$DL4ME_STATUS_INPUT_INVALID"
 else
     # Validate the specified data path
     if [[ -d "$data_path" ]]; then
@@ -351,9 +395,9 @@ else
         echo "------------------------------------"
         echo "The give path to the data folder is not valid: $data_path"
         echo "Please, check that this path is correct and exists."
-        read -p "Press enter to close the terminal."
+        pause_native_cli
         echo "------------------------------------" 
-        exit 1
+        exit "$DL4ME_STATUS_INPUT_INVALID"
     fi
 fi 
 
@@ -365,9 +409,9 @@ if [ -z "$result_path" ]; then
     echo "No path to the output folder has been specified."
     echo "If you are using the CLI, please make sure to use -o argument and give a value to it."
     echo "If you are using the GUI, please make sure to use that you have selected a path to the output folder."
-    read -p "Press enter to close the terminal."
+    pause_native_cli
     echo "------------------------------------" 
-    exit 1
+    exit "$DL4ME_STATUS_INPUT_INVALID"
 else
     # Validate the specified result path
     if [[ -d "$result_path" ]]; then
@@ -380,9 +424,9 @@ else
         echo "------------------------------------"
         echo "The give path to the output folder is not valid: $result_path"
         echo "Please, check that this path is correct and exists."
-        read -p "Press enter to close the terminal."
+        pause_native_cli
         echo "------------------------------------" 
-        exit 1
+        exit "$DL4ME_STATUS_INPUT_INVALID"
     fi
 fi 
 
@@ -418,7 +462,7 @@ if [[ "$notebook_url" == https://raw.githubusercontent.com/* ]] && \
     echo "Configuration reproducibility check failed." >&2
     echo "GitHub notebook URLs must contain a full 40-character commit SHA:" >&2
     echo "  $notebook_url" >&2
-    exit 1
+    exit "$DL4ME_STATUS_INPUT_INVALID"
 fi
 
 # Check if the notebook path is missing (SIMPLE USECASE) 
@@ -472,9 +516,9 @@ else
         echo "------------------------------------"
         echo "The give path to the notebook.ipynb is not valid: $notebook_path"
         echo "Please, check that this path is correct and exists."
-        read -p "Press enter to close the terminal."
+        pause_native_cli
         echo "------------------------------------" 
-        exit 1
+        exit "$DL4ME_STATUS_INPUT_INVALID"
     fi
 fi
 
@@ -517,9 +561,9 @@ else
         echo "------------------------------------"
         echo "The given path to the requirements input is not valid: $requirements_path"
         echo "Please, check that this path is correct and exists."
-        read -p "Press enter to close the terminal."
+        pause_native_cli
         echo "------------------------------------" 
-        exit 1
+        exit "$DL4ME_STATUS_INPUT_INVALID"
     fi
 fi
 
@@ -614,7 +658,7 @@ if grep -q credsStore ~/.docker/config.json; then
 fi
 
 # Execute the pre building tests
-/bin/bash "$BASEDIR/.tools/bash_tools/pre_build_test.sh" "$docker_tag" || exit 1
+/bin/bash "$BASEDIR/.tools/bash_tools/pre_build_test.sh" "$docker_tag" || exit "$DL4ME_STATUS_DOCKER_IMAGE_FAILED"
 
 ###
 # Get what is the containerisation system that will be used
@@ -688,7 +732,7 @@ if [ "$flag_version_selected" -eq 1 ] && [[ "$containerisation" == "Docker"* ]];
 
         if [ -z "$flag_build" ] || [ "$flag_build" -eq 0 ]; then
             echo "Older-version launch cancelled."
-            exit 0
+            controlled_exit "$DL4ME_STATUS_USER_CANCELLED"
         fi
 
         if [ "$flag_build" -eq 3 ]; then
@@ -699,7 +743,7 @@ if [ "$flag_version_selected" -eq 1 ] && [[ "$containerisation" == "Docker"* ]];
         # action is to download the published image from Docker Hub.
         if ! historical_image_available_for_arch "$docker_tag"; then
             historical_image_unavailable
-            exit 1
+            exit "$DL4ME_STATUS_HISTORICAL_IMAGE_UNAVAILABLE"
         fi
 
         if [ "$flag_gui" -eq 1 ]; then
@@ -716,7 +760,7 @@ if [ "$flag_version_selected" -eq 1 ] && [[ "$containerisation" == "Docker"* ]];
 
         if [ -z "$flag_build" ] || [ "$flag_build" -eq 0 ]; then
             echo "Older-version download cancelled."
-            exit 0
+            controlled_exit "$DL4ME_STATUS_USER_CANCELLED"
         fi
 
         historical_download_requested=1
@@ -727,7 +771,7 @@ if [ "$flag_version_selected" -eq 1 ] && [[ "$containerisation" == "Docker"* ]];
     if [ "$historical_download_requested" -eq 1 ]; then
         if ! historical_image_available_for_arch "$docker_tag"; then
             historical_image_unavailable
-            exit 1
+            exit "$DL4ME_STATUS_HISTORICAL_IMAGE_UNAVAILABLE"
         fi
         flag_build=3
     fi
@@ -741,6 +785,10 @@ else
         if docker image inspect "$docker_tag" >/dev/null 2>&1; then
             if [ "$flag_gui" -eq 1 ]; then
                 flag_build=$(wish "$BASEDIR/.tools/tcl_tools/local_img_gui.tcl" "$OSTYPE")
+                if [ "$flag_build" = "0" ]; then
+                    echo "Docker image selection cancelled."
+                    controlled_exit "$DL4ME_STATUS_USER_CANCELLED"
+                fi
             else
                 echo "Image exists locally. Do you want to build and replace the existing one?"
                 select yn in "Yes" "No"; do
@@ -755,10 +803,10 @@ else
         if [ -z "$flag_build" ]; then
             echo ""
             echo "------------------------------------"
-            echo "You should have chosen an option."
-            read -r -p "Press enter to close the terminal."
+            echo "No Docker image action was selected."
+            pause_native_cli
             echo "------------------------------------"
-            exit 1
+            controlled_exit "$DL4ME_STATUS_USER_CANCELLED"
         fi
 
         # If the local image is not being reused, see whether Docker Hub has it.
@@ -778,6 +826,10 @@ else
                 if [ "$arch_count" -gt 0 ]; then
                     if [ "$flag_gui" -eq 1 ]; then
                         flag_build=$(wish "$BASEDIR/.tools/tcl_tools/hub_img_gui.tcl" "$OSTYPE")
+                        if [ "$flag_build" = "0" ]; then
+                            echo "Docker image selection cancelled."
+                            controlled_exit "$DL4ME_STATUS_USER_CANCELLED"
+                        fi
                     else
                         echo "The image $docker_tag is already available on Docker Hub. Do you prefer to pull it (faster option) instead of building it?"
                         select yn in "Yes" "No"; do
@@ -791,10 +843,10 @@ else
                     if [ -z "$flag_build" ]; then
                         echo ""
                         echo "------------------------------------"
-                        echo "You should have chosen an option."
-                        read -r -p "Press enter to close the terminal."
+                        echo "No Docker image action was selected."
+                        pause_native_cli
                         echo "------------------------------------"
-                        exit 1
+                        controlled_exit "$DL4ME_STATUS_USER_CANCELLED"
                     fi
                 else
                     # No compatible published image: current versions may still
@@ -817,7 +869,7 @@ if [ "$flag_version_selected" -eq 1 ] && [ "$flag_build" -eq 2 ]; then
     echo "Older Docker image versions cannot be built from the current configuration."
     echo "Please use an existing local copy or download the published image from Docker Hub."
     echo "------------------------------------"
-    exit 1
+    exit "$DL4ME_STATUS_HISTORICAL_IMAGE_UNAVAILABLE"
 fi
 
 if [ "$flag_build" -eq 3 ]; then
@@ -850,9 +902,9 @@ if [ "$flag_build" -eq 2 ]; then
         echo "------------------------------------"
         echo "The selected Dockerfile does not exist: $selected_dockerfile"
         echo "Please make sure the repository contains the split modern/legacy Dockerfiles under the docker/ folder."
-        read -r -p "Press enter to close the terminal."
+        pause_native_cli
         echo "------------------------------------"
-        exit 1
+        exit "$DL4ME_STATUS_DOCKER_IMAGE_FAILED"
     fi
 
     echo "Checking deterministic Python dependency lock..."
@@ -860,11 +912,11 @@ if [ "$flag_build" -eq 2 ]; then
     # Lock validation itself only needs Python. The venv/pinned resolver is
     # required only when a missing or stale lock actually needs regeneration.
     if ! command -v python3 >/dev/null 2>&1; then
-        /bin/bash "$BASEDIR/.tools/bash_tools/requirements_installation/python3_lock_tools.sh" || exit 1
+        /bin/bash "$BASEDIR/.tools/bash_tools/requirements_installation/python3_lock_tools.sh" || exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
     fi
     if ! command -v python3 >/dev/null 2>&1; then
         echo "Python 3 is required to maintain deterministic dependency locks." >&2
-        exit 1
+        exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
     fi
 
     if [ "$requirements_override" -eq 1 ]; then
@@ -901,15 +953,15 @@ if [ "$flag_build" -eq 2 ]; then
         fi
         [ -n "$lock_venv_test_dir" ] && rm -rf "$lock_venv_test_dir"
         if [ "$lock_venv_ready" -ne 1 ]; then
-            /bin/bash "$BASEDIR/.tools/bash_tools/requirements_installation/python3_lock_tools.sh" || exit 1
+            /bin/bash "$BASEDIR/.tools/bash_tools/requirements_installation/python3_lock_tools.sh" || exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
         fi
     fi
 
-    python3 "$BASEDIR/.tools/python_tools/requirements_lock.py" ensure "${notebook_lock_args[@]}" || exit 1
+    python3 "$BASEDIR/.tools/python_tools/requirements_lock.py" ensure "${notebook_lock_args[@]}" || exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
 
     # The notebook converter has its own small deterministic lock and does not
     # inherit the notebook runtime profile.
-    python3 "$BASEDIR/.tools/python_tools/requirements_lock.py" ensure "${converter_lock_args[@]}" || exit 1
+    python3 "$BASEDIR/.tools/python_tools/requirements_lock.py" ensure "${converter_lock_args[@]}" || exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
 
     echo "Checking immutable Docker base-image lock..."
     base_image_assignments="$(
@@ -919,25 +971,25 @@ if [ "$flag_build" -eq 2 ]; then
             --config "$config_path" \
             --gpu "$flag_gpu" \
             --shell
-    )" || exit 1
+    )" || exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
     eval "$base_image_assignments"
     if [ -z "${CONVERTER_BASE_IMAGE:-}" ] || [ -z "${FINAL_BASE_IMAGE:-}" ]; then
         echo "Could not resolve immutable Docker base images." >&2
-        exit 1
+        exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
     fi
     echo "Converter base: $CONVERTER_BASE_IMAGE"
     echo "Final base:     $FINAL_BASE_IMAGE"
 
     if [ ! -f "$requirements_lock_path" ]; then
         echo "Dependency lock was not created: $requirements_lock_path" >&2
-        exit 1
+        exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
     fi
 
     # Docker COPY sources must live inside the build context. Stage only the
     # generated lock; the human-facing requirements input is never installed.
     mkdir -p "$build_input_dir"
     requirements_lock_context_path=".tools/docker_build_inputs/requirements-$$.lock.txt"
-    cp "$requirements_lock_path" "$BASEDIR/$requirements_lock_context_path" || exit 1
+    cp "$requirements_lock_path" "$BASEDIR/$requirements_lock_context_path" || exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
     trap cleanup_lock_build_input EXIT
 fi
 
@@ -998,10 +1050,9 @@ else
             echo "------------------------------------"
             echo "Error looking for existing docker image with the given tag:"
             echo "$docker_tag"
-            read -p "Press enter to close the terminal."
+            pause_native_cli
             echo "------------------------------------" 
-            # Close the terminal
-            exit 1
+            exit "$DL4ME_STATUS_DOCKER_IMAGE_FAILED"
         fi
     fi
 fi
@@ -1013,13 +1064,13 @@ if [ "$DOCKER_OUT" -ne 0 ]; then
     echo "Docker image build/pull failed."
     echo "Please review the Docker output above for details."
     echo "------------------------------------"
-    exit "$DOCKER_OUT"
+    exit "$DL4ME_STATUS_DOCKER_IMAGE_FAILED"
 fi
 
 echo "Docker image is ready."
 
 # Execute the post building tests against the image that will be launched.
-/bin/bash "$BASEDIR/.tools/bash_tools/post_build_test.sh" "$docker_tag" "$flag_gpu" || exit 1
+/bin/bash "$BASEDIR/.tools/bash_tools/post_build_test.sh" "$docker_tag" "$flag_gpu" || exit "$DL4ME_STATUS_POST_BUILD_FAILED"
 
 sleep 3
 
@@ -1096,13 +1147,27 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     if [ "$flag_gpu" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
         docker run -it --label org.dl4miceverywhere.managed=true --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
+        CONTAINER_OUT=$?
         echo -e "The command used to run this container has been:\n\tdocker run -it --label org.dl4miceverywhere.managed=true --gpus all -p $port:$port -v \"$data_path:/home/data\" -v \"$result_path:/home/results\" --shm-size=256m \"$docker_tag\"  /bin/bash -c \"$docker_command\"" >> "$result_path/docker_info.txt"
     else
         # Run the docker image without activating the GPU
         docker run -it --label org.dl4miceverywhere.managed=true -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
+        CONTAINER_OUT=$?
         echo -e "The command used to run this container has been:\n\tdocker run -it --label org.dl4miceverywhere.managed=true -p $port:$port -v \"$data_path:/home/data\" -v \"$result_path:/home/results\" --shm-size=256m \"$docker_tag\"  /bin/bash -c \"$docker_command\"" >> "$result_path/docker_info.txt"
     fi
 
+
+    # SIGINT/SIGTERM are normal ways for a user to stop an interactive notebook
+    # session. Other non-zero Docker exits are genuine runtime failures and should
+    # not be reported as a successful session.
+    if [ "${CONTAINER_OUT:-0}" -ne 0 ] && [ "$CONTAINER_OUT" -ne 130 ] && [ "$CONTAINER_OUT" -ne 143 ]; then
+        echo ""
+        echo "------------------------------------"
+        echo "The notebook container stopped with Docker exit code $CONTAINER_OUT."
+        echo "Review the container output above for the underlying error."
+        echo "------------------------------------"
+        exit "$DL4ME_STATUS_CONTAINER_RUNTIME_FAILED"
+    fi
 
     # Read the variables from the yaml file
     echo -e "Used docker tag has been:\n\t$docker_tag" >> "$result_path/docker_info.txt"
@@ -1114,9 +1179,9 @@ else
     echo ""
     echo "------------------------------------"
     echo "Error during the building of the docker image. Please check the logs."
-    read -p "Press enter to close the terminal."
+    pause_native_cli
     echo "------------------------------------" 
-    exit 1 
+    exit "$DL4ME_STATUS_DOCKER_IMAGE_FAILED"
 fi
 
 # A user stopping the interactive notebook session is a normal completion.

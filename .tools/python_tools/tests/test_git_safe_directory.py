@@ -28,9 +28,9 @@ class GitSafeDirectoryTests(unittest.TestCase):
     def test_update_script_uses_scoped_repo_git_wrapper(self):
         text = UPDATE_SCRIPT.read_text(encoding="utf-8")
         self.assertIn('git -c safe.directory="$REPO_ROOT" -C "$REPO_ROOT" "$@"', text)
-        self.assertIn("branch_name=$(repo_git branch --show-current)", text)
-        self.assertIn("local_commit=$(repo_git rev-parse HEAD)", text)
-        self.assertIn("repo_git pull", text)
+        self.assertIn("branch_name=$(repo_git branch --show-current", text)
+        self.assertIn("local_commit=$(repo_git rev-parse HEAD", text)
+        self.assertIn("repo_git pull --ff-only", text)
         self.assertNotIn("git config --global", text)
 
 
