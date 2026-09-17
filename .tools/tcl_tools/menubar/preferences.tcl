@@ -14,7 +14,7 @@ if {"$fexist" == "1"} {
         set e [split "$data" ":"]
         set varname [string trim [lindex "$e" 0]]
         set varvalue [string trim [lindex "$e" 1]]
-        eval "set cache_$varname \"$varvalue\""
+        set cache_$varname $varvalue
     }
     close "$fp"
 } else {

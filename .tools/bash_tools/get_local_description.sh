@@ -3,7 +3,7 @@
 # Get the basedir
 BASEDIR=$(dirname "$(readlink -f "$0")")
 
-# Import get_yaml_args_from_file and get_yaml_args_from_url
+# Import safe YAML value loaders
 source "$BASEDIR/get_yaml_args.sh"
 
 ## The input parameters
@@ -12,7 +12,7 @@ source "$BASEDIR/get_yaml_args.sh"
 # $3 = $notebook_name
 
 # Get the local version on the configuration.yaml
-eval $(get_yaml_args_from_file "$1/notebooks/$2/$3/configuration.yaml")
+load_yaml_args_from_file "$1/notebooks/$2/$3/configuration.yaml" || exit 1
 
 local_description="$config_dl4miceverywhere_description"
 

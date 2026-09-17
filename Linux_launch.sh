@@ -85,7 +85,7 @@ EOF
 rename_parsed_argument() {
     variable_name="$1"
     config_variable_name="config_dl4miceverywhere_$1"
-    eval "$variable_name=\$$config_variable_name"
+    printf -v "$variable_name" '%s' "${!config_variable_name}"
 }
 
 check_parsed_argument() {
@@ -144,7 +144,7 @@ track_managed_docker_image() {
 }
 
 
-# Import get_yaml_args_from_file
+# Import safe YAML value loader
 source "$BASEDIR/.tools/bash_tools/get_yaml_args.sh"
 
 is_legacy_python() {
@@ -440,7 +440,7 @@ if [ "$flag_test" -eq 1 ]; then
 fi
 
 # Read the variables from the yaml file
-eval $(get_yaml_args_from_file "$config_path")
+load_yaml_args_from_file "$config_path" || exit "$DL4ME_STATUS_INPUT_INVALID"
 
 # Check the parsed variables
 check_parsed_argument notebook_url
@@ -964,15 +964,15 @@ if [ "$flag_build" -eq 2 ]; then
     python3 "$BASEDIR/.tools/python_tools/requirements_lock.py" ensure "${converter_lock_args[@]}" || exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
 
     echo "Checking immutable Docker base-image lock..."
-    base_image_assignments="$(
+    base_image_values="$(
         python3 "$BASEDIR/.tools/python_tools/base_image_lock.py" \
             --repo-root "$BASEDIR" \
             ensure-for-build \
             --config "$config_path" \
-            --gpu "$flag_gpu" \
-            --shell
+            --gpu "$flag_gpu"
     )" || exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
-    eval "$base_image_assignments"
+    CONVERTER_BASE_IMAGE="$(printf '%s' "$base_image_values" | python3 -c 'import json, sys; print(json.load(sys.stdin)["converter_base_image"])')" || exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
+    FINAL_BASE_IMAGE="$(printf '%s' "$base_image_values" | python3 -c 'import json, sys; print(json.load(sys.stdin)["final_base_image"])')" || exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
     if [ -z "${CONVERTER_BASE_IMAGE:-}" ] || [ -z "${FINAL_BASE_IMAGE:-}" ]; then
         echo "Could not resolve immutable Docker base images." >&2
         exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
@@ -1172,7 +1172,7 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     # Read the variables from the yaml file
     echo -e "Used docker tag has been:\n\t$docker_tag" >> "$result_path/docker_info.txt"
 
-    eval $(get_yaml_args_from_file "$BASEDIR/construct.yaml" "contruct_info_")
+    load_yaml_args_from_file "$BASEDIR/construct.yaml" "contruct_info_" || exit "$DL4ME_STATUS_INPUT_INVALID"
     echo -e "Used DL4MicEverywhere version has been:\n\t$contruct_info_version" >> "$result_path/docker_info.txt"
 
 else

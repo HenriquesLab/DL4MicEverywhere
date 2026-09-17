@@ -3,7 +3,7 @@
 # Get the basedir
 BASEDIR=$(dirname "$(readlink -f "$0")")
 
-# Import get_yaml_args_from_file
+# Import safe YAML value loader
 source "$BASEDIR/get_yaml_args.sh"
 
 function save_versioning {
@@ -96,7 +96,7 @@ for notebook_type in "$BASEDIR"/../../notebooks/*; do
     for notebook_folder in "$notebook_type"/*; do
         if [ -d "$notebook_folder" ]; then
             # Extract the notebook url from the configuration file
-            eval $(get_yaml_args_from_file "$notebook_folder/configuration.yaml")
+            load_yaml_args_from_file "$notebook_folder/configuration.yaml" || continue
             notebook_url="$config_dl4miceverywhere_notebook_url"
 
             # Get the notebook name (which is related to the docker image tag)

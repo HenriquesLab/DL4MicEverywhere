@@ -15,7 +15,7 @@ if {"$fexist" == "1"} {
         set e [split "$data" ":"]
         set varname [string trim [lindex "$e" 0]]
         set varvalue [string trim [lindex "$e" 1]]
-        eval "set cache_$varname \"$varvalue\""
+        set cache_$varname $varvalue
     }
     close "$fp"
 } else {
@@ -333,12 +333,12 @@ proc onComboboxSelectedFolder {notebook_folder} {
         
         # Get the number of subfolders in the selected folder
 
-        catch {eval exec find [glob "$basedir/notebooks/$selectedFolder/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | wc -l} num_folders
+        catch {exec find [glob "$basedir/notebooks/$selectedFolder/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | wc -l} num_folders
         
         set no_folders_flag 0
         if {"$num_folders" == 1} {
             # In case only one folder has been found, it may be that there are no folder
-            catch {eval exec find [glob "$basedir/notebooks/$selectedFolder/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0} folder_name
+            catch {exec find [glob "$basedir/notebooks/$selectedFolder/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0} folder_name
 
             if {"$folder_name" == "."} {
                 # If the folder is called ".", this means that there are no folders
@@ -348,7 +348,7 @@ proc onComboboxSelectedFolder {notebook_folder} {
 
         if {"$no_folders_flag" != 1} {
             # Notebook list will only be updated in case there are subfolders
-            catch {eval exec find [glob "$basedir/notebooks/$selectedFolder/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | xargs -0 -n 1 basename | sort} output
+            catch {exec find [glob "$basedir/notebooks/$selectedFolder/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | xargs -0 -n 1 basename | sort} output
 
             append notebookList " " $output
         }
@@ -505,7 +505,7 @@ grid .fr.principal.intro_8 -row 7 -column 0 -columnspan 3 -sticky ew -padx 12 -p
 set folderList "-"
 
 # Get the number of folders.
-catch {eval exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | wc -l} num_folders
+catch {exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | wc -l} num_folders
 
 # Flag to indicate if there are no folders.
 set no_folders_flag 0
@@ -516,7 +516,7 @@ if {"$num_folders" == 0} {
     set no_folders_flag_flag 1
 } else {
     # Otherwise, check the depth on the folders.
-    catch {eval exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0} folder_name
+    catch {exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0} folder_name
     # Check if there are no subfolders.
     if {"$folder_name" == "."} {
         # If the folder_name is ".", this means that there are no subfolders on the notebooks folder.
@@ -526,7 +526,7 @@ if {"$num_folders" == 0} {
 
 # In case there are subfolders (flag of NO folders is off).
 if {"$no_folders_flag" == 0} {
-    catch {eval exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | xargs -0 -n 1 basename | sort} aux_notebok_folder_list
+    catch {exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | xargs -0 -n 1 basename | sort} aux_notebok_folder_list
     append folderList " " "$aux_notebok_folder_list"
 }
 

@@ -3,11 +3,11 @@
 # Get the basedir
 BASEDIR=$(dirname "$(readlink -f "$0")")
 
-# Import get_yaml_args_from_file
+# Import safe YAML value loader
 source "$BASEDIR/get_yaml_args.sh"
 
 # Extract information from the cached versionings
-eval $(get_yaml_args_from_file "$BASEDIR/../../construct.yaml" "var_")
+load_yaml_args_from_file "$BASEDIR/../../construct.yaml" "var_" || exit 1
 
 # Extract dl4miceverywhere version
 dl4miceverywhere_version="$var_version"
