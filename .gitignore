@@ -2,6 +2,7 @@
 .tools/.cache/.cache_gui
 .tools/.cache/.cache_preferences
 .tools/.cache/.windows_setup
+.tools/.cache/.managed_docker_images
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

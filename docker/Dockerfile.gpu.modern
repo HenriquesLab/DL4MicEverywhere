@@ -74,6 +74,9 @@ RUN python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py \
 ##   CONVERTER_BASE_IMAGE, FINAL_BASE_IMAGE, UBUNTU_VERSION, CUDA_VERSION, CUDNN_VERSION
 ####
 FROM ${FINAL_BASE_IMAGE} AS final
+
+# Ownership label used by scoped DL4MicEverywhere Docker cleanup.
+LABEL org.dl4miceverywhere.managed="true"
 ARG UBUNTU_VERSION
 ARG CUDA_VERSION
 ARG CUDNN_VERSION

@@ -76,7 +76,7 @@ fi
 # Check if the clean option has been selected and run the script if so
 if [[ "$clean" == "Automatically"* || "$clean" == "Ask first"* ]]; then
     if [[ "$clean" == "Ask first"* ]]; then
-        flag_clean=$(wish "$BASEDIR/../tcl_tools/oneline_yes_no_gui.tcl" "Clean Docker Dekstop" "Would you like to leverage space on Docker Desktop application?")
+        flag_clean=$(wish "$BASEDIR/../tcl_tools/oneline_yes_no_gui.tcl" "Clean DL4MicEverywhere Docker resources" "Remove unused DL4MicEverywhere-labelled Docker containers, images, and networks older than 24 hours? Other Docker resources, Docker volumes, and shared build cache will be preserved.")
         # flag_clean == 2 --> Yes
         # flag_clean == 3 --> No
     fi

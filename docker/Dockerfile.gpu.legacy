@@ -76,6 +76,9 @@ RUN python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py \
 ## GPU support now follows the same arg contract as the modern GPU Dockerfile.
 ####
 FROM ${FINAL_BASE_IMAGE} AS final
+
+# Ownership label used by scoped DL4MicEverywhere Docker cleanup.
+LABEL org.dl4miceverywhere.managed="true"
 ARG UBUNTU_VERSION
 ARG CUDA_VERSION
 ARG CUDNN_VERSION

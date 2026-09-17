@@ -84,9 +84,9 @@ label .fr.principal.clean_label -text "Clean Docker space:"
 place .fr.principal.clean_label -relx 0.03 -rely 0.62
 
 set selectedClean "-"
-set listClean [list "Automatically" "Manually"]
+set listClean [list "Automatically" "Ask first" "Manually"]
 
-ttk::combobox .fr.principal.clean -values $listUpdate -textvariable selectedClean -state readonly
+ttk::combobox .fr.principal.clean -values $listClean -textvariable selectedClean -state readonly
 place .fr.principal.clean -relx 0.48 -rely 0.62
 
 ##### Buttons section #####

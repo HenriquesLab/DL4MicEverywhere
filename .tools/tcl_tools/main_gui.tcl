@@ -737,12 +737,15 @@ proc cmdpref {}   {
 proc cmdcleandocker {} {
     global basedir
 
-    set answer [tk_messageBox -type yesno -icon warning -default no \
-        -title "Reclaim Docker Space" \
-        -message "Remove unused Docker resources older than 24 hours?" \
-        -detail "This uses the same cleanup policy as the optional startup cleanup. It can remove stopped containers, unused networks, dangling images, and unused build cache older than 24 hours. Docker volumes are not removed."]
+    set choice [tk_dialog .dockerCleanupChoice \
+        "Reclaim Docker Space" \
+        "Choose how much Docker space to reclaim.\n\nClean DL4MicEverywhere removes only unused containers, images, and networks labelled as managed by DL4MicEverywhere and older than 24 hours. Docker volumes and unrelated Docker resources are preserved.\n\nClean + build cache also prunes unused Docker build cache older than 24 hours. Docker build cache is shared daemon-wide and cannot be scoped reliably to DL4MicEverywhere." \
+        warning 0 \
+        "Clean DL4MicEverywhere" \
+        "Clean + build cache" \
+        "Cancel"]
 
-    if {$answer ne "yes"} {
+    if {$choice == 2} {
         return
     }
 
@@ -750,15 +753,21 @@ proc cmdcleandocker {} {
     update idletasks
 
     set cleanup_script "$basedir/.tools/bash_tools/pre_build_launch/clean_docker.sh"
-    set failed [catch {exec /bin/bash "$cleanup_script" 2>@1} result]
+    if {$choice == 1} {
+        set failed [catch {exec /bin/bash "$cleanup_script" --include-build-cache 2>@1} result]
+        set cleanup_scope "DL4MicEverywhere resources and shared Docker build cache"
+    } else {
+        set failed [catch {exec /bin/bash "$cleanup_script" 2>@1} result]
+        set cleanup_scope "DL4MicEverywhere resources only"
+    }
 
     . configure -cursor ""
     update idletasks
 
     if {$failed} {
         set detail [string trim $result]
-        if {[string length $detail] > 1400} {
-            set detail "[string range $detail 0 1396]..."
+        if {[string length $detail] > 1800} {
+            set detail "[string range $detail 0 1796]..."
         }
         tk_messageBox -type ok -icon error -title "Docker cleanup failed" \
             -message "Docker space could not be reclaimed." \
@@ -766,21 +775,18 @@ proc cmdcleandocker {} {
         return
     }
 
-    set reclaimed ""
-    if {[regexp -nocase {Total reclaimed space:[[:space:]]*([^\r\n]+)} $result -> amount]} {
-        set reclaimed [string trim $amount]
-    }
-
-    if {$reclaimed ne ""} {
-        set detail "Docker reported reclaimed space: $reclaimed"
+    set reclaimed_lines [regexp -all -inline -nocase {Total reclaimed space:[[:space:]]*[^\r\n]+} $result]
+    if {[llength $reclaimed_lines] > 0} {
+        set detail "$cleanup_scope\n\n[join $reclaimed_lines \n]\n\nDocker volumes were not removed."
     } else {
-        set detail "The Docker cleanup command completed successfully."
+        set detail "$cleanup_scope\n\nCleanup completed successfully. Docker volumes were not removed."
     }
 
     tk_messageBox -type ok -icon info -title "Docker cleanup complete" \
         -message "Docker space cleanup completed." \
         -detail $detail
 }
+
 proc cmdpcheckupdates {} {
     global basedir
 
