@@ -34,16 +34,15 @@ DL4MicEverywhere comes packaged with an executable for each operating system. Do
 <details>
 <summary>On MacOs:</summary>
     
-The automatic installation on MacOs guides you through these steps:
+The macOS launcher performs a native prerequisite check before starting the shared DL4MicEverywhere application:
 
-1. **Homebrew installation:**
+1. **Homebrew:** if Homebrew is missing, DL4MicEverywhere runs Homebrew's official installer. Both Apple Silicon (`/opt/homebrew`) and Intel (`/usr/local`) default prefixes are supported without editing your shell profiles.
+2. **Tcl/Tk:** if `wish` is missing, the launcher installs Homebrew's `tcl-tk` package and adds its executable directory only to the current DL4MicEverywhere process environment.
+3. **Docker Desktop:** if `/Applications/Docker.app` is missing, DL4MicEverywhere downloads the current architecture-specific installer from Docker's official stable endpoint, verifies the DMG with macOS, and runs Docker's installer. macOS may request an administrator password for this installation step. DL4MicEverywhere does **not** accept Docker's license on your behalf; Docker Desktop presents its terms on first launch.
+4. **Docker readiness:** if Docker Desktop is installed but not running, DL4MicEverywhere offers to open it and waits for the engine. On a first launch, complete Docker Desktop's onboarding/license window if it appears.
+5. **No unnecessary reboot:** Homebrew, Tcl/Tk, and Docker Desktop setup do not force a Mac restart. The GUI opens as soon as the prerequisites are ready.
 
-    1.1. You need to enter the password when asked.
-    1.2. Click **RETURN/ENTER** when asked to start the installation.
-
-2. **TCL/TK and Docker Desktop are automatically installed (do not need interaction).**
-
-3. **The GUI will pop up, and you can start using DL4MicEverywhere.**
+The macOS wrapper also preserves DL4MicEverywhere's controlled outcomes, so normal close/update/cancel operations and known failures are shown with specific messages instead of immediately closing Terminal.
 
 </details>
 

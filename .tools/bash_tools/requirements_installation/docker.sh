@@ -54,11 +54,6 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # The package lists are already current from the Docker repository setup.
     sudo apt-get -y install /tmp/DockerDesktop.deb
 
-    # Download the Docker Desktop .deb file v4.27.1 and install it
-    # curl https://desktop.docker.com/linux/main/amd64/136059/docker-desktop-4.27.1-amd64.deb -o /tmp/DockerDesktop.deb
-    # sudo apt-get -y update
-    # sudo apt-get -y install /tmp/DockerDesktop.deb
-
     # We want the user to restart its machine, for that reason we will not launch Docker Desktop
 
     # if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
@@ -82,45 +77,80 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # fi
 
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    # Mac OSX
+    # macOS: install the current Docker Desktop release from Docker's stable,
+    # architecture-specific download URLs. These unversioned URLs are the same
+    # targets exposed by Docker's official macOS installation documentation.
+    # Do not auto-accept the Docker Subscription Service Agreement; Docker
+    # Desktop will present it to the user on first launch.
+    machine_arch=$(uname -m)
+    case "$machine_arch" in
+        arm64)
+            docker_dmg_url="https://desktop.docker.com/mac/main/arm64/Docker.dmg"
+            ;;
+        x86_64)
+            docker_dmg_url="https://desktop.docker.com/mac/main/amd64/Docker.dmg"
+            ;;
+        *)
+            echo "ERROR: Unsupported Mac architecture: $machine_arch" >&2
+            exit 1
+            ;;
+    esac
 
-    # Install podman
-    # brew install podman
-    # podman machine init
-    # podman machine start
+    docker_app="${DL4ME_DOCKER_APP_PATH:-/Applications/Docker.app}"
+    temp_root=$(mktemp -d "${TMPDIR:-/tmp}/dl4me-docker.XXXXXX") || exit 1
+    docker_dmg="$temp_root/Docker.dmg"
+    mount_point="$temp_root/mount"
+    mkdir -p "$mount_point"
+    docker_mounted=0
 
-    # # Check if is an Apple Silicon chip
-    if [[ $(uname -m) == 'arm64' ]]; then
-        # Docker official website, to get the best experience, still recommends to install Rosetta
-        # To install Rosetta 2 manually from the command line, run the following command:
-        softwareupdate --agree-to-license --install-rosetta
+    cleanup_macos_docker_install() {
+        if [ "$docker_mounted" -eq 1 ]; then
+            hdiutil detach "$mount_point" -quiet >/dev/null 2>&1 || true
+        fi
+        rm -rf "$temp_root"
+    }
+    trap cleanup_macos_docker_install EXIT INT TERM
 
-        # Download the v4.27.1 ARM64 Docker installer
-        curl https://desktop.docker.com/mac/main/arm64/136059/Docker.dmg -o /tmp/Docker.dmg
-    else
-        # Download the v4.27.1 latest AMD64 Docker installer
-        curl https://desktop.docker.com/mac/main/amd64/136059/Docker.dmg -o /tmp/Docker.dmg
+    echo "Downloading the current Docker Desktop installer for $machine_arch..."
+    if ! curl -fL --retry 3 --connect-timeout 15 --max-time 1800 \
+        "$docker_dmg_url" -o "$docker_dmg"; then
+        echo "ERROR: Docker Desktop download failed." >&2
+        exit 1
     fi
 
-    # Install Docker Desktop
-    hdiutil attach /tmp/Docker.dmg
-    /Volumes/Docker/Docker.app/Contents/MacOS/install
-    hdiutil detach /Volumes/Docker
+    if ! hdiutil verify "$docker_dmg" >/dev/null; then
+        echo "ERROR: The downloaded Docker Desktop disk image did not pass macOS verification." >&2
+        exit 1
+    fi
 
-    # Add Docker Desktop (docker) to the environment variable PATH
-    echo 'export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"' >> ~/.zshrc
-    echo 'export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"' >> ~/.bashrc
+    if ! hdiutil attach "$docker_dmg" -nobrowse -readonly -mountpoint "$mount_point" >/dev/null; then
+        echo "ERROR: Docker Desktop disk image could not be mounted." >&2
+        exit 1
+    fi
+    docker_mounted=1
 
-    # We want the user to restart its machine, for that reason we will not launch Docker Desktop
+    docker_installer="$mount_point/Docker.app/Contents/MacOS/install"
+    if [ ! -x "$docker_installer" ]; then
+        echo "ERROR: Docker Desktop installer was not found inside the mounted disk image." >&2
+        exit 1
+    fi
 
-    # # Launch Docker Desktop
-    # open -a Docker &
-    # pid_docker=$!
-    # # Wait until is opened
-    # wait $pid_docker
-    # while ! docker info &> /dev/null; do
-    #     sleep 5
-    # done
+    echo "Installing Docker Desktop into /Applications..."
+    echo "macOS may ask for an administrator password for this installation step."
+    if ! sudo "$docker_installer" --user="$USER"; then
+        echo "ERROR: Docker Desktop installer returned a failure." >&2
+        exit 1
+    fi
+
+    # The official installer targets /Applications/Docker.app. Tests may
+    # override the expected path without changing production behavior.
+    if [ ! -d "$docker_app" ]; then
+        echo "ERROR: Docker Desktop installation completed but $docker_app was not found." >&2
+        exit 1
+    fi
+
+    echo "Docker Desktop was installed successfully."
+    echo "On first launch, Docker Desktop will ask you to review and accept its terms."
 
 elif [[ "$OSTYPE" == "msys*" ]]; then
     # Windows

@@ -124,7 +124,7 @@ class ManualDockerCleanupTests(unittest.TestCase):
 
     def test_builds_and_notebook_containers_carry_management_label(self):
         text = LINUX_LAUNCHER.read_text(encoding="utf-8")
-        self.assertEqual(text.count('--label "org.dl4miceverywhere.managed=true"'), 2)
+        self.assertEqual(text.count('--label "org.dl4miceverywhere.managed=true"'), 1)
         self.assertGreaterEqual(text.count("--label org.dl4miceverywhere.managed=true"), 4)
 
     def test_all_published_runtime_images_embed_management_label(self):

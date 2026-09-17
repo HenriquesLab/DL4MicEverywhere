@@ -99,110 +99,29 @@ sudo apt-get install -y tcl tk
 <details>
 <summary>On Mac:</summary>
 
-## 1. Docker Installation
+## Automatic setup
 
-Firstly, Docker Desktop needs to be installed on your computer. Follow the official guideline: https://docs.docker.com/desktop/install/mac-install/
+The recommended path is to launch `MacOS_launch.command`. DL4MicEverywhere checks the following components and installs supported missing prerequisites:
 
-## 2. Install Tcl/Tk for the DL4MicEverywhere graphical user interface
+1. **Homebrew** — installed with Homebrew's official installer when missing. Apple Silicon and Intel default prefixes are discovered automatically; DL4MicEverywhere does not require `brew shellenv` or modify your shell startup files.
+2. **Tcl/Tk** — `brew install tcl-tk` is used only when the `wish` GUI executable is unavailable.
+3. **Docker Desktop** — DL4MicEverywhere downloads the current stable `Docker.dmg` directly from Docker's architecture-specific official endpoint (`arm64` for Apple Silicon, `amd64` for Intel), verifies the disk image with `hdiutil verify`, and invokes Docker's supported command-line installer. The Docker license is not accepted automatically.
 
-The only requirement to use the graphical user interface (GUI) is to have [Tcl/Tk](https://www.tcl.tk/) installed on your computer.
+After installation, DL4MicEverywhere refreshes its own PATH and continues. A full Mac restart is not required for these components. If Docker Desktop is starting for the first time, complete Docker's onboarding/license dialog and wait for the engine to become ready.
 
-Most Mac OS X operating system distributions include Tcl/Tk. If not already installed, you will receive an error similar to the following:
+## Manual setup
 
-```
-DEPRECATION WARNING: The system version of Tk is deprecated and may be removed in a future release. Please don't rely on it. Set TK_SILENCE_DEPRECATION=1 to suppress this warning.
-```
-you can install or update the appropriate packages in two different ways:
+If you prefer to install the prerequisites yourself:
 
- * Option 1: Using Homebrew:
-   Install or update the `tcl-tk` package:
-   ```
-   brew install tcl-tk
-   ```
+- Follow Docker's current macOS installation guide: https://docs.docker.com/desktop/setup/install/mac-install/
+- Install Homebrew from https://brew.sh/ if required.
+- Install Tcl/Tk with:
 
-   **Note**: If you don't have the `brew` command, install [Homebrew](https://brew.sh/) by running the following command in your terminal:
-   ```
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
+  ```bash
+  brew install tcl-tk
+  ```
 
- * Option 2: Using a package installation:
-   
-   Go to https://www.tcl.tk/software/tcltk/ and click on the Active Tcl [link](https://www.activestate.com/products/tcl/): 
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_01.png" 
-     alt="Main window"
-     width="80%" 
-     height="80%" />
-
-   In this case, as you are using macOS, click on the macOS option:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_02_Mac.png" 
-     alt="Main window"
-     width="80%" 
-     height="80%" />
-
-   Then, you can create an account, or continue to download without an account, to be able to download the installation file:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_03.png" 
-     alt="Main window"
-     width="80%" 
-     height="80%" />
-
-   Afterwards this window will be shown. Don't worry. Click on **View all Available Builds**:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_04_Mac.png" 
-     alt="Main window"
-     width="80%" 
-     height="80%" />
-
-   and then click on the **Download** button to get the `.pkg` file:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_05_Mac.png" 
-     alt="Main window"
-     width="80%" 
-     height="80%" />
-
-   Then, find the package that you have downloaded:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_06_Mac.png" 
-     alt="Main window"
-     width="60%" 
-     height="60%" />
-
-   and after double-clicking, an installation window will pop up. Click on **Continue** to start the installation:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_07_Mac.png" 
-     alt="Main window"
-     width="60%" 
-     height="60%" />
-
-   Click on **Continue** to go to the **License** step:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_08_Mac.png" 
-     alt="Main window"
-     width="60%" 
-     height="60%" />
-
-   Click on **Agree**:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_09_Mac.png" 
-     alt="Main window"
-     width="60%" 
-     height="60%" />
-
-   Click on **Install** to start the installation:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_10_Mac.png" 
-     alt="Main window"
-     width="60%" 
-     height="60%" />
-
-   The installation has been completed, click on **Close** and everything should be ready.
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_11_Mac.png" 
-     alt="Main window"
-     width="60%" 
-     height="60%" />
+Then launch `MacOS_launch.command` again. DL4MicEverywhere detects both `/opt/homebrew` (Apple Silicon) and `/usr/local` (Intel) automatically.
 
 </details>
 

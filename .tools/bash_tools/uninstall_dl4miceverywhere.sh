@@ -3,16 +3,19 @@
 # Targeted DL4MicEverywhere uninstaller.
 # $1: 1 to remove DL4MicEverywhere Docker resources, 0 otherwise.
 #
-# Exit code 42 is reserved for Windows/WSL. In that case Docker cleanup is
-# completed here, but the Windows launcher removes the application folder only
-# after WSL has returned, avoiding deletion of a directory still in use by cmd.
+# Exit code 42 is a platform-wrapper uninstall completion signal. On Windows/WSL,
+# Docker cleanup is completed here and the Windows wrapper removes the application
+# folder after WSL returns. On macOS, this script removes the folder itself and
+# returns 42 so MacOS_launch.command can report a successful uninstall.
 
 set -u
 
-SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
-TARGET_DIR=$(readlink -f "$SCRIPT_DIR/../..")
+SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P)" || exit 1
+source "$SCRIPT_DIR/path_utils.sh" || exit 1
+SCRIPT_DIR=$(dl4me_realpath "$SCRIPT_DIR") || exit 1
+TARGET_DIR=$(dl4me_realpath "$SCRIPT_DIR/../..") || exit 1
 CLEAN_DOCKER="${1:-0}"
-WINDOWS_DELETE_EXIT=42
+WRAPPER_UNINSTALL_EXIT=42
 
 show_error() {
     local message="$1"
@@ -185,10 +188,19 @@ fi
 if [ "${DL4ME_WINDOWS_WRAPPER:-0}" = "1" ] && \
    { grep -qi microsoft /proc/version 2>/dev/null || \
      [ "$(systemd-detect-virt 2>/dev/null || true)" = "wsl" ]; }; then
-    exit "$WINDOWS_DELETE_EXIT"
+    exit "$WRAPPER_UNINSTALL_EXIT"
 fi
 
 # Linux/macOS: leave the installation directory before removing it so no shell
 # process keeps it as its current working directory.
 cd /
-rm -rf -- "$TARGET_DIR"
+if ! rm -rf -- "$TARGET_DIR"; then
+    show_error "The application folder could not be removed."
+    exit 1
+fi
+
+if [ "${DL4ME_MACOS_WRAPPER:-0}" = "1" ]; then
+    exit "$WRAPPER_UNINSTALL_EXIT"
+fi
+
+exit 0

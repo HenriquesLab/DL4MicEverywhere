@@ -1,7 +1,9 @@
 #!/bin/bash
 
-BASEDIR=$(dirname "$(readlink -f "$0")")
-REPO_ROOT=$(readlink -f "$BASEDIR/../../..")
+SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P)" || exit 1
+source "$SCRIPT_DIR/../path_utils.sh" || exit 1
+BASEDIR=$(dl4me_realpath "$SCRIPT_DIR") || exit 1
+REPO_ROOT=$(dl4me_realpath "$BASEDIR/../../..") || exit 1
 source "$BASEDIR/../launcher_status.sh"
 
 # Git 2.35+ rejects repositories whose filesystem ownership does not match the

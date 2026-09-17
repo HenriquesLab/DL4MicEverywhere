@@ -3,7 +3,7 @@
 # Shared DL4MicEverywhere launcher status contract.
 #
 # 0         Normal completion.
-# 42        Windows uninstall handoff (existing contract).
+# 42        Platform-wrapper uninstall completion/handoff.
 # 90-94     Controlled outcomes: intentional stops that are not failures.
 # 95-104    Handled stops: known problems with a tailored user-facing message.
 # Other     Unexpected/unclassified failure.

@@ -33,6 +33,13 @@ is_wsl_runtime() {
 local_port_is_busy() {
     local candidate="$1"
 
+    # macOS ships lsof and a BSD netstat whose flags/output differ from Linux.
+    # Prefer lsof there so a native Mac listener is detected reliably.
+    if [[ "${OSTYPE:-}" == "darwin"* ]] && command -v lsof >/dev/null 2>&1; then
+        lsof -nP -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1
+        return $?
+    fi
+
     if command -v ss >/dev/null 2>&1; then
         ss -H -ltn "sport = :$candidate" 2>/dev/null | grep -q .
         return $?

@@ -1,11 +1,4 @@
 #!/bin/bash
-
-echo "Installing Homebrew..."
-
-# Export non interactive variable to avoid asking for input
-exportNONINTERACTIVE=1 
-
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >>  ~/.zprofile
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# Backward-compatible shim for the historical misspelled filename.
+SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P)" || exit 1
+exec /bin/bash "$SCRIPT_DIR/homebrew.sh" "$@"

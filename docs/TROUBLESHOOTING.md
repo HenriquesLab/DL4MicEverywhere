@@ -6,7 +6,7 @@ This guide provides solutions to common issues encountered when using DL4MicEver
 
 ### **Docker daemon fails to start**
 
-- Ensure your OS meets the requirements for Docker Desktop. Docker requires Windows 10 Pro/Enterprise x64 or macOS 10.13+ .
+- Ensure your OS meets the requirements for Docker Desktop. Check Docker Desktop's current system requirements for your Windows or macOS release; Docker supports a rolling set of operating-system versions.
 - On Linux, ensure Docker engine is installed and the service is running. Check status with: `systemctl status docker`
 - Confirm your user is in the `docker` group to avoid permission errors.
 
@@ -26,9 +26,12 @@ This guide provides solutions to common issues encountered when using DL4MicEver
 - Increase Docker resources in Preferences > Resources. At least 2 CPUs and 4GB memory recommended.
 - On Linux, check other processes consuming resources. Docker may need more RAM/CPUs.
 
-### **Docker desktop does not start or crashes after running DL4MicEverywhere on Mac**
+### **Docker Desktop does not become ready after DL4MicEverywhere opens it on Mac**
 
-- Ensure you are not using any Docker container in the terminal. Then, open a terminal and force quit Docker by typing: `pkill -SIGHUP -f /Applications/Docker.app 'docker serve'`
+- Open Docker Desktop from `/Applications/Docker.app` and complete any first-run onboarding or license dialog.
+- Wait until Docker Desktop reports that the engine is running, then launch DL4MicEverywhere again.
+- If Docker Desktop reports that the application is damaged or cannot start, reinstall it using Docker's current macOS installation guide rather than force-killing internal Docker processes.
+- DL4MicEverywhere waits up to two minutes for `docker info` to become responsive and reports a prerequisite error if the engine is still unavailable.
 
 ### **Docker cannot build image**
 - Your docker client might be out of space. [Read here how to clear space](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/DOCKER_DESKTOP.md).

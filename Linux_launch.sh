@@ -1,15 +1,17 @@
 #!/bin/bash
 
 # Get the basedir
-BASEDIR=$(dirname "$(readlink -f "$0")")
+SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P)" || exit 1
+source "$SCRIPT_DIR/.tools/bash_tools/path_utils.sh" || exit 1
+BASEDIR=$(dl4me_realpath "$SCRIPT_DIR") || exit 1
 source "$BASEDIR/.tools/bash_tools/launcher_status.sh"
 
 # Controlled outcomes are successful user-driven stops. Windows receives the
-# dedicated code so its wrapper can explain what happened; native Linux/macOS
-# keep conventional exit code 0.
+# dedicated code so its wrapper can explain what happened; native Linux
+# keeps the conventional exit code 0 when no platform wrapper is active.
 controlled_exit() {
     local status="$1"
-    if [ "${DL4ME_WINDOWS_WRAPPER:-0}" = "1" ]; then
+    if [ "${DL4ME_WINDOWS_WRAPPER:-0}" = "1" ] || [ "${DL4ME_MACOS_WRAPPER:-0}" = "1" ]; then
         exit "$status"
     fi
     exit 0
@@ -18,7 +20,7 @@ controlled_exit() {
 # Avoid stacking an inner "press Enter" prompt with the Windows wrapper's
 # tailored message. Native CLI launches still get their traditional pause.
 pause_native_cli() {
-    if [ "$flag_gui" -eq 0 ] && [ "${DL4ME_WINDOWS_WRAPPER:-0}" != "1" ]; then
+    if [ "$flag_gui" -eq 0 ] && [ "${DL4ME_WINDOWS_WRAPPER:-0}" != "1" ] && [ "${DL4ME_MACOS_WRAPPER:-0}" != "1" ]; then
         read -r -p "Press enter to close the terminal."
     fi
 }
@@ -253,9 +255,9 @@ else
     IFS=$'\n' read -d '' -r -a strarr <<<"$gui_arguments"
 
     # Closing the GUI is a normal user cancellation, not a launcher failure.
-    # On Windows, return a dedicated control code so the outer batch wrapper can
-    # keep its console open long enough to explain that the close was intentional.
-    # Native Linux/macOS launches still finish with the conventional success code.
+    # Platform wrappers receive a dedicated control code so they can keep
+    # their terminal open long enough to explain that the close was intentional.
+    # Native Linux launches still finish with the conventional success code.
     if [ "${strarr[0]}" = "__DL4ME_CANCEL__" ]; then
         controlled_exit "$DL4ME_STATUS_GUI_CLOSED"
     fi
@@ -920,7 +922,8 @@ if [ "$flag_build" -eq 2 ]; then
     fi
 
     if [ "$requirements_override" -eq 1 ]; then
-        requirements_lock_path="$(dirname "$(readlink -f "$requirements_input_path")")/requirements.lock.txt"
+        requirements_input_realpath=$(dl4me_realpath "$requirements_input_path") || exit "$DL4ME_STATUS_INPUT_INVALID"
+        requirements_lock_path="$(dirname "$requirements_input_realpath")/requirements.lock.txt"
         notebook_lock_args=(
             --config "$config_path"
             --source "$requirements_input_path"
@@ -929,7 +932,8 @@ if [ "$flag_build" -eq 2 ]; then
             --repo-root "$BASEDIR"
         )
     else
-        requirements_lock_path="$(dirname "$(readlink -f "$config_path")")/requirements.lock.txt"
+        config_realpath=$(dl4me_realpath "$config_path") || exit "$DL4ME_STATUS_INPUT_INVALID"
+        requirements_lock_path="$(dirname "$config_realpath")/requirements.lock.txt"
         notebook_lock_args=(--config "$config_path" --repo-root "$BASEDIR")
     fi
 
@@ -1001,42 +1005,33 @@ if [ "$flag_build" -eq 3 ]; then
 else
     # Build the docker image without GUI
     if [ "$flag_build" -eq 2 ]; then
-        echo "To build the docker image, you need to provide root access by entering your password."
-        echo "Otherwise, you can choose the option of getting the image from Docker Hub or follow"
-        echo "the steps in our documentation."
-        if [ "$flag_gpu" -eq 1 ]; then
-            sudo docker build --file "$selected_dockerfile" -t "$docker_tag" \
-                --label "org.dl4miceverywhere.managed=true" \
-                --build-arg CONVERTER_BASE_IMAGE="${CONVERTER_BASE_IMAGE}" \
-                --build-arg FINAL_BASE_IMAGE="${FINAL_BASE_IMAGE}" \
-                --build-arg UBUNTU_VERSION="${ubuntu_version}" \
-                --build-arg CUDA_VERSION="${cuda_version}" \
-                --build-arg CUDNN_VERSION="${cudnn_version}" \
-                --build-arg GPU_FLAG="${flag_gpu}" \
-                --build-arg PYTHON_VERSION="${python_version}" \
-                --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
-                --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
-                --build-arg PATH_TO_REQUIREMENTS_LOCK="${requirements_lock_context_path}" \
-                --build-arg NOTEBOOK_NAME="${notebook_name}" \
-                --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" \
-                "$BASEDIR"
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # Docker Desktop on macOS runs for the logged-in user. Using sudo
+            # changes Docker config/context ownership and can make the Desktop
+            # socket/context unavailable to the build command.
+            docker_build_command=(docker build)
         else
-            sudo docker build --file "$selected_dockerfile" -t "$docker_tag" \
-                --label "org.dl4miceverywhere.managed=true" \
-                --build-arg CONVERTER_BASE_IMAGE="${CONVERTER_BASE_IMAGE}" \
-                --build-arg FINAL_BASE_IMAGE="${FINAL_BASE_IMAGE}" \
-                --build-arg UBUNTU_VERSION="${ubuntu_version}" \
-                --build-arg CUDA_VERSION="${cuda_version}" \
-                --build-arg CUDNN_VERSION="${cudnn_version}" \
-                --build-arg GPU_FLAG="${flag_gpu}" \
-                --build-arg PYTHON_VERSION="${python_version}" \
-                --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
-                --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
-                --build-arg PATH_TO_REQUIREMENTS_LOCK="${requirements_lock_context_path}" \
-                --build-arg NOTEBOOK_NAME="${notebook_name}" \
-                --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" \
-                "$BASEDIR"
+            echo "To build the docker image, you may need to provide root access by entering your password."
+            echo "Otherwise, you can choose the option of getting the image from Docker Hub or follow"
+            echo "the steps in our documentation."
+            docker_build_command=(sudo docker build)
         fi
+
+        "${docker_build_command[@]}" --file "$selected_dockerfile" -t "$docker_tag" \
+            --label "org.dl4miceverywhere.managed=true" \
+            --build-arg CONVERTER_BASE_IMAGE="${CONVERTER_BASE_IMAGE}" \
+            --build-arg FINAL_BASE_IMAGE="${FINAL_BASE_IMAGE}" \
+            --build-arg UBUNTU_VERSION="${ubuntu_version}" \
+            --build-arg CUDA_VERSION="${cuda_version}" \
+            --build-arg CUDNN_VERSION="${cudnn_version}" \
+            --build-arg GPU_FLAG="${flag_gpu}" \
+            --build-arg PYTHON_VERSION="${python_version}" \
+            --build-arg PATH_TO_NOTEBOOK="${notebook_path}" \
+            --build-arg PATH_TO_REQUIREMENTS="${requirements_path}" \
+            --build-arg PATH_TO_REQUIREMENTS_LOCK="${requirements_lock_context_path}" \
+            --build-arg NOTEBOOK_NAME="${notebook_name}" \
+            --build-arg SECTIONS_TO_REMOVE="${sections_to_remove}" \
+            "$BASEDIR"
 
         DOCKER_OUT=$? # Gets if the docker image has been built
         cleanup_lock_build_input

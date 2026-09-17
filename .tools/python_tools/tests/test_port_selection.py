@@ -49,6 +49,37 @@ class PortSelectionRuntimeTests(unittest.TestCase):
         self.assertEqual(result.stdout.strip(), "8889")
         self.assertIn("Port 8888 is already allocated", result.stderr)
 
+
+    def test_macos_uses_lsof_before_linux_netstat_syntax(self):
+        # Stock macOS has BSD netstat and lsof. The selector must prefer lsof
+        # because the Linux `netstat -ltn` probe is not portable to macOS.
+        with tempfile.TemporaryDirectory(prefix="dl4me-mac-port-test-") as tempdir:
+            fakebin = Path(tempdir)
+            (fakebin / "lsof").write_text(
+                "#!/bin/bash\n"
+                "case \" $* \" in\n"
+                "  *\" -iTCP:8888 \"*) exit 0 ;;\n"
+                "  *) exit 1 ;;\n"
+                "esac\n",
+                encoding="utf-8",
+            )
+            (fakebin / "netstat").write_text(
+                "#!/bin/bash\nexit 99\n",
+                encoding="utf-8",
+            )
+            os.chmod(fakebin / "lsof", 0o755)
+            os.chmod(fakebin / "netstat", 0o755)
+
+            result = self.run_selector(
+                8888,
+                OSTYPE="darwin",
+                PATH=f"{fakebin}:/usr/bin:/bin",
+            )
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(result.stdout.strip(), "8889")
+        self.assertIn("Port 8888 is already allocated", result.stderr)
+
     def test_windows_host_listener_is_checked_even_when_linux_port_is_free(self):
         # Simulate the user's topology: WSL has no listener on 8888, but a native
         # Windows application does. The fake PowerShell helper reports only 8888

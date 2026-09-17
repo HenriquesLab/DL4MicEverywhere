@@ -46,7 +46,7 @@ exe = EXE(
 )
 app = BUNDLE(
     exe,
-    name='{output_name}.app',
+    name=f'{output_name}.app',
     icon=None,
     bundle_identifier=None,
 )

@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Get the base directory of DL4MicEveywhere repository
-BASEDIR=$(dirname "$(readlink -f "$0")")
+SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P)" || exit 1
+source "$SCRIPT_DIR/bash_tools/path_utils.sh" || exit 1
+BASEDIR=$(dl4me_realpath "$SCRIPT_DIR") || exit 1
 # Get the directory of the desktop folder
 DESKTOPDIR=$(xdg-user-dir DESKTOP)
 

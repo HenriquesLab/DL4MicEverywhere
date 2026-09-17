@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Get the basedir
-BASEDIR=$(dirname "$(readlink -f "$0")")
+SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P)" || exit 1
+source "$SCRIPT_DIR/path_utils.sh" || exit 1
+BASEDIR=$(dl4me_realpath "$SCRIPT_DIR") || exit 1
 
 # Import safe YAML value loaders
 source "$BASEDIR/get_yaml_args.sh"
