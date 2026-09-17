@@ -1131,8 +1131,12 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     # Launch a subprocess to open the browser with the port in 10 seconds
     /bin/bash "$BASEDIR/.tools/bash_tools/open_browser.sh" 10 "http://localhost:$port/lab/tree/$notebook_name/?token=$notebook_token" &
 
-    # Define the command that will be run when the docker image is launched
-    docker_command="jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token; cp /home/docker_info.txt /home/results/docker_info.txt; cp /home/$notebook_name /home/results/$notebook_name;" 
+    # Define the command that will be run when the docker image is launched.
+    # Preserve Jupyter's exit status before the best-effort persistence copies:
+    # a Jupyter failure must not be hidden by successful cp commands, and a copy
+    # failure must not make an otherwise clean Jupyter shutdown look like a
+    # container/runtime failure.
+    docker_command="jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token; JUPYTER_OUT=\$?; cp /home/docker_info.txt /home/results/docker_info.txt || echo 'WARNING: Could not copy docker_info.txt into the results directory.' >&2; cp \"/home/$notebook_name\" \"/home/results/$notebook_name\" || echo 'WARNING: Could not copy the notebook into the results directory.' >&2; exit \"\$JUPYTER_OUT\""
 
     if [ "$flag_gpu" -eq 1 ]; then
         # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
