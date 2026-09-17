@@ -35,6 +35,7 @@ class ControlledOutcomeTests(unittest.TestCase):
             "DL4ME_STATUS_UPDATE_FAILED": 101,
             "DL4ME_STATUS_UNINSTALL_FAILED": 102,
             "DL4ME_STATUS_PREREQUISITE_FAILED": 103,
+            "DL4ME_STATUS_PORT_UNAVAILABLE": 104,
         }
         for name, value in expected.items():
             with self.subTest(name=name):
@@ -58,6 +59,7 @@ class ControlledOutcomeTests(unittest.TestCase):
             101: "update_failed",
             102: "uninstall_failed",
             103: "linux_prerequisite_failed",
+            104: "port_unavailable",
         }
         generic = text.index("goto :launch_failed")
         for code, label in routes.items():

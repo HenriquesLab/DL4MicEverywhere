@@ -255,6 +255,7 @@ if "%LAUNCH_RESULT%"=="100" goto :container_runtime_failed
 if "%LAUNCH_RESULT%"=="101" goto :update_failed
 if "%LAUNCH_RESULT%"=="102" goto :uninstall_failed
 if "%LAUNCH_RESULT%"=="103" goto :linux_prerequisite_failed
+if "%LAUNCH_RESULT%"=="104" goto :port_unavailable
 
 goto :launch_failed
 
@@ -1021,6 +1022,27 @@ echo DL4MicEverywhere dependencies were installed successfully.
 echo A Windows restart was requested successfully.
 echo.
 exit /b 0
+
+
+:port_unavailable
+echo.
+echo ============================================================
+echo DL4MicEverywhere could not find a usable notebook port
+echo ============================================================
+echo.
+echo The launcher could not safely reserve a TCP port for the notebook.
+echo On Windows, DL4MicEverywhere checks both Ubuntu/WSL and the Windows host
+echo so an existing Windows application using localhost is not overlooked.
+echo.
+echo Close an unused service if appropriate, or launch again after the port is free.
+echo If you use the CLI, you can also request a specific port with -p.
+echo.
+echo No notebook container was started. Existing Docker containers and data were
+echo not changed by this port-selection failure.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
 
 :launch_failed
 echo.

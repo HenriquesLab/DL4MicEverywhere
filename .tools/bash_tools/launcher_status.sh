@@ -5,7 +5,7 @@
 # 0         Normal completion.
 # 42        Windows uninstall handoff (existing contract).
 # 90-94     Controlled outcomes: intentional stops that are not failures.
-# 95-103    Handled stops: known problems with a tailored user-facing message.
+# 95-104    Handled stops: known problems with a tailored user-facing message.
 # Other     Unexpected/unclassified failure.
 
 DL4ME_STATUS_UNINSTALL_HANDOFF=42
@@ -24,3 +24,4 @@ DL4ME_STATUS_CONTAINER_RUNTIME_FAILED=100
 DL4ME_STATUS_UPDATE_FAILED=101
 DL4ME_STATUS_UNINSTALL_FAILED=102
 DL4ME_STATUS_PREREQUISITE_FAILED=103
+DL4ME_STATUS_PORT_UNAVAILABLE=104

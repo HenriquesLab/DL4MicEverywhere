@@ -1091,41 +1091,31 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
         exit 0
     fi
 
-    # Choose an initial port
+    # Choose an initial port. Docker Desktop publishes WSL container ports on
+    # the Windows host, so the shared selector checks both network namespaces
+    # when this launcher is running under WSL.
     if [ -z "$port_number" ]; then
-        # In case user does not provide a port number, use the default 8888 port
-        port=8888
+        requested_port=8888
     else
-        # Else, use the port provided by the user
-        port="$port_number"
+        requested_port="$port_number"
     fi
 
-    # Check if selected port is available if not try next one until finding a usable port. 
-    if [[ "$OSTYPE" == "linux-gnu"* && "$(systemd-detect-virt)" == "wsl"* ]]; then        
-        # Linux inside the Windows Subsystem for Linux needs to look differently to the ports
-        while ( netstat -a | grep :$port &> /dev/null )
-        do
-            echo WARNING: Port $port is already allocated.
-            port=$((port+1))
-            if [ $port -gt 9000 ]; then
-                # We want the port to be between 8000 and 9000
-                port=8000
-            sleep 1
-            fi
-        done
-    else
-        while ( lsof -i:$port &> /dev/null )
-        do
-            echo WARNING: Port $port is already allocated.
-            port=$((port+1))
-            if [ $port -gt 9000 ]; then
-                # We want the port to be between 8000 and 9000
-                port=8000
-            sleep 1
-            fi
-        done
+    port=$(/bin/bash "$BASEDIR/.tools/bash_tools/select_notebook_port.sh" "$requested_port")
+    PORT_SELECTION_RESULT=$?
+    if [ "$PORT_SELECTION_RESULT" -ne 0 ]; then
+        echo ""
+        echo "------------------------------------"
+        echo "DL4MicEverywhere could not select a free notebook port."
+        if [ "$PORT_SELECTION_RESULT" -eq 3 ]; then
+            echo "Every port in the preferred range 8000-9000 appears to be in use."
+        else
+            echo "The port availability check itself could not be completed safely."
+        fi
+        echo "Review the diagnostic message above, close an unused service if needed, and try again."
+        echo "------------------------------------"
+        exit "$DL4ME_STATUS_PORT_UNAVAILABLE"
     fi
-    echo SUCCESS: Port $port will be used.
+    echo "SUCCESS: Port $port will be used."
 
     # Based on the openssl command and the base64 encoding, a 50 characters token is generated
     notebook_token=$(openssl rand -base64 50 | tr -dc 'a-zA-Z0-9')
