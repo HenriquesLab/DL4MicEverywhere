@@ -11,8 +11,8 @@ cite:
   text: Uwe Schmidt, Martin Weigert, Coleman Broaddus, Gene Myers. Cell Detection with Star-Convex Polygons. MICCAI 2018 (2018). https://doi.org/10.1007/978-3-030-00934-2_30
 config:
   dl4miceverywhere:
-    cuda_version: 11.8.0
-    cudnn_version: 8.6.0.163
+    cuda_version: 12.5.0
+    cudnn_version: 9.3.0.75
     description: StarDist_2D_DL4Mic is the conversion of the 2D StarDist from ZeroCostDL4Mic.
     dl4miceverywhere_version: 2.2.0
     docker_hub_image: stardist_2d_zerocostdl4mic-z1.20.7-d2.2.0
