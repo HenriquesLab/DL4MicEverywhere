@@ -20,6 +20,7 @@ rem ============================================================================
 set "SCRIPT_PATH=%~dp0"
 if "%SCRIPT_PATH:~-1%"=="\" set "SCRIPT_PATH=%SCRIPT_PATH:~0,-1%"
 set "BASEDIR=%SCRIPT_PATH%"
+set "DL4ME_WINDOWS_TOOLS=%BASEDIR%\.tools\windows_tools"
 set "WSL_UTF8=1"
 set "DOCKER_DESKTOP_EXE="
 set "DOCKER_EXE="
@@ -30,6 +31,15 @@ set "PREFERRED_UBUNTU_DISTRO=Ubuntu-24.04"
 cd /d "%BASEDIR%"
 
 call :print_header
+
+rem A downloaded ZIP can mark every bundled PowerShell helper as coming from
+rem the Internet. A managed RemoteSigned policy overrides -ExecutionPolicy Bypass,
+rem so remove that mark from this launcher's own helpers before calling any of
+rem them. Inline PowerShell commands are permitted by RemoteSigned.
+echo Checking bundled Windows helpers...
+if not exist "%DL4ME_WINDOWS_TOOLS%\" goto :powershell_helpers_unavailable
+powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $policy = Get-ExecutionPolicy; if ($policy -in @('AllSigned', 'Restricted')) { Write-Host ('Windows PowerShell policy ' + $policy + ' does not permit the bundled unsigned helpers.'); exit 2 }; Get-ChildItem -LiteralPath $env:DL4ME_WINDOWS_TOOLS -Filter '*.ps1' -File | Unblock-File -ErrorAction Stop"
+if errorlevel 1 goto :powershell_helpers_unavailable
 
 rem =============================================================================
 rem 1. WSL and Ubuntu discovery. The launcher itself remains non-elevated. If
@@ -348,6 +358,16 @@ echo DL4MicEverywhere could not determine the Windows Subsystem for Linux state.
 echo.
 echo Please run "wsl --version" and "wsl --status" in PowerShell or Command Prompt
 echo to inspect the WSL installation, then run Windows_launch.bat again.
+echo.
+pause
+exit /b 1
+
+:powershell_helpers_unavailable
+echo.
+echo DL4MicEverywhere could not prepare its bundled Windows helpers.
+echo Windows PowerShell policy or file permissions may be preventing them from
+echo running. If this computer is managed by your organization, ask IT whether
+echo these PowerShell helpers can be allowed or signed for this computer.
 echo.
 pause
 exit /b 1
