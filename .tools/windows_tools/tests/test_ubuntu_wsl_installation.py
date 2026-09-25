@@ -184,12 +184,49 @@ class UbuntuWslInstallationTests(unittest.TestCase):
         helper = USER_DISCOVERY_HELPER.read_text(encoding="utf-8")
 
         self.assertIn("Get-ConfiguredDefaultUser", helper)
-        self.assertIn("Get-OnlyRegularHomeUser", helper)
+        self.assertIn("Get-RegularHomeUsers", helper)
         self.assertIn("-ieq 'user'", helper)
         self.assertIn("(?i:default)", helper)
-        self.assertIn("$uniqueUsers.Count -eq 1", helper)
+        self.assertIn("$regularUsers.Count -eq 1", helper)
         self.assertIn("$uid -lt 1000 -or $uid -ge 65534", helper)
         self.assertIn("$home.StartsWith('/home/')", helper)
+
+    def test_user_discovery_distinguishes_uninitialized_from_ambiguous_state(self):
+        helper = USER_DISCOVERY_HELPER.read_text(encoding="utf-8")
+
+        self.assertIn("if ($regularUsers.Count -eq 0)", helper)
+        self.assertIn("exit 2", helper)
+        self.assertIn("exit 3", helper)
+        self.assertLess(helper.index("if ($regularUsers.Count -eq 0)"), helper.index("exit 3"))
+
+    def test_launcher_resumes_ubuntu_oobe_only_when_no_regular_user_exists(self):
+        launcher = WINDOWS_LAUNCH.read_text(encoding="utf-8")
+
+        verify_block = launcher[
+            launcher.index("rem Resolve the configured non-root Linux account explicitly."):
+            launcher.index("rem =============================================================================\nrem 2. Docker Desktop discovery")
+        ]
+        self.assertIn('set "UBUNTU_USER_DISCOVERY_RESULT=%ERRORLEVEL%"', verify_block)
+        self.assertIn('if "%UBUNTU_USER_DISCOVERY_RESULT%"=="2" goto :ubuntu_user_setup_required', verify_block)
+        self.assertIn('if not "%UBUNTU_USER_DISCOVERY_RESULT%"=="0" goto :ubuntu_user_not_ready', verify_block)
+
+        recovery_start = launcher.index("\n:ubuntu_user_setup_required\n")
+        recovery_end = launcher.index("\n:ubuntu_user_not_ready\n")
+        recovery = launcher[recovery_start:recovery_end]
+        self.assertIn("wsl.exe -d %UBUNTU_DISTRO%", recovery)
+        self.assertIn("call :discover_ubuntu_user", recovery)
+        self.assertIn("goto :ubuntu_user_setup_still_incomplete", recovery)
+        self.assertNotIn("goto :verify_ubuntu", recovery)
+
+    def test_launcher_preserves_user_discovery_helper_exit_code(self):
+        launcher = WINDOWS_LAUNCH.read_text(encoding="utf-8")
+        start = launcher.index("\n:discover_ubuntu_user\n")
+        end = launcher.index("\n:discover_docker\n")
+        block = launcher[start:end]
+
+        self.assertIn('> "%UBUNTU_USER_OUTPUT%"', block)
+        self.assertIn('set "UBUNTU_USER_DISCOVERY_RESULT=%ERRORLEVEL%"', block)
+        self.assertIn('exit /b %UBUNTU_USER_DISCOVERY_RESULT%', block)
 
 
     def test_install_helper_normalizes_listed_distro_and_probes_from_root(self):

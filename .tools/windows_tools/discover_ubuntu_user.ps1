@@ -97,7 +97,7 @@ function Get-ConfiguredDefaultUser {
     return ''
 }
 
-function Get-OnlyRegularHomeUser {
+function Get-RegularHomeUsers {
     $passwdLines = & wsl.exe --distribution $Distribution --user root --cd / --exec /bin/cat /etc/passwd 2>$null
     if ($LASTEXITCODE -ne 0) {
         throw 'Could not read /etc/passwd from the Ubuntu distribution.'
@@ -139,12 +139,7 @@ function Get-OnlyRegularHomeUser {
         $users.Add($name)
     }
 
-    $uniqueUsers = @($users | Sort-Object -Unique)
-    if ($uniqueUsers.Count -eq 1) {
-        return $uniqueUsers[0]
-    }
-
-    return ''
+    return @($users | Sort-Object -Unique)
 }
 
 try {
@@ -156,13 +151,20 @@ try {
 
     # If /etc/wsl.conf has no usable [user] default, fall back only when there
     # is exactly one normal /home account. Never guess between multiple users.
-    $fallbackUser = Get-OnlyRegularHomeUser
-    if (-not [string]::IsNullOrWhiteSpace($fallbackUser) -and (Test-LinuxUser -Name $fallbackUser)) {
-        Write-Output $fallbackUser
+    $regularUsers = @(Get-RegularHomeUsers)
+    if ($regularUsers.Count -eq 1 -and (Test-LinuxUser -Name $regularUsers[0])) {
+        Write-Output $regularUsers[0]
         exit 0
     }
 
-    exit 2
+    # Keep the absence of any regular account distinct from an ambiguous or
+    # inconsistent existing-user state. The Windows launcher can safely resume
+    # Ubuntu's one-time OOBE only when no regular account exists at all.
+    if ($regularUsers.Count -eq 0) {
+        exit 2
+    }
+
+    exit 3
 } catch {
     exit 10
 }

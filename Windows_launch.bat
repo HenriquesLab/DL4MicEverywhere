@@ -95,7 +95,9 @@ rem can retain a stale UID-1000 default even when the valid Ubuntu user has a
 rem different UID (for example 1001), which can produce stale default-user relay errors.
 if not exist "%BASEDIR%\.tools\windows_tools\discover_ubuntu_user.ps1" goto :ubuntu_user_helper_missing
 call :discover_ubuntu_user
-if not "%ERRORLEVEL%"=="0" goto :ubuntu_user_not_ready
+set "UBUNTU_USER_DISCOVERY_RESULT=%ERRORLEVEL%"
+if "%UBUNTU_USER_DISCOVERY_RESULT%"=="2" goto :ubuntu_user_setup_required
+if not "%UBUNTU_USER_DISCOVERY_RESULT%"=="0" goto :ubuntu_user_not_ready
 
 echo       Ubuntu user: %UBUNTU_USER%
 echo       Ubuntu: ready (WSL 2).
@@ -142,13 +144,24 @@ exit /b 0
 
 :discover_ubuntu_user
 set "UBUNTU_USER="
+set "UBUNTU_USER_DISCOVERY_RESULT=10"
+set "UBUNTU_USER_OUTPUT=%TEMP%\dl4me_ubuntu_user.txt"
+if exist "%UBUNTU_USER_OUTPUT%" del /q "%UBUNTU_USER_OUTPUT%" >nul 2>&1
 
 rem Resolve the Linux username in PowerShell while probing the distribution as
 rem root. The helper validates /etc/wsl.conf first and deliberately does not
-rem assume that the normal account has UID 1000. It returns one ASCII-safe token.
-for /f "usebackq delims=" %%U in (`powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\discover_ubuntu_user.ps1" -Distribution %UBUNTU_DISTRO%`) do if not defined UBUNTU_USER set "UBUNTU_USER=%%U"
-if not defined UBUNTU_USER exit /b 1
-exit /b 0
+rem assume that the normal account has UID 1000. Preserve its exit code so the
+rem caller can distinguish a never-initialized distro from an ambiguous account.
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\discover_ubuntu_user.ps1" -Distribution %UBUNTU_DISTRO% > "%UBUNTU_USER_OUTPUT%"
+set "UBUNTU_USER_DISCOVERY_RESULT=%ERRORLEVEL%"
+if not "%UBUNTU_USER_DISCOVERY_RESULT%"=="0" goto :discover_ubuntu_user_cleanup
+for /f "usebackq delims=" %%U in ("%UBUNTU_USER_OUTPUT%") do if not defined UBUNTU_USER set "UBUNTU_USER=%%U"
+if defined UBUNTU_USER goto :discover_ubuntu_user_cleanup
+set "UBUNTU_USER_DISCOVERY_RESULT=10"
+
+:discover_ubuntu_user_cleanup
+if exist "%UBUNTU_USER_OUTPUT%" del /q "%UBUNTU_USER_OUTPUT%" >nul 2>&1
+exit /b %UBUNTU_USER_DISCOVERY_RESULT%
 
 :discover_docker
 set "DOCKER_DESKTOP_EXE="
@@ -546,8 +559,9 @@ echo.
 echo %PREFERRED_UBUNTU_DISTRO% was installed, but its first-run Linux user setup did
 echo not complete successfully.
 echo.
-echo Start %PREFERRED_UBUNTU_DISTRO% once, create the requested Linux username and
-echo password, close the Ubuntu shell, and then run Windows_launch.bat again.
+echo If Windows or WSL requested a restart, restart Windows and run Windows_launch.bat
+echo again. DL4MicEverywhere will detect the installed-but-uninitialized Ubuntu distro
+echo and automatically resume the username/password setup.
 echo.
 pause
 exit /b 1
@@ -594,6 +608,59 @@ echo error if the distribution itself is already usable.
 echo.
 pause
 exit /b 1
+
+:ubuntu_user_setup_required
+echo.
+echo The Ubuntu distribution %UBUNTU_DISTRO% is installed, but its one-time Linux
+echo user setup has not completed yet.
+echo.
+echo DL4MicEverywhere will now resume Ubuntu's standard first-run setup. Create the
+echo requested Linux username and password. When the Ubuntu shell appears, type:
+echo.
+echo     exit
+echo.
+echo The launcher will then validate the new account and continue automatically.
+echo.
+wsl.exe -d %UBUNTU_DISTRO%
+set "UBUNTU_FIRST_RUN_RESULT=%ERRORLEVEL%"
+if not "%UBUNTU_FIRST_RUN_RESULT%"=="0" goto :ubuntu_user_setup_resume_failed
+
+call :discover_ubuntu_user
+set "UBUNTU_USER_DISCOVERY_RESULT=%ERRORLEVEL%"
+if not "%UBUNTU_USER_DISCOVERY_RESULT%"=="0" goto :ubuntu_user_setup_still_incomplete
+
+echo.
+echo       Ubuntu user: %UBUNTU_USER%
+echo       Ubuntu: ready (WSL 2).
+goto :check_docker
+
+:ubuntu_user_setup_resume_failed
+echo.
+echo Ubuntu's one-time Linux user setup did not complete successfully.
+echo.
+echo If Windows or WSL requested a restart, restart Windows and run
+echo Windows_launch.bat again. DL4MicEverywhere will retry this setup safely.
+echo.
+echo You can also start the setup directly with:
+echo.
+echo     wsl -d %UBUNTU_DISTRO%
+echo.
+pause
+exit /b 1
+
+:ubuntu_user_setup_still_incomplete
+echo.
+echo Ubuntu returned from its first-run setup, but DL4MicEverywhere still could not
+echo validate a usable non-root Linux account.
+echo.
+echo Run the following command once and complete any username/password prompt:
+echo.
+echo     wsl -d %UBUNTU_DISTRO%
+echo.
+echo Then type "exit" and run Windows_launch.bat again. If no setup prompt appears,
+echo use the account diagnostics below.
+echo.
+goto :ubuntu_user_not_ready
 
 :ubuntu_user_not_ready
 echo.
