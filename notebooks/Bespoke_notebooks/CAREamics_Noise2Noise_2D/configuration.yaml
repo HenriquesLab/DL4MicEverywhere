@@ -1,0 +1,43 @@
+authors:
+- The CAREamics team
+badges:
+- icon: https://colab.research.google.com/assets/colab-badge.svg
+  label: Open in Colab
+  url: https://colab.research.google.com/github/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/Bespoke_notebooks/CAREamics_Noise2Noise_2D/CAREamics_Noise2Noise_2D_ZeroCostDL4Mic.ipynb
+cite:
+- doi: https://doi.org/10.1038/s41467-021-22518-0
+  text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
+- doi: https://arxiv.org/abs/1803.04189
+  text: 'Lehtinen, J. et al. Noise2Noise: Learning Image Restoration without Clean Data. ICML 2018. https://arxiv.org/abs/1803.04189'
+- doi: https://github.com/CAREamics/careamics
+  text: 'CAREamics: a PyTorch/Lightning library for denoising and restoration in microscopy. https://github.com/CAREamics/careamics'
+config:
+  dl4miceverywhere:
+    cuda_version: 12.2.2
+    cudnn_version: 8.9.7.29
+    description: CAREamics_Noise2Noise_2D is a CAREamics-powered Noise2Noise 2D notebook, using a PyTorch/Lightning implementation.
+    dl4miceverywhere_version: 2.2.0
+    docker_hub_image: careamics_noise2noise_2d_zerocostdl4mic-b1.0.0-d2.2.0
+    notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/CAREamics_Noise2Noise_2D/CAREamics_Noise2Noise_2D_ZeroCostDL4Mic.ipynb
+    notebook_version: 1.0.0
+    python_version: '3.11'
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/CAREamics_Noise2Noise_2D/requirements.txt
+    sections_to_remove: 1.1. 1.2. 2. 6.3.
+    ubuntu_version: '22.04'
+description: self-supervised denoising of 2D images using pairs of independently-noisy acquisitions, powered by CAREamics. No clean ground truth required.
+documentation: https://careamics.github.io/
+download_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/CAREamics_Noise2Noise_2D/CAREamics_Noise2Noise_2D_ZeroCostDL4Mic.ipynb
+git_repo: https://github.com/CAREamics/careamics
+links:
+- Notebook Preview
+name: Noise2Noise (2D) - CAREamics
+tags:
+- colab
+- notebook
+- Noise2Noise
+- denoising
+- CAREamics
+- 2D
+- dl4miceverywhere
+type: application
+version: 1.0.0
