@@ -1,0 +1,43 @@
+authors:
+- The CAREamics team
+badges:
+- icon: https://colab.research.google.com/assets/colab-badge.svg
+  label: Open in Colab
+  url: https://colab.research.google.com/github/HenriquesLab/DL4MicEverywhere/blob/main/notebooks/Bespoke_notebooks/CAREamics_CARE_2D/CAREamics_CARE_2D_ZeroCostDL4Mic.ipynb
+cite:
+- doi: https://doi.org/10.1038/s41467-021-22518-0
+  text: von Chamier, L., Laine, R.F., Jukkala, J. et al. Democratising deep learning for microscopy with ZeroCostDL4Mic. Nat Commun 12, 2276 (2021). https://doi.org/10.1038/s41467-021-22518-0
+- doi: https://doi.org/10.1038/s41592-018-0216-7
+  text: 'Weigert, M., Schmidt, U., Boothe, T. et al. Content-aware image restoration: pushing the limits of fluorescence microscopy. Nat Methods 15, 1090-1097 (2018). https://doi.org/10.1038/s41592-018-0216-7'
+- doi: https://github.com/CAREamics/careamics
+  text: 'CAREamics: a PyTorch/Lightning library for denoising and restoration in microscopy. https://github.com/CAREamics/careamics'
+config:
+  dl4miceverywhere:
+    cuda_version: 12.2.2
+    cudnn_version: 8.9.7.29
+    description: CAREamics_CARE_2D is a CAREamics-powered CARE 2D notebook, using a PyTorch/Lightning implementation. It is an alternative to the existing CSBDeep-based CARE_2D_DL4Mic notebook.
+    dl4miceverywhere_version: 2.2.0
+    docker_hub_image: careamics_care_2d_zerocostdl4mic-b1.0.0-d2.2.0
+    notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/CAREamics_CARE_2D/CAREamics_CARE_2D_ZeroCostDL4Mic.ipynb
+    notebook_version: 1.0.0
+    python_version: '3.11'
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/CAREamics_CARE_2D/requirements.txt
+    sections_to_remove: 1.1. 1.2. 2. 6.3.
+    ubuntu_version: '22.04'
+description: supervised restoration of 2D images. CARE is trained on pairs of low-SNR input and matching high-SNR ground truth images, powered by CAREamics. An alternative to the existing CSBDeep-based CARE 2D notebook.
+documentation: https://careamics.github.io/
+download_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/CAREamics_CARE_2D/CAREamics_CARE_2D_ZeroCostDL4Mic.ipynb
+git_repo: https://github.com/CAREamics/careamics
+links:
+- Notebook Preview
+name: CARE (2D) - CAREamics
+tags:
+- colab
+- notebook
+- CARE
+- denoising
+- CAREamics
+- 2D
+- dl4miceverywhere
+type: application
+version: 1.0.0
