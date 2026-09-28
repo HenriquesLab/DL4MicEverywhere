@@ -131,10 +131,14 @@ RUN curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh |
 # Do not add it again, or apt may fail with conflicting Signed-By settings.
 RUN set -eux; \
     apt-get update; \
-    if [ -n "${CUDNN_VERSION}" ]; then \
+    if [[ "${CUDNN_VERSION}" == 8* ]]; then \
         apt-get install -y --no-install-recommends \
             "libcudnn8=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*}" \
             "libcudnn8-dev=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*}"; \
+    elif [[ "${CUDNN_VERSION}" == 9* ]]; then  \
+        apt-get install -y --no-install-recommends \
+            "libcudnn9-cuda-${CUDA_VERSION%%.*}" \
+            "libcudnn9-dev-cuda-${CUDA_VERSION%%.*}"; \
     else \
         apt-get install -y --no-install-recommends \
             libcudnn8 \
