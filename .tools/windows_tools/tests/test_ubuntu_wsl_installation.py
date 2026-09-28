@@ -3,6 +3,7 @@ import unittest
 
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+WINDOWS_TOOLS = REPO_ROOT / ".tools" / "windows_tools"
 WINDOWS_LAUNCH = REPO_ROOT / "Windows_launch.bat"
 INSTALL_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "install_ubuntu_wsl.ps1"
 DISCOVERY_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "discover_ubuntu_wsl.ps1"
@@ -10,6 +11,7 @@ READINESS_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "wsl_readiness.ps1"
 VERSION_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "check_wsl_distribution_version.ps1"
 CONVERSION_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "convert_wsl_distribution_to_v2.ps1"
 USER_DISCOVERY_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "discover_ubuntu_user.ps1"
+USER_CREATION_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "create_ubuntu_user.ps1"
 DOCKER_USER_ACCESS_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "ensure_ubuntu_docker_user_access.ps1"
 PRE_LAUNCH_TEST = REPO_ROOT / ".tools" / "bash_tools" / "pre_launch_test.sh"
 
@@ -189,7 +191,7 @@ class UbuntuWslInstallationTests(unittest.TestCase):
         self.assertIn("(?i:default)", helper)
         self.assertIn("$regularUsers.Count -eq 1", helper)
         self.assertIn("$uid -lt 1000 -or $uid -ge 65534", helper)
-        self.assertIn("$home.StartsWith('/home/')", helper)
+        self.assertIn("$linuxHomeDirectory.StartsWith('/home/')", helper)
 
     def test_user_discovery_distinguishes_uninitialized_from_ambiguous_state(self):
         helper = USER_DISCOVERY_HELPER.read_text(encoding="utf-8")
@@ -199,7 +201,7 @@ class UbuntuWslInstallationTests(unittest.TestCase):
         self.assertIn("exit 3", helper)
         self.assertLess(helper.index("if ($regularUsers.Count -eq 0)"), helper.index("exit 3"))
 
-    def test_launcher_resumes_ubuntu_oobe_only_when_no_regular_user_exists(self):
+    def test_launcher_offers_guarded_user_creation_when_discovery_fails(self):
         launcher = WINDOWS_LAUNCH.read_text(encoding="utf-8")
 
         verify_block = launcher[
@@ -207,16 +209,17 @@ class UbuntuWslInstallationTests(unittest.TestCase):
             launcher.index("rem =============================================================================\nrem 2. Docker Desktop discovery")
         ]
         self.assertIn('set "UBUNTU_USER_DISCOVERY_RESULT=%ERRORLEVEL%"', verify_block)
-        self.assertIn('if "%UBUNTU_USER_DISCOVERY_RESULT%"=="2" goto :ubuntu_user_setup_required', verify_block)
-        self.assertIn('if not "%UBUNTU_USER_DISCOVERY_RESULT%"=="0" goto :ubuntu_user_not_ready', verify_block)
+        self.assertIn('if not "%UBUNTU_USER_DISCOVERY_RESULT%"=="0" goto :ubuntu_user_setup_required', verify_block)
 
         recovery_start = launcher.index("\n:ubuntu_user_setup_required\n")
         recovery_end = launcher.index("\n:ubuntu_user_not_ready\n")
         recovery = launcher[recovery_start:recovery_end]
-        self.assertIn("wsl.exe -d %UBUNTU_DISTRO%", recovery)
+        self.assertIn("create_ubuntu_user.ps1", recovery)
+        self.assertIn("-Distribution %UBUNTU_DISTRO%", recovery)
         self.assertIn("call :discover_ubuntu_user", recovery)
         self.assertIn("goto :ubuntu_user_setup_still_incomplete", recovery)
-        self.assertNotIn("goto :verify_ubuntu", recovery)
+        self.assertIn('if "%UBUNTU_USER_SETUP_RESULT%"=="3" goto :ubuntu_user_not_ready', recovery)
+        self.assertNotIn("run_ubuntu_oobe.ps1", recovery)
 
     def test_launcher_preserves_user_discovery_helper_exit_code(self):
         launcher = WINDOWS_LAUNCH.read_text(encoding="utf-8")
@@ -228,12 +231,67 @@ class UbuntuWslInstallationTests(unittest.TestCase):
         self.assertIn('set "UBUNTU_USER_DISCOVERY_RESULT=%ERRORLEVEL%"', block)
         self.assertIn('exit /b %UBUNTU_USER_DISCOVERY_RESULT%', block)
 
-
-    def test_install_helper_normalizes_listed_distro_and_probes_from_root(self):
+    def test_install_helper_defers_user_creation_to_launcher(self):
         text = INSTALL_HELPER.read_text(encoding="utf-8")
         self.assertIn("Normalize-WslDistributionName", text)
         self.assertIn("Replace([string][char]0, '')", text)
-        self.assertIn("--user root --cd / --exec /bin/true", text)
+        self.assertIn("create the normal Ubuntu user with your input", text)
+        self.assertNotIn("/usr/sbin/useradd", text)
+        self.assertNotIn("/usr/bin/passwd", text)
+
+    def test_user_creation_helper_lets_user_choose_account_and_password_in_ubuntu(self):
+        helper = USER_CREATION_HELPER.read_text(encoding="utf-8")
+
+        self.assertIn("Read-Host", helper)
+        self.assertIn("Ubuntu username", helper)
+        self.assertIn("/usr/sbin/useradd -m -U -s /bin/bash", helper)
+        self.assertIn("/usr/bin/passwd $user", helper)
+        self.assertIn("/usr/sbin/usermod -aG sudo $user", helper)
+        self.assertIn("/usr/bin/getent', 'group'", helper)
+        self.assertIn("/usr/sbin/groupdel $User", helper)
+        self.assertIn("Your password will be entered directly into Ubuntu", helper)
+        self.assertNotIn("ConvertTo-SecureString", helper)
+        self.assertNotIn("chpasswd", helper)
+
+    def test_windows_helpers_do_not_assign_to_powershell_home_automatic_variable(self):
+        # PowerShell variable names are case-insensitive. $HOME is a built-in
+        # read-only automatic variable, so assignments such as `$home = ...`
+        # fail at runtime even though the casing looks like a local variable.
+        for helper_path in WINDOWS_TOOLS.glob("*.ps1"):
+            helper = helper_path.read_text(encoding="utf-8")
+            self.assertNotRegex(
+                helper,
+                r"(?im)^\s*\$home\s*=",
+                msg=f"{helper_path.name} assigns to PowerShell's read-only $HOME variable",
+            )
+
+    def test_user_creation_helper_refuses_to_modify_existing_regular_user_state(self):
+        helper = USER_CREATION_HELPER.read_text(encoding="utf-8")
+
+        self.assertIn("Get-RegularHomeUsers", helper)
+        self.assertIn("if ($existingUsers.Count -gt 0)", helper)
+        self.assertIn("will not create another account automatically", helper)
+        self.assertIn("exit 3", helper)
+
+    def test_user_creation_helper_sets_default_user_and_validates_non_root_uid(self):
+        helper = USER_CREATION_HELPER.read_text(encoding="utf-8")
+
+        self.assertIn("Set-WslDefaultUser", helper)
+        self.assertIn("[user]", helper)
+        self.assertIn('default=$User', helper)
+        self.assertIn("/usr/bin/tee /etc/wsl.conf", helper)
+        self.assertIn("--terminate $Distribution", helper)
+        self.assertIn("'/usr/bin/id', '-u'", helper)
+        self.assertIn("$uid -le 0", helper)
+
+    def test_windows_launcher_never_runs_application_as_root(self):
+        launcher = WINDOWS_LAUNCH.read_text(encoding="utf-8")
+        launch_start = launcher.index("\n:launch_application\n")
+        launch_block = launcher[launch_start:]
+
+        self.assertIn("-u %UBUNTU_USER% --exec /usr/bin/env DL4ME_WINDOWS_WRAPPER=1", launch_block)
+        self.assertNotIn("-u root --exec /usr/bin/env DL4ME_WINDOWS_WRAPPER=1", launch_block)
+        self.assertIn("it never runs the app", launcher)
 
 
 if __name__ == "__main__":

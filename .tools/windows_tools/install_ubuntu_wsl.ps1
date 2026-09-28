@@ -50,7 +50,8 @@ function Show-UbuntuConsentDialog {
         'distribution for your Windows user account; it does not enable Windows optional',
         'features or change the default distribution used by other applications.',
         '',
-        'After installation, Ubuntu will ask you once to create a Linux username and password.'
+        'After installation, DL4MicEverywhere will ask you to choose the Ubuntu username',
+        'and Ubuntu itself will securely prompt you for that account password.'
     ) -join [Environment]::NewLine
     $form.Controls.Add($body)
 
@@ -183,7 +184,7 @@ try {
 
     # Do not inherit a machine's previous default WSL generation. DL4MicEverywhere
     # requires WSL 2, so configure the newly installed distro explicitly before
-    # first-run user creation. This changes only this distribution.
+    # the launcher creates the normal Linux account. This changes only this distribution.
     Write-Host "Ensuring $Distribution uses WSL 2..."
     & wsl.exe --set-version $Distribution 2
     if ($LASTEXITCODE -ne 0) {
@@ -193,31 +194,10 @@ try {
 
     Write-Host ''
     Write-Host "$Distribution has been installed successfully." -ForegroundColor Green
+    Write-Host 'DL4MicEverywhere will now create the normal Ubuntu user with your input.'
+    Write-Host 'The Windows launcher will ask you to choose the Linux username and Ubuntu will'
+    Write-Host 'collect the password directly, including after an interrupted fresh installation.'
     Write-Host ''
-    Write-Host 'Ubuntu now needs to perform its standard one-time Linux user setup.'
-    Write-Host 'Create the requested Linux username and password.'
-    Write-Host 'When the Ubuntu shell appears after setup, type:'
-    Write-Host ''
-    Write-Host '    exit' -ForegroundColor Cyan
-    Write-Host ''
-    Write-Host 'DL4MicEverywhere will then continue automatically.'
-    Write-Host ''
-
-    & wsl.exe --distribution $Distribution
-    $firstRunResult = $LASTEXITCODE
-    if ($firstRunResult -ne 0) {
-        Write-Host "ERROR: The first Ubuntu launch returned exit code $firstRunResult." -ForegroundColor Red
-        exit 13
-    }
-
-    # Confirm that the distribution can start after first-run initialization.
-    & wsl.exe --distribution $Distribution --user root --cd / --exec /bin/true
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host 'ERROR: Ubuntu is installed but could not be started after its initial setup.' -ForegroundColor Red
-        exit 13
-    }
-
-    Write-Host "$Distribution initial setup completed successfully." -ForegroundColor Green
     exit 0
 } catch {
     Write-Host "ERROR: Unexpected Ubuntu installation failure: $($_.Exception.Message)" -ForegroundColor Red

@@ -32,14 +32,18 @@ cd /d "%BASEDIR%"
 
 call :print_header
 
-rem A downloaded ZIP can mark every bundled PowerShell helper as coming from
-rem the Internet. A managed RemoteSigned policy overrides -ExecutionPolicy Bypass,
-rem so remove that mark from this launcher's own helpers before calling any of
-rem them. Inline PowerShell commands are permitted by RemoteSigned.
-echo Checking bundled Windows helpers...
-if not exist "%DL4ME_WINDOWS_TOOLS%\" goto :powershell_helpers_unavailable
-powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $policy = Get-ExecutionPolicy; if ($policy -in @('AllSigned', 'Restricted')) { Write-Host ('Windows PowerShell policy ' + $policy + ' does not permit the bundled unsigned helpers.'); exit 2 }; Get-ChildItem -LiteralPath $env:DL4ME_WINDOWS_TOOLS -Filter '*.ps1' -File | Unblock-File -ErrorAction Stop"
-if errorlevel 1 goto :powershell_helpers_unavailable
+rem Prepare every bundled PowerShell helper before executing any .ps1 file.
+rem ZIP downloads can propagate Mark-of-the-Web (Zone.Identifier) to extracted
+rem scripts. Under RemoteSigned that blocks unsigned helpers even when this
+rem launcher requests -ExecutionPolicy Bypass, because managed policy wins.
+rem The bootstrap itself is an inline PowerShell command, so it can safely
+rem remove and verify those marks before the first script-file invocation.
+call :prepare_powershell_helpers
+set "POWERSHELL_HELPER_RESULT=%ERRORLEVEL%"
+if "%POWERSHELL_HELPER_RESULT%"=="0" goto :check_wsl
+if "%POWERSHELL_HELPER_RESULT%"=="2" goto :powershell_policy_unsupported
+if "%POWERSHELL_HELPER_RESULT%"=="3" goto :powershell_helpers_still_blocked
+goto :powershell_helpers_unavailable
 
 rem =============================================================================
 rem 1. WSL and Ubuntu discovery. The launcher itself remains non-elevated. If
@@ -93,11 +97,14 @@ if not "%UBUNTU_WSL_VERSION_RESULT%"=="0" goto :ubuntu_wsl_version_unknown
 rem Resolve the configured non-root Linux account explicitly. Some WSL states
 rem can retain a stale UID-1000 default even when the valid Ubuntu user has a
 rem different UID (for example 1001), which can produce stale default-user relay errors.
+rem If discovery cannot find a usable account, hand off to the guarded account
+rem setup helper. That helper independently refuses to create a new account when
+rem Ubuntu already contains regular /home users, so ambiguous existing installs
+rem are never modified or guessed.
 if not exist "%BASEDIR%\.tools\windows_tools\discover_ubuntu_user.ps1" goto :ubuntu_user_helper_missing
 call :discover_ubuntu_user
 set "UBUNTU_USER_DISCOVERY_RESULT=%ERRORLEVEL%"
-if "%UBUNTU_USER_DISCOVERY_RESULT%"=="2" goto :ubuntu_user_setup_required
-if not "%UBUNTU_USER_DISCOVERY_RESULT%"=="0" goto :ubuntu_user_not_ready
+if not "%UBUNTU_USER_DISCOVERY_RESULT%"=="0" goto :ubuntu_user_setup_required
 
 echo       Ubuntu user: %UBUNTU_USER%
 echo       Ubuntu: ready (WSL 2).
@@ -130,6 +137,13 @@ if not "%ERRORLEVEL%"=="0" goto :docker_not_ready
 
 echo       Docker Desktop: ready.
 goto :check_docker_integration
+
+:prepare_powershell_helpers
+echo Checking bundled Windows helpers...
+if not exist "%DL4ME_WINDOWS_TOOLS%\" exit /b 4
+
+powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $effectivePolicy = Get-ExecutionPolicy; if ($effectivePolicy -in @('AllSigned', 'Restricted')) { Write-Host ('Windows PowerShell policy ' + $effectivePolicy + ' requires signed scripts or forbids script files.'); exit 2 }; $files = @(Get-ChildItem -LiteralPath $env:DL4ME_WINDOWS_TOOLS -Recurse -Filter '*.ps1' -File -ErrorAction Stop); if ($files.Count -eq 0) { Write-Host 'No bundled PowerShell helpers were found.'; exit 4 }; $blocked = New-Object System.Collections.Generic.List[string]; foreach ($file in $files) { $zone = Get-Item -LiteralPath $file.FullName -Stream Zone.Identifier -ErrorAction SilentlyContinue; if ($null -eq $zone) { continue }; try { Unblock-File -LiteralPath $file.FullName -ErrorAction Stop } catch { }; $zone = Get-Item -LiteralPath $file.FullName -Stream Zone.Identifier -ErrorAction SilentlyContinue; if ($null -ne $zone) { try { Remove-Item -LiteralPath $file.FullName -Stream Zone.Identifier -Force -ErrorAction Stop } catch { }; $zone = Get-Item -LiteralPath $file.FullName -Stream Zone.Identifier -ErrorAction SilentlyContinue }; if ($null -ne $zone) { [void]$blocked.Add($file.FullName) } }; if ($blocked.Count -gt 0) { Write-Host 'ERROR: Windows still marks these bundled PowerShell helpers as downloaded from the Internet:' -ForegroundColor Red; foreach ($path in $blocked) { Write-Host ('  ' + $path) -ForegroundColor Red }; exit 3 }; Write-Host ('      PowerShell helpers: ready (' + $files.Count + ' checked).'); exit 0"
+exit /b %ERRORLEVEL%
 
 :discover_ubuntu
 set "UBUNTU_DISTRO="
@@ -318,6 +332,41 @@ rem ============================================================================
 rem Clear prerequisite / installation messages
 rem =============================================================================
 
+:powershell_policy_unsupported
+echo.
+echo DL4MicEverywhere cannot run its bundled Windows PowerShell helpers because
+echo this computer enforces an execution policy that requires signed scripts or
+echo forbids script files.
+echo.
+echo DL4MicEverywhere does not weaken or override managed Windows security policy.
+echo If this computer is managed by your organization, ask IT whether the bundled
+echo helpers can be allowed or signed for this computer.
+echo.
+pause
+exit /b 1
+
+:powershell_helpers_still_blocked
+echo.
+echo DL4MicEverywhere found Windows Internet security marks on one or more bundled
+echo PowerShell helpers and could not remove them automatically.
+echo.
+echo No PowerShell helper was executed. File permissions or endpoint security
+echo software may be preventing removal of the Zone.Identifier stream.
+echo Review the specific file paths printed above and try DL4MicEverywhere again
+echo after the Windows security restriction has been resolved.
+echo.
+pause
+exit /b 1
+
+:powershell_helpers_unavailable
+echo.
+echo DL4MicEverywhere could not prepare its bundled Windows PowerShell helpers.
+echo The helper folder may be missing, unreadable, or blocked by Windows security.
+echo Please use a complete DL4MicEverywhere download and try again.
+echo.
+pause
+exit /b 1
+
 :wsl_not_installed
 echo.
 echo Windows Subsystem for Linux is not installed or its Windows components are not
@@ -371,16 +420,6 @@ echo DL4MicEverywhere could not determine the Windows Subsystem for Linux state.
 echo.
 echo Please run "wsl --version" and "wsl --status" in PowerShell or Command Prompt
 echo to inspect the WSL installation, then run Windows_launch.bat again.
-echo.
-pause
-exit /b 1
-
-:powershell_helpers_unavailable
-echo.
-echo DL4MicEverywhere could not prepare its bundled Windows helpers.
-echo Windows PowerShell policy or file permissions may be preventing them from
-echo running. If this computer is managed by your organization, ask IT whether
-echo these PowerShell helpers can be allowed or signed for this computer.
 echo.
 pause
 exit /b 1
@@ -611,20 +650,24 @@ exit /b 1
 
 :ubuntu_user_setup_required
 echo.
-echo The Ubuntu distribution %UBUNTU_DISTRO% is installed, but its one-time Linux
-echo user setup has not completed yet.
+echo Ubuntu does not currently have a usable non-root account for DL4MicEverywhere.
 echo.
-echo DL4MicEverywhere will now resume Ubuntu's standard first-run setup. Create the
-echo requested Linux username and password. When the Ubuntu shell appears, type:
+echo If this is a fresh Ubuntu installation, DL4MicEverywhere can create the normal
+echo Linux account now. You will choose the username yourself and Ubuntu will ask
+echo you to enter the password directly. The password is not stored by DL4MicEverywhere.
 echo.
-echo     exit
+echo The account will receive its own /home directory and sudo access, and it will
+echo be configured as Ubuntu's default WSL user when possible.
 echo.
-echo The launcher will then validate the new account and continue automatically.
-echo.
-wsl.exe -d %UBUNTU_DISTRO%
-set "UBUNTU_FIRST_RUN_RESULT=%ERRORLEVEL%"
-if not "%UBUNTU_FIRST_RUN_RESULT%"=="0" goto :ubuntu_user_setup_resume_failed
+if not exist "%BASEDIR%\.tools\windows_tools\create_ubuntu_user.ps1" goto :ubuntu_user_setup_helper_missing
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\create_ubuntu_user.ps1" -Distribution %UBUNTU_DISTRO%
+set "UBUNTU_USER_SETUP_RESULT=%ERRORLEVEL%"
+if "%UBUNTU_USER_SETUP_RESULT%"=="0" goto :ubuntu_user_setup_validate
+if "%UBUNTU_USER_SETUP_RESULT%"=="2" goto :ubuntu_user_setup_cancelled
+if "%UBUNTU_USER_SETUP_RESULT%"=="3" goto :ubuntu_user_not_ready
+goto :ubuntu_user_setup_failed
 
+:ubuntu_user_setup_validate
 call :discover_ubuntu_user
 set "UBUNTU_USER_DISCOVERY_RESULT=%ERRORLEVEL%"
 if not "%UBUNTU_USER_DISCOVERY_RESULT%"=="0" goto :ubuntu_user_setup_still_incomplete
@@ -634,31 +677,41 @@ echo       Ubuntu user: %UBUNTU_USER%
 echo       Ubuntu: ready (WSL 2).
 goto :check_docker
 
-:ubuntu_user_setup_resume_failed
+:ubuntu_user_setup_failed
 echo.
-echo Ubuntu's one-time Linux user setup did not complete successfully.
+echo Ubuntu user creation did not complete successfully.
 echo.
-echo If Windows or WSL requested a restart, restart Windows and run
-echo Windows_launch.bat again. DL4MicEverywhere will retry this setup safely.
+echo DL4MicEverywhere did not fall back to running the application as root. Review
+echo the specific account-creation message shown above and run Windows_launch.bat
+echo again when ready.
 echo.
-echo You can also start the setup directly with:
+pause
+exit /b 1
+
+:ubuntu_user_setup_cancelled
 echo.
-echo     wsl -d %UBUNTU_DISTRO%
+echo Ubuntu user creation was cancelled.
+echo No Linux account was created or selected by DL4MicEverywhere.
+echo Run Windows_launch.bat again whenever you are ready to finish Ubuntu setup.
+echo.
+pause
+exit /b 0
+
+:ubuntu_user_setup_helper_missing
+echo.
+echo The DL4MicEverywhere Ubuntu account-creation helper is missing from this copy
+echo of the repository. Please download a complete DL4MicEverywhere release and try again.
 echo.
 pause
 exit /b 1
 
 :ubuntu_user_setup_still_incomplete
 echo.
-echo Ubuntu returned from its first-run setup, but DL4MicEverywhere still could not
-echo validate a usable non-root Linux account.
+echo Ubuntu returned from account creation, but DL4MicEverywhere still could not
+echo validate the new non-root Linux account.
 echo.
-echo Run the following command once and complete any username/password prompt:
-echo.
-echo     wsl -d %UBUNTU_DISTRO%
-echo.
-echo Then type "exit" and run Windows_launch.bat again. If no setup prompt appears,
-echo use the account diagnostics below.
+echo The application will not run as root. Use the diagnostics below to inspect the
+echo account that Ubuntu created.
 echo.
 goto :ubuntu_user_not_ready
 
@@ -667,8 +720,10 @@ echo.
 echo The Ubuntu distribution %UBUNTU_DISTRO% is installed, but DL4MicEverywhere
 echo could not resolve a usable non-root Linux account for it.
 echo.
-echo DL4MicEverywhere does not assume that the account must have UID 1000. It first
-echo checks the [user] default entry in /etc/wsl.conf and then validates the account.
+echo DL4MicEverywhere does not assume that the account must have UID 1000. It checks
+echo the [user] default entry in /etc/wsl.conf and regular /home accounts. If no
+echo normal account exists, the launcher offers to create one; it never runs the app
+echo as root.
 echo.
 echo Inspect the configured account with:
 echo.

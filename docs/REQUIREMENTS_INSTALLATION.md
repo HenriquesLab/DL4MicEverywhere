@@ -16,6 +16,8 @@ The installation guidelines will be different depending on your operative system
 
 ## Intro
 Windows operating systems require a slightly more complicated installation process. Also, beware there might be differences between Windows 10 and 11.
+
+Before running any bundled PowerShell helper, `Windows_launch.bat` automatically checks the helper files for Windows Mark-of-the-Web (`Zone.Identifier`) metadata that can be propagated from a downloaded ZIP. On systems using `RemoteSigned`, the launcher removes those marks recursively and verifies that they are gone before executing the first `.ps1` file. This does not change the computer's PowerShell execution policy. If an organization enforces `AllSigned`/`Restricted`, or endpoint security prevents the marks from being removed, DL4MicEverywhere stops with a specific diagnostic instead of trying to bypass the managed policy.
 - WSL 2 is checked first. If WSL is missing or outdated, DL4MicEverywhere can install/update it automatically using Microsoft's official WSL commands, requesting Administrator permission only for the machine-level WSL step when needed. If no Ubuntu distribution is present afterwards, DL4MicEverywhere can install Ubuntu 24.04 LTS automatically.
 - Docker Desktop can then be installed automatically by DL4MicEverywhere in per-user mode, or installed manually if preferred.
 - DL4MicEverywhere installs missing Linux-side runtime utilities such as Tcl/Tk inside the selected Ubuntu distribution.
@@ -40,10 +42,11 @@ If no Ubuntu distribution is found, the launcher offers to install **Ubuntu-24.0
 2. Asks for explicit user consent before installing anything.
 3. Uses Microsoft's supported `wsl --install --distribution Ubuntu-24.04 --no-launch` command.
 4. If the normal installation fails, offers a retry using WSL's `--web-download` mode.
-5. Starts Ubuntu once so the user can complete the standard Linux username/password creation.
-6. Verifies that the distribution can start and then returns to the normal DL4MicEverywhere preflight.
+5. Returns to the Windows preflight, which checks whether Ubuntu already has a regular Linux user.
+6. If no regular user exists, asks the user to choose their own Ubuntu username, creates that normal `/home` account, lets Ubuntu's `passwd` command collect the password interactively, grants `sudo` access, and configures the account as the WSL default when possible. DL4MicEverywhere itself is never launched as `root`.
+7. Verifies the created account and continues with Docker setup.
 
-DL4MicEverywhere does **not** create or store Linux credentials and does not change the user's global default WSL distribution.
+DL4MicEverywhere creates the Ubuntu account only after the user chooses the username; the password is entered directly into Ubuntu and is never stored by DL4MicEverywhere. The launcher does not change the user's global default WSL distribution.
 
 If automatic installation fails, the equivalent manual command is:
 
@@ -51,7 +54,7 @@ If automatic installation fails, the equivalent manual command is:
 wsl --install -d Ubuntu-24.04
 ```
 
-After installation, complete Ubuntu's normal first-run username/password setup.
+If an interrupted setup leaves Ubuntu installed with no regular Linux account, rerunning `Windows_launch.bat` will detect that state and offer the same guarded account-creation flow again.
 
 ## 2. Docker Desktop installation
 

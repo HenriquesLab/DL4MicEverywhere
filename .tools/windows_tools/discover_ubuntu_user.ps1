@@ -120,13 +120,13 @@ function Get-RegularHomeUsers {
         if (-not [int]::TryParse($parts[2], [ref]$uid)) {
             continue
         }
-        $home = $parts[5]
+        $linuxHomeDirectory = $parts[5]
         $shell = $parts[6]
 
         if ($uid -lt 1000 -or $uid -ge 65534) {
             continue
         }
-        if (-not $home.StartsWith('/home/')) {
+        if (-not $linuxHomeDirectory.StartsWith('/home/')) {
             continue
         }
         if ($shell -match '(?i)/(nologin|false|sync)$') {
