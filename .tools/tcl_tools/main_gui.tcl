@@ -3,6 +3,9 @@
 # Set the BASEDIR
 set basedir [lindex $argv 0]
 
+# Load cross-platform list/filesystem helpers before building GUI selectors.
+source [file join $basedir .tools tcl_tools list_utils.tcl]
+
 # Check if there is cache information
 set filename "$basedir/.tools/.cache/.cache_gui"
 set fexist [file exist $filename]
@@ -324,35 +327,17 @@ proc onComboboxSelectedFolder {notebook_folder} {
     # Always update the selected folder
     set selectedFolder "${notebook_folder}"
 
-    # Reset the notebook list and version list
-    set notebookList "-"
-    set versionList "-"
+    # Reset the notebook list and version list as real Tcl lists.
+    set notebookList [list "-"]
+    set versionList [list "-"]
 
-    # Get notebooks on that folder
-    if {"$selectedFolder" != "-"} {
-        
-        # Get the number of subfolders in the selected folder
-
-        catch {exec find [glob "$basedir/notebooks/$selectedFolder/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | wc -l} num_folders
-        
-        set no_folders_flag 0
-        if {"$num_folders" == 1} {
-            # In case only one folder has been found, it may be that there are no folder
-            catch {exec find [glob "$basedir/notebooks/$selectedFolder/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0} folder_name
-
-            if {"$folder_name" == "."} {
-                # If the folder is called ".", this means that there are no folders
-                set no_folders_flag 1
-            }
+    # Discover notebooks using Tcl itself.  Do not parse `find`/`xargs` output:
+    # paths and directory names may contain spaces or Tcl-special characters.
+    if {$selectedFolder ne "-"} {
+        set notebookDirectory [file join $basedir notebooks $selectedFolder]
+        foreach notebookName [dl4me_immediate_subdirectory_names $notebookDirectory] {
+            lappend notebookList $notebookName
         }
-
-        if {"$no_folders_flag" != 1} {
-            # Notebook list will only be updated in case there are subfolders
-            catch {exec find [glob "$basedir/notebooks/$selectedFolder/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | xargs -0 -n 1 basename | sort} output
-
-            append notebookList " " $output
-        }
-    
     } else {
         set selectedNotebook "-"
     }
@@ -375,8 +360,8 @@ proc onComboboxSelectedNotebook {notebook_name} {
         # Reset selected version to latest and version list
         set selectedVersion "-"
 
-        # Reset the version list
-        set versionList "-"
+        # Reset the version list as a real Tcl list.
+        set versionList [list "-"]
         
         # Read a yaml file
         catch {exec /bin/bash "$basedir/.tools/bash_tools/get_local_description.sh" "$basedir" "$selectedFolder" "$notebook_name"} output
@@ -386,12 +371,15 @@ proc onComboboxSelectedNotebook {notebook_name} {
         .fr.principal.notebook_description delete 0.0 end
         .fr.principal.notebook_description insert end [lindex "$arguments" 0]
 
-        # Get the list with the versions
+        # Get the list with the versions.  Convert command output into list
+        # elements explicitly instead of treating arbitrary text as Tcl list syntax.
         catch {exec /bin/bash "$basedir/.tools/bash_tools/get_docker_versions.sh" "$notebook_name"} version_list
-        append versionList " " "$version_list"
+        foreach version [dl4me_nonempty_words $version_list] {
+            lappend versionList $version
+        }
     } else {
         set selectedVersion "-"
-        set versionList "-"
+        set versionList [list "-"]
     }
 
     .fr.principal.versions configure -values $versionList
@@ -501,37 +489,15 @@ grid .fr.principal.intro_7 -row 6 -column 0 -columnspan 3 -sticky ew -padx 12
 label .fr.principal.intro_8 -text "    - Checkbox for setting up a GPU-enabled Docker container image" -anchor w
 grid .fr.principal.intro_8 -row 7 -column 0 -columnspan 3 -sticky ew -padx 12 -pady {0 8}
 
-# Define the list with possible default notebooks.
-set folderList "-"
-
-# Get the number of folders.
-catch {exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | wc -l} num_folders
-
-# Flag to indicate if there are no folders.
-set no_folders_flag 0
-
-# Check the number of folders.
-if {"$num_folders" == 0} {
-    # If it is 0, then there are no folders.
-    set no_folders_flag_flag 1
-} else {
-    # Otherwise, check the depth on the folders.
-    catch {exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0} folder_name
-    # Check if there are no subfolders.
-    if {"$folder_name" == "."} {
-        # If the folder_name is ".", this means that there are no subfolders on the notebooks folder.
-        set no_folders_flag 1
-    }
-}
-
-# In case there are subfolders (flag of NO folders is off).
-if {"$no_folders_flag" == 0} {
-    catch {exec find [glob "$basedir/notebooks/"] -mindepth 1 -maxdepth 1 -type d ! -name '.' -print0 | xargs -0 -n 1 basename | sort} aux_notebok_folder_list
-    append folderList " " "$aux_notebok_folder_list"
+# Define the list with possible default notebook categories.  Build a real
+# Tcl list so paths/names containing spaces, braces, colons, etc. remain safe.
+set folderList [list "-"]
+foreach folderName [dl4me_immediate_subdirectory_names [file join $basedir notebooks]] {
+    lappend folderList $folderName
 }
 
 set selectedFolder "-"
-set notebookList "-"
+set notebookList [list "-"]
 set selectedNotebook "-"
 
 font create myFont -family Helvetica -size 10
@@ -561,7 +527,7 @@ grid .fr.principal.notebooks -in .fr.principal.notebook_selectors -row 1 -column
 bind .fr.principal.notebooks <<ComboboxSelected>> { onComboboxSelectedNotebook [%W get]}
 
 # Define the version selector directly below the notebook selector.
-set versionList "-"
+set versionList [list "-"]
 set selectedVersion "-"
 
 frame .fr.principal.version_row
