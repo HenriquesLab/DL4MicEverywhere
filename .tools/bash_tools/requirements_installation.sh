@@ -46,8 +46,21 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     fi
 fi
 
-# Verify Tcl/Tk (wish), installing it when needed.
-if ! command -v wish >/dev/null 2>&1; then
+# Verify Tcl/Tk (wish), installing it when needed. On macOS the wish bundled
+# with the system (Tk 8.5) does not count: it is blocked on recent macOS.
+wish_is_usable() {
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        dl4me_macos_wish_usable
+    else
+        command -v wish >/dev/null 2>&1
+    fi
+}
+
+if ! wish_is_usable; then
+    if [[ "$OSTYPE" == "darwin"* ]] && command -v wish >/dev/null 2>&1; then
+        echo "Only the outdated Tcl/Tk bundled with macOS was found ($(command -v wish))."
+        echo "Installing a current Tcl/Tk with Homebrew..."
+    fi
     /bin/bash "$BASEDIR/requirements_installation/tcl_tk.sh" || {
         show_install_failure "Tcl/Tk" "DL4MicEverywhere requires the wish GUI executable."
         exit 1
@@ -55,8 +68,12 @@ if ! command -v wish >/dev/null 2>&1; then
     if [[ "$OSTYPE" == "darwin"* ]]; then
         dl4me_setup_macos_path
     fi
-    if ! command -v wish >/dev/null 2>&1; then
-        show_install_failure "Tcl/Tk" "Tcl/Tk was installed, but wish could not be located."
+    if ! wish_is_usable; then
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            show_install_failure "Tcl/Tk" "Homebrew's tcl-tk was installed, but its wish is not found before the outdated macOS /usr/bin/wish. Check 'brew --prefix tcl-tk'."
+        else
+            show_install_failure "Tcl/Tk" "Tcl/Tk was installed, but wish could not be located."
+        fi
         exit 1
     fi
     any_installation_flag=1
@@ -129,12 +146,29 @@ if [[ "$containerisation" == "Docker"* ]]; then
         fi
     else
         if ! command -v docker >/dev/null 2>&1; then
-            /bin/bash "$BASEDIR/requirements_installation/docker.sh" || exit 1
+            docker_installed_marker=$(mktemp "${TMPDIR:-/tmp}/dl4me-docker-installed.XXXXXX") || exit 1
+            rm -f "$docker_installed_marker"
+            DL4ME_DOCKER_INSTALLED_MARKER="$docker_installed_marker" \
+                /bin/bash "$BASEDIR/requirements_installation/docker.sh" || exit 1
             if ! command -v docker >/dev/null 2>&1; then
                 show_install_failure "Docker" "The Docker CLI could not be located after installation."
                 exit 1
             fi
             any_installation_flag=1
+
+            # Docker Engine was installed in this run, so no other containers can
+            # be running yet. Only now is it safe to configure the NVIDIA runtime,
+            # which restarts the Docker daemon. Existing Docker installations are
+            # never reconfigured; the GPU check explains what is missing instead.
+            if [ -f "$docker_installed_marker" ] && command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi >/dev/null 2>&1; then
+                if ! /bin/bash "$BASEDIR/requirements_installation/nvidia_container_toolkit.sh"; then
+                    echo ""
+                    echo "WARNING: The NVIDIA Container Toolkit could not be installed."
+                    echo "DL4MicEverywhere will still work on the CPU."
+                    /bin/bash "$BASEDIR/requirements_installation/nvidia_container_toolkit.sh" --print-instructions
+                fi
+            fi
+            rm -f "$docker_installed_marker"
         else
             echo "Docker already installed."
         fi

@@ -34,10 +34,17 @@ DL4MicEverywhere comes packaged with an executable for each operating system. Do
 <details>
 <summary>On MacOs:</summary>
     
+> ⚠️ **First launch: "Apple could not verify MacOS_launch.command"**
+> A ZIP download marks every extracted file as downloaded from the Internet, and macOS blocks the first double-click of the unsigned launcher. Approve it once:
+> 1. Click **Done** in the warning (not *Move to Bin*).
+> 2. Open **System Settings > Privacy & Security**, scroll to the message about `MacOS_launch.command` and click **Open Anyway**, then confirm.
+>
+> Alternatively, remove the download mark from the whole folder in Terminal: `xattr -dr com.apple.quarantine /path/to/DL4MicEverywhere`. Copies downloaded with `git clone` are not marked and open directly. Only the first launch is affected.
+
 The macOS launcher performs a native prerequisite check before starting the shared DL4MicEverywhere application:
 
 1. **Homebrew:** if Homebrew is missing, DL4MicEverywhere runs Homebrew's official installer. Both Apple Silicon (`/opt/homebrew`) and Intel (`/usr/local`) default prefixes are supported without editing your shell profiles.
-2. **Tcl/Tk:** if `wish` is missing, the launcher installs Homebrew's `tcl-tk` package and adds its executable directory only to the current DL4MicEverywhere process environment.
+2. **Tcl/Tk:** if no current `wish` is available, the launcher installs Homebrew's `tcl-tk` package and adds its executable directory only to the current DL4MicEverywhere process environment. The outdated Tcl/Tk 8.5 bundled with macOS (`/usr/bin/wish`) is not used: recent macOS versions refuse to launch it.
 3. **Docker Desktop:** if `/Applications/Docker.app` is missing, DL4MicEverywhere downloads the current architecture-specific installer from Docker's official stable endpoint, verifies the DMG with macOS, and runs Docker's installer. macOS may request an administrator password for this installation step. DL4MicEverywhere does **not** accept Docker's license on your behalf; Docker Desktop presents its terms on first launch.
 4. **Docker readiness:** if Docker Desktop is installed but not running, DL4MicEverywhere offers to open it and waits for the engine. On a first launch, complete Docker Desktop's onboarding/license window if it appears.
 5. **No unnecessary reboot:** Homebrew, Tcl/Tk, and Docker Desktop setup do not force a Mac restart. The GUI opens as soon as the prerequisites are ready.
@@ -88,9 +95,18 @@ bash .tools/create_desktop.sh
 ```
 This will create a `DL4MicEverywhere.desktop` file in your Desktop. You will need to right-click the file and ´Allow Launching´, after that launch DL4MicEverywhere by double-clicking it. The automatic installation guides you through these steps:
 
-1. **You need to enter the password when asked.**
-2. **TCL/TK and Docker Desktop are automatically installed (do not need interaction).**
+1. **You need to enter the password when asked.** It is only needed the first time, to install missing system packages. Later launches, including building Docker images, do not ask for it.
+2. **Tcl/Tk and Docker Engine are installed automatically if they are missing.** If an NVIDIA driver is present, the NVIDIA Container Toolkit is also installed so Docker can use the GPU. Your user is added to the `docker` group; log out and back in (or restart) when asked so this takes effect.
 3. **The GUI will pop up, and you can start using DL4MicEverywhere**
+
+> ℹ️ **Docker Engine instead of Docker Desktop on Linux**
+> On Linux, DL4MicEverywhere uses Docker Engine, not Docker Desktop: Docker Desktop for Linux runs containers inside a virtual machine that cannot use NVIDIA GPUs. Compared with the Docker Desktop steps shown elsewhere in this guide:
+> - There is no "start Docker Desktop" step: Docker Engine starts automatically with the computer.
+> - Remove old images with DL4MicEverywhere's own **File > Reclaim Docker Space...** menu option.
+> - Container output is shown in the launcher terminal.
+> - Docker Desktop's CPU/memory limits do not apply: Docker Engine can use the whole computer.
+>
+> **Existing Docker installations are never changed.** If Docker is already installed (for example on a shared server), DL4MicEverywhere uses it as it is. It does not reinstall it, change its configuration, or restart it. If something is missing (for example GPU support or your access to Docker), the launcher explains what to ask the computer's administrator for. You can install Docker Desktop for Linux yourself, but GPU acceleration is not available while it is the active Docker engine.
 
 </details>
 

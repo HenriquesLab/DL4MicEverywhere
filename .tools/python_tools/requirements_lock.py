@@ -30,6 +30,22 @@ GITHUB_RAW_PIN = re.compile(
 )
 PACKAGE_RE = re.compile(r"^\s*([A-Za-z0-9][A-Za-z0-9_.-]*)(?:\[[^\]]+\])?\s*(?:[<>=!~@;]|$)")
 
+# Docker builds images for the daemon's own architecture, and some packages
+# have architecture-specific dependencies (for example TensorFlow on aarch64
+# pulls tensorflow-cpu-aws). Each architecture therefore gets its own lock.
+PLATFORM_TARGETS = {
+    "amd64": "x86_64-unknown-linux-gnu",
+    "arm64": "aarch64-unknown-linux-gnu",
+}
+DEFAULT_PLATFORM = "amd64"
+
+
+def lock_filename(platform: str) -> str:
+    # amd64 keeps the historical name so existing committed locks stay valid.
+    if platform == DEFAULT_PLATFORM:
+        return "requirements.lock.txt"
+    return f"requirements.{platform}.lock.txt"
+
 
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
@@ -265,6 +281,7 @@ def expected_metadata(
     config_dir: Path | None,
     python_version: str,
     profile: str | None,
+    platform: str = DEFAULT_PLATFORM,
 ) -> dict[str, str]:
     ppath = profile_path(repo_root, python_version, profile)
     profile_hash = sha256_bytes(ppath.read_bytes()) if ppath is not None else "none"
@@ -272,6 +289,7 @@ def expected_metadata(
         "format": LOCK_FORMAT,
         "source": canonical_source(source, repo_root, config_dir),
         "python-version": python_version,
+        "python-platform": PLATFORM_TARGETS[platform],
         "runtime-profile": str(ppath.relative_to(repo_root)) if ppath is not None else "none",
         "runtime-profile-sha256": profile_hash,
         "resolver": f"uv=={UV_VERSION}",
@@ -290,11 +308,15 @@ def validate_lock(
     config_dir: Path | None,
     python_version: str,
     profile: str | None,
+    platform: str = DEFAULT_PLATFORM,
 ) -> tuple[bool, str]:
     metadata, body = parse_header(lock_path)
     if not metadata:
         return False, "missing DL4MicEverywhere lock metadata"
-    expected = expected_metadata(source, repo_root, config_dir, python_version, profile)
+    # Locks written before python-platform was recorded were resolved with
+    # uv's "linux" target, which is x86_64.
+    metadata.setdefault("python-platform", PLATFORM_TARGETS[DEFAULT_PLATFORM])
+    expected = expected_metadata(source, repo_root, config_dir, python_version, profile, platform)
     for key, value in expected.items():
         if metadata.get(key) != value:
             return False, f"{key} changed"
@@ -349,6 +371,7 @@ def generate_lock(
     python_version: str,
     profile: str | None,
     cutoff: str | None = None,
+    platform: str = DEFAULT_PLATFORM,
 ) -> None:
     if is_url(source) and "raw.githubusercontent.com" in source and not GITHUB_RAW_PIN.match(source):
         raise ValueError(
@@ -377,18 +400,28 @@ def generate_lock(
         cmd = uv_cmd + [
             "pip", "compile", str(combined_path),
             "--python-version", python_version,
-            "--python-platform", "linux",
+            "--python-platform", PLATFORM_TARGETS[platform],
             "--generate-hashes",
             "--no-header",
             "--no-annotate",
             "--exclude-newer", cutoff,
             "--output-file", str(compiled_path),
         ]
-        print(f"Resolving {source} for Python {python_version} with uv=={UV_VERSION} ...")
-        subprocess.run(cmd, check=True)
+        print(f"Resolving {source} for Python {python_version} on linux/{platform} with uv=={UV_VERSION} ...")
+        try:
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as exc:
+            if platform != DEFAULT_PLATFORM:
+                raise RuntimeError(
+                    f"The requirements could not be resolved for linux/{platform}. Some packages "
+                    "(for example TensorFlow older than 2.10) were never published for ARM "
+                    "computers such as Apple Silicon Macs. Use an Intel/AMD computer, or choose "
+                    "the published Docker Hub image if it supports this computer."
+                ) from exc
+            raise
         body = compiled_path.read_text(encoding="utf-8").replace("\r\n", "\n")
 
-    metadata = expected_metadata(source, repo_root, config_dir, python_version, profile)
+    metadata = expected_metadata(source, repo_root, config_dir, python_version, profile, platform)
     metadata["source-sha256"] = sha256_bytes(source_bytes)
     metadata["combined-input-sha256"] = sha256_text(combined)
     metadata["exclude-newer"] = cutoff
@@ -396,7 +429,7 @@ def generate_lock(
 
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     ordered_keys = [
-        "format", "source", "source-sha256", "python-version", "runtime-profile",
+        "format", "source", "source-sha256", "python-version", "python-platform", "runtime-profile",
         "runtime-profile-sha256", "resolver", "exclude-newer",
         "combined-input-sha256", "body-sha256",
     ]
@@ -411,8 +444,8 @@ def generate_lock(
     print(f"Wrote lock: {lock_path}")
 
 
-def default_lock_path(config_path: Path) -> Path:
-    return config_path.resolve().parent / "requirements.lock.txt"
+def default_lock_path(config_path: Path, platform: str = DEFAULT_PLATFORM) -> Path:
+    return config_path.resolve().parent / lock_filename(platform)
 
 
 def iter_configs(repo_root: Path):
@@ -446,6 +479,7 @@ def ensure_one(args: argparse.Namespace, force: bool = False) -> int:
         cfg_source, cfg_python = "", ""
     source = args.source or cfg_source
     python_version = args.python_version or cfg_python
+    platform = getattr(args, "platform", None) or DEFAULT_PLATFORM
     if not source or not python_version:
         raise ValueError("source and python version are required (directly or via --config)")
 
@@ -454,13 +488,13 @@ def ensure_one(args: argparse.Namespace, force: bool = False) -> int:
         if not lock_path.is_absolute():
             lock_path = (repo_root / lock_path).resolve()
     elif config_path:
-        lock_path = default_lock_path(config_path)
+        lock_path = default_lock_path(config_path, platform)
     elif not is_url(source):
-        lock_path = resolve_local_source(source, repo_root, config_dir).parent / "requirements.lock.txt"
+        lock_path = resolve_local_source(source, repo_root, config_dir).parent / lock_filename(platform)
     else:
         raise ValueError("--lock is required for a URL source when --config is not supplied")
 
-    valid, reason = validate_lock(lock_path, source, repo_root, config_dir, python_version, args.profile)
+    valid, reason = validate_lock(lock_path, source, repo_root, config_dir, python_version, args.profile, platform)
     if valid and not force:
         if not args.quiet:
             print(f"Lock is up to date: {lock_path}")
@@ -474,7 +508,7 @@ def ensure_one(args: argparse.Namespace, force: bool = False) -> int:
     if not args.quiet:
         print(f"Lock needs regeneration: {lock_path} ({reason})")
     generate_lock(
-        lock_path, source, repo_root, config_dir, python_version, args.profile, args.cutoff
+        lock_path, source, repo_root, config_dir, python_version, args.profile, args.cutoff, platform
     )
     print(lock_path)
     return 0
@@ -487,6 +521,7 @@ def all_configs(args: argparse.Namespace, check_only: bool) -> int:
         ns = argparse.Namespace(
             config=str(config), repo_root=str(repo_root), source=None, python_version=None,
             lock=None, profile="auto", cutoff=args.cutoff, quiet=True, check_only=check_only,
+            platform=getattr(args, "platform", DEFAULT_PLATFORM),
         )
         try:
             rc = ensure_one(ns, force=getattr(args, "force", False))
@@ -510,6 +545,8 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--profile", default="auto", help="runtime profile path, auto, or none")
         p.add_argument("--repo-root", help="repository root (normally auto-detected)")
         p.add_argument("--cutoff", help="uv --exclude-newer cutoff for a newly generated lock")
+        p.add_argument("--platform", choices=sorted(PLATFORM_TARGETS), default=DEFAULT_PLATFORM,
+                       help="Docker image architecture the lock is resolved for")
         p.add_argument("--quiet", action="store_true")
         return p
 
@@ -525,6 +562,7 @@ def build_parser() -> argparse.ArgumentParser:
         p = sub.add_parser(name, help=text)
         p.add_argument("--repo-root", default=".")
         p.add_argument("--cutoff")
+        p.add_argument("--platform", choices=sorted(PLATFORM_TARGETS), default=DEFAULT_PLATFORM)
         p.add_argument("--force", action="store_true")
     return parser
 

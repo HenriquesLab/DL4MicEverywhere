@@ -10,6 +10,10 @@ This guide provides solutions to common issues encountered when using DL4MicEver
 - On Linux, ensure Docker engine is installed and the service is running. Check status with: `systemctl status docker`
 - Confirm your user is in the `docker` group to avoid permission errors.
 
+### **"Docker is running, but your user is not allowed to use it" (Linux)**
+
+Docker answered with `permission denied` on its socket: your user is not (yet) in the `docker` group. If DL4MicEverywhere has just installed Docker, log out and back in (or restart). Otherwise ask the computer's administrator to run `sudo usermod -aG docker <your user>`. DL4MicEverywhere does not use `sudo` to work around this, because images built with `sudo` end up where later `docker run` commands cannot find them.
+
 ### **Cannot pull Docker images** 
 
 - Verify internet connection and proxy settings. Docker needs access to Docker Hub.
@@ -50,10 +54,24 @@ This process requires you to restart your computer, enter the BIOS and enabling 
 
 ## GPU Support
 
+### **GPU check failed: which layer?**
+
+After an image is ready, DL4MicEverywhere checks GPU access in three layers and names the one that failed:
+
+1. **Docker -> GPU passthrough.** Docker cannot give containers the GPU at all (`could not select device driver "" with capabilities: [[gpu]]`).
+   - *Linux with Docker Engine:* the NVIDIA Container Toolkit is missing. See [GPU support](REQUIREMENTS_INSTALLATION.md) or run `bash .tools/bash_tools/requirements_installation/nvidia_container_toolkit.sh --print-instructions`.
+   - *Linux with Docker Desktop:* Docker Desktop for Linux cannot use NVIDIA GPUs. Use Docker Engine (`docker context use default` if it is installed).
+   - *Windows:* update Docker Desktop (*Check for updates*) and the Windows NVIDIA driver; do not install a driver inside Ubuntu.
+   - *All:* `nvidia-smi` must work on the computer itself.
+2. **CUDA/cuDNN libraries in the image.** Docker reaches the GPU, but the CUDA/cuDNN versions in the image do not match what TensorFlow was built for, or are newer than the host driver supports. The report shows both versions. Update `cuda_version`/`cudnn_version` in the notebook's `configuration.yaml`, or update the NVIDIA driver.
+3. **Framework.** Docker and the libraries look fine, but TensorFlow or PyTorch still cannot use the GPU. The framework's own error is shown.
+
+GPU images install exactly the cuDNN version in `configuration.yaml` (`cudnn_version`); cuDNN 8 and cuDNN 9 (`libcudnn9-cuda-<major>`) are both supported.
+
 ### **Notebooks fail with CUDA errors**
 
 - Verify Nvidia drivers are properly installed for your GPU.
-- Ensure `nvidia-docker` is installed and runtime is enabled in Docker.
+- Ensure the NVIDIA Container Toolkit is installed and configured for Docker (Linux).
 - Consider updating Nvidia driver and CUDA to latest compatible versions.
 - Ensure that you have checked `Enable GPU-backend inference`:
 
@@ -174,6 +192,12 @@ This process requires you to restart your computer, enter the BIOS and enabling 
 ## Launchers
 
 ### **`MacOs_launcher` cannot be oppened**
+
+> ℹ️ **macOS 15 (Sequoia) and later:** the right-click > **Open** shortcut shown below no longer bypasses this warning. Instead, click **Done**, open **System Settings > Privacy & Security**, and click **Open Anyway** next to the `MacOS_launch.command` message (once). Alternatively run `xattr -dr com.apple.quarantine /path/to/DL4MicEverywhere` in Terminal. Copies downloaded with `git clone` are not affected.
+
+### **The GUI crashes on macOS with "Launch Constraint Violation" (Tk 8.5)**
+
+macOS 15 refuses to start the outdated Tcl/Tk 8.5 bundled with the system (`/usr/bin/wish`). The launcher installs and uses Homebrew's `tcl-tk` instead. If you still see this error, run `brew install tcl-tk` and launch DL4MicEverywhere again.
 
 MacOS computers will notify you that the file you want to launch cannot verified if it is free from malware and it will pop you the following message:
 

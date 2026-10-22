@@ -3,15 +3,10 @@ SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P)" || 
 source "$SCRIPT_DIR/../path_utils.sh" || exit 1
 BASEDIR=$(dl4me_realpath "$SCRIPT_DIR") || exit 1
 source "$BASEDIR/../macos_env.sh" || exit 1
+source "$BASEDIR/docker_state.sh" || exit 1
 if [[ "${OSTYPE:-}" == "darwin"* ]]; then
     dl4me_setup_macos_path
 fi
-echo "WARNING: Docker daemon is not running."
-
-# Launch the window asking the user to launch Docker Desktop.
-docker_flag=$(wish "$BASEDIR/../../tcl_tools/docker_desktop_gui.tcl")
-# docker_flag == 3 --> Yes, launch
-# docker_flag == 2 --> No, do not launch
 
 pause_if_unwrapped() {
     if [ "${DL4ME_WINDOWS_WRAPPER:-0}" != "1" ] && [ "${DL4ME_MACOS_WRAPPER:-0}" != "1" ] && [ -t 0 ]; then
@@ -19,18 +14,80 @@ pause_if_unwrapped() {
     fi
 }
 
-if [[ "$docker_flag" -eq 2 ]]; then
+# Classify the problem first. Docker Engine on Linux, Docker Desktop, and a user
+# without access to the Docker socket each need a different action, and an
+# existing Docker installation is never reconfigured.
+docker_state=$(dl4me_docker_state)
+
+case "$docker_state" in
+    ready)
+        exit 0
+        ;;
+    no_permission)
+        echo ""
+        echo "------------------------------------"
+        echo "Docker is running, but your user ($(id -un)) is not allowed to use it."
+        echo ""
+        echo "Docker reported:"
+        echo "  $DL4ME_DOCKER_INFO_ERROR"
+        echo ""
+        echo "Your user must be a member of the docker group. If DL4MicEverywhere has just"
+        echo "installed Docker, log out and back in (or restart the computer) so the new group"
+        echo "membership applies. Otherwise ask the administrator of this computer to run:"
+        echo ""
+        echo "  sudo usermod -aG docker $(id -un)"
+        echo ""
+        echo "Note: members of the docker group can control Docker with root-equivalent rights."
+        pause_if_unwrapped
+        echo "------------------------------------"
+        exit 1
+        ;;
+    unknown)
+        echo ""
+        echo "------------------------------------"
+        echo "Docker is installed, but DL4MicEverywhere could not connect to it."
+        echo ""
+        echo "Docker reported:"
+        echo "  $DL4ME_DOCKER_INFO_ERROR"
+        echo ""
+        echo "Make sure Docker is running and that 'docker info' works in a terminal,"
+        echo "then run DL4MicEverywhere again."
+        pause_if_unwrapped
+        echo "------------------------------------"
+        exit 1
+        ;;
+esac
+
+if [ "$docker_state" = "engine_stopped" ]; then
+    docker_product="Docker"
+else
+    docker_product="Docker Desktop"
+fi
+
+echo "WARNING: $docker_product is not running."
+
+# Launch the window asking the user whether to start Docker.
+docker_flag=$(wish "$BASEDIR/../../tcl_tools/docker_desktop_gui.tcl" "$docker_product")
+# docker_flag == 3 --> Yes, launch
+# docker_flag == 2 --> No, do not launch
+
+if [[ "$docker_flag" -ne 3 ]]; then
     echo ""
     echo "------------------------------------"
-    echo "Docker Desktop needs to be running before DL4MicEverywhere can continue."
-    echo "Start Docker Desktop, wait for the engine to report that it is ready, and try again."
+    echo "$docker_product needs to be running before DL4MicEverywhere can continue."
+    echo "Start $docker_product, wait for it to report that it is ready, and try again."
     pause_if_unwrapped
     echo "------------------------------------"
     exit 1
 fi
 
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
+if [ "$docker_state" = "engine_stopped" ]; then
+    # Starting a stopped service does not disturb anything that is running.
+    echo "Starting the Docker service. You may be asked for your password."
+    sudo systemctl start docker >/dev/null 2>&1 || sudo systemctl start docker.socket >/dev/null 2>&1 || true
+
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    if dl4me_is_wsl; then
         # Docker Desktop can be installed either per-user (current recommended
         # Windows mode) or for all users. Discover both from inside WSL.
         docker_desktop_exe=""
@@ -114,8 +171,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     echo "If this is Docker Desktop's first launch, complete its license/onboarding window first."
     echo "When Docker Desktop reports that the engine is running, launch DL4MicEverywhere again."
 else
-    echo "Docker daemon or Docker Desktop has still not been started."
-    echo "Make sure that it is correctly installed and running."
+    echo "$docker_product has still not been started."
+    echo "Make sure that it is correctly installed and running ('docker info' should work)."
     echo "Run DL4MicEverywhere again when it is running."
 fi
 pause_if_unwrapped

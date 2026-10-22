@@ -2,6 +2,12 @@
 
 Docker Desktop is a tool for managing Docker containers and images. It provides a visual interface for monitoring the Docker images installed on your computer and the containers currently running.
 
+> ℹ️ This page applies to **Windows and macOS**. On Linux, DL4MicEverywhere uses Docker Engine (Docker Desktop for Linux cannot use NVIDIA GPUs); see the Linux note in the [User Guide](USER_GUIDE.md#run-dl4miceverywhere-for-the-first-time).
+
+## Keeping Docker Desktop up to date
+
+Older Docker Desktop releases can fail to pass the NVIDIA GPU through to WSL 2 with newer NVIDIA libraries. Update from Docker Desktop itself (**Check for updates**); per-user installations update without Administrator rights. When an NVIDIA GPU is present and the installed version is older than the tested minimum, `Windows_launch.bat` shows a warning and lets you continue or stop. It never updates Docker Desktop automatically.
+
 
 ## Windows per-user installation
 

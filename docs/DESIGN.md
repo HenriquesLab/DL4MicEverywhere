@@ -22,6 +22,16 @@ Before you can use DL4MicEverywhere, ensure you have the following:
 
 In case you miss some of the requirements, follow the steps described on the [REQUIREMENTS INSTALLATION](REQUIREMENTS_INSTALLATION.md).
 
+### Non-destructive prerequisite installation
+
+DL4MicEverywhere may install a missing component, and start a stopped one after asking. It never removes, reconfigures, or restarts an existing Docker, WSL, or NVIDIA driver installation; when something is missing it explains what to do instead. In practice:
+
+- Docker is installed only when the `docker` command is missing, and never over conflicting distribution packages (`docker.io`, `containerd`, `runc`, `podman-docker`).
+- The NVIDIA Container Toolkit, whose configuration restarts the Docker daemon, is configured automatically only right after DL4MicEverywhere installed Docker Engine itself.
+- The Docker context, Docker Desktop settings, and Docker Desktop versions are never changed automatically; an outdated Docker Desktop only produces a warning.
+- Docker cleanup and uninstall only touch resources labelled `org.dl4miceverywhere.managed`.
+- On Linux, Docker Engine is used instead of Docker Desktop, because Docker Desktop for Linux cannot pass NVIDIA GPUs to containers.
+
 ## Docker Containers
 
 At the heart of DL4MicEverywhere are Docker images, each corresponding to a notebook (see [notebook types](NOTEBOOK_TYPES.md)). These images package all the necessary dependencies and configurations required for the smooth operation of the notebooks, thereby enhancing reproducibility by mitigating software environment discrepancies.

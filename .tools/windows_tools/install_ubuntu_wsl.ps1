@@ -6,6 +6,18 @@ param(
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
+# Exit-code contract used by Windows_launch.bat:
+#   0  = Ubuntu is installed and uses WSL 2
+#   2  = user cancelled the installation
+#   10 = distribution not found in the WSL online catalog
+#   11 = WSL installation command failed, including the --web-download retry
+#   12 = Windows must restart before Ubuntu can be registered (not scheduled)
+#   14 = Ubuntu is installed but could not be configured as WSL 2
+#   15 = unexpected helper failure
+#   20 = Windows restart was scheduled successfully
+
+. "$PSScriptRoot\wsl_common.ps1"
+
 function Normalize-WslDistributionName {
     param([AllowNull()][string]$Name)
 
@@ -178,18 +190,29 @@ try {
     }
 
     if (-not (Test-DistributionListed -Distro $Distribution)) {
-        Write-Host "ERROR: WSL reported a successful installation, but $Distribution is not registered." -ForegroundColor Red
-        exit 12
+        # When Windows components such as Virtual Machine Platform were not yet
+        # enabled, `wsl --install` enables them and reports success, but the
+        # distribution can only be registered after a Windows restart. The WSL
+        # output that says so is localized, so rely only on "success + not registered".
+        Write-Host ''
+        Write-Host "WSL enabled the Windows components it needs. Windows must restart before $Distribution can be installed." -ForegroundColor Yellow
+        $restartResult = Request-WindowsRestart
+        exit $restartResult
     }
 
     # Do not inherit a machine's previous default WSL generation. DL4MicEverywhere
-    # requires WSL 2, so configure the newly installed distro explicitly before
-    # the launcher creates the normal Linux account. This changes only this distribution.
-    Write-Host "Ensuring $Distribution uses WSL 2..."
-    & wsl.exe --set-version $Distribution 2
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "ERROR: Could not configure $Distribution as WSL 2. Exit code: $LASTEXITCODE" -ForegroundColor Red
-        exit 14
+    # requires WSL 2. Current WSL versions already register new distributions as
+    # WSL 2, and `wsl --set-version` then fails with "already the requested
+    # version", so only convert when the distribution is not WSL 2 yet, and
+    # judge the result by querying WSL again rather than by the exit code.
+    if ((Get-WslDistributionGeneration -Distro $Distribution) -ne 0) {
+        Write-Host "Ensuring $Distribution uses WSL 2..."
+        & wsl.exe --set-version $Distribution 2
+        $setVersionResult = $LASTEXITCODE
+        if ((Get-WslDistributionGeneration -Distro $Distribution) -ne 0) {
+            Write-Host "ERROR: Could not configure $Distribution as WSL 2. Exit code: $setVersionResult" -ForegroundColor Red
+            exit 14
+        }
     }
 
     Write-Host ''

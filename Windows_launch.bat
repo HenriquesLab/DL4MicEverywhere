@@ -243,6 +243,13 @@ rem 3. Docker Desktop WSL integration
 rem =============================================================================
 
 :check_docker_integration
+rem Advisory only: warn when an old Docker Desktop may break GPU passthrough.
+rem Docker Desktop is never updated automatically.
+if not exist "%BASEDIR%\.tools\windows_tools\check_docker_desktop_version.ps1" goto :check_docker_integration_probe
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\check_docker_desktop_version.ps1" -DockerExe "%DOCKER_EXE%"
+if "%ERRORLEVEL%"=="2" goto :docker_update_requested
+
+:check_docker_integration_probe
 echo.
 echo [3/4] Checking Docker Desktop integration with %UBUNTU_DISTRO%...
 
@@ -536,10 +543,11 @@ if "%UBUNTU_INSTALL_RESULT%"=="0" goto :ubuntu_install_completed
 if "%UBUNTU_INSTALL_RESULT%"=="2" goto :ubuntu_install_cancelled
 if "%UBUNTU_INSTALL_RESULT%"=="10" goto :ubuntu_distribution_unavailable
 if "%UBUNTU_INSTALL_RESULT%"=="11" goto :ubuntu_install_failed
-if "%UBUNTU_INSTALL_RESULT%"=="12" goto :ubuntu_installed_not_found
+if "%UBUNTU_INSTALL_RESULT%"=="12" goto :ubuntu_restart_required
 if "%UBUNTU_INSTALL_RESULT%"=="13" goto :ubuntu_initial_setup_failed
 if "%UBUNTU_INSTALL_RESULT%"=="14" goto :ubuntu_wsl2_configuration_failed
 if "%UBUNTU_INSTALL_RESULT%"=="15" goto :ubuntu_install_failed
+if "%UBUNTU_INSTALL_RESULT%"=="20" goto :wsl_restart_scheduled
 goto :ubuntu_install_failed
 
 :ubuntu_install_completed
@@ -582,16 +590,27 @@ echo.
 pause
 exit /b 1
 
-:ubuntu_installed_not_found
+:docker_update_requested
 echo.
-echo WSL reported a successful Ubuntu installation, but DL4MicEverywhere could not
-echo find the registered %PREFERRED_UBUNTU_DISTRO% distribution afterwards.
-echo.
-echo Run "wsl --list --verbose" to inspect the registered distributions and then
-echo run Windows_launch.bat again.
+echo Open Docker Desktop and choose "Check for updates" to install the latest
+echo version, then run Windows_launch.bat again.
 echo.
 pause
-exit /b 1
+exit /b 0
+
+:ubuntu_restart_required
+echo.
+echo WSL enabled the Windows components it needs, so Windows must restart before
+echo %PREFERRED_UBUNTU_DISTRO% can be installed.
+echo.
+echo Please restart Windows, then run Windows_launch.bat again. The Ubuntu
+echo installation will continue automatically.
+echo.
+echo If this message appears again after restarting, run "wsl --list --verbose" to
+echo inspect the registered distributions.
+echo.
+pause
+exit /b 0
 
 :ubuntu_initial_setup_failed
 echo.

@@ -29,6 +29,23 @@ dl4me_find_brew() {
     return 1
 }
 
+# Apple's bundled Tcl/Tk 8.5 (/usr/bin/wish -> /System/Library/Frameworks/Tk.framework)
+# is deprecated, and macOS 15 refuses to launch it ("Launch Constraint Violation").
+# Only a separately installed wish (Homebrew tcl-tk, or another Tk 8.6+ build)
+# is usable. Checked by path so the GUI toolkit does not have to be started.
+dl4me_macos_wish_usable() {
+    local wish_path resolved
+    wish_path=$(command -v wish 2>/dev/null) || return 1
+    resolved="$wish_path"
+    if command -v dl4me_realpath >/dev/null 2>&1; then
+        resolved=$(dl4me_realpath "$wish_path" 2>/dev/null) || resolved="$wish_path"
+    fi
+    case "$wish_path:$resolved" in
+        /usr/bin/*|/System/Library/*|*:/usr/bin/*|*:/System/Library/*) return 1 ;;
+    esac
+    return 0
+}
+
 dl4me_setup_macos_path() {
     local brew_bin tcl_prefix docker_app
 

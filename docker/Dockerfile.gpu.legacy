@@ -1,3 +1,4 @@
+# check=skip=InvalidDefaultArgInFrom
 ARG CONVERTER_BASE_IMAGE
 ARG FINAL_BASE_IMAGE
 ARG UBUNTU_VERSION=20.04
@@ -173,19 +174,29 @@ RUN curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/bab86d5de571015b63fd
     nvm use "${NODE_VERSION}" && \
     nvm alias default "${NODE_VERSION}"
 
-# Optional cuDNN install
+# cuDNN install, pinned to the cudnn_version from configuration.yaml.
 # The nvidia/cuda base image already provides the CUDA apt repository.
 # Do not add it again, or apt may fail with conflicting Signed-By settings.
+# NVIDIA's package names changed with cuDNN 9:
+#   cuDNN <= 8: libcudnn8=<cudnn>-1+cuda<major.minor>
+#   cuDNN >= 9: libcudnn9-cuda-<major>=<cudnn>-1
 RUN set -eux; \
-    apt-get update; \
-    if [ -n "${CUDNN_VERSION}" ]; then \
-        apt-get install -y --no-install-recommends \
-            "libcudnn8=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*}" \
-            "libcudnn8-dev=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*}"; \
+    if [ -z "${CUDNN_VERSION}" ]; then \
+        echo "cudnn_version is empty in configuration.yaml; GPU images need an exact cuDNN version." >&2; \
+        exit 1; \
+    fi; \
+    cudnn_major="${CUDNN_VERSION%%.*}"; \
+    cuda_major="${CUDA_VERSION%%.*}"; \
+    cuda_major_minor="${CUDA_VERSION%.*}"; \
+    if [ "${cudnn_major}" -ge 9 ]; then \
+        cudnn_packages="libcudnn${cudnn_major}-cuda-${cuda_major}=${CUDNN_VERSION}-1 libcudnn${cudnn_major}-dev-cuda-${cuda_major}=${CUDNN_VERSION}-1"; \
     else \
-        apt-get install -y --no-install-recommends \
-            libcudnn8 \
-            libcudnn8-dev; \
+        cudnn_packages="libcudnn${cudnn_major}=${CUDNN_VERSION}-1+cuda${cuda_major_minor} libcudnn${cudnn_major}-dev=${CUDNN_VERSION}-1+cuda${cuda_major_minor}"; \
+    fi; \
+    apt-get update; \
+    if ! apt-get install -y --no-install-recommends ${cudnn_packages}; then \
+        echo "cuDNN ${CUDNN_VERSION} is not published for CUDA ${CUDA_VERSION} on Ubuntu ${UBUNTU_VERSION}. Check cuda_version and cudnn_version in configuration.yaml." >&2; \
+        exit 1; \
     fi; \
     rm -rf /var/lib/apt/lists/*
 

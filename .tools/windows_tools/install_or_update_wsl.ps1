@@ -183,36 +183,8 @@ function Ask-WebDownloadRetry {
     return ($result -eq [System.Windows.Forms.DialogResult]::Yes)
 }
 
-function Request-WindowsRestart {
-    Add-Type -AssemblyName System.Windows.Forms
-
-    $result = [System.Windows.Forms.MessageBox]::Show(
-        @(
-            'Windows needs to restart before WSL 2 is ready.',
-            '',
-            'Restart Windows now?',
-            '',
-            'After Windows restarts, run Windows_launch.bat again. The launcher will',
-            'continue with the automatic Ubuntu and Docker Desktop setup.'
-        ) -join [Environment]::NewLine,
-        'DL4MicEverywhere - Windows restart required',
-        [System.Windows.Forms.MessageBoxButtons]::YesNo,
-        [System.Windows.Forms.MessageBoxIcon]::Information
-    )
-
-    if ($result -ne [System.Windows.Forms.DialogResult]::Yes) {
-        return 12
-    }
-
-    try {
-        & shutdown.exe /r /t 0 /c 'DL4MicEverywhere WSL installation completed. Restarting Windows to apply WSL 2 changes.'
-        if ($LASTEXITCODE -eq 0) {
-            return 20
-        }
-    } catch {}
-
-    return 12
-}
+# Request-WindowsRestart is shared with install_ubuntu_wsl.ps1.
+. "$PSScriptRoot\wsl_common.ps1"
 
 try {
     if (-not (Show-WslConsentDialog -RequestedOperation $Operation)) {

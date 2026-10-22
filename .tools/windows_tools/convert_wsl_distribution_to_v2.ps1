@@ -6,6 +6,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+. "$PSScriptRoot\wsl_common.ps1"
+
 try {
     Add-Type -AssemblyName System.Windows.Forms
 
@@ -33,8 +35,11 @@ try {
 
     Write-Host "Converting $Distribution to WSL 2..."
     & wsl.exe --set-version $Distribution 2
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "ERROR: WSL conversion returned exit code $LASTEXITCODE." -ForegroundColor Red
+    $setVersionResult = $LASTEXITCODE
+    # `wsl --set-version` can return an error even when the distribution is
+    # already WSL 2 ("already the requested version"), so query WSL again.
+    if ((Get-WslDistributionGeneration -Distro $Distribution) -ne 0) {
+        Write-Host "ERROR: WSL conversion returned exit code $setVersionResult." -ForegroundColor Red
         exit 10
     }
 

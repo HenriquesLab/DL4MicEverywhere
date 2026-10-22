@@ -84,7 +84,22 @@ After the Windows preflight succeeds, DL4MicEverywhere launches its normal Linux
 
 ## 1. Docker Installation
 
-Firstly, Docker Desktop needs to be installed on your computer. Follow the official guideline: https://docs.docker.com/desktop/install/linux-install/
+DL4MicEverywhere uses **Docker Engine** on Linux (not Docker Desktop, whose virtual machine cannot use NVIDIA GPUs). If the `docker` command is missing, the launcher installs it automatically on Ubuntu/Debian from Docker's official apt repository, starts it at boot, and adds your user to the `docker` group (log out and back in afterwards). To install it manually, follow https://docs.docker.com/engine/install/ubuntu/ and https://docs.docker.com/engine/install/linux-postinstall/.
+
+DL4MicEverywhere never modifies an existing installation: if `docker` is already available it is used as it is, and if Ubuntu's own `docker.io`, `containerd`, `runc` or `podman-docker` packages are present, the automatic installation stops instead of replacing them.
+
+> ℹ️ Members of the `docker` group can control Docker with root-equivalent rights. On shared computers, an administrator may prefer [rootless Docker](https://docs.docker.com/engine/security/rootless/); DL4MicEverywhere does not set it up automatically.
+
+## 1b. GPU support (NVIDIA Container Toolkit)
+
+To use an NVIDIA GPU inside containers, Docker needs the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html). It works with any installed NVIDIA driver version (DL4MicEverywhere never installs drivers).
+
+- When DL4MicEverywhere installs Docker Engine itself and `nvidia-smi` works, the toolkit is installed and configured in the same step.
+- On an existing Docker installation, configuring the toolkit restarts Docker, which stops every running container, so DL4MicEverywhere only shows the commands. Run them yourself (or ask the administrator) when convenient:
+
+  ```bash
+  bash .tools/bash_tools/requirements_installation/nvidia_container_toolkit.sh --print-instructions
+  ```
 
 ## 2. Install Tcl/Tk for the DL4MicEverywhere graphical user interface
 
@@ -107,7 +122,7 @@ sudo apt-get install -y tcl tk
 The recommended path is to launch `MacOS_launch.command`. DL4MicEverywhere checks the following components and installs supported missing prerequisites:
 
 1. **Homebrew** — installed with Homebrew's official installer when missing. Apple Silicon and Intel default prefixes are discovered automatically; DL4MicEverywhere does not require `brew shellenv` or modify your shell startup files.
-2. **Tcl/Tk** — `brew install tcl-tk` is used only when the `wish` GUI executable is unavailable.
+2. **Tcl/Tk** — `brew install tcl-tk` is used when no current `wish` GUI executable is available. The Tcl/Tk 8.5 bundled with macOS (`/usr/bin/wish`) does not count, because macOS 15 and later refuse to launch it.
 3. **Docker Desktop** — DL4MicEverywhere downloads the current stable `Docker.dmg` directly from Docker's architecture-specific official endpoint (`arm64` for Apple Silicon, `amd64` for Intel), verifies the disk image with `hdiutil verify`, and invokes Docker's supported command-line installer. The Docker license is not accepted automatically.
 
 After installation, DL4MicEverywhere refreshes its own PATH and continues. A full Mac restart is not required for these components. If Docker Desktop is starting for the first time, complete Docker's onboarding/license dialog and wait for the engine to become ready.

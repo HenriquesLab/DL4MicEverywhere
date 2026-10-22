@@ -11,7 +11,8 @@ puts $basedir
 
 # Get DL4MicEverywhere version if possible and define the window title
 if {"$construct_exist" == "1"} {
-    catch {exec /bin/bash "$basedir/.tools/bash_tools/get_dl4miceverywhere_version.sh"} output
+    # -ignorestderr: harmless child stderr output (always on macOS) is not an error.
+    catch {exec -ignorestderr -- /bin/bash "$basedir/.tools/bash_tools/get_dl4miceverywhere_version.sh"} output
     set dl4miceverywhere_version "$output"
 } else {
     set dl4miceverywhere_version "ERROR"

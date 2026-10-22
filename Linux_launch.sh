@@ -430,7 +430,18 @@ else
         echo "------------------------------------" 
         exit "$DL4ME_STATUS_INPUT_INVALID"
     fi
-fi 
+fi
+
+# Check that Docker itself can reach the NVIDIA GPU before the larger GPU image
+# is pulled or built. An existing Docker installation is never reconfigured.
+if [ "$flag_gpu" -eq 1 ]; then
+    source "$BASEDIR/.tools/bash_tools/pre_build_launch/gpu_docker_support.sh"
+    docker_gpu_problem=$(dl4me_docker_gpu_problem)
+    if [ -n "$docker_gpu_problem" ]; then
+        dl4me_explain_docker_gpu_problem "$docker_gpu_problem" "$BASEDIR"
+        flag_gpu=0
+    fi
+fi
 
 if [ "$flag_test" -eq 1 ]; then
     # If the test flag is set, print whether the GPU flag has been set
@@ -921,20 +932,34 @@ if [ "$flag_build" -eq 2 ]; then
         exit "$DL4ME_STATUS_DEPENDENCY_FAILED"
     fi
 
+    # Docker builds for the daemon's architecture (arm64 on Apple Silicon even
+    # through Docker Desktop's VM), so resolve the notebook lock for that
+    # architecture. The converter lock (pure-Python nbformat) is shared.
+    case "$(docker info --format '{{.Architecture}}' 2>/dev/null)" in
+        aarch64|arm64) lock_platform="arm64" ;;
+        *) lock_platform="amd64" ;;
+    esac
+    if [ "$lock_platform" = "amd64" ]; then
+        lock_file_name="requirements.lock.txt"
+    else
+        lock_file_name="requirements.$lock_platform.lock.txt"
+    fi
+
     if [ "$requirements_override" -eq 1 ]; then
         requirements_input_realpath=$(dl4me_realpath "$requirements_input_path") || exit "$DL4ME_STATUS_INPUT_INVALID"
-        requirements_lock_path="$(dirname "$requirements_input_realpath")/requirements.lock.txt"
+        requirements_lock_path="$(dirname "$requirements_input_realpath")/$lock_file_name"
         notebook_lock_args=(
             --config "$config_path"
             --source "$requirements_input_path"
             --python-version "$python_version"
             --lock "$requirements_lock_path"
+            --platform "$lock_platform"
             --repo-root "$BASEDIR"
         )
     else
         config_realpath=$(dl4me_realpath "$config_path") || exit "$DL4ME_STATUS_INPUT_INVALID"
-        requirements_lock_path="$(dirname "$config_realpath")/requirements.lock.txt"
-        notebook_lock_args=(--config "$config_path" --repo-root "$BASEDIR")
+        requirements_lock_path="$(dirname "$config_realpath")/$lock_file_name"
+        notebook_lock_args=(--config "$config_path" --platform "$lock_platform" --repo-root "$BASEDIR")
     fi
 
     converter_lock_args=(
@@ -1005,17 +1030,12 @@ if [ "$flag_build" -eq 3 ]; then
 else
     # Build the docker image without GUI
     if [ "$flag_build" -eq 2 ]; then
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-            # Docker Desktop on macOS runs for the logged-in user. Using sudo
-            # changes Docker config/context ownership and can make the Desktop
-            # socket/context unavailable to the build command.
-            docker_build_command=(docker build)
-        else
-            echo "To build the docker image, you may need to provide root access by entering your password."
-            echo "Otherwise, you can choose the option of getting the image from Docker Hub or follow"
-            echo "the steps in our documentation."
-            docker_build_command=(sudo docker build)
-        fi
+        # Build as the current user on every OS, like the pull/inspect/run steps.
+        # Building with sudo would use root's Docker context and could put the
+        # image into a different engine than the one `docker run` uses later.
+        # A build never uses the GPU, so it never needs extra privileges for it.
+        # Access to Docker is checked (and explained) by pre_launch_test.sh.
+        docker_build_command=(docker build)
 
         "${docker_build_command[@]}" --file "$selected_dockerfile" -t "$docker_tag" \
             --label "org.dl4miceverywhere.managed=true" \
@@ -1065,7 +1085,14 @@ fi
 echo "Docker image is ready."
 
 # Execute the post building tests against the image that will be launched.
-/bin/bash "$BASEDIR/.tools/bash_tools/post_build_test.sh" "$docker_tag" "$flag_gpu" || exit "$DL4ME_STATUS_POST_BUILD_FAILED"
+# Dependency consistency (`pip check`) is enforced only for images built in this
+# run; published images are used exactly as they were released.
+if [ "$flag_build" -eq 2 ]; then
+    strict_dependency_check=1
+else
+    strict_dependency_check=0
+fi
+/bin/bash "$BASEDIR/.tools/bash_tools/post_build_test.sh" "$docker_tag" "$flag_gpu" "$strict_dependency_check" || exit "$DL4ME_STATUS_POST_BUILD_FAILED"
 
 sleep 3
 

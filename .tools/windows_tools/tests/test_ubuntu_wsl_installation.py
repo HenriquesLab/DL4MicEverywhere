@@ -91,6 +91,33 @@ class UbuntuWslInstallationTests(unittest.TestCase):
         self.assertIn("& wsl.exe --set-version $Distribution 2", helper)
         self.assertIn("exit 14", helper)
 
+    def test_fresh_install_converts_only_when_not_already_wsl2(self):
+        # Current WSL registers new distributions as WSL 2 already, and
+        # `wsl --set-version` then fails with WSL_E_VM_MODE_INVALID_STATE.
+        helper = INSTALL_HELPER.read_text(encoding="utf-8")
+        guard = "if ((Get-WslDistributionGeneration -Distro $Distribution) -ne 0) {"
+        self.assertIn(guard, helper)
+        self.assertLess(helper.index(guard), helper.index("& wsl.exe --set-version $Distribution 2"))
+        # Success is judged by querying WSL again, not by the exit code.
+        after = helper[helper.index("& wsl.exe --set-version $Distribution 2"):]
+        self.assertLess(after.index("Get-WslDistributionGeneration"), after.index("exit 14"))
+
+    def test_conversion_rechecks_wsl_generation_after_set_version(self):
+        helper = CONVERSION_HELPER.read_text(encoding="utf-8")
+        after = helper[helper.index("& wsl.exe --set-version $Distribution 2"):]
+        self.assertIn("Get-WslDistributionGeneration", after)
+        self.assertIn('. "$PSScriptRoot\\wsl_common.ps1"', helper)
+
+    def test_unregistered_distro_after_successful_install_requests_restart(self):
+        helper = INSTALL_HELPER.read_text(encoding="utf-8")
+        launcher = WINDOWS_LAUNCH.read_text(encoding="utf-8")
+        not_listed = helper[helper.index("if (-not (Test-DistributionListed -Distro $Distribution)) {\n        # When"):]
+        self.assertIn("Request-WindowsRestart", not_listed[:900])
+        self.assertIn('. "$PSScriptRoot\\wsl_common.ps1"', helper)
+        self.assertIn('"%UBUNTU_INSTALL_RESULT%"=="12" goto :ubuntu_restart_required', launcher)
+        self.assertIn('"%UBUNTU_INSTALL_RESULT%"=="20" goto :wsl_restart_scheduled', launcher)
+        self.assertNotIn("ubuntu_installed_not_found", launcher)
+
     def test_existing_wsl1_distro_can_be_converted_automatically(self):
         launcher = WINDOWS_LAUNCH.read_text(encoding="utf-8")
         helper = CONVERSION_HELPER.read_text(encoding="utf-8")

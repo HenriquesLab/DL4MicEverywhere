@@ -5,6 +5,8 @@ set basedir [lindex $argv 0]
 
 # Load cross-platform list/filesystem helpers before building GUI selectors.
 source [file join $basedir .tools tcl_tools list_utils.tcl]
+# Child processes may log harmless messages to stderr (always on macOS).
+source [file join $basedir .tools tcl_tools exec_utils.tcl]
 
 # Check if there is cache information
 set filename "$basedir/.tools/.cache/.cache_gui"
@@ -41,7 +43,7 @@ set construct_exist [file exist $construct]
 
 # Get DL4MicEverywhere version if possible and define the window title
 if {"$construct_exist" == "1"} {
-    catch {exec /bin/bash "$basedir/.tools/bash_tools/get_dl4miceverywhere_version.sh"} output
+    catch {dl4me_exec /bin/bash "$basedir/.tools/bash_tools/get_dl4miceverywhere_version.sh"} output
     set window_title "DL4MicEverywhere - v$output"
 } else {
     set window_title "DL4MicEverywhere"
@@ -364,7 +366,7 @@ proc onComboboxSelectedNotebook {notebook_name} {
         set versionList [list "-"]
         
         # Read a yaml file
-        catch {exec /bin/bash "$basedir/.tools/bash_tools/get_local_description.sh" "$basedir" "$selectedFolder" "$notebook_name"} output
+        catch {dl4me_exec /bin/bash "$basedir/.tools/bash_tools/get_local_description.sh" "$basedir" "$selectedFolder" "$notebook_name"} output
         set arguments [split "$output" \n]
 
         # Get the arguments that we want
@@ -373,7 +375,7 @@ proc onComboboxSelectedNotebook {notebook_name} {
 
         # Get the list with the versions.  Convert command output into list
         # elements explicitly instead of treating arbitrary text as Tcl list syntax.
-        catch {exec /bin/bash "$basedir/.tools/bash_tools/get_docker_versions.sh" "$notebook_name"} version_list
+        catch {dl4me_exec /bin/bash "$basedir/.tools/bash_tools/get_docker_versions.sh" "$notebook_name"} version_list
         foreach version [dl4me_nonempty_words $version_list] {
             lappend versionList $version
         }
@@ -694,11 +696,19 @@ bind .fr <Control-d> cmddoc
 
 proc cmdabout {} {
     global basedir
-    exec wish "$basedir/.tools/tcl_tools/menubar/about.tcl" "$basedir"
+    if {[catch {dl4me_exec wish "$basedir/.tools/tcl_tools/menubar/about.tcl" "$basedir"} result]} {
+        tk_messageBox -type ok -icon error -title "About" \
+            -message "The About window could not be opened." \
+            -detail [string trim $result]
+    }
 }
 proc cmdpref {}   {
     global basedir
-    exec /bin/bash "$basedir/.tools/bash_tools/cache_preferences.sh"
+    if {[catch {dl4me_exec /bin/bash "$basedir/.tools/bash_tools/cache_preferences.sh"} result]} {
+        tk_messageBox -type ok -icon error -title "Preferences" \
+            -message "The preferences could not be saved." \
+            -detail [string trim $result]
+    }
 }
 proc cmdcleandocker {} {
     global basedir
@@ -787,9 +797,10 @@ proc cmduninstall {} {
     #   0 = cancel
     #   1 = uninstall application files only
     #   2 = uninstall application files and DL4MicEverywhere Docker resources
-    if {[catch {exec wish "$basedir/.tools/tcl_tools/menubar/uninstall.tcl"} result]} {
+    if {[catch {dl4me_exec wish "$basedir/.tools/tcl_tools/menubar/uninstall.tcl"} result]} {
         tk_messageBox -type ok -icon error -title "Uninstall error" \
-            -message "The uninstall confirmation window could not be opened."
+            -message "The uninstall confirmation window could not be opened." \
+            -detail [string trim $result]
         return
     }
 

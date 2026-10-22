@@ -6,6 +6,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 WINDOWS_LAUNCH = REPO_ROOT / "Windows_launch.bat"
 VERSION_CHECKER = REPO_ROOT / ".tools" / "windows_tools" / "check_wsl_version.ps1"
 WSL_HELPER = REPO_ROOT / ".tools" / "windows_tools" / "install_or_update_wsl.ps1"
+WSL_COMMON = REPO_ROOT / ".tools" / "windows_tools" / "wsl_common.ps1"
 
 
 class WslPrerequisiteInstallationTests(unittest.TestCase):
@@ -67,11 +68,15 @@ class WslPrerequisiteInstallationTests(unittest.TestCase):
 
     def test_helper_handles_reboot_required_and_optional_restart(self):
         text = WSL_HELPER.read_text(encoding="utf-8")
+        common = WSL_COMMON.read_text(encoding="utf-8")
         self.assertIn("@(3010, 1641)", text)
         self.assertIn("Request-WindowsRestart", text)
-        self.assertIn("shutdown.exe /r /t 0", text)
-        self.assertIn("return 20", text)
-        self.assertIn("return 12", text)
+        self.assertIn('. "$PSScriptRoot\\wsl_common.ps1"', text)
+        # The restart prompt is shared with install_ubuntu_wsl.ps1.
+        self.assertIn("function Request-WindowsRestart", common)
+        self.assertIn("shutdown.exe /r /t 0", common)
+        self.assertIn("return 20", common)
+        self.assertIn("return 12", common)
 
     def test_launcher_handles_all_prerequisite_result_codes(self):
         text = WINDOWS_LAUNCH.read_text(encoding="utf-8")

@@ -3,7 +3,50 @@
 echo "Installing Docker..."
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    # Linux
+    # Linux: install Docker Engine only. Docker Desktop for Linux runs containers
+    # inside a VM that cannot pass NVIDIA GPUs through (`--gpus` is only supported
+    # by Docker Desktop on Windows/WSL2), so it is not installed on native Linux.
+
+    # Inside WSL, Docker is provided by Docker Desktop for Windows through its WSL
+    # integration. Installing Docker Engine in the distribution would shadow that
+    # integration, so never do it here.
+    if command -v systemd-detect-virt >/dev/null 2>&1 && [[ "$(systemd-detect-virt 2>/dev/null)" == "wsl"* ]]; then
+        echo ""
+        echo "------------------------------------"
+        echo "The docker command is not available inside this WSL distribution."
+        echo "DL4MicEverywhere uses Docker Desktop for Windows with WSL integration and does"
+        echo "not install Docker Engine inside WSL. Run Windows_launch.bat so it can check"
+        echo "Docker Desktop and its WSL integration for this Ubuntu distribution."
+        echo "------------------------------------"
+        exit 1
+    fi
+
+    # Docker's packages conflict with distribution packages such as docker.io,
+    # containerd, runc and podman-docker; apt would silently remove them. Such
+    # hosts (for example CI or Kubernetes nodes) are managed by someone else, so
+    # stop and explain instead of changing them.
+    conflicting_packages=""
+    for package in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
+        if dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q "install ok installed"; then
+            conflicting_packages="$conflicting_packages $package"
+        fi
+    done
+    if [ -n "$conflicting_packages" ]; then
+        echo ""
+        echo "------------------------------------"
+        echo "Docker Engine was not installed because these packages are already present:"
+        echo " $conflicting_packages"
+        echo "Installing Docker's official packages would remove them, which could disrupt"
+        echo "other software on this computer. DL4MicEverywhere does not change existing"
+        echo "container installations."
+        echo ""
+        echo "If this computer is managed by someone else, ask them to make the docker"
+        echo "command available to your user. Otherwise follow Docker's guide:"
+        echo "  https://docs.docker.com/engine/install/ubuntu/"
+        echo "------------------------------------"
+        exit 1
+    fi
+
     # Add Docker's official GPG key:
     sudo apt-get -y update
     sudo apt-get -y install ca-certificates curl
@@ -20,61 +63,24 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     
     # Install the latest Docker version. Package metadata was refreshed just
     # above after adding Docker's repository, so another update is unnecessary.
-    sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin || exit 1
+
+    # Start Docker now and on every boot, so there is no separate "start Docker"
+    # step for the user (unlike Docker Desktop).
+    sudo systemctl enable --now docker || exit 1
 
     ## Allow to run Docker as a non-root user
-    # Create a docker group
-    sudo groupadd docker
-    # Add your user to that group
-    sudo usermod -aG docker $USER
-    
-    # As we will tell the user to restart its machine, this will not be needed
-    # Activate the changes to groups
-    # newgrp docker
+    # The docker-ce package normally creates the docker group already.
+    getent group docker >/dev/null || sudo groupadd docker
+    # Add your user to that group. This takes effect after logging out and back in.
+    sudo usermod -aG docker "$USER" || exit 1
 
-    # Check if the OS is Ubuntu 24.04 (Docker Destop is still not supported on it)
-    ubuntu_v=$(grep DISTRIB_RELEASE /etc/lsb-release | cut -f2 -d'=')
-    # Check if the actual version is 24.04
-    if [[ "${ubuntu_v//\"}" == "24.04" ]]; then
-        # As they say in their original installation guide: https://docs.docker.com/desktop/install/ubuntu/
-        # The latest Ubuntu 24.04 LTS is not yet supported. Docker Desktop will fail to start. 
-        # Due to a change in how the latest Ubuntu release restricts the unprivileged namespaces, 
-        # sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 needs to be run at least once
-        
-        # This command would only work for the actual session, after reboot will be lost
-        # sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-        
-        # As previous command would be lost, we need to make it permanent modifying the following file
-        echo 'kernel.apparmor_restrict_unprivileged_userns = 0' | sudo tee -a /etc/sysctl.conf
-        # Instead of using "echo >>", as we need to use sudo, we will use "tee -a"
+    # Tell the caller that Docker Engine was installed in this run. Only a freshly
+    # installed Engine may be configured for NVIDIA GPUs automatically, because
+    # that requires restarting the Docker daemon.
+    if [ -n "${DL4ME_DOCKER_INSTALLED_MARKER:-}" ]; then
+        : > "$DL4ME_DOCKER_INSTALLED_MARKER"
     fi
-
-    # Install latest Docker Desktop version
-    curl https://desktop.docker.com/linux/main/$(dpkg --print-architecture)/docker-desktop-$(dpkg --print-architecture).deb -o /tmp/DockerDesktop.deb
-    # The package lists are already current from the Docker repository setup.
-    sudo apt-get -y install /tmp/DockerDesktop.deb
-
-    # We want the user to restart its machine, for that reason we will not launch Docker Desktop
-
-    # if [[ "$(systemd-detect-virt)" == "wsl"* ]]; then
-    #     # Linux inside the Windows Subsystem for Linux needs to export/link the start command
-    #     "/mnt/c/Program Files/Docker/Docker/Docker Desktop.exe"
-    #     pid_docker=$!
-    #     # Wait until is opened
-    #     wait $pid_docker
-    #     while ! docker info &> /dev/null; do
-    #         sleep 5
-    #     done
-    # else
-    #     # Native Linux
-    #     systemctl --user start docker-desktop
-    #     pid_docker=$!
-    #     # Wait until is opened
-    #     wait $pid_docker
-    #     while ! docker info &> /dev/null; do
-    #         sleep 5
-    #     done
-    # fi
 
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS: install the current Docker Desktop release from Docker's stable,

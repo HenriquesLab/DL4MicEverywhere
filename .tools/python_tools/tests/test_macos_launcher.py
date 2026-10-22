@@ -80,11 +80,10 @@ class MacOSLauncherStaticTests(unittest.TestCase):
         self.assertIn("license/onboarding", daemon)
 
 
-    def test_macos_docker_build_uses_user_desktop_context(self):
+    def test_docker_build_uses_user_context_on_every_os(self):
         text = LINUX.read_text(encoding="utf-8")
-        self.assertIn('if [[ "$OSTYPE" == "darwin"* ]]; then', text)
         self.assertIn('docker_build_command=(docker build)', text)
-        self.assertIn('docker_build_command=(sudo docker build)', text)
+        self.assertNotIn('sudo docker build', text)
 
     def test_docker_wait_loop_does_not_require_seq(self):
         text = DOCKER_DAEMON.read_text(encoding="utf-8")
