@@ -290,7 +290,8 @@ def expected_metadata(
         "source": canonical_source(source, repo_root, config_dir),
         "python-version": python_version,
         "python-platform": PLATFORM_TARGETS[platform],
-        "runtime-profile": str(ppath.relative_to(repo_root)) if ppath is not None else "none",
+        # POSIX separators so a lock generated on Windows stays valid in WSL/Linux.
+        "runtime-profile": ppath.relative_to(repo_root).as_posix() if ppath is not None else "none",
         "runtime-profile-sha256": profile_hash,
         "resolver": f"uv=={UV_VERSION}",
     }

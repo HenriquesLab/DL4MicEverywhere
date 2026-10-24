@@ -11,7 +11,12 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # Open the URL with Windows PowerShell directly. -NoProfile prevents a
         # user's PowerShell profile/execution-policy settings from producing
         # unrelated warnings in the DL4MicEverywhere terminal.
-        DL4ME_BROWSER_URL="$url" powershell.exe -NoProfile -NonInteractive \
+        # WSL only shares Linux environment variables with Windows programs when
+        # they are listed in WSLENV; without it PowerShell receives no URL.
+        # Passing the URL through the environment (not the command line) keeps
+        # characters such as '&' or '?' from being interpreted by PowerShell.
+        DL4ME_BROWSER_URL="$url" WSLENV="DL4ME_BROWSER_URL${WSLENV:+:$WSLENV}" \
+            powershell.exe -NoProfile -NonInteractive \
             -Command 'Start-Process -FilePath $env:DL4ME_BROWSER_URL'
     else
         xdg-open "$url"

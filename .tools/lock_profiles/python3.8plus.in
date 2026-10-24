@@ -4,3 +4,9 @@ nbformat==5.9.2
 ipywidgets==8.1.0
 jupyterlab==3.6.0
 matplotlib==3.6.3
+# Keep the setuptools installed by the Dockerfiles (SETUPTOOLS_VERSION for
+# Python 3.8+). Packages such as TensorFlow depend on setuptools without an
+# upper bound, so without this pin the lock would pull the newest release and
+# replace the Dockerfile's version. setuptools 82+ no longer ships pkg_resources,
+# which notebook packages such as stardist 0.9.1 still import.
+setuptools==75.3.2

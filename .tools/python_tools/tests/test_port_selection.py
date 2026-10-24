@@ -152,6 +152,13 @@ class PortSelectionContractTests(unittest.TestCase):
         self.assertIn("powershell.exe -NoProfile -NonInteractive", text)
         self.assertNotIn('export BROWSER="powershell.exe /C start"', text)
 
+    def test_wsl_browser_url_is_shared_with_windows_powershell(self):
+        # Without WSLENV, Windows PowerShell never sees DL4ME_BROWSER_URL and
+        # Start-Process fails with "The argument is null or empty".
+        text = BROWSER.read_text(encoding="utf-8")
+        self.assertIn('WSLENV="DL4ME_BROWSER_URL${WSLENV:+:$WSLENV}"', text)
+        self.assertIn("Start-Process -FilePath $env:DL4ME_BROWSER_URL", text)
+
 
 if __name__ == "__main__":
     unittest.main()

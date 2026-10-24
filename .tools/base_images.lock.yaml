@@ -2,3 +2,22 @@
 # Existing digests are immutable pins. Use refresh-all intentionally to update them.
 schema_version: 1
 images:
+  "python:3.9.20-alpine3.19":
+    digest: "sha256:ce3ad85aaccd151968e3e939615e8ea3e0df9a268ed9fe6d0cdec070f8cb795b"
+    platforms:
+      "linux/386": "sha256:ad0b83c0aa901555d06ba84534a0fae343c7a07d23ad3d1f09b915445647b236"
+      "linux/amd64": "sha256:3e73db958323b7a2ea8de035d09c4474e77168fd7a48b0a09dfeb85a23709707"
+      "linux/arm/v6": "sha256:e5660def13a223ab4750486fd7def292ad6bc4bc44a666d60c6087da5c41c261"
+      "linux/arm/v7": "sha256:16ab09edfdef4d01b73ed9e9ffef3c9f6c5f452cb2a8f26eaefd4c20d2e515b2"
+      "linux/arm64": "sha256:41f4a5b2c89cf92fa385ded71de3c7940545dbeea6524370614bb522e1effa4b"
+      "linux/ppc64le": "sha256:9974a01abde999b5b277c9e657541980f96eb8ff9d545c7bac00cc27b608078c"
+      "linux/s390x": "sha256:bd276ffac21759d3028c619dbc6df1d76ec0cc8abd55598400521ecf465c93ed"
+  "ubuntu:22.04":
+    digest: "sha256:0a9887931b0e38af2e3487ed39e29436b0535c4f3f52e57745baaf79d1898956"
+    platforms:
+      "linux/amd64": "sha256:98510ac07bb4545e389be502a8918b385c018bfe4ceeb5ac7e0375c782268b04"
+      "linux/arm/v7": "sha256:f0a785c07dff9e5f2a8acab9f2baa830cbec49de6634e69fc4be2d1e72d703cd"
+      "linux/arm64": "sha256:88881eb36da489f9ff8746ece8048ca16cc94f80e8cd3ae7e8335d8822631591"
+      "linux/ppc64le": "sha256:bbdfcd2f52e59e4ae38b0bfd9cd9629185be34be5a9a6905ef6b078f6212836c"
+      "linux/riscv64": "sha256:e2238861d202b4ce04104e658f38276553e37b09f7205d8138d755daa2f54123"
+      "linux/s390x": "sha256:294228125b482f652f84de81408e1d6ac5555ac25b5fc1fb4e85f166369dfe04"
