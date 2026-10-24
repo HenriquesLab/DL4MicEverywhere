@@ -1,0 +1,2 @@
+careamics==0.3.2
+matplotlib>=3.9
