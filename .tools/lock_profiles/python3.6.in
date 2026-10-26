@@ -4,3 +4,9 @@ nbformat==5.0.2
 ipywidgets==8.0.0a0
 jupyterlab==2.3.2
 matplotlib==3.0.3
+# The converted notebooks import yaml to remember widget values
+# (.tools/notebook_autoconversion/code_utils_one_cell.py).
+pyyaml==6.0.1
+# Keep the setuptools installed by the legacy Dockerfiles (SETUPTOOLS_VERSION for
+# Python 3.6); see python3.8plus.in.
+setuptools==59.6.0

@@ -142,3 +142,6 @@ cheatsheet*.txt
 .tools/docker_build_inputs/
 
 .tools/.cache/uv/
+
+# Local reports from .tools/python_tools/build_and_test_images.py
+image_test_reports/

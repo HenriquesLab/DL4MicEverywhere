@@ -68,6 +68,42 @@ class RequirementsLockPlatformTests(unittest.TestCase):
         self.assertEqual(cmd[cmd.index("--python-platform") + 1], "x86_64-unknown-linux-gnu")
         self.assertTrue(self.validate(lock, "amd64"))
 
+    def test_python37_resolves_for_the_installed_patch_release(self):
+        # "3.7" alone means 3.7.0 to uv and excludes pandas 1.2.3 (>=3.7.1).
+        lock = self.root / "requirements.lock.txt"
+        with mock.patch.object(requirements_lock, "locate_uv", return_value=["uv"]), \
+                mock.patch.object(requirements_lock.subprocess, "run", side_effect=self.fake_run):
+            requirements_lock.generate_lock(lock, str(self.source), self.root, self.root, "3.7", "none", CUTOFF)
+        cmd = self.commands[-1]
+        self.assertEqual(cmd[cmd.index("--python-version") + 1], "3.7.17")
+        self.assertIn("# dl4me-lock-python-version: 3.7\n", lock.read_text(encoding="utf-8"))
+
+    def test_python36_is_resolved_with_pip_tools_on_the_same_python(self):
+        # uv refuses Python < 3.7; legacy locks are resolved by pip-tools inside
+        # the official image of the exact Python release the legacy images build.
+        lock = self.root / "requirements.lock.txt"
+
+        def fake_docker(cmd, check=True):
+            self.commands.append(cmd)
+            work = Path(cmd[cmd.index("-v") + 1].rsplit(":/work", 1)[0])
+            (work / "requirements.compiled.txt").write_text(
+                "tensorflow==1.12.0 \\\n    --hash=sha256:" + "b" * 64 + "\n", encoding="utf-8")
+            return subprocess.CompletedProcess(cmd, 0)
+
+        with mock.patch.object(requirements_lock.shutil, "which", return_value="/usr/bin/docker"), \
+                mock.patch.object(requirements_lock, "locate_uv", side_effect=AssertionError("uv used")), \
+                mock.patch.object(requirements_lock.subprocess, "run", side_effect=fake_docker):
+            requirements_lock.generate_lock(lock, str(self.source), self.root, self.root, "3.6", "none", CUTOFF)
+        cmd = self.commands[-1]
+        self.assertEqual(cmd[:2], ["docker", "run"])
+        self.assertIn("python:3.6.15-slim", cmd)
+        self.assertIn("pip-compile --generate-hashes --allow-unsafe", cmd[-1])
+        text = lock.read_text(encoding="utf-8")
+        self.assertIn("# dl4me-lock-resolver: pip-tools==6.4.0 on python:3.6.15-slim", text)
+        self.assertIn("tensorflow==1.12.0", text)
+        self.assertTrue(requirements_lock.validate_lock(
+            lock, str(self.source), self.root, self.root, "3.6", "none")[0])
+
     def test_locks_without_platform_header_count_as_amd64(self):
         lock = self.generate("amd64")
         text = lock.read_text(encoding="utf-8")

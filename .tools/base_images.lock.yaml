@@ -12,6 +12,15 @@ images:
       "linux/arm64": "sha256:41f4a5b2c89cf92fa385ded71de3c7940545dbeea6524370614bb522e1effa4b"
       "linux/ppc64le": "sha256:9974a01abde999b5b277c9e657541980f96eb8ff9d545c7bac00cc27b608078c"
       "linux/s390x": "sha256:bd276ffac21759d3028c619dbc6df1d76ec0cc8abd55598400521ecf465c93ed"
+  "ubuntu:20.04":
+    digest: "sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214"
+    platforms:
+      "linux/amd64": "sha256:c664f8f86ed5a386b0a340d981b8f81714e21a8b9c73f658c4bea56aa179d54a"
+      "linux/arm/v7": "sha256:6bd4d0d10d12efa59eb474de11541cae66d2d1b5efd1e3cc79718af783fe1f4a"
+      "linux/arm64": "sha256:722ea796ac2d57eeb3627c58a582fc1acc58be51faf815e1bce1682ae5c092f7"
+      "linux/ppc64le": "sha256:0231085a1cd7d635722fbf6f75981b6c5d3330693b15653ff0dcf34152dbc546"
+      "linux/riscv64": "sha256:731f1f953b04e2f73394b5b6990153f0a703c81d0de71270265d8d206409178f"
+      "linux/s390x": "sha256:c1661b84ff68805c464d0d641c1f183776c0e663162fbbbc1ee731f3525ecf0d"
   "ubuntu:22.04":
     digest: "sha256:0a9887931b0e38af2e3487ed39e29436b0535c4f3f52e57745baaf79d1898956"
     platforms:

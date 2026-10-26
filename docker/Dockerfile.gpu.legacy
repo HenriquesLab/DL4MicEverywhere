@@ -247,7 +247,8 @@ RUN set -eux; \
     make -j"$(nproc)"; \
     make altinstall; \
     "/opt/python/${PYTHON_VERSION}/bin/python${PYTHON_VERSION}" -m venv "${VIRTUAL_ENV}"; \
-    "${VIRTUAL_ENV}/bin/python" -m pip install \
+    # The pip bundled with Python 3.6.15 (18.1) crashes on PIP_NO_CACHE_DIR=1.
+    env -u PIP_NO_CACHE_DIR "${VIRTUAL_ENV}/bin/python" -m pip install --no-cache-dir \
         "pip==${PIP_VERSION}" \
         "setuptools==${SETUPTOOLS_VERSION}" \
         "wheel==${WHEEL_VERSION}"; \
@@ -255,6 +256,9 @@ RUN set -eux; \
     ln -sf "${VIRTUAL_ENV}/bin/python" /usr/local/bin/python3; \
     ln -sf "${VIRTUAL_ENV}/bin/pip" /usr/local/bin/pip; \
     ln -sf "${VIRTUAL_ENV}/bin/pip" /usr/local/bin/pip3; \
+    # Same setuptools for the isolated environments in which pip compiles
+    # packages without wheels; otherwise each build fetches the newest one.
+    printf 'setuptools==%s\n' "${SETUPTOOLS_VERSION}" > /opt/dl4me-build-constraints.txt; \
     rm -rf /tmp/build-python
 
 WORKDIR /home
@@ -263,7 +267,10 @@ WORKDIR /home
 # The lock includes transitive dependencies, hashes, and DL4MicEverywhere's
 # runtime defaults for packages not explicitly supplied by the notebook input.
 COPY ${PATH_TO_REQUIREMENTS_LOCK} /tmp/requirements.lock.txt
-RUN python -m pip install --require-hashes -r /tmp/requirements.lock.txt && \
+# PIP_CONSTRAINT also reaches the isolated build environments of packages
+# compiled from source, so their setuptools stays pinned too.
+RUN PIP_CONSTRAINT=/opt/dl4me-build-constraints.txt \
+    python -m pip install --require-hashes -r /tmp/requirements.lock.txt && \
     rm /tmp/requirements.lock.txt
 
 # Copy the converted notebook from stage 1
