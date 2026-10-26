@@ -102,7 +102,7 @@ This will create a `DL4MicEverywhere.desktop` file in your Desktop. You will nee
 > ℹ️ **Docker Engine instead of Docker Desktop on Linux**
 > On Linux, DL4MicEverywhere uses Docker Engine, not Docker Desktop: Docker Desktop for Linux runs containers inside a virtual machine that cannot use NVIDIA GPUs. Compared with the Docker Desktop steps shown elsewhere in this guide:
 > - There is no "start Docker Desktop" step: Docker Engine starts automatically with the computer.
-> - Remove old images with DL4MicEverywhere's own **File > Reclaim Docker Space...** menu option.
+> - Remove old images, and the Docker build cache left by image builds, with DL4MicEverywhere's own **File > Reclaim Docker Space...** menu option.
 > - Container output is shown in the launcher terminal.
 > - Docker Desktop's CPU/memory limits do not apply: Docker Engine can use the whole computer.
 >

@@ -1,5 +1,8 @@
 #! /usr/local/bin/wish
 
+# Opens the dialog in front of the terminal window (see window_utils.tcl).
+source [file join [file dirname [file normalize [info script]]] window_utils.tcl]
+
 # Define the shape of the window
 set width 550
 set height 150
@@ -37,3 +40,5 @@ pack .fr.no -padx 30 -side right
 wm protocol . WM_DELETE_WINDOW { puts "restart_later"; exit 0 }
 wm title . "Installation Complete"
 wm geometry . ${width}x${height}+${width_offset}+${height_offset}
+
+dl4me_bring_to_front

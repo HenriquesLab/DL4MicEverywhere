@@ -129,10 +129,11 @@ class UpdateScriptRuntimeTests(unittest.TestCase):
         cache_dir.mkdir(parents=True)
         shutil.copy2(UPDATE, script_dir / "update_dl4miceverywhere.sh")
         shutil.copy2(STATUS, self.root / ".tools" / "bash_tools" / "launcher_status.sh")
-        shutil.copy2(
-            REPO_ROOT / ".tools" / "bash_tools" / "path_utils.sh",
-            self.root / ".tools" / "bash_tools" / "path_utils.sh",
-        )
+        for helper in ("path_utils.sh", "gui_utils.sh"):
+            shutil.copy2(
+                REPO_ROOT / ".tools" / "bash_tools" / helper,
+                self.root / ".tools" / "bash_tools" / helper,
+            )
         (cache_dir / ".cache_preferences").write_text("update : Automatically\n", encoding="utf-8")
 
         self.fakebin = self.tempdir / "bin"

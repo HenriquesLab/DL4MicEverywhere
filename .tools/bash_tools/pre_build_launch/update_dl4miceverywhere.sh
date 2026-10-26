@@ -2,6 +2,7 @@
 
 SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P)" || exit 1
 source "$SCRIPT_DIR/../path_utils.sh" || exit 1
+source "$SCRIPT_DIR/../gui_utils.sh" || exit 1
 BASEDIR=$(dl4me_realpath "$SCRIPT_DIR") || exit 1
 REPO_ROOT=$(dl4me_realpath "$BASEDIR/../../..") || exit 1
 source "$BASEDIR/../launcher_status.sh"
@@ -22,7 +23,7 @@ show_notice() {
     local title="$1"
     local message="$2"
     if [ "$flag_gui" -eq 1 ] && command -v wish >/dev/null 2>&1; then
-        wish "$BASEDIR/../../tcl_tools/oneline_done_gui.tcl" "$title" "$message" || true
+        dl4me_wish "$BASEDIR/../../tcl_tools/oneline_done_gui.tcl" "$title" "$message" || true
     else
         echo ""
         echo "------------------------------------"
@@ -81,6 +82,7 @@ if [ "$already_asked" = "1" ]; then
     fi
 
     if [ "$flag_gui" -eq 1 ]; then
+        dl4me_announce_dialog
         update_flag=$(wish "$BASEDIR/../../tcl_tools/menubar/ask_update.tcl" "$already_asked" 2>/dev/null || true)
         [ -n "$update_flag" ] || update_flag=1
     else
@@ -92,6 +94,7 @@ if [ "$already_asked" = "1" ]; then
     fi
 elif [ "$local_commit" != "$online_commit" ] && [[ "$update" == "Ask first"* ]]; then
     if [ "$flag_gui" -eq 1 ]; then
+        dl4me_announce_dialog
         update_flag=$(wish "$BASEDIR/../../tcl_tools/menubar/ask_update.tcl" "$already_asked" 2>/dev/null || true)
         [ -n "$update_flag" ] || update_flag=1
     else

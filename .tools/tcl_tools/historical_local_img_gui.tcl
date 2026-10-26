@@ -1,5 +1,8 @@
 #! /usr/local/bin/wish
 
+# Opens the dialog in front of the terminal window (see window_utils.tcl).
+source [file join [file dirname [file normalize [info script]]] window_utils.tcl]
+
 set docker_tag [lindex $argv 0]
 
 set width 760
@@ -47,3 +50,5 @@ ttk::button .fr.buttons.cancel -text "Cancel" -command {finish 0}
 grid .fr.buttons.use -row 0 -column 0 -padx 5
 grid .fr.buttons.download -row 0 -column 1 -padx 5
 grid .fr.buttons.cancel -row 0 -column 2 -padx 5
+
+dl4me_bring_to_front

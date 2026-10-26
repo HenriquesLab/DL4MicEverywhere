@@ -2,6 +2,7 @@
 
 SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P)" || exit 1
 source "$SCRIPT_DIR/path_utils.sh" || exit 1
+source "$SCRIPT_DIR/gui_utils.sh" || exit 1
 BASEDIR=$(dl4me_realpath "$SCRIPT_DIR") || exit 1
 source "$BASEDIR/macos_env.sh" || exit 1
 
@@ -215,7 +216,7 @@ if [[ "$any_installation_flag" -ne 0 ]]; then
     echo "It's recommended to restart your computer to apply all changes."
     echo "------------------------------------"
 
-    requirements_flag=$(wish "$BASEDIR/../tcl_tools/restart_computer.tcl")
+    requirements_flag=$(dl4me_wish "$BASEDIR/../tcl_tools/restart_computer.tcl")
 
     if [[ "$requirements_flag" == "restart_now" ]]; then
         if [[ -n "${WSL_DISTRO_NAME:-}" ]] || grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null; then

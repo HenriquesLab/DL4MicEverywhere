@@ -234,8 +234,20 @@ WORKDIR /home
 COPY ${PATH_TO_REQUIREMENTS_LOCK} /tmp/requirements.lock.txt
 # PIP_CONSTRAINT also reaches the isolated build environments of packages
 # compiled from source, so their setuptools stays pinned too.
-RUN PIP_CONSTRAINT=/opt/dl4me-build-constraints.txt \
-    python -m pip install --require-hashes -r /tmp/requirements.lock.txt && \
+# pip cannot resume an interrupted download, and PIP_RETRIES does not cover a
+# download that stalls halfway, so the install is retried up to three times.
+# Downloads are kept in a BuildKit cache mount, which is not part of the image,
+# so a retry or a later build only fetches what is missing. The hashes in the
+# lock are still checked for every file taken from the cache.
+RUN --mount=type=cache,id=dl4me-pip,target=/root/.cache/pip \
+    for attempt in 1 2 3; do \
+        env -u PIP_NO_CACHE_DIR PIP_CONSTRAINT=/opt/dl4me-build-constraints.txt \
+            python -m pip install --cache-dir /root/.cache/pip \
+                --require-hashes -r /tmp/requirements.lock.txt && break; \
+        if [ "$attempt" -eq 3 ]; then exit 1; fi; \
+        echo "Installing the Python packages failed (attempt $attempt of 3). Retrying in 20 seconds ..."; \
+        sleep 20; \
+    done && \
     rm /tmp/requirements.lock.txt
 
 # Copy the converted notebook from stage 1

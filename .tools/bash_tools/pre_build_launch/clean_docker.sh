@@ -7,32 +7,26 @@
 #   org.dl4miceverywhere.managed=true
 #
 # Only objects older than 24 hours are considered. Docker volumes are never
-# pruned here. Shared Docker build cache is also left alone unless the caller
-# explicitly opts in with --include-build-cache.
+# pruned here. Unused Docker build cache older than 24 hours is pruned too: it
+# holds the layers and package downloads of image builds, and it cannot be
+# attributed to DL4MicEverywhere alone, so it is the one daemon-wide step.
 
 set -u
 
 MANAGED_LABEL="org.dl4miceverywhere.managed=true"
-INCLUDE_BUILD_CACHE=0
 
 usage() {
     cat <<'USAGE'
-Usage: clean_docker.sh [--include-build-cache]
+Usage: clean_docker.sh
 
-Without options, remove only unused DL4MicEverywhere-labelled Docker resources
-older than 24 hours. Docker volumes and shared Docker build cache are preserved.
-
---include-build-cache
-    Also prune unused Docker build cache older than 24 hours. Build cache is a
-    Docker-wide shared resource and cannot be scoped reliably to this project.
+Remove unused DL4MicEverywhere-labelled Docker containers, images and networks
+older than 24 hours, and unused Docker build cache older than 24 hours.
+Docker volumes are preserved.
 USAGE
 }
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
-        --include-build-cache)
-            INCLUDE_BUILD_CACHE=1
-            ;;
         -h|--help)
             usage
             exit 0
@@ -48,12 +42,8 @@ done
 
 echo "Reclaiming DL4MicEverywhere Docker disk space ..."
 echo "Only unused resources labelled '$MANAGED_LABEL' and older than 24 hours will be removed."
+echo "Unused Docker build cache older than 24 hours is also removed."
 echo "Docker volumes are not removed."
-if [ "$INCLUDE_BUILD_CACHE" -eq 1 ]; then
-    echo "Shared Docker build cache older than 24 hours WILL also be pruned."
-else
-    echo "Shared Docker build cache is not removed."
-fi
 echo ""
 
 if ! docker info >/dev/null 2>&1; then
@@ -101,23 +91,12 @@ run_prune \
         --filter "label=$MANAGED_LABEL" \
         --filter "until=24h" || exit 1
 
-if [ "$INCLUDE_BUILD_CACHE" -eq 1 ]; then
-    echo "--- Shared Docker build cache (explicit opt-in) ---"
-    echo "NOTE: Docker build cache is daemon-wide and cannot be reliably attributed"
-    echo "to DL4MicEverywhere alone. Only cache older than 24 hours is considered."
-    if ! docker builder prune -f --filter "until=24h"; then
-        echo "ERROR: Shared Docker build-cache cleanup failed." >&2
-        exit 1
-    fi
-    echo ""
-fi
+# Build cache includes the pip download cache of the image builds. Images are
+# pruned first, so the cache of the removed images is unused by now.
+run_prune     "Unused Docker build cache"     docker builder prune -f         --filter "until=24h" || exit 1
 
 echo "Docker cleanup completed successfully."
-if [ "$INCLUDE_BUILD_CACHE" -eq 1 ]; then
-    echo "DL4MicEverywhere-labelled resources and opted-in shared Docker build cache were considered."
-else
-    echo "Only DL4MicEverywhere-labelled resources were considered."
-fi
+echo "DL4MicEverywhere-labelled resources and unused Docker build cache were considered."
 echo "Docker volumes were not removed."
 echo ""
 echo "################################"

@@ -1,6 +1,7 @@
 #!/bin/bash
 SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P)" || exit 1
 source "$SCRIPT_DIR/../path_utils.sh" || exit 1
+source "$SCRIPT_DIR/../gui_utils.sh" || exit 1
 BASEDIR=$(dl4me_realpath "$SCRIPT_DIR") || exit 1
 source "$BASEDIR/../macos_env.sh" || exit 1
 source "$BASEDIR/docker_state.sh" || exit 1
@@ -67,7 +68,7 @@ fi
 echo "WARNING: $docker_product is not running."
 
 # Launch the window asking the user whether to start Docker.
-docker_flag=$(wish "$BASEDIR/../../tcl_tools/docker_desktop_gui.tcl" "$docker_product")
+docker_flag=$(dl4me_wish "$BASEDIR/../../tcl_tools/docker_desktop_gui.tcl" "$docker_product")
 # docker_flag == 3 --> Yes, launch
 # docker_flag == 2 --> No, do not launch
 

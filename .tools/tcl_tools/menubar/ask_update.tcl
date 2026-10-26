@@ -1,5 +1,8 @@
 #! /usr/local/bin/wish
 
+# Opens the dialog in front of the terminal window (see window_utils.tcl).
+source [file join [file dirname [file dirname [file normalize [info script]]]] window_utils.tcl]
+
 set already_asked [lindex $argv 0]
 
 # Define the shape of the window
@@ -44,3 +47,5 @@ pack .fr.no -padx 30 -side right
 # Create the window, give a name to it and locate it in the middle of the screen
 wm title . "Do you want to update?"
 wm geometry . ${width}x${height}+${width_offset}+${height_offset}
+
+dl4me_bring_to_front

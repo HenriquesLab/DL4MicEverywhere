@@ -27,6 +27,17 @@ class PipNetworkResilienceTests(unittest.TestCase):
                 self.assertGreaterEqual(text.count("--require-hashes"), 2)
                 self.assertIn("COPY ${PATH_TO_REQUIREMENTS_LOCK} /tmp/requirements.lock.txt", text)
 
+    def test_package_install_is_retried_with_cached_downloads(self):
+        # A download that stalls halfway (pix2pix on a slow connection) is not
+        # retried by pip itself; the retry must not start every download again.
+        for dockerfile in DOCKERFILES:
+            with self.subTest(dockerfile=dockerfile.name):
+                text = dockerfile.read_text(encoding="utf-8")
+                self.assertIn("RUN --mount=type=cache,id=dl4me-pip,target=/root/.cache/pip \\\n"
+                              "    for attempt in 1 2 3; do \\\n", text)
+                self.assertIn("python -m pip install --cache-dir /root/.cache/pip", text)
+                self.assertIn('if [ "$attempt" -eq 3 ]; then exit 1; fi', text)
+
     def test_unet_2d_uses_jupyterlab_compatible_requests_pin(self):
         requirements = (
             REPO_ROOT

@@ -2,6 +2,7 @@
 
 SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P)" || exit 1
 source "$SCRIPT_DIR/path_utils.sh" || exit 1
+source "$SCRIPT_DIR/gui_utils.sh" || exit 1
 BASEDIR=$(dl4me_realpath "$SCRIPT_DIR") || exit 1
 flag_gui="$1"
 source "$BASEDIR/launcher_status.sh"
@@ -78,7 +79,7 @@ fi
 # Check if the clean option has been selected and run the script if so
 if [[ "$clean" == "Automatically"* || "$clean" == "Ask first"* ]]; then
     if [[ "$clean" == "Ask first"* ]]; then
-        flag_clean=$(wish "$BASEDIR/../tcl_tools/oneline_yes_no_gui.tcl" "Clean DL4MicEverywhere Docker resources" "Remove unused DL4MicEverywhere-labelled Docker containers, images, and networks older than 24 hours? Other Docker resources, Docker volumes, and shared build cache will be preserved.")
+        flag_clean=$(dl4me_wish "$BASEDIR/../tcl_tools/oneline_yes_no_gui.tcl" "Clean DL4MicEverywhere Docker resources" "Remove unused DL4MicEverywhere-labelled Docker containers, images, and networks, and unused Docker build cache, older than 24 hours? Other Docker resources and Docker volumes will be preserved.")
         # flag_clean == 2 --> Yes
         # flag_clean == 3 --> No
     fi

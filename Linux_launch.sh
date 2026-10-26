@@ -3,6 +3,7 @@
 # Get the basedir
 SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P)" || exit 1
 source "$SCRIPT_DIR/.tools/bash_tools/path_utils.sh" || exit 1
+source "$SCRIPT_DIR/.tools/bash_tools/gui_utils.sh" || exit 1
 BASEDIR=$(dl4me_realpath "$SCRIPT_DIR") || exit 1
 source "$BASEDIR/.tools/bash_tools/launcher_status.sh"
 
@@ -239,7 +240,7 @@ else
     # A normal user close is represented explicitly by __DL4ME_CANCEL__.  Keep
     # wish/Tcl failures distinct so an empty/crashed GUI cannot be mistaken for
     # a successful cancellation.
-    gui_arguments=$(wish "$BASEDIR/.tools/tcl_tools/main_gui.tcl" "$BASEDIR" "$OSTYPE")
+    gui_arguments=$(dl4me_wish "$BASEDIR/.tools/tcl_tools/main_gui.tcl" "$BASEDIR" "$OSTYPE")
     gui_result=$?
 
     if [ "$gui_result" -ne 0 ]; then
@@ -714,7 +715,7 @@ historical_image_available_for_arch() {
 historical_image_unavailable() {
     local error_message="The selected older version is not available on Docker Hub for this computer. Please choose another version or use the current version."
     if [ "$flag_gui" -eq 1 ]; then
-        wish "$BASEDIR/.tools/tcl_tools/oneline_done_gui.tcl" \
+        dl4me_wish "$BASEDIR/.tools/tcl_tools/oneline_done_gui.tcl" \
             "Older image not available" "$error_message"
     else
         echo "$error_message"
@@ -729,7 +730,7 @@ if [ "$flag_version_selected" -eq 1 ] && [[ "$containerisation" == "Docker"* ]];
         # The exact historical image already exists locally. Offer reuse or a
         # fresh download of the published image, but never offer Build.
         if [ "$flag_gui" -eq 1 ]; then
-            flag_build=$(wish "$BASEDIR/.tools/tcl_tools/historical_local_img_gui.tcl" "$docker_tag")
+            flag_build=$(dl4me_wish "$BASEDIR/.tools/tcl_tools/historical_local_img_gui.tcl" "$docker_tag")
         else
             echo "The selected older image already exists locally:"
             echo "  $docker_tag"
@@ -760,7 +761,7 @@ if [ "$flag_version_selected" -eq 1 ] && [[ "$containerisation" == "Docker"* ]];
         fi
 
         if [ "$flag_gui" -eq 1 ]; then
-            flag_build=$(wish "$BASEDIR/.tools/tcl_tools/historical_download_gui.tcl" "$docker_tag")
+            flag_build=$(dl4me_wish "$BASEDIR/.tools/tcl_tools/historical_download_gui.tcl" "$docker_tag")
         else
             echo "For older versions, only downloading from Docker Hub is available."
             echo "Selected image: $docker_tag"
@@ -797,7 +798,7 @@ else
         # Check if there is a docker image with that tag locally.
         if docker image inspect "$docker_tag" >/dev/null 2>&1; then
             if [ "$flag_gui" -eq 1 ]; then
-                flag_build=$(wish "$BASEDIR/.tools/tcl_tools/local_img_gui.tcl" "$OSTYPE")
+                flag_build=$(dl4me_wish "$BASEDIR/.tools/tcl_tools/local_img_gui.tcl" "$OSTYPE")
                 if [ "$flag_build" = "0" ]; then
                     echo "Docker image selection cancelled."
                     controlled_exit "$DL4ME_STATUS_USER_CANCELLED"
@@ -838,7 +839,7 @@ else
 
                 if [ "$arch_count" -gt 0 ]; then
                     if [ "$flag_gui" -eq 1 ]; then
-                        flag_build=$(wish "$BASEDIR/.tools/tcl_tools/hub_img_gui.tcl" "$OSTYPE")
+                        flag_build=$(dl4me_wish "$BASEDIR/.tools/tcl_tools/hub_img_gui.tcl" "$OSTYPE")
                         if [ "$flag_build" = "0" ]; then
                             echo "Docker image selection cancelled."
                             controlled_exit "$DL4ME_STATUS_USER_CANCELLED"

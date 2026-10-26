@@ -12,6 +12,7 @@ set -u
 
 SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P)" || exit 1
 source "$SCRIPT_DIR/path_utils.sh" || exit 1
+source "$SCRIPT_DIR/gui_utils.sh" || exit 1
 SCRIPT_DIR=$(dl4me_realpath "$SCRIPT_DIR") || exit 1
 TARGET_DIR=$(dl4me_realpath "$SCRIPT_DIR/../..") || exit 1
 CLEAN_DOCKER="${1:-0}"
@@ -27,6 +28,7 @@ show_error() {
     echo "------------------------------------"
 
     if command -v wish >/dev/null 2>&1 && [ -f "$TARGET_DIR/.tools/tcl_tools/menubar/uninstall.tcl" ]; then
+        dl4me_announce_dialog
         wish "$TARGET_DIR/.tools/tcl_tools/menubar/uninstall.tcl" \
             --error \
             "$message Nothing in the DL4MicEverywhere application folder was removed." \

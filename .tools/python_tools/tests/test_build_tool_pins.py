@@ -90,8 +90,9 @@ class BuildToolPinTests(unittest.TestCase):
                 text = dockerfile.read_text(encoding="utf-8")
                 self.assertIn(
                     "printf 'setuptools==%s\\n' \"${SETUPTOOLS_VERSION}\" > /opt/dl4me-build-constraints.txt", text)
-                self.assertIn("RUN PIP_CONSTRAINT=/opt/dl4me-build-constraints.txt \\\n"
-                              "    python -m pip install --require-hashes -r /tmp/requirements.lock.txt", text)
+                self.assertIn("env -u PIP_NO_CACHE_DIR PIP_CONSTRAINT=/opt/dl4me-build-constraints.txt \\\n"
+                              "            python -m pip install --cache-dir /root/.cache/pip \\\n"
+                              "                --require-hashes -r /tmp/requirements.lock.txt", text)
 
 
 if __name__ == "__main__":

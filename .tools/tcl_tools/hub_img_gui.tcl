@@ -1,5 +1,8 @@
 #! /usr/local/bin/wish
 
+# Opens the dialog in front of the terminal window (see window_utils.tcl).
+source [file join [file dirname [file normalize [info script]]] window_utils.tcl]
+
 # Define the shape of the window
 set width 440
 set height 220
@@ -70,3 +73,5 @@ pack .fr.no -padx [expr 50 - ($is_mac * 30) + ($is_linux * 1)] -side right
 wm protocol . WM_DELETE_WINDOW {finish 0}
 wm title . "There is an online Docker image"
 wm geometry . ${width}x${height}+${width_offset}+${height_offset}
+
+dl4me_bring_to_front

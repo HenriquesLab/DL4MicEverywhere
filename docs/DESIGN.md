@@ -29,7 +29,7 @@ DL4MicEverywhere may install a missing component, and start a stopped one after 
 - Docker is installed only when the `docker` command is missing, and never over conflicting distribution packages (`docker.io`, `containerd`, `runc`, `podman-docker`).
 - The NVIDIA Container Toolkit, whose configuration restarts the Docker daemon, is configured automatically only right after DL4MicEverywhere installed Docker Engine itself.
 - The Docker context, Docker Desktop settings, and Docker Desktop versions are never changed automatically; an outdated Docker Desktop only produces a warning.
-- Docker cleanup and uninstall only touch resources labelled `org.dl4miceverywhere.managed`.
+- Uninstall only touches resources labelled `org.dl4miceverywhere.managed`. Docker cleanup touches those resources plus unused Docker build cache older than 24 hours: Docker cannot attribute build cache to one project, and removed cache is only downloaded or rebuilt again when a build needs it.
 - On Linux, Docker Engine is used instead of Docker Desktop, because Docker Desktop for Linux cannot pass NVIDIA GPUs to containers.
 
 ## Docker Containers

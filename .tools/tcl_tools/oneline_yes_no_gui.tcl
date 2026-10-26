@@ -1,5 +1,8 @@
 #! /usr/local/bin/wish
 
+# Opens the dialog in front of the terminal window (see window_utils.tcl).
+source [file join [file dirname [file normalize [info script]]] window_utils.tcl]
+
 set title [lindex $argv 0]
 set text [lindex $argv 1]
 
@@ -35,3 +38,5 @@ pack .fr.no -padx [expr $width / 10 ]  -side right
 # Create the window, give a name to it and locate it in the middle of the screen
 wm title . "$title"
 wm geometry . ${width}x${height}+${width_offset}+${height_offset}
+
+dl4me_bring_to_front

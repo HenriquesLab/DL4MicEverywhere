@@ -7,6 +7,7 @@ set basedir [lindex $argv 0]
 source [file join $basedir .tools tcl_tools list_utils.tcl]
 # Child processes may log harmless messages to stderr (always on macOS).
 source [file join $basedir .tools tcl_tools exec_utils.tcl]
+source [file join $basedir .tools tcl_tools window_utils.tcl]
 
 # Check if there is cache information
 set filename "$basedir/.tools/.cache/.cache_gui"
@@ -715,13 +716,13 @@ proc cmdcleandocker {} {
 
     set choice [tk_dialog .dockerCleanupChoice \
         "Reclaim Docker Space" \
-        "Choose how much Docker space to reclaim.\n\nClean DL4MicEverywhere removes only unused containers, images, and networks labelled as managed by DL4MicEverywhere and older than 24 hours. Docker volumes and unrelated Docker resources are preserved.\n\nClean + build cache also prunes unused Docker build cache older than 24 hours. Docker build cache is shared daemon-wide and cannot be scoped reliably to DL4MicEverywhere." \
+        "Remove unused containers, images, and networks labelled as managed by DL4MicEverywhere and older than 24 hours, together with unused Docker build cache older than 24 hours (the layers and package downloads kept from image builds).\n\nDocker build cache is shared by every Docker build on this computer, so cache from other projects older than 24 hours is removed too; those projects simply download or rebuild it when needed. Docker volumes and other Docker resources are preserved." \
         warning 0 \
-        "Clean DL4MicEverywhere" \
-        "Clean + build cache" \
+        "Clean" \
         "Cancel"]
 
-    if {$choice == 2} {
+    # 1 is Cancel; -1 means the dialog was closed.
+    if {$choice != 0} {
         return
     }
 
@@ -729,13 +730,8 @@ proc cmdcleandocker {} {
     update idletasks
 
     set cleanup_script "$basedir/.tools/bash_tools/pre_build_launch/clean_docker.sh"
-    if {$choice == 1} {
-        set failed [catch {exec /bin/bash "$cleanup_script" --include-build-cache 2>@1} result]
-        set cleanup_scope "DL4MicEverywhere resources and shared Docker build cache"
-    } else {
-        set failed [catch {exec /bin/bash "$cleanup_script" 2>@1} result]
-        set cleanup_scope "DL4MicEverywhere resources only"
-    }
+    set failed [catch {exec /bin/bash "$cleanup_script" 2>@1} result]
+    set cleanup_scope "DL4MicEverywhere resources and unused Docker build cache"
 
     . configure -cursor ""
     update idletasks
@@ -841,3 +837,5 @@ set min_height [expr {min($minimum_height, $initial_height)}]
 wm minsize . $min_width $min_height
 
 wm geometry . ${initial_width}x${initial_height}
+
+dl4me_bring_to_front

@@ -1,5 +1,8 @@
 #! /usr/local/bin/wish
 
+# Opens the dialog in front of the terminal window (see window_utils.tcl).
+source [file join [file dirname [file dirname [file normalize [info script]]]] window_utils.tcl]
+
 # This file is also used for friendly uninstall error messages after the main
 # launcher window has closed.
 if {[llength $argv] >= 2 && [lindex $argv 0] eq "--error"} {
@@ -38,7 +41,6 @@ proc confirmUninstall {} {
 wm title . "Uninstall DL4MicEverywhere"
 wm resizable . 1 0
 wm protocol . WM_DELETE_WINDOW cancelUninstall
-catch {wm attributes . -topmost 1}
 
 frame .fr -padx 18 -pady 16
 grid .fr -row 0 -column 0 -sticky nsew
@@ -91,5 +93,5 @@ set y [expr {max(0, ([winfo vrootheight .] - $dialog_height) / 2)}]
 wm geometry . ${dialog_width}x${dialog_height}+${x}+${y}
 wm minsize . 480 $dialog_height
 
-raise .
+dl4me_bring_to_front
 focus .fr.buttons.cancel

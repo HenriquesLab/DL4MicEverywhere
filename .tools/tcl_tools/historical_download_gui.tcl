@@ -1,5 +1,8 @@
 #! /usr/local/bin/wish
 
+# Opens the dialog in front of the terminal window (see window_utils.tcl).
+source [file join [file dirname [file normalize [info script]]] window_utils.tcl]
+
 set docker_tag [lindex $argv 0]
 
 set width 720
@@ -44,3 +47,5 @@ ttk::button .fr.buttons.accept -text "Accept" -command {finish 3}
 
 grid .fr.buttons.cancel -row 0 -column 0 -padx 8
 grid .fr.buttons.accept -row 0 -column 1 -padx 8
+
+dl4me_bring_to_front
