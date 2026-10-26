@@ -7,7 +7,7 @@
 # from stdout.
 dl4me_announce_dialog() {
     if [[ "${OSTYPE:-}" == "darwin"* ]]; then
-        echo "A DL4MicEverywhere window is waiting for your answer. If you cannot see it, click the Wish icon in the Dock." >&2
+        echo "A DL4MicEverywhere window is waiting for your answer. If you cannot see it, please check your open windows." >&2
     fi
 }
 
