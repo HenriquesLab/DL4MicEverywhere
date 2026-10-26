@@ -137,8 +137,8 @@ RUN set -eux; \
             "libcudnn8-dev=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*}"; \
     elif [[ "${CUDNN_VERSION}" == 9* ]]; then  \
         apt-get install -y --no-install-recommends \
-            "libcudnn9-cuda-${CUDA_VERSION%%.*}" \
-            "libcudnn9-dev-cuda-${CUDA_VERSION%%.*}"; \
+            "libcudnn9-cuda-${CUDA_VERSION%%.*}=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*}" \
+            "libcudnn9-dev-cuda-${CUDA_VERSION%%.*}=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*}";
     else \
         apt-get install -y --no-install-recommends \
             libcudnn8 \
