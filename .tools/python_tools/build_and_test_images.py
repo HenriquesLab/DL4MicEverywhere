@@ -1,542 +1,520 @@
 #!/usr/bin/env python3
-"""Build every notebook image locally, check it, and write a report.
+"""DL4MicEverywhere image build/import/GPU diagnostic runner.
 
-For each ``notebooks/**/configuration.yaml`` this script:
+Drop-in replacement for .tools/python_tools/build_and_test_images.py on improve_gui.
+Preserves existing CLI and JSON result structure; adds GPU execution diagnostics,
+network-error classification and more conservative runtime-install warnings.
 
-1. resolves the dependency lock and the pinned base images exactly like
-   ``Linux_launch.sh`` does when it builds an image;
-2. builds the Docker image with the same Dockerfile and build arguments;
-3. runs ``post_build_test.sh`` (Python, ``pip check``, Jupyter, GPU when built
-   for GPU);
-4. imports, inside the image, every module the converted notebook imports, so
-   failures such as ``No module named 'pkg_resources'`` are found before a user
-   runs the notebook;
-5. removes the image (and, by default, the Docker build cache) so a long run
-   does not fill the disk.
-
-Results are written after every notebook to ``report.md`` and ``report.json``
-in the output folder, with one log file per step. Run it where DL4MicEverywhere
-itself runs (Linux, WSL, or macOS with Docker available):
-
-    python3 .tools/python_tools/build_and_test_images.py
-    python3 .tools/python_tools/build_and_test_images.py --only StarDist --only CARE_2D
-    python3 .tools/python_tools/build_and_test_images.py --variant gpu
-    python3 .tools/python_tools/build_and_test_images.py --dry-run
+Run from Linux/WSL/macOS with Docker:
+  python3 .tools/python_tools/build_and_test_images.py --variant both
+  python3 .tools/python_tools/build_and_test_images.py --only Detectron2 --variant cpu
 """
-
 from __future__ import annotations
 
 import argparse
-import datetime as _dt
+import datetime as dt
 import importlib.util
 import json
-from pathlib import Path
 import re
 import shutil
 import subprocess
 import sys
 import time
+from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-TEST_IMAGE_REPOSITORY = "dl4me-image-test"
-IMPORT_REPORT_MARKER = "DL4ME_IMPORT_REPORT:"
+ROOT = Path(__file__).resolve().parents[2]
+TAG_PREFIX = "dl4me-image-test"
+IMPORT_MARKER = "DL4ME_IMPORT_REPORT:"
+GPU_MARKER = "DL4ME_GPU_REPORT:"
 
-_lock_spec = importlib.util.spec_from_file_location(
-    "requirements_lock", Path(__file__).resolve().parent / "requirements_lock.py"
-)
-requirements_lock = importlib.util.module_from_spec(_lock_spec)
-assert _lock_spec.loader is not None
-_lock_spec.loader.exec_module(requirements_lock)
+spec = importlib.util.spec_from_file_location("requirements_lock", Path(__file__).with_name("requirements_lock.py"))
+lock_util = importlib.util.module_from_spec(spec)
+assert spec.loader is not None
+spec.loader.exec_module(lock_util)
 
-# Runs inside the image with the image's own Python (as old as 3.5 for legacy
-# notebooks), so it must avoid f-strings and newer syntax. It collects the
-# import statements of every code cell of the converted notebook and executes
-# each one. Imports inside `try:` blocks are optional fallbacks: a failure there
-# is reported as a warning, not an error. Some notebooks deliberately keep an
-# install section (`!git clone ...`, `!pip install git+...`, `!wget code.zip`) that
-# provides modules only when the user runs it; when such commands remain, failing
-# imports are reported as "installed at run time" warnings, together with the commands.
-IMPORT_CHECK_CODE = r'''
+# This code runs inside the image, including legacy Python 3.5/3.6.
+IMPORT_CODE = r'''
 import ast
 import json
 import os
 import re
 import sys
-
-# Jupyter plots with its inline backend; without this, old matplotlib versions
-# pick TkAgg in a plain Python process and `import pyplot` fails on tkinter.
 os.environ.setdefault("MPLBACKEND", "Agg")
-
-MARKER = "DL4ME_IMPORT_REPORT:"
-INSTALL_COMMAND = re.compile(
-    r"(pip3?|conda|mamba)\s+install|git\s+clone|setup\.py\s+(install|develop)|\b(wget|curl)\s")
+marker = "DL4ME_IMPORT_REPORT:"
+install_re = re.compile(r"(?:pip3?|conda|mamba)\s+install|git\s+clone|setup\.py\s+(?:install|develop)|\b(?:wget|curl)\s", re.I)
 install_commands = []
+imports = []
+notebook = json.load(open(sys.argv[1], encoding="utf-8"))
 
-
-def code_cells(notebook_path):
-    with open(notebook_path, encoding="utf-8") as handle:
-        notebook = json.load(handle)
-    for cell in notebook.get("cells", []):
-        if cell.get("cell_type") != "code":
-            continue
-        source = cell.get("source", "")
-        if isinstance(source, list):
-            source = "".join(source)
-        # Shell commands and IPython magics are not Python syntax.
-        lines = []
-        for line in source.splitlines():
-            if line.lstrip().startswith(("!", "%")):
-                if INSTALL_COMMAND.search(line) and "uninstall" not in line:
-                    install_commands.append(line.strip())
-            else:
-                lines.append(line)
-        yield "\n".join(lines)
-
-
-def statement_for(node):
-    if isinstance(node, ast.Import):
-        return ["import %s" % alias.name for alias in node.names]
-    if node.level:
-        return []
-    names = ", ".join(alias.name for alias in node.names)
-    return ["from %s import %s" % (node.module, names)]
-
-
-def collect(nodes, optional, found):
+def collect(nodes, optional=False):
     for node in nodes:
-        if isinstance(node, (ast.Import, ast.ImportFrom)):
-            for statement in statement_for(node):
-                found.append((statement, optional))
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                imports.append(("import " + alias.name, optional))
+            continue
+        if isinstance(node, ast.ImportFrom):
+            if node.level == 0 and node.module:
+                imports.append(("from %s import %s" % (node.module, ", ".join(a.name for a in node.names)), optional))
             continue
         if node.__class__.__name__ in ("Try", "TryExcept", "TryFinally", "TryStar"):
-            collect(getattr(node, "body", []), True, found)
+            collect(getattr(node, "body", []), True)
             for handler in getattr(node, "handlers", []):
-                collect(handler.body, True, found)
-            collect(getattr(node, "orelse", []), optional, found)
-            collect(getattr(node, "finalbody", []), optional, found)
+                collect(handler.body, True)
+            collect(getattr(node, "orelse", []), optional)
+            collect(getattr(node, "finalbody", []), optional)
             continue
         for field in ("body", "orelse", "finalbody"):
-            collect(getattr(node, field, []) or [], optional, found)
+            collect(getattr(node, field, []) or [], optional)
 
-
-IMPORT_LINE = re.compile(r"^\s*((?:import|from)\s+[A-Za-z_][\w.]*.*)$")
-
-found = []
-for code in code_cells(sys.argv[1]):
+line_re = re.compile(r"^\s*((?:import|from)\s+[A-Za-z_][\w.]*.*)$")
+for cell in notebook.get("cells", []):
+    if cell.get("cell_type") != "code":
+        continue
+    src = cell.get("source", "")
+    if isinstance(src, list):
+        src = "".join(src)
+    lines = []
+    for line in src.splitlines():
+        if line.lstrip().startswith(("!", "%")):
+            if install_re.search(line) and "uninstall" not in line:
+                install_commands.append(line.strip())
+        else:
+            lines.append(line)
+    code = "\n".join(lines)
     try:
-        collect(ast.parse(code).body, False, found)
+        collect(ast.parse(code).body)
     except SyntaxError:
-        # Cells with unusual IPython syntax: fall back to plain import lines.
         for line in code.splitlines():
-            match = IMPORT_LINE.match(line)
-            if match and (" import " in match.group(1) or match.group(1).startswith("import ")):
-                found.append((match.group(1).split("#")[0].strip(), False))
+            match = line_re.match(line)
+            if match:
+                imports.append((match.group(1).split("#")[0].strip(), False))
 
 results = []
 seen = set()
-for statement, optional in found:
+for statement, optional in imports:
     if statement in seen:
         continue
     seen.add(statement)
-    entry = {"statement": statement, "optional": optional, "runtime": False, "ok": True, "error": ""}
+    entry = {"statement": statement, "optional": optional, "runtime": False,
+             "ok": True, "error": "", "classification": "ok"}
     try:
         exec(statement, {})
     except BaseException as exc:
         entry["ok"] = False
         entry["error"] = "%s: %s" % (exc.__class__.__name__, exc)
-        # Only "the imported package itself is absent" can be explained by the
-        # notebook's own install commands. A package that is present but fails
-        # on one of its dependencies (stardist -> pkg_resources) is a real bug.
-        # google.colab only exists on Google Colab, so it is never "installed".
-        module = statement.split()[1]
+        module = statement.split()[1].split(".")[0]
         missing = (getattr(exc, "name", None) or "").split(".")[0]
-        entry["runtime"] = (bool(install_commands) and not optional
-                            and isinstance(exc, ImportError) and missing == module.split(".")[0]
-                            and not module.startswith("google.colab"))
+        # Runtime hypothesis is *unverified*. Do not claim the commands install it.
+        runtime_candidate = (bool(install_commands) and not optional and
+                             isinstance(exc, ImportError) and module == missing and
+                             module != "google")
+        entry["runtime"] = runtime_candidate
+        entry["classification"] = ("optional" if optional else
+                                   "runtime_candidate_unverified" if runtime_candidate else
+                                   "required_missing_or_broken")
     results.append(entry)
-
-# On its own line: imported packages may print progress bars without a newline.
-sys.stdout.write("\n" + MARKER + json.dumps({"imports": results, "install_commands": install_commands}) + "\n")
+print("\n" + marker + json.dumps({"imports": results, "install_commands": install_commands}))
 sys.stdout.flush()
-required_failures = [r for r in results if not r["ok"] and not r["optional"] and not r["runtime"]]
-sys.exit(1 if required_failures else 0)
+if any(not x["ok"] and not x["optional"] and not x["runtime"] for x in results):
+    sys.exit(1)
+'''
+
+# Actual GPU execution rather than mere device enumeration. Python 3.5-compatible.
+# Uses explicit placement to prevent TensorFlow silently falling back to CPU.
+GPU_CODE = r'''
+import json
+import sys
+import traceback
+result = {"frameworks": {}, "notes": []}
+
+def note(framework, status, detail):
+    result["frameworks"][framework] = {"status": status, "detail": detail}
+
+try:
+    import tensorflow as tf
+except ImportError:
+    note("tensorflow", "SKIP", "Not installed")
+except BaseException as exc:
+    note("tensorflow", "FAIL", "Import error: %s: %s" % (type(exc).__name__, exc))
+else:
+    version = getattr(tf, "__version__", "unknown")
+    try:
+        if version.split(".")[0] == "1":
+            conf = tf.ConfigProto(allow_soft_placement=False, log_device_placement=False)
+            with tf.Graph().as_default():
+                with tf.device("/device:GPU:0"):
+                    a = tf.constant([[1., 2.], [3., 4.]])
+                    product = tf.matmul(a, a)
+                with tf.Session(config=conf) as sess:
+                    sess.run(product)
+        else:
+            # TF2 may be invoked in v1 graph mode by some notebooks.
+            gpus = tf.config.list_physical_devices("GPU")
+            if not gpus:
+                raise RuntimeError("TensorFlow lists no GPU devices")
+            with tf.device("/GPU:0"):
+                a = tf.constant([[1., 2.], [3., 4.]])
+                out = tf.matmul(a, a)
+                if hasattr(out, "numpy"):
+                    out.numpy()
+                else:
+                    with tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(allow_soft_placement=False)) as sess:
+                        sess.run(out)
+        note("tensorflow", "PASS", "GPU matrix multiplication succeeded; version=" + version)
+    except BaseException as exc:
+        note("tensorflow", "FAIL", "GPU execution failed; version=%s; %s: %s" % (version, type(exc).__name__, exc))
+        traceback.print_exc()
+
+try:
+    import torch
+except ImportError:
+    note("pytorch", "SKIP", "Not installed")
+except BaseException as exc:
+    note("pytorch", "FAIL", "Import error: %s: %s" % (type(exc).__name__, exc))
+else:
+    try:
+        if not torch.cuda.is_available():
+            raise RuntimeError("torch.cuda.is_available() is False")
+        a = torch.tensor([[1., 2.], [3., 4.]], device="cuda:0")
+        out = torch.mm(a, a)
+        torch.cuda.synchronize()
+        out.cpu()
+        note("pytorch", "PASS", "GPU matrix multiplication succeeded; version=" + torch.__version__)
+    except BaseException as exc:
+        note("pytorch", "FAIL", "GPU execution failed; %s: %s" % (type(exc).__name__, exc))
+        traceback.print_exc()
+
+print("\nDL4ME_GPU_REPORT:" + json.dumps(result))
+sys.stdout.flush()
+if any(item["status"] == "FAIL" for item in result["frameworks"].values()):
+    sys.exit(1)
 '''
 
 
-def now() -> str:
-    return _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+def now():
+    return dt.datetime.now().isoformat(timespec="seconds")
 
 
-def config_value(config: Path, key: str, default: str | None = None) -> str:
+def config_value(path, key, default=None):
     try:
-        return requirements_lock.parse_config_value(config, key)
+        return lock_util.parse_config_value(path, key)
     except ValueError:
         if default is None:
             raise
         return default
 
 
-def is_legacy_python(python_version: str) -> bool:
-    return python_version in ("3.5", "3.6")
+def slug(path):
+    return re.sub(r"[^a-z0-9_.-]+", "-", path.parent.name.lower()).strip("-.") or "notebook"
 
 
-def select_dockerfile(gpu: bool, python_version: str) -> str:
-    legacy = is_legacy_python(python_version)
-    if gpu:
-        return "docker/Dockerfile.gpu.legacy" if legacy else "docker/Dockerfile.gpu.modern"
-    return "docker/Dockerfile.legacy" if legacy else "docker/Dockerfile.modern"
-
-
-def notebook_slug(config: Path) -> str:
-    return re.sub(r"[^a-z0-9_.-]+", "-", config.parent.name.lower()).strip("-.") or "notebook"
-
-
-def discover_configs(repo_root: Path, only: list[str]) -> list[Path]:
-    configs = sorted((repo_root / "notebooks").rglob("configuration.yaml"))
-    if only:
-        wanted = [value.lower() for value in only]
-        configs = [c for c in configs if any(w in str(c.relative_to(repo_root)).lower() for w in wanted)]
-    return configs
-
-
-def docker_platform() -> str:
-    """Architecture Docker builds for, as used for the requirement locks."""
-    result = subprocess.run(
-        ["docker", "info", "--format", "{{.Architecture}}"],
-        text=True, capture_output=True, check=False,
-    )
-    return "arm64" if result.stdout.strip() in ("aarch64", "arm64") else "amd64"
-
-
-def run_logged(command: list[str], log_path: Path, timeout: int | None = None) -> tuple[int, float]:
-    """Run a command, appending its output to a log file. Returns (status, seconds)."""
+def run(command, logpath, timeout=None):
     start = time.monotonic()
-    with log_path.open("a", encoding="utf-8") as log:
-        log.write("$ " + " ".join(command) + "\n")
+    with logpath.open("a", encoding="utf-8") as log:
+        log.write("$ " + " ".join(command[:12]) + (" [...]" if len(command) > 12 else "") + "\n")
         log.flush()
         try:
-            status = subprocess.run(
-                command, cwd=REPO_ROOT, stdout=log, stderr=subprocess.STDOUT,
-                timeout=timeout, check=False,
-            ).returncode
+            status = subprocess.run(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT,
+                                    timeout=timeout, check=False).returncode
         except subprocess.TimeoutExpired:
-            log.write(f"\nTIMEOUT after {timeout} seconds\n")
+            log.write("TIMEOUT after %s seconds\n" % timeout)
             status = 124
-    return status, time.monotonic() - start
+        except OSError as exc:
+            log.write("Command failure: %s\n" % exc)
+            status = 125
+    return status, round(time.monotonic() - start, 1)
 
 
-class Plan:
-    """Everything needed to build and test one notebook image."""
-
-    def __init__(self, config: Path, gpu: bool, platform: str):
-        self.config = config
-        self.gpu = gpu
-        self.platform = platform
-        self.relative_config = config.relative_to(REPO_ROOT).as_posix()
-        self.python_version = config_value(config, "python_version")
-        self.ubuntu_version = config_value(config, "ubuntu_version")
-        self.cuda_version = config_value(config, "cuda_version", "")
-        self.cudnn_version = config_value(config, "cudnn_version", "")
-        self.notebook_url = config_value(config, "notebook_url")
-        self.requirements_url = config_value(config, "requirements_url", "")
-        self.sections_to_remove = config_value(config, "sections_to_remove", "")
-        self.notebook_name = self.notebook_url.rstrip("/").rsplit("/", 1)[-1]
-        self.dockerfile = select_dockerfile(gpu, self.python_version)
-        self.variant = "gpu" if gpu else "cpu"
-        self.tag = f"{TEST_IMAGE_REPOSITORY}:{notebook_slug(config)}-{self.variant}"
-        lock = requirements_lock.default_lock_path(config, platform)
-        self.lock_relative = lock.relative_to(REPO_ROOT.resolve()).as_posix()
-
-    def build_command(self, converter_base: str, final_base: str) -> list[str]:
-        build_args = {
-            "CONVERTER_BASE_IMAGE": converter_base,
-            "FINAL_BASE_IMAGE": final_base,
-            "UBUNTU_VERSION": self.ubuntu_version,
-            "CUDA_VERSION": self.cuda_version,
-            "CUDNN_VERSION": self.cudnn_version,
-            "GPU_FLAG": "1" if self.gpu else "0",
-            "PYTHON_VERSION": self.python_version,
-            "PATH_TO_NOTEBOOK": self.notebook_url,
-            "PATH_TO_REQUIREMENTS": self.requirements_url,
-            "PATH_TO_REQUIREMENTS_LOCK": self.lock_relative,
-            "NOTEBOOK_NAME": self.notebook_name,
-            "SECTIONS_TO_REMOVE": self.sections_to_remove,
-        }
-        command = [
-            "docker", "build", "--file", self.dockerfile, "-t", self.tag,
-            "--label", "org.dl4miceverywhere.managed=true",
-            "--label", "org.dl4miceverywhere.image-test=true",
-        ]
-        for key, value in build_args.items():
-            command += ["--build-arg", f"{key}={value}"]
-        return command + ["."]
-
-    def import_command(self) -> list[str]:
-        command = ["docker", "run", "--rm"]
-        if self.gpu:
-            command += ["--gpus", "all"]
-        return command + [self.tag, "python", "-c", IMPORT_CHECK_CODE, f"/home/{self.notebook_name}"]
-
-
-def parse_import_report(log_text: str) -> dict | None:
-    for line in reversed(log_text.splitlines()):
-        position = line.find(IMPORT_REPORT_MARKER)
-        if position >= 0:
+def parse_marker(path, marker):
+    if not path.exists():
+        return None
+    for line in reversed(path.read_text(encoding="utf-8", errors="replace").splitlines()):
+        if marker in line:
             try:
-                return json.loads(line[position + len(IMPORT_REPORT_MARKER):])
+                return json.loads(line.split(marker, 1)[1])
             except ValueError:
                 return None
     return None
 
 
-def empty_imports() -> dict:
+def classify_failure(path, step):
+    if not path.exists():
+        return "unknown"
+    content = path.read_text(encoding="utf-8", errors="replace").lower()
+    if "timeout after" in content:
+        return "timeout"
+    if any(x in content for x in ("could not connect", "temporary failure in name resolution",
+                                  "connection refused", "connection timed out", "network is unreachable")):
+        return "network_or_repository_connectivity"
+    if "hashes do not match" in content or "hash mismatch" in content:
+        return "package_hash_mismatch"
+    if "unable to locate package libcudnn" in content:
+        return "cudnn_package_unavailable_or_repository_failure"
+    if "no module named" in content or "modulenotfounderror" in content:
+        return "missing_python_module"
+    if step == "gpu":
+        return "gpu_framework_execution"
+    return "see_log"
+
+
+class Plan:
+    def __init__(self, config, gpu, platform):
+        self.config = config
+        self.gpu = gpu
+        self.platform = platform
+        self.relative = config.relative_to(ROOT).as_posix()
+        self.python = config_value(config, "python_version")
+        self.ubuntu = config_value(config, "ubuntu_version")
+        self.cuda = config_value(config, "cuda_version", "")
+        self.cudnn = config_value(config, "cudnn_version", "")
+        self.url = config_value(config, "notebook_url")
+        self.requirements_url = config_value(config, "requirements_url", "")
+        self.sections = config_value(config, "sections_to_remove", "")
+        self.name = self.url.rstrip("/").split("/")[-1]
+        self.variant = "gpu" if gpu else "cpu"
+        suffix = ".legacy" if self.python in ("3.5", "3.6") else ".modern"
+        self.dockerfile = "docker/Dockerfile" + (".gpu" if gpu else "") + suffix
+        self.tag = "%s:%s-%s" % (TAG_PREFIX, slug(config), self.variant)
+        self.lock = lock_util.default_lock_path(config, platform).relative_to(ROOT.resolve()).as_posix()
+
+    def build(self, bases):
+        params = {
+            "CONVERTER_BASE_IMAGE": bases["converter_base_image"],
+            "FINAL_BASE_IMAGE": bases["final_base_image"],
+            "UBUNTU_VERSION": self.ubuntu,
+            "CUDA_VERSION": self.cuda,
+            "CUDNN_VERSION": self.cudnn,
+            "GPU_FLAG": "1" if self.gpu else "0",
+            "PYTHON_VERSION": self.python,
+            "PATH_TO_NOTEBOOK": self.url,
+            "PATH_TO_REQUIREMENTS": self.requirements_url,
+            "PATH_TO_REQUIREMENTS_LOCK": self.lock,
+            "NOTEBOOK_NAME": self.name,
+            "SECTIONS_TO_REMOVE": self.sections,
+        }
+        cmd = ["docker", "build", "--progress=plain", "--file", self.dockerfile, "-t", self.tag,
+               "--label", "org.dl4miceverywhere.managed=true",
+               "--label", "org.dl4miceverywhere.image-test=true"]
+        for key, value in params.items():
+            cmd += ["--build-arg", "%s=%s" % (key, value)]
+        return cmd + ["."]
+
+    def docker_run(self, code, extra=None):
+        cmd = ["docker", "run", "--rm"]
+        if self.gpu:
+            cmd += ["--gpus", "all"]
+        cmd += [self.tag, "python", "-c", code]
+        return cmd + (extra or [])
+
+
+def empty_imports():
     return {"total": 0, "failed": [], "optional_failed": [], "runtime_failed": [], "install_commands": []}
 
 
-def test_one(plan: Plan, log_dir: Path, args: argparse.Namespace) -> dict:
-    stem = f"{notebook_slug(plan.config)}-{plan.variant}"
-    logs = {name: log_dir / f"{stem}-{name}.log" for name in ("prepare", "build", "smoke", "imports")}
-    result = {
-        "config": plan.relative_config,
-        "variant": plan.variant,
-        "python": plan.python_version,
-        "image": plan.tag,
-        "started": now(),
-        "status": "FAIL",
-        "failed_step": "",
-        "steps": {},
-        "imports": empty_imports(),
-        "image_size_gb": None,
-        "logs": {name: path.relative_to(log_dir.parent).as_posix() for name, path in logs.items()},
-    }
+def test_one(plan, logdir, args):
+    stem = slug(plan.config) + "-" + plan.variant
+    logs = {key: logdir / (stem + "-" + key + ".log") for key in
+            ("prepare", "build", "smoke", "imports", "gpu")}
+    result = {"config": plan.relative, "variant": plan.variant, "python": plan.python,
+              "image": plan.tag, "started": now(), "status": "FAIL", "failed_step": "",
+              "failure_category": "", "steps": {}, "imports": empty_imports(),
+              "gpu": {}, "image_size_gb": None,
+              "logs": {k: p.relative_to(logdir.parent).as_posix() for k, p in logs.items()}}
 
-    def step(name: str, status: int, seconds: float) -> bool:
-        result["steps"][name] = {"ok": status == 0, "seconds": round(seconds, 1)}
-        if status != 0 and not result["failed_step"]:
+    def step(name, code, secs):
+        result["steps"][name] = {"ok": code == 0, "seconds": secs}
+        if code and not result["failed_step"]:
             result["failed_step"] = name
-        return status == 0
+            result["failure_category"] = classify_failure(logs[name], name)
+        return code == 0
 
-    # 1. Dependency lock and pinned base images, as Linux_launch.sh does.
     python = sys.executable
-    status, seconds = run_logged(
-        [python, ".tools/python_tools/requirements_lock.py", "ensure", "--config", plan.relative_config,
-         "--platform", plan.platform, "--repo-root", "."], logs["prepare"])
-    if status == 0:
-        more_status, more_seconds = run_logged(
-            [python, ".tools/python_tools/requirements_lock.py", "ensure",
-             "--source", "docker/converter-requirements.txt", "--python-version", "3.9",
-             "--lock", "docker/converter-requirements.lock.txt", "--profile", "none", "--repo-root", "."],
-            logs["prepare"])
-        status, seconds = more_status, seconds + more_seconds
-    base_images = {}
-    if status == 0:
+    code, elapsed = run([python, ".tools/python_tools/requirements_lock.py", "ensure", "--config",
+                         plan.relative, "--platform", plan.platform, "--repo-root", "."], logs["prepare"])
+    if code == 0:
+        code2, secs = run([python, ".tools/python_tools/requirements_lock.py", "ensure", "--source",
+                           "docker/converter-requirements.txt", "--python-version", "3.9", "--lock",
+                           "docker/converter-requirements.lock.txt", "--profile", "none", "--repo-root", "."],
+                          logs["prepare"])
+        code, elapsed = code2, elapsed + secs
+    bases = None
+    if code == 0:
         start = time.monotonic()
-        pinned = subprocess.run(
-            [python, ".tools/python_tools/base_image_lock.py", "--repo-root", ".", "ensure-for-build",
-             "--config", plan.relative_config, "--gpu", "1" if plan.gpu else "0"],
-            cwd=REPO_ROOT, text=True, capture_output=True, check=False,
-        )
+        proc = subprocess.run([python, ".tools/python_tools/base_image_lock.py", "--repo-root", ".",
+                               "ensure-for-build", "--config", plan.relative,
+                               "--gpu", "1" if plan.gpu else "0"], cwd=ROOT, capture_output=True, text=True)
         with logs["prepare"].open("a", encoding="utf-8") as log:
-            log.write(pinned.stdout + pinned.stderr)
-        status, seconds = pinned.returncode, seconds + time.monotonic() - start
-        if status == 0:
-            base_images = json.loads(pinned.stdout.strip().splitlines()[-1])
-    if not step("prepare", status, seconds):
+            log.write(proc.stdout + proc.stderr)
+        code, elapsed = proc.returncode, elapsed + round(time.monotonic() - start, 1)
+        if not code:
+            try:
+                bases = json.loads(proc.stdout.strip().splitlines()[-1])
+            except (ValueError, IndexError):
+                code = 1
+    if not step("prepare", code, elapsed):
         return result
 
-    # 2. Build.
-    status, seconds = run_logged(
-        plan.build_command(base_images["converter_base_image"], base_images["final_base_image"]),
-        logs["build"], timeout=args.build_timeout * 60)
-    if not step("build", status, seconds):
+    code, secs = run(plan.build(bases), logs["build"], args.build_timeout * 60)
+    if not step("build", code, secs):
         return result
 
     size = subprocess.run(["docker", "image", "inspect", "--format", "{{.Size}}", plan.tag],
-                          text=True, capture_output=True, check=False).stdout.strip()
+                          capture_output=True, text=True).stdout.strip()
     if size.isdigit():
         result["image_size_gb"] = round(int(size) / 1e9, 2)
 
-    # 3. The launcher's post-build smoke test (strict pip check: built in this run).
-    status, seconds = run_logged(
-        ["bash", ".tools/bash_tools/post_build_test.sh", plan.tag, "1" if plan.gpu else "0", "1"],
-        logs["smoke"], timeout=args.test_timeout * 60)
-    step("smoke", status, seconds)
+    code, secs = run(["bash", ".tools/bash_tools/post_build_test.sh", plan.tag,
+                      "1" if plan.gpu else "0", "1"], logs["smoke"], args.test_timeout * 60)
+    step("smoke", code, secs)
 
-    # 4. Every import of the converted notebook, inside the image.
-    status, seconds = run_logged(plan.import_command(), logs["imports"], timeout=args.test_timeout * 60)
-    report = parse_import_report(logs["imports"].read_text(encoding="utf-8", errors="replace"))
-    if report is None:
-        status = status or 1
-    else:
-        entries = report["imports"]
+    code, secs = run(plan.docker_run(IMPORT_CODE, ["/home/" + plan.name]), logs["imports"],
+                     args.test_timeout * 60)
+    parsed = parse_marker(logs["imports"], IMPORT_MARKER)
+    if parsed is not None:
+        entries = parsed.get("imports", [])
         result["imports"] = {
             "total": len(entries),
-            "failed": [r for r in entries if not r["ok"] and not r["optional"] and not r.get("runtime")],
-            "optional_failed": [r for r in entries if not r["ok"] and r["optional"]],
-            "runtime_failed": [r for r in entries if not r["ok"] and r.get("runtime")],
-            "install_commands": report.get("install_commands", []),
+            "failed": [x for x in entries if not x["ok"] and not x["optional"] and not x["runtime"]],
+            "optional_failed": [x for x in entries if not x["ok"] and x["optional"]],
+            "runtime_failed": [x for x in entries if not x["ok"] and x["runtime"]],
+            "install_commands": parsed.get("install_commands", []),
         }
-    step("imports", status, seconds)
+    else:
+        code = code or 1
+    step("imports", code, secs)
+
+    # Run even if smoke fails; diagnostic evidence must not be lost.
+    if plan.gpu:
+        code, secs = run(plan.docker_run(GPU_CODE), logs["gpu"], args.test_timeout * 60)
+        parsed = parse_marker(logs["gpu"], GPU_MARKER)
+        result["gpu"] = parsed or {"error": "No structured GPU report (possibly Docker passthrough failed)"}
+        if parsed is None:
+            code = code or 1
+        step("gpu", code, secs)
 
     if not result["failed_step"]:
-        warnings = result["imports"]["optional_failed"] or result["imports"]["runtime_failed"]
-        result["status"] = "WARN" if warnings else "PASS"
+        result["status"] = "WARN" if (result["imports"]["optional_failed"] or
+                                     result["imports"]["runtime_failed"]) else "PASS"
     return result
 
 
-def cleanup(plan: Plan, args: argparse.Namespace, log_path: Path) -> None:
-    if args.keep_images:
-        return
-    run_logged(["docker", "image", "rm", "-f", plan.tag], log_path)
-    if not args.keep_build_cache:
-        # The build cache is shared by the whole Docker daemon and grows by
-        # several GB per notebook; this run was asked to keep the disk free.
-        run_logged(["docker", "builder", "prune", "-f"], log_path)
-
-
-def write_reports(output_dir: Path, results: list[dict], meta: dict) -> None:
-    (output_dir / "report.json").write_text(
-        json.dumps({"meta": meta, "results": results}, indent=2), encoding="utf-8")
-
-    counts = {status: sum(r["status"] == status for r in results) for status in ("PASS", "WARN", "FAIL")}
-    lines = [
-        "# DL4MicEverywhere image test report",
-        "",
-        f"- Started: {meta['started']}",
-        f"- Finished: {meta.get('finished', 'running...')}",
-        f"- Docker platform: linux/{meta['platform']}",
-        f"- Variant(s): {', '.join(meta['variants'])}",
-        f"- Notebooks planned: {meta['planned']}",
-        f"- Result so far: {counts['PASS']} PASS, {counts['WARN']} WARN, {counts['FAIL']} FAIL",
-        "",
-        "PASS = built, smoke test and all notebook imports OK. "
-        "WARN = only optional imports (inside `try:` blocks) failed, or imports failed in a notebook "
-        "that still has its own install commands (`!pip install`, `!git clone`, `!wget`), which provide those "
-        "modules when the user runs them; check that the listed commands really install them. "
-        "FAIL = see the failed step and its log.",
-        "",
-        "| Notebook | Variant | Python | Status | Failed step | Build (min) | Image (GB) | Imports | Failed imports | Logs |",
-        "|---|---|---|---|---|---|---|---|---|---|",
-    ]
+def write_reports(folder, results, meta):
+    (folder / "report.json").write_text(json.dumps({"meta": meta, "results": results}, indent=2) + "\n",
+                                        encoding="utf-8")
+    counts = {s: sum(x["status"] == s for x in results) for s in ("PASS", "WARN", "FAIL")}
+    lines = ["# DL4MicEverywhere image testing report", "", "Started: %s  " % meta["started"],
+             "Finished: %s  " % meta.get("finished", "running"),
+             "Platform: linux/%s  " % meta["platform"],
+             "Planned: %s | Completed: %s  " % (meta["planned"], len(results)),
+             "**%s PASS, %s WARN, %s FAIL**" % (counts["PASS"], counts["WARN"], counts["FAIL"]),
+             "", "WARN means optional imports or **unverified** runtime-install candidates; "
+             "the notebook's commands have NOT been executed.", "",
+             "| Notebook | Variant | Python | Result | Failed step | Cause | GPU execution | Imports | Logs |",
+             "|---|---|---|---|---|---|---|---|---|"]
     for r in results:
-        build = r["steps"].get("build", {})
-        build_minutes = f"{build['seconds'] / 60:.1f}" if build else ""
-        imports = {**empty_imports(), **r["imports"]}
-        failed = "; ".join(f"`{f['statement']}`: {f['error']}" for f in imports["failed"])
-        optional = "; ".join(f"`{f['statement']}` (optional)" for f in imports["optional_failed"])
-        runtime = "; ".join(f"`{f['statement']}` (installed at run time?)" for f in imports["runtime_failed"])
-        if runtime:
-            runtime += " — notebook install commands: " + "; ".join(
-                f"`{c}`" for c in imports["install_commands"][:5])
-        failed_text = "; ".join(t for t in (failed, runtime, optional) if t).replace("|", "\\|")
-        ok_imports = (imports["total"] - len(imports["failed"]) - len(imports["optional_failed"])
-                      - len(imports["runtime_failed"]))
-        import_text = f"{ok_imports}/{imports['total']}" if "imports" in r["steps"] else ""
-        logs = " ".join(f"[{name}]({path})" for name, path in r["logs"].items()
-                        if (output_dir / path).exists())
-        lines.append(
-            f"| {Path(r['config']).parent.name} | {r['variant']} | {r['python']} | {r['status']} | "
-            f"{r['failed_step']} | {build_minutes} | {r['image_size_gb'] or ''} | {import_text} | "
-            f"{failed_text} | {logs} |"
-        )
-    (output_dir / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+        imp = r.get("imports", empty_imports())
+        failures = len(imp["failed"]) + len(imp["optional_failed"]) + len(imp["runtime_failed"])
+        imports = "%d/%d" % (imp["total"] - failures, imp["total"]) if "imports" in r["steps"] else "-"
+        gpu = r.get("gpu", {}).get("frameworks", {})
+        gpu_text = ", ".join("%s:%s" % (k, v["status"]) for k, v in gpu.items()) or "-"
+        links = " ".join("[%s](%s)" % (k, v) for k, v in r.get("logs", {}).items()
+                         if (folder / v).exists())
+        fields = [Path(r["config"]).parent.name, r["variant"], r["python"], r["status"],
+                  r["failed_step"] or "-", r.get("failure_category") or "-", gpu_text, imports, links]
+        lines.append("| " + " | ".join(str(v).replace("|", "\\|") for v in fields) + " |")
+    lines += ["", "## Detailed failures and warnings", ""]
+    for r in results:
+        if r["status"] == "PASS":
+            continue
+        lines.append("### %s (%s) — %s" % (Path(r["config"]).parent.name, r["variant"], r["status"]))
+        if r["failed_step"]:
+            lines.append("- Failed step: **%s**; classification: **%s**" %
+                         (r["failed_step"], r.get("failure_category", "unknown")))
+        for group, title in (("failed", "Required import failure"),
+                             ("runtime_failed", "Runtime install candidate, NOT verified"),
+                             ("optional_failed", "Optional import")):
+            for item in r["imports"][group]:
+                lines.append("- %s: `%s` — %s" % (title, item["statement"], item["error"]))
+        for framework, check in r.get("gpu", {}).get("frameworks", {}).items():
+            if check["status"] == "FAIL":
+                lines.append("- %s GPU: %s" % (framework, check["detail"]))
+        lines.append("")
+    (folder / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def build_parser() -> argparse.ArgumentParser:
+def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--only", action="append", default=[],
-                        help="Test only configurations whose path contains this text (repeatable)")
-    parser.add_argument("--variant", choices=("cpu", "gpu", "both"), default="cpu",
-                        help="Image variant(s) to build (GPU needs an NVIDIA GPU usable by Docker)")
-    parser.add_argument("--output-dir", default="image_test_reports",
-                        help="Folder for the timestamped report folders (default: image_test_reports)")
-    parser.add_argument("--keep-images", action="store_true", help="Do not remove the tested images")
-    parser.add_argument("--keep-build-cache", action="store_true",
-                        help="Do not run 'docker builder prune' after each image")
-    parser.add_argument("--build-timeout", type=int, default=120, help="Minutes allowed per build (default 120)")
-    parser.add_argument("--test-timeout", type=int, default=30, help="Minutes allowed per test step (default 30)")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Only list what would be built, with the Dockerfile and image tag")
-    return parser
-
-
-def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
-    configs = discover_configs(REPO_ROOT, args.only)
+    parser.add_argument("--only", action="append", default=[])
+    parser.add_argument("--variant", choices=("cpu", "gpu", "both"), default="cpu")
+    parser.add_argument("--output-dir", default="image_test_reports")
+    parser.add_argument("--keep-images", action="store_true")
+    parser.add_argument("--keep-build-cache", action="store_true")
+    parser.add_argument("--build-timeout", type=int, default=120)
+    parser.add_argument("--test-timeout", type=int, default=30)
+    parser.add_argument("--dry-run", action="store_true")
+    args = parser.parse_args()
+    configs = sorted((ROOT / "notebooks").rglob("configuration.yaml"))
+    if args.only:
+        configs = [x for x in configs if any(y.lower() in str(x.relative_to(ROOT)).lower() for y in args.only)]
     if not configs:
-        print("No configuration.yaml matched.", file=sys.stderr)
-        return 1
+        parser.error("No configuration.yaml files matched")
     variants = {"cpu": [False], "gpu": [True], "both": [False, True]}[args.variant]
-
     if args.dry_run:
         for config in configs:
             for gpu in variants:
                 plan = Plan(config, gpu, "amd64")
-                print(f"{plan.relative_config}\n    {plan.dockerfile} -> {plan.tag} (Python {plan.python_version})")
-        print(f"\n{len(configs) * len(variants)} image(s) would be built and tested.")
+                print("%s: %s -> %s" % (plan.relative, plan.dockerfile, plan.tag))
         return 0
-
-    for tool in ("docker", "bash"):
-        if shutil.which(tool) is None:
-            print(f"'{tool}' is required. Run this script where DL4MicEverywhere runs (Linux, WSL or macOS).",
-                  file=sys.stderr)
-            return 1
-    if subprocess.run(["docker", "info"], capture_output=True, check=False).returncode != 0:
-        print("Docker is not running or not accessible ('docker info' failed).", file=sys.stderr)
-        return 1
-
-    platform = docker_platform()
-    stamp = _dt.datetime.now().strftime("%Y%m%d-%H%M%S")
-    output_dir = (REPO_ROOT / args.output_dir / stamp) if not Path(args.output_dir).is_absolute() \
-        else Path(args.output_dir) / stamp
-    log_dir = output_dir / "logs"
-    log_dir.mkdir(parents=True, exist_ok=True)
-    meta = {"started": now(), "platform": platform, "variants": [("gpu" if g else "cpu") for g in variants],
+    for executable in ("docker", "bash"):
+        if not shutil.which(executable):
+            parser.error("%s is required" % executable)
+    if subprocess.run(["docker", "info"], capture_output=True).returncode:
+        parser.error("Docker is not running or accessible")
+    arch = subprocess.run(["docker", "info", "--format", "{{.Architecture}}"],
+                          capture_output=True, text=True).stdout.strip()
+    platform = "arm64" if arch in ("arm64", "aarch64") else "amd64"
+    output_base = Path(args.output_dir)
+    folder = (output_base if output_base.is_absolute() else ROOT / output_base) / dt.datetime.now().strftime("%Y%m%d-%H%M%S")
+    logdir = folder / "logs"
+    logdir.mkdir(parents=True)
+    meta = {"started": now(), "platform": platform, "variants": ["gpu" if x else "cpu" for x in variants],
             "planned": len(configs) * len(variants)}
-
-    print(f"Testing {meta['planned']} image(s) on linux/{platform}. Report: {output_dir / 'report.md'}")
-    if not args.keep_images and not args.keep_build_cache:
-        print("After each image, the image is removed and 'docker builder prune -f' clears the Docker build cache.")
-
-    results: list[dict] = []
+    results = []
     interrupted = False
-    for index, config in enumerate(configs, 1):
+    for config in configs:
         for gpu in variants:
+            plan = None
             try:
                 plan = Plan(config, gpu, platform)
-            except (ValueError, OSError) as exc:
-                results.append({"config": config.relative_to(REPO_ROOT).as_posix(), "variant": "gpu" if gpu else "cpu",
-                                "python": "", "image": "", "status": "FAIL", "failed_step": f"config: {exc}",
-                                "steps": {}, "imports": empty_imports(),
-                                "image_size_gb": None, "logs": {}})
-                write_reports(output_dir, results, meta)
-                continue
-            print(f"[{index}/{len(configs)}] {plan.relative_config} ({plan.variant}) ...", flush=True)
-            try:
-                result = test_one(plan, log_dir, args)
+                print("Testing %s (%s)" % (plan.relative, plan.variant), flush=True)
+                result = test_one(plan, logdir, args)
             except KeyboardInterrupt:
                 interrupted = True
-                result = {"config": plan.relative_config, "variant": plan.variant, "python": plan.python_version,
-                          "image": plan.tag, "status": "FAIL", "failed_step": "interrupted", "steps": {},
-                          "imports": empty_imports(), "image_size_gb": None,
-                          "logs": {}}
+                break
+            except (OSError, ValueError, RuntimeError) as exc:
+                result = {"config": config.relative_to(ROOT).as_posix(),
+                          "variant": "gpu" if gpu else "cpu", "python": "", "image": "",
+                          "status": "FAIL", "failed_step": "setup", "failure_category": str(exc),
+                          "steps": {}, "imports": empty_imports(), "gpu": {}, "logs": {}}
             finally:
-                cleanup(plan, args, log_dir / f"{notebook_slug(config)}-{plan.variant}-cleanup.log")
-            results.append(result)
-            print(f"    {result['status']}" + (f" (failed step: {result['failed_step']})" if result["failed_step"] else ""),
-                  flush=True)
-            write_reports(output_dir, results, meta)
+                if plan and not args.keep_images:
+                    run(["docker", "image", "rm", "-f", plan.tag],
+                        logdir / (slug(plan.config) + "-" + plan.variant + "-cleanup.log"))
+                    if not args.keep_build_cache:
+                        # Matches previous script: affects Docker's SHARED build cache.
+                        run(["docker", "builder", "prune", "-f"],
+                            logdir / (slug(plan.config) + "-" + plan.variant + "-cleanup.log"))
             if interrupted:
                 break
+            results.append(result)
+            print("  -> %s %s" % (result["status"], result["failed_step"]), flush=True)
+            write_reports(folder, results, meta)
         if interrupted:
             break
-
     meta["finished"] = now() + (" (interrupted)" if interrupted else "")
-    write_reports(output_dir, results, meta)
-    print(f"\nReport: {output_dir / 'report.md'}")
-    if interrupted:
-        return 130
-    return 0 if all(r["status"] != "FAIL" for r in results) else 1
+    write_reports(folder, results, meta)
+    print("Reports: %s" % (folder / "report.md"))
+    return 130 if interrupted else 1 if any(r["status"] == "FAIL" for r in results) else 0
 
 
 if __name__ == "__main__":
