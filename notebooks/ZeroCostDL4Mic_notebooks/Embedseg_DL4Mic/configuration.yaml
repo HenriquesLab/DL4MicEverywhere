@@ -17,7 +17,7 @@ config:
     dl4miceverywhere_version: 2.2.0
     docker_hub_image: embedseg_2d_zerocostdl4mic-z1.15.0-d2.2.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/Colab_notebooks/EmbedSeg_2D_ZeroCostDL4Mic.ipynb
-    notebook_version: 1.15.0
+    notebook_version: 1.15.1
     python_version: '3.9'
     requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/EmbedSeg_2D_requirements_simple.txt
     sections_to_remove: 1.0. 1.1. 2.
