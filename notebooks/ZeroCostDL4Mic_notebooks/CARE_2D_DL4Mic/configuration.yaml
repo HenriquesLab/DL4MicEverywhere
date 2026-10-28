@@ -11,8 +11,8 @@ cite:
   text: 'Weigert, M., Schmidt, U., Boothe, T. et al. Content-aware image restoration: pushing the limits of fluorescence microscopy. Nat Methods 15, 1090–1097 (2018). https://doi.org/10.1038/s41592-018-0216-7'
 config:
   dl4miceverywhere:
-    cuda_version: 11.8.0
-    cudnn_version: 8.6.0.163
+    cuda_version: 12.2.2
+    cudnn_version: 8.9.5.29
     description: CARE_2D_DL4Mic is the conversion of the 2D CARE from ZeroCostDL4Mic.
     dl4miceverywhere_version: 2.2.0
     docker_hub_image: care_2d_zerocostdl4mic-z1.15.3-d2.2.0

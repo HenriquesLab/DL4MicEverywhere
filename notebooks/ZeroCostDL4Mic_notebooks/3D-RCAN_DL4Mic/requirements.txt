@@ -9,6 +9,7 @@ h5py==3.10.0
 ipywidgets==8.1.1
 matplotlib==3.5.0
 numpy==1.22.4
+numexpr==2.8.4
 pandas==1.5.3
 pip==21.2.4
 scipy==1.10.1
