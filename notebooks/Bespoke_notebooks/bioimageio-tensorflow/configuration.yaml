@@ -14,8 +14,8 @@ cite:
   text: 'Iván Hidalgo-Cenalmor, Joanna W Pylvänäinen, Mariana G Ferreira, et al., DL4MicEverywhere: Deep learning for microscopy made flexible, shareable, and reproducible, bioRxiv 2023'
 config:
   dl4miceverywhere:
-    cuda_version: 11.2.2
-    cudnn_version: 8.1.1.33
+    cuda_version: 12.2.2
+    cudnn_version: 8.9.5.29
     description: Notebook to load models from the BioImage Model Zoo in TensorFlow
     dl4miceverywhere_version: 2.2.0
     docker_hub_image: load_bioimageio_tensorflow-b1.0.0-d2.2.0
