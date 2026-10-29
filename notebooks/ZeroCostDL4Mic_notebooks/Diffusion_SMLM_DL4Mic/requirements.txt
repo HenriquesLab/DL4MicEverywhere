@@ -1,5 +1,5 @@
 # Migrated from immutable upstream dependency input:
-# https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/Diffusion_model_SMLM_requirements.txt
+
 
 # Requirements for Diffusion Model for SMLM_v1.0.ipynb
 fpdf2==2.7.4
