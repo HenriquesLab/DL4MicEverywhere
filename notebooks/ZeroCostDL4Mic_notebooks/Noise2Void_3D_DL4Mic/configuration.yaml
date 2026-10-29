@@ -16,10 +16,10 @@ config:
     description: Noise2Void_3D_DL4Mic is the conversion of the 3D Noise2Void from ZeroCostDL4Mic.
     dl4miceverywhere_version: 2.2.0
     docker_hub_image: noise2void_3d_zerocostdl4mic-z1.16.2-d2.2.0
-    notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/Colab_notebooks/Noise2Void_3D_ZeroCostDL4Mic.ipynb
+    notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/335211c4edc1d43fdce664267431109fec32f142/notebooks/ZeroCostDL4Mic_notebooks/Noise2Void_3D_DL4Mic/Noise2Void_3D_ZeroCostDL4Mic.ipynb
     notebook_version: 1.16.2
     python_version: '3.10'
-    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/Noise2Void_3D_requirements_simple.txt
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/335211c4edc1d43fdce664267431109fec32f142/notebooks/ZeroCostDL4Mic_notebooks/Noise2Void_3D_DL4Mic/requirements.txt
     sections_to_remove: 1.1. 1.2. 2. 6.2.
     ubuntu_version: '22.04'
 covers:

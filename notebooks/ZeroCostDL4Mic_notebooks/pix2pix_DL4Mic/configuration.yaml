@@ -16,10 +16,10 @@ config:
     description: pix2pix_DL4Mic is the conversion of the pix2pix from ZeroCostDL4Mic.
     dl4miceverywhere_version: 2.2.0
     docker_hub_image: pix2pix_zerocostdl4mic-z1.17.7-d2.2.0
-    notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/Colab_notebooks/pix2pix_ZeroCostDL4Mic.ipynb
+    notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/335211c4edc1d43fdce664267431109fec32f142/notebooks/ZeroCostDL4Mic_notebooks/pix2pix_DL4Mic/pix2pix_ZeroCostDL4Mic.ipynb
     notebook_version: 1.17.7
     python_version: '3.8'
-    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/pix2pix_requirements_simple.txt
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/335211c4edc1d43fdce664267431109fec32f142/notebooks/ZeroCostDL4Mic_notebooks/pix2pix_DL4Mic/requirements.txt
     sections_to_remove: 2. 6.3.
     ubuntu_version: '22.04'
 covers:

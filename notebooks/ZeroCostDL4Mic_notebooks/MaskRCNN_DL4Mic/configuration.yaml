@@ -16,10 +16,10 @@ config:
     description: MaskRCNN_DL4Mic is the conversion of the MaskRCNN notebook from ZeroCostDL4Mic.
     dl4miceverywhere_version: 2.2.0
     docker_hub_image: maskrcnn_zerocostdl4mic-z1.14.2-d2.2.0
-    notebook_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/Colab_notebooks/MaskRCNN_ZeroCostDL4Mic.ipynb
+    notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/335211c4edc1d43fdce664267431109fec32f142/notebooks/ZeroCostDL4Mic_notebooks/MaskRCNN_DL4Mic/MaskRCNN_ZeroCostDL4Mic.ipynb
     notebook_version: 1.14.2
     python_version: '3.9'
-    requirements_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/requirements_files/MaskRCNN_requirements_simple.txt
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/335211c4edc1d43fdce664267431109fec32f142/notebooks/ZeroCostDL4Mic_notebooks/MaskRCNN_DL4Mic/requirements.txt
     sections_to_remove: 1.2. 2. 6.3.
     ubuntu_version: '22.04'
 covers:
