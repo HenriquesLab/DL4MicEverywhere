@@ -16,10 +16,10 @@ config:
     description: WGAN_DL4Mic is the conversion of the WGAN notebook from ZeroCostDL4Mic.
     dl4miceverywhere_version: 2.2.0
     docker_hub_image: wgan_zerocostdl4mic-z1.15.1-d2.2.0
-    notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/335211c4edc1d43fdce664267431109fec32f142/notebooks/ZeroCostDL4Mic_notebooks/WGAN_DL4Mic/WGAN_ZeroCostDL4Mic.ipynb
+    notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/c00d27bd969ab34c9bce7336bf4f5a5173eae9a6/notebooks/ZeroCostDL4Mic_notebooks/WGAN_DL4Mic/WGAN_ZeroCostDL4Mic.ipynb
     notebook_version: 1.15.1
     python_version: '3.9'
-    requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/335211c4edc1d43fdce664267431109fec32f142/notebooks/ZeroCostDL4Mic_notebooks/WGAN_DL4Mic/requirements.txt
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/c00d27bd969ab34c9bce7336bf4f5a5173eae9a6/notebooks/ZeroCostDL4Mic_notebooks/WGAN_DL4Mic/requirements.txt
     sections_to_remove: 2. 6.3.
     ubuntu_version: '22.04'
 covers:
