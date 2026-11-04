@@ -1,0 +1,44 @@
+name: Delete Docker Hub tags
+
+# Docker Hub collaborators cannot delete images on a personal account, so maintainers
+# delete broken tags from henriqueslab/dl4miceverywhere through this workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Tags to delete, separated by spaces, commas or new lines'
+        required: true
+      dry_run:
+        description: 'Only check and list the tags, delete nothing'
+        type: boolean
+        default: true
+
+jobs:
+  delete-tags:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete tags
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          # The push token may lack the delete scope; a separate delete-scoped token takes precedence.
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_DELETE_TOKEN || secrets.DOCKERHUB_TOKEN }}
+          TAGS: ${{ inputs.tags }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -uo pipefail
+          set -f
+          api=https://hub.docker.com/v2/namespaces/henriqueslab/repositories/dl4miceverywhere/tags
+          jwt=$(curl -fsS -X POST https://hub.docker.com/v2/auth/token -H 'Content-Type: application/json' \
+            -d "$(jq -n --arg u "$DOCKERHUB_USERNAME" --arg p "$DOCKERHUB_TOKEN" '{identifier: $u, secret: $p}')" | jq -r .access_token)
+          if [ -z "$jwt" ] || [ "$jwt" = null ]; then echo "Docker Hub login failed"; exit 1; fi
+          echo "::add-mask::$jwt"
+          failed=0
+          for tag in $(echo "$TAGS" | tr ',' ' '); do
+            if ! [[ $tag =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]]; then echo "invalid tag name: $tag"; failed=1; continue; fi
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$api/$tag")
+            if [ "$code" != 200 ]; then echo "not found ($code): $tag"; failed=1; continue; fi
+            if [ "$DRY_RUN" = true ]; then echo "would delete: $tag"; continue; fi
+            code=$(curl -s -o /dev/null -w '%{http_code}' -X DELETE -H "Authorization: Bearer $jwt" "$api/$tag")
+            if [[ $code == 2* ]]; then echo "deleted: $tag"; else echo "delete failed ($code): $tag"; failed=1; fi
+          done
+          exit $failed
