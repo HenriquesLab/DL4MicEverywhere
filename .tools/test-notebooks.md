@@ -17,35 +17,40 @@ Legend: ✅ success · ❌ failure · ⚠️ cancelled · ⏭️ skipped · ⬜ 
 
 | Notebook | Release tag | AMD64 build | AMD64 smoke | GPU build | GPU-image smoke | ARM64 build | ARM64 smoke | Final tag | Latest generated |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| General BioImageIO notebook - PyTorch | `load_bioimageio_pytorch-b1.6.0-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| General BioImageIO notebook - TensorFlow | `load_bioimageio_tensorflow-b1.0.0-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| FRUNet-Exosomes | `frunet_tem_exosomes_sev-e1.0.0-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| SISR_Metric_Calculation | `sisr_metrics_calculation-e0.0.1-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| RCAN (3D) - ZeroCostDL4Mic | `3d_rcan_zerocostdl4mic-z1.14.1-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| CARE (2D) - ZeroCostDL4Mic | `care_2d_zerocostdl4mic-z1.15.3-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| CARE (3D) - ZeroCostDL4Mic | `care_3d_zerocostdl4mic-z1.15.3-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| Cellpose (2D and 3D) - ZeroCostDL4Mic | `cellpose_2d_zerocostdl4mic-z1.16.3-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| CycleGAN (2D) - ZeroCostDL4Mic | `cyclegan_zerocostdl4mic-z1.13.5-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| DFCAN - ZeroCostDL4Mic | `dfcan_zerocostdl4mic-z1.14.1-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| DRMIME - ZeroCostDL4Mic | `drmime_2d_zerocostdl4mic-z1.14.2-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| DecoNoising (2D) - ZeroCostDL4Mic | `deconoising_2d_zerocostdl4mic-z1.14.1-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| Deep-STORM (2D) - ZeroCostDL4Mic | `deep-storm_2d_zerocostdl4mic-z1.14.2-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| DenoiSeg (2D) - ZeroCostDL4Mic | `denoiseg_zerocostdl4mic-z1.14.1-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| Detectron2 - ZeroCostDL4Mic | `detectron2_2d_zerocostdl4mic-z1.15.1-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| Diffusion model for SMLM - ZeroCostDL4Mic | `diffusion_model_smlm_zerocostdl4mic-z1.12-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| EmbedSeg (2D) - ZeroCostDL4Mic | `embedseg_2d_zerocostdl4mic-z1.15.0-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| MaskRCNN - ZeroCostDL4Mic | `maskrcnn_zerocostdl4mic-z1.14.2-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| Noise2Void (2D) - ZeroCostDL4Mic | `noise2void_2d_zerocostdl4mic-z1.16.2-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| Noise2VOID (3D) - ZeroCostDL4Mic | `noise2void_3d_zerocostdl4mic-z1.16.2-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| RetinaNet - ZeroCostDL4Mic | `retinanet_zerocostdl4mic-z1.14.1-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| SplineDist (2D) - ZeroCostDL4Mic | `splinedist_2d_zerocostdl4mic-z1.14.1-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| StarDist (2D) - ZeroCostDL4Mic | `stardist_2d_zerocostdl4mic-z1.20.5-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| StarDist (3D) - ZeroCostDL4Mic | `stardist_3d_zerocostdl4mic-z1.15.4-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| U-Net (2D) - ZeroCostDL4Mic | `u-net_2d_zerocostdl4mic-z2.2.1-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| U-Net (2D) multilabel segmentation - ZeroCostDL4Mic | `u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| U-Net (3D) - ZeroCostDL4Mic | `u-net_3d_zerocostdl4mic-z3.1.2-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| WGAN - ZeroCostDL4Mic | `wgan_zerocostdl4mic-z1.15.1-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| YOLOv2 - ZeroCostDL4Mic | `yolov2_zerocostdl4mic-z1.13-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| Label-free Prediction - fnet - (2D) ZeroCostDL4Mic | `fnet_2d_zerocostdl4mic-z1.14.1-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| Label-free Prediction - fnet - (3D) ZeroCostDL4Mic | `fnet_3d_zerocostdl4mic-z1.13.1-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| pix2pix (2D) - ZeroCostDL4Mic | `pix2pix_zerocostdl4mic-z1.17.7-d2.2.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| CARE (2D) - CAREamics | `careamics_care_2d_zerocostdl4mic-b1.0.0-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| CARE (3D) - CAREamics | `careamics_care_3d_zerocostdl4mic-b1.0.0-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| Noise2Noise (2D) - CAREamics | `careamics_noise2noise_2d_zerocostdl4mic-b1.0.0-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| Noise2Void (2D) - CAREamics | `careamics_noise2void_2d_zerocostdl4mic-b1.0.0-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| Noise2Void (3D) - CAREamics | `careamics_noise2void_3d_zerocostdl4mic-b1.0.0-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| General BioImageIO notebook - PyTorch | `load_bioimageio_pytorch-b1.6.0-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| General BioImageIO notebook - TensorFlow | `load_bioimageio_tensorflow-b1.0.0-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| FRUNet-Exosomes | `frunet_tem_exosomes_sev-e1.0.0-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| SISR_Metric_Calculation | `sisr_metrics_calculation-e0.0.1-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| RCAN (3D) - ZeroCostDL4Mic | `3d_rcan_zerocostdl4mic-z1.14.2-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| CARE (2D) - ZeroCostDL4Mic | `care_2d_zerocostdl4mic-z1.15.3-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| CARE (3D) - ZeroCostDL4Mic | `care_3d_zerocostdl4mic-z1.15.3-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| Cellpose (2D and 3D) - ZeroCostDL4Mic | `cellpose_2d_zerocostdl4mic-z1.16.3-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| CycleGAN (2D) - ZeroCostDL4Mic | `cyclegan_zerocostdl4mic-z1.13.5-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| DFCAN - ZeroCostDL4Mic | `dfcan_zerocostdl4mic-z1.14.1-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| DRMIME - ZeroCostDL4Mic | `drmime_2d_zerocostdl4mic-z1.14.2-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| DecoNoising (2D) - ZeroCostDL4Mic | `deconoising_2d_zerocostdl4mic-z1.14.1-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| Deep-STORM (2D) - ZeroCostDL4Mic | `deep-storm_2d_zerocostdl4mic-z1.14.2-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| DenoiSeg (2D) - ZeroCostDL4Mic | `denoiseg_zerocostdl4mic-z1.14.1-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| Detectron2 - ZeroCostDL4Mic | `detectron2_2d_zerocostdl4mic-z1.15.2-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| Diffusion model for SMLM - ZeroCostDL4Mic | `diffusion_model_smlm_zerocostdl4mic-z1.12-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| EmbedSeg (2D) - ZeroCostDL4Mic | `embedseg_2d_zerocostdl4mic-z1.15.1-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| MaskRCNN - ZeroCostDL4Mic | `maskrcnn_zerocostdl4mic-z1.14.2-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| Noise2Void (2D) - ZeroCostDL4Mic | `noise2void_2d_zerocostdl4mic-z1.16.2-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| Noise2VOID (3D) - ZeroCostDL4Mic | `noise2void_3d_zerocostdl4mic-z1.16.2-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| RetinaNet - ZeroCostDL4Mic | `retinanet_zerocostdl4mic-z1.14.1-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| SplineDist (2D) - ZeroCostDL4Mic | `splinedist_2d_zerocostdl4mic-z1.14.1-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| StarDist (2D) - ZeroCostDL4Mic | `stardist_2d_zerocostdl4mic-z1.20.5-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| StarDist (3D) - ZeroCostDL4Mic | `stardist_3d_zerocostdl4mic-z1.15.4-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| U-Net (2D) - ZeroCostDL4Mic | `u-net_2d_zerocostdl4mic-z2.2.2-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| U-Net (2D) multilabel segmentation - ZeroCostDL4Mic | `u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| U-Net (3D) - ZeroCostDL4Mic | `u-net_3d_zerocostdl4mic-z3.1.2-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| WGAN - ZeroCostDL4Mic | `wgan_zerocostdl4mic-z1.15.1-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| YOLOv2 - ZeroCostDL4Mic | `yolov2_zerocostdl4mic-z1.13-d2.3.0`<br><sub>[CI run](https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568)</sub> | ⬜ Not run | ⬜ Not run | ⬜ Not run | ⬜ Not run | ❌ Failed<br><sub>2026-11-07 01:30 UTC</sub> | ⏭️ Skipped | ⏭️ Skipped | — |
+| Label-free Prediction - fnet - (2D) ZeroCostDL4Mic | `fnet_2d_zerocostdl4mic-z1.14.2-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| Label-free Prediction - fnet - (3D) ZeroCostDL4Mic | `fnet_3d_zerocostdl4mic-z1.13.2-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| pix2pix (2D) - ZeroCostDL4Mic | `pix2pix_zerocostdl4mic-z1.17.7-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
