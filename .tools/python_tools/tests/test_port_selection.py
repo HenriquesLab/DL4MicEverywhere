@@ -108,7 +108,8 @@ class PortSelectionRuntimeTests(unittest.TestCase):
                 except OSError:
                     self.skipTest("Port 8888 is already occupied in the test environment")
 
-            env_path = f"{fakebin}:/usr/bin:/bin"
+            # macOS keeps lsof and netstat in /usr/sbin.
+            env_path = f"{fakebin}:/usr/bin:/bin:/usr/sbin:/sbin"
             result = self.run_selector(
                 8888,
                 DL4ME_WINDOWS_WRAPPER="1",
