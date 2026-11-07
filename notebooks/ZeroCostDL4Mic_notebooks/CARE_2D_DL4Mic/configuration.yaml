@@ -14,8 +14,8 @@ config:
     cuda_version: 12.2.2
     cudnn_version: 8.9.5.29
     description: CARE_2D_DL4Mic is the conversion of the 2D CARE from ZeroCostDL4Mic.
-    dl4miceverywhere_version: 2.2.0
-    docker_hub_image: care_2d_zerocostdl4mic-z1.15.3-d2.2.0
+    dl4miceverywhere_version: 2.3.0
+    docker_hub_image: care_2d_zerocostdl4mic-z1.15.3-d2.3.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/335211c4edc1d43fdce664267431109fec32f142/notebooks/ZeroCostDL4Mic_notebooks/CARE_2D_DL4Mic/CARE_2D_ZeroCostDL4Mic.ipynb
     notebook_version: 1.15.3
     python_version: '3.10'

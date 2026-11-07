@@ -16,10 +16,28 @@ spec.loader.exec_module(images)
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 STARDIST = REPO_ROOT / "notebooks" / "ZeroCostDL4Mic_notebooks" / "StarDist_2D_DL4Mic" / "configuration.yaml"
+FRUNET = REPO_ROOT / "notebooks" / "External_notebooks" / "FRUNet-Exosomes" / "configuration.yaml"
 
 
 def notebook(*cells):
     return {"cells": [{"cell_type": kind, "source": source} for kind, source in cells], "nbformat": 4}
+
+
+def run_in_fake_env(code, marker, args=(), packages=None):
+    """Run in-image check code with optional fake packages: {name: __init__ source}.
+
+    Returns the process result and the report parsed from its output log.
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        for name, source in (packages or {}).items():
+            (Path(tmp) / name).mkdir()
+            (Path(tmp) / name / "__init__.py").write_text(source, encoding="utf-8")
+        env = dict(os.environ, PYTHONPATH=tmp)
+        result = subprocess.run([sys.executable, "-c", code, *args],
+                                text=True, capture_output=True, check=False, env=env)
+        log = Path(tmp) / "check.log"
+        log.write_text(result.stdout, encoding="utf-8")
+        return result, images.parse_marker(log, marker)
 
 
 class ImportCheckTests(unittest.TestCase):
@@ -27,16 +45,7 @@ class ImportCheckTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "notebook.ipynb"
             path.write_text(json.dumps(nb), encoding="utf-8")
-            # Optional fake packages importable by the check: {name: __init__ source}.
-            for name, source in (packages or {}).items():
-                (Path(tmp) / name).mkdir()
-                (Path(tmp) / name / "__init__.py").write_text(source, encoding="utf-8")
-            env = dict(os.environ, PYTHONPATH=tmp)
-            result = subprocess.run(
-                [sys.executable, "-c", images.IMPORT_CHECK_CODE, str(path)],
-                text=True, capture_output=True, check=False, env=env,
-            )
-        report = images.parse_import_report(result.stdout)
+            result, report = run_in_fake_env(images.IMPORT_CODE, images.IMPORT_MARKER, [str(path)], packages)
         self.assertIsNotNone(report, result.stdout + result.stderr)
         self.last_install_commands = report["install_commands"]
         return result.returncode, {entry["statement"]: entry for entry in report["imports"]}
@@ -52,6 +61,7 @@ class ImportCheckTests(unittest.TestCase):
         entry = report["from deconoising_like_missing import training"]
         self.assertFalse(entry["ok"])
         self.assertTrue(entry["runtime"])
+        self.assertEqual(entry["classification"], "runtime_candidate_unverified")
         self.assertEqual(self.last_install_commands, ["!git clone https://github.com/juglab/DecoNoising"])
 
     def test_modules_from_downloaded_code_are_runtime_warnings(self):
@@ -82,9 +92,12 @@ class ImportCheckTests(unittest.TestCase):
 
     def test_report_marker_is_found_after_progress_output(self):
         # pix2pix: a download progress bar (no newline) preceded the marker.
-        text = "collection.json: 235kiB [00:00, 125MiB/s]   " + images.IMPORT_REPORT_MARKER + \
-            json.dumps({"imports": [], "install_commands": []})
-        self.assertEqual(images.parse_import_report(text), {"imports": [], "install_commands": []})
+        with tempfile.TemporaryDirectory() as tmp:
+            log = Path(tmp) / "imports.log"
+            log.write_text("collection.json: 235kiB [00:00, 125MiB/s]   " + images.IMPORT_MARKER +
+                           json.dumps({"imports": [], "install_commands": []}) + "\n", encoding="utf-8")
+            self.assertEqual(images.parse_marker(log, images.IMPORT_MARKER),
+                             {"imports": [], "install_commands": []})
 
     def test_missing_module_fails(self):
         status, report = self.run_check(notebook(
@@ -99,6 +112,7 @@ class ImportCheckTests(unittest.TestCase):
         self.assertFalse(failed["ok"])
         self.assertFalse(failed["optional"])
         self.assertFalse(failed["runtime"])
+        self.assertEqual(failed["classification"], "required_missing_or_broken")
         self.assertIn("ModuleNotFoundError", failed["error"])
 
     def test_broken_dependency_fails_even_with_install_commands(self):
@@ -140,10 +154,42 @@ class ImportCheckTests(unittest.TestCase):
         self.assertIn("from os import path", report)
 
 
+class GpuCheckTests(unittest.TestCase):
+    def run_gpu_check(self, packages):
+        result, report = run_in_fake_env(images.GPU_CODE, images.GPU_MARKER, packages=packages)
+        self.assertIsNotNone(report, result.stdout + result.stderr)
+        return result.returncode, report
+
+    def test_frameworks_that_are_not_installed_are_skipped(self):
+        status, report = self.run_gpu_check({
+            "tensorflow": "raise ImportError('simulated: not installed')\n",
+            "torch": "raise ImportError('simulated: not installed')\n",
+        })
+        self.assertEqual(status, 0)
+        self.assertEqual(report["frameworks"]["tensorflow"]["status"], "SKIP")
+        self.assertEqual(report["frameworks"]["pytorch"]["status"], "SKIP")
+
+    def test_pytorch_without_cuda_fails_the_gpu_step(self):
+        status, report = self.run_gpu_check({
+            "tensorflow": "raise ImportError('simulated: not installed')\n",
+            "torch": "__version__ = '0.0'\nclass cuda:\n    @staticmethod\n"
+                     "    def is_available():\n        return False\n",
+        })
+        self.assertEqual(status, 1)
+        self.assertEqual(report["frameworks"]["pytorch"]["status"], "FAIL")
+        self.assertIn("is_available() is False", report["frameworks"]["pytorch"]["detail"])
+
+    def test_gpu_check_parses_on_legacy_python(self):
+        # Both checks run inside images as old as Python 3.5.
+        import ast
+        for code in (images.IMPORT_CODE, images.GPU_CODE):
+            ast.parse(code, feature_version=(3, 5))
+
+
 class PlanTests(unittest.TestCase):
     def test_build_matches_launcher_inputs(self):
         plan = images.Plan(STARDIST, gpu=False, platform="amd64")
-        command = plan.build_command("converter@sha256:a", "final@sha256:b")
+        command = plan.build({"converter_base_image": "converter@sha256:a", "final_base_image": "final@sha256:b"})
         args = dict(
             value.split("=", 1) for flag, value in zip(command, command[1:]) if flag == "--build-arg"
         )
@@ -160,21 +206,47 @@ class PlanTests(unittest.TestCase):
         plan = images.Plan(STARDIST, gpu=True, platform="arm64")
         self.assertEqual(plan.dockerfile, "docker/Dockerfile.gpu.modern")
         self.assertTrue(plan.tag.endswith("-gpu"))
-        self.assertTrue(plan.lock_relative.endswith("requirements.arm64.lock.txt"))
-        self.assertIn("--gpus", plan.import_command())
+        self.assertTrue(plan.lock.endswith("requirements.arm64.lock.txt"))
+        self.assertIn("--gpus", plan.docker_run(images.GPU_CODE))
+        self.assertNotIn("--gpus", images.Plan(STARDIST, gpu=False, platform="amd64").docker_run("pass"))
 
     def test_legacy_python_uses_legacy_dockerfiles(self):
-        self.assertEqual(images.select_dockerfile(False, "3.6"), "docker/Dockerfile.legacy")
-        self.assertEqual(images.select_dockerfile(True, "3.5"), "docker/Dockerfile.gpu.legacy")
-        self.assertEqual(images.select_dockerfile(False, "3.7"), "docker/Dockerfile.modern")
+        self.assertEqual(images.Plan(FRUNET, gpu=False, platform="amd64").dockerfile, "docker/Dockerfile.legacy")
+        self.assertEqual(images.Plan(FRUNET, gpu=True, platform="amd64").dockerfile, "docker/Dockerfile.gpu.legacy")
 
     def test_only_filter_and_dry_run_cover_every_configuration(self):
-        every = images.discover_configs(REPO_ROOT, [])
-        self.assertEqual(len(every), len(list((REPO_ROOT / "notebooks").rglob("configuration.yaml"))))
-        self.assertEqual(images.discover_configs(REPO_ROOT, ["stardist_2d"]), [STARDIST])
-        for config in every:
-            with self.subTest(config=config.parent.name):
-                images.Plan(config, gpu=False, platform="amd64")
+        def dry_run(*args):
+            result = subprocess.run([sys.executable, str(MODULE_PATH), "--dry-run", *args],
+                                    text=True, capture_output=True, check=False)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            return result.stdout.splitlines()
+
+        every = list((REPO_ROOT / "notebooks").rglob("configuration.yaml"))
+        self.assertEqual(len(dry_run()), len(every))
+        self.assertEqual(len(dry_run("--variant", "both")), 2 * len(every))
+        only = dry_run("--only", "stardist_2d")
+        self.assertEqual(len(only), 1)
+        self.assertIn("StarDist_2D_DL4Mic/configuration.yaml", only[0])
+
+
+class FailureClassificationTests(unittest.TestCase):
+    def classify(self, text, step="build"):
+        with tempfile.TemporaryDirectory() as tmp:
+            log = Path(tmp) / "step.log"
+            log.write_text(text, encoding="utf-8")
+            return images.classify_failure(log, step)
+
+    def test_known_failures_are_named(self):
+        self.assertEqual(self.classify("TIMEOUT after 600 seconds"), "timeout")
+        self.assertEqual(self.classify("Temporary failure in name resolution"),
+                         "network_or_repository_connectivity")
+        self.assertEqual(self.classify("ERROR: THESE PACKAGES DO NOT MATCH THE HASHES FROM THE REQUIREMENTS FILE."),
+                         "package_hash_mismatch")
+        self.assertEqual(self.classify("E: Unable to locate package libcudnn9-cuda-12"),
+                         "cudnn_package_unavailable_or_repository_failure")
+        self.assertEqual(self.classify("ModuleNotFoundError: No module named 'torch'"), "missing_python_module")
+        self.assertEqual(self.classify("terminate called", step="gpu"), "gpu_framework_execution")
+        self.assertEqual(self.classify("something else"), "see_log")
 
 
 class ReportTests(unittest.TestCase):
@@ -182,11 +254,12 @@ class ReportTests(unittest.TestCase):
         result = {
             "config": "notebooks/X/StarDist_2D_DL4Mic/configuration.yaml", "variant": "cpu", "python": "3.11",
             "image": "dl4me-image-test:stardist-cpu", "status": "FAIL", "failed_step": "imports",
+            "failure_category": "missing_python_module",
             "steps": {"build": {"ok": True, "seconds": 600}, "imports": {"ok": False, "seconds": 20}},
-            "imports": {"total": 3, "optional_failed": [], "failed": [
-                {"statement": "from stardist import fill_label_holes", "optional": False, "ok": False,
-                 "error": "ModuleNotFoundError: No module named 'pkg_resources'"}]},
-            "image_size_gb": 6.2, "logs": {},
+            "imports": {"total": 3, "optional_failed": [], "runtime_failed": [], "install_commands": [],
+                        "failed": [{"statement": "from stardist import fill_label_holes", "optional": False,
+                                    "ok": False, "error": "ModuleNotFoundError: No module named 'pkg_resources'"}]},
+            "gpu": {}, "image_size_gb": 6.2, "logs": {},
         }
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp)
@@ -195,7 +268,8 @@ class ReportTests(unittest.TestCase):
             markdown = (out / "report.md").read_text(encoding="utf-8")
             data = json.loads((out / "report.json").read_text(encoding="utf-8"))
         self.assertIn("0 PASS, 0 WARN, 1 FAIL", markdown)
-        self.assertIn("| StarDist_2D_DL4Mic | cpu | 3.11 | FAIL | imports | 10.0 | 6.2 | 2/3 |", markdown)
+        self.assertIn("| StarDist_2D_DL4Mic | cpu | 3.11 | FAIL | imports | missing_python_module | - | 2/3 |",
+                      markdown)
         self.assertIn("No module named 'pkg_resources'", markdown)
         self.assertEqual(data["results"][0]["failed_step"], "imports")
 

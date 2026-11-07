@@ -246,7 +246,8 @@ def classify_failure(path, step):
     if any(x in content for x in ("could not connect", "temporary failure in name resolution",
                                   "connection refused", "connection timed out", "network is unreachable")):
         return "network_or_repository_connectivity"
-    if "hashes do not match" in content or "hash mismatch" in content:
+    # pip says "THESE PACKAGES DO NOT MATCH THE HASHES FROM THE REQUIREMENTS FILE".
+    if any(x in content for x in ("hashes do not match", "do not match the hashes", "hash mismatch")):
         return "package_hash_mismatch"
     if "unable to locate package libcudnn" in content:
         return "cudnn_package_unavailable_or_repository_failure"

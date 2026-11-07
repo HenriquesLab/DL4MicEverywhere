@@ -14,8 +14,8 @@ config:
     cuda_version: 11.8.0
     cudnn_version: 8.6.0.163
     description: YOLOv2_DL4Mic is the conversion of the YOLOv2 from ZeroCostDL4Mic.
-    dl4miceverywhere_version: 2.2.0
-    docker_hub_image: yolov2_zerocostdl4mic-z1.13-d2.2.0
+    dl4miceverywhere_version: 2.3.0
+    docker_hub_image: yolov2_zerocostdl4mic-z1.13-d2.3.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/335211c4edc1d43fdce664267431109fec32f142/notebooks/ZeroCostDL4Mic_notebooks/YOLOv2_DL4Mic/YOLOv2_ZeroCostDL4Mic.ipynb
     notebook_version: '1.13'
     python_version: '3.7'

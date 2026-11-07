@@ -1,8 +1,7 @@
 name: Update configuration files with the manifest information from ZeroCostDL4Mic
 on:
-  # At 06:00 AM of every day
-  schedule:
-      - cron: "0 6 * * *"
+  # Manual only: the configurations pin their notebook copy in this repository,
+  # and this sync would overwrite their metadata from ZeroCostDL4Mic's master branch.
   workflow_dispatch:
 
 jobs:

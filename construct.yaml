@@ -1,5 +1,5 @@
 name: "dl4miceverywhere"
-version: "2.2.0"
+version: "2.3.0"
 channels:
   - "http://repo.continuum.io/pkgs/main/"
 environment: base

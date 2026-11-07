@@ -17,8 +17,8 @@ config:
     cuda_version: 12.2.2
     cudnn_version: 8.9.5.29
     description: Notebook to load models from the BioImage Model Zoo in TensorFlow
-    dl4miceverywhere_version: 2.2.0
-    docker_hub_image: load_bioimageio_tensorflow-b1.0.0-d2.2.0
+    dl4miceverywhere_version: 2.3.0
+    docker_hub_image: load_bioimageio_tensorflow-b1.0.0-d2.3.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/c98433a07a54f5aba65888fa9a5fed216af93c3c/notebooks/Bespoke_notebooks/bioimageio-tensorflow/load_bioimageio_tensorflow.ipynb
     notebook_version: 1.0.0
     python_version: '3.9'

@@ -1,9 +1,9 @@
 name: Check and build updated ZeroCostDL4Mic notebook
 
 on:
-  # At 01:30 AM of every day
-  schedule:
-    - cron: "30 1 * * *"
+  # Manual only. ZeroCostDL4Mic configurations now build the notebook copy pinned
+  # in this repository (notebook_url), so an automatic version bump would publish
+  # the old pinned notebook under the new version. Update the copy first.
   workflow_dispatch:
 
 permissions:

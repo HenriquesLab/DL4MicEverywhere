@@ -14,8 +14,8 @@ config:
     cuda_version: 12.5.1
     cudnn_version: 9.2.0.82
     description: U-Net_2D_Multilabel_DL4Mic is the conversion of the 2D U-Net Multilabel from ZeroCostDL4Mic.
-    dl4miceverywhere_version: 2.2.0
-    docker_hub_image: u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.2.0
+    dl4miceverywhere_version: 2.3.0
+    docker_hub_image: u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.3.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/335211c4edc1d43fdce664267431109fec32f142/notebooks/ZeroCostDL4Mic_notebooks/U-Net_2D_Multilabel_DL4Mic/U-Net_2D_Multilabel_ZeroCostDL4Mic.ipynb
     notebook_version: 2.2.0
     python_version: '3.12'

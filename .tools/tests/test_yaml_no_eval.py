@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 import unittest
@@ -47,10 +48,10 @@ class YamlNoEvalTests(unittest.TestCase):
             '"$config_dl4miceverywhere_notebook_version" "$config_dl4miceverywhere_docker_hub_image"\n'
         )
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(
-            result.stdout,
-            "3.9|1.14.1|dfcan_zerocostdl4mic-z1.14.1-d2.2.0",
-        )
+        # The tag ends in the DL4MicEverywhere version, which changes with each release.
+        tag = re.search(r"^\s+docker_hub_image: (\S+)$", config.read_text(encoding="utf-8"), re.MULTILINE).group(1)
+        self.assertTrue(tag.startswith("dfcan_zerocostdl4mic-z1.14.1-d"), tag)
+        self.assertEqual(result.stdout, f"3.9|1.14.1|{tag}")
 
     def test_yaml_consumers_do_not_eval_parser_output(self):
         consumers = [
