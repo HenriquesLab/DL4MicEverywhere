@@ -68,7 +68,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Update deterministic base-image lock"
-          git push
+          # The dependency lock workflow runs on the same pushes and may push first.
+          for attempt in 1 2 3; do
+            git push && exit 0
+            git pull --rebase origin "$GITHUB_REF_NAME"
+          done
+          exit 1
 
       - name: Explain publishing step after intentional refresh
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.refresh_existing && steps.changes.outputs.changed == 'true' }}

@@ -361,7 +361,6 @@ jobs:
       - build_arm64
     runs-on:  [self-hosted, Ubuntu, NotDocker]
     permissions:
-      id-token: write
       contents: read
     steps:
       - name: Clone DL4MicEverywhere repository
@@ -396,7 +395,6 @@ jobs:
       - build_arm64
     runs-on:  [self-hosted, Ubuntu, NotDocker]
     permissions:
-      id-token: write
       contents: read
     steps:
       - name: Clone DL4MicEverywhere repository
@@ -431,7 +429,6 @@ jobs:
       - build_arm64
     runs-on:  [self-hosted, Ubuntu, NotDocker]
     permissions:
-      id-token: write
       contents: read
     steps:
       - name: Clone DL4MicEverywhere repository

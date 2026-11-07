@@ -56,4 +56,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Update deterministic dependency locks"
-          git push
+          # The base-image lock workflow runs on the same pushes and may push first.
+          for attempt in 1 2 3; do
+            git push && exit 0
+            git pull --rebase origin "$GITHUB_REF_NAME"
+          done
+          exit 1
