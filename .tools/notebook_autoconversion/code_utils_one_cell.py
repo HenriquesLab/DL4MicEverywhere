@@ -242,6 +242,7 @@ def code_to_cell(code, time_imported, ipywidget_imported, function_name):
     Generates a list of code cells for a Jupyter notebook based on the given code.
     Parameters:
     - code (str): The code to be converted into code cells.
+    - time_imported (bool): Indicates whether the `time` library has already been imported.
     - ipywidget_imported (bool): Indicates whether the `ipywidgets` library has already been imported.
     - function_name (str): The name of the function to be created.
     Returns:

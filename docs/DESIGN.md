@@ -22,6 +22,16 @@ Before you can use DL4MicEverywhere, ensure you have the following:
 
 In case you miss some of the requirements, follow the steps described on the [REQUIREMENTS INSTALLATION](REQUIREMENTS_INSTALLATION.md).
 
+### Non-destructive prerequisite installation
+
+DL4MicEverywhere may install a missing component, and start a stopped one after asking. It never removes, reconfigures, or restarts an existing Docker, WSL, or NVIDIA driver installation; when something is missing it explains what to do instead. In practice:
+
+- Docker is installed only when the `docker` command is missing, and never over conflicting distribution packages (`docker.io`, `containerd`, `runc`, `podman-docker`).
+- The NVIDIA Container Toolkit, whose configuration restarts the Docker daemon, is configured automatically only right after DL4MicEverywhere installed Docker Engine itself.
+- The Docker context, Docker Desktop settings, and Docker Desktop versions are never changed automatically; an outdated Docker Desktop only produces a warning.
+- Uninstall only touches resources labelled `org.dl4miceverywhere.managed`. Docker cleanup touches those resources plus unused Docker build cache older than 24 hours: Docker cannot attribute build cache to one project, and removed cache is only downloaded or rebuilt again when a build needs it.
+- On Linux, Docker Engine is used instead of Docker Desktop, because Docker Desktop for Linux cannot pass NVIDIA GPUs to containers.
+
 ## Docker Containers
 
 At the heart of DL4MicEverywhere are Docker images, each corresponding to a notebook (see [notebook types](NOTEBOOK_TYPES.md)). These images package all the necessary dependencies and configurations required for the smooth operation of the notebooks, thereby enhancing reproducibility by mitigating software environment discrepancies.
@@ -34,8 +44,10 @@ GitHub Actions are set up to automatically build and publish these containers to
 
 There is a different launchers for each operative system:
 
-- [`MacOS_launch.command`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/MacOS_launch.sh): which is a double click launcher for MacOS systems. Your computer might block the use of this file, in that case follow the steps we provide in [this troubleshoot](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md#macos_launher-cannot-be-oppened). 
-- [`Windows_launch.bat`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/Windows_launch.sh): which is a double click launcher for Windows systems. Your computer might block the use of this file, in that case follow the steps we provide in [this troubleshoot](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md#windows_launher-cannot-be-oppened). 
+- [`MacOS_launch.command`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/MacOS_launch.command): which is a double click launcher for MacOS systems. Your computer might block the use of this file, in that case follow the steps we provide in [this troubleshoot](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md#macos_launher-cannot-be-oppened). 
+- [`Windows_launch.bat`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/Windows_launch.bat): which is a double click launcher for Windows systems. Your computer might block the use of this file, in that case follow the steps we provide in [this troubleshoot](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/TROUBLESHOOTING.md#windows_launher-cannot-be-oppened). 
+  The Windows launcher performs a WSL-first preflight. When WSL 2 and Ubuntu are already usable but Docker Desktop is missing, it can install Docker Desktop in Docker's per-user WSL 2 mode without Windows elevation. The helper obtains explicit license consent, downloads only from Docker's official endpoint, validates the installer Authenticode signature, and never edits Docker Desktop WSL-integration settings automatically.
+
 - [`Linux_launch.sh`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/Linux_launch.sh): is the main launcher that is called by the others, this is not a double click launcher, but you can create one by running the `create_desktop.sh` script.
 
 The [`Linux_launch.sh`](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/Linux_launch.sh) script offers a straightforward interface for building and running the Docker containers. It manages argument parsing, configuration file reading, pre-build testing, image building, and container execution.

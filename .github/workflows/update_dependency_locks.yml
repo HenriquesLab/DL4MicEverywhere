@@ -1,0 +1,59 @@
+name: Update deterministic dependency locks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'notebooks/**/configuration.yaml'
+      - 'notebooks/**/requirements.txt'
+      - '.tools/lock_profiles/**'
+      - '.tools/python_tools/requirements_lock.py'
+      - 'docker/converter-requirements.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dependency-locks-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  update-locks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Generate or refresh stale notebook locks
+        run: python3 .tools/python_tools/requirements_lock.py ensure-all --repo-root .
+
+      - name: Generate or refresh converter lock
+        run: |
+          python3 .tools/python_tools/requirements_lock.py ensure \
+            --source docker/converter-requirements.txt \
+            --python-version 3.9 \
+            --lock docker/converter-requirements.lock.txt \
+            --profile none \
+            --repo-root .
+
+      - name: Commit generated locks
+        shell: bash
+        run: |
+          find notebooks -name requirements.lock.txt -print0 | xargs -0 -r git add --
+          git add -- docker/converter-requirements.lock.txt
+          if git diff --cached --quiet; then
+            echo "Dependency locks are already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update deterministic dependency locks"
+          git push

@@ -1,3 +1,9 @@
+# DL4MicEverywhere
+.tools/.cache/.cache_gui
+.tools/.cache/.cache_preferences
+.tools/.cache/.windows_setup
+.tools/.cache/.managed_docker_images
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -39,8 +45,6 @@ htmlcov/
 .nox/
 .coverage
 .coverage.*
-.cache
-.cache_gui
 nosetests.xml
 coverage.xml
 *.cover
@@ -134,3 +138,10 @@ cython_debug/
 # MAC DS_Store
 *.DS_Store
 cheatsheet*.txt
+# Ephemeral deterministic lock staged inside the Docker build context
+.tools/docker_build_inputs/
+
+.tools/.cache/uv/
+
+# Local reports from .tools/python_tools/build_and_test_images.py
+image_test_reports/

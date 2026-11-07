@@ -42,10 +42,17 @@ if not os.path.exists(launch_command):
 
 # launch_command += " ./"
 
-# Execute the launch command
-try:
-    print(f"Executing {launch_command} on {os_name}")
-    result = subprocess.run(launch_command, check=True, shell=True)
+# Execute the launch command and preserve its status. Unix launchers are passed
+# as argv to Bash so repository/application paths containing spaces are safe.
+print(f"Executing {launch_command} on {os_name}")
+if os_name == "Windows":
+    result = subprocess.run(f'"{launch_command}"', shell=True, check=False)
+else:
+    result = subprocess.run(["/bin/bash", launch_command], check=False)
+
+if result.returncode == 0:
     print("Execution successful.")
-except subprocess.CalledProcessError as e:
-    print(f"An error occurred while executing {launch_command}: {e}")
+else:
+    print(f"Launcher exited with status {result.returncode}.")
+
+sys.exit(result.returncode)

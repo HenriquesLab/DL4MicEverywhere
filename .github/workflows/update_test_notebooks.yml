@@ -1,0 +1,146 @@
+name: Update automated notebook image status
+
+on:
+  workflow_call:
+    inputs:
+      config_file:
+        required: true
+        type: string
+      docker_tag:
+        required: true
+        type: string
+      amd64_build:
+        required: false
+        type: string
+        default: not_run
+      amd64_smoke:
+        required: false
+        type: string
+        default: not_run
+      amd64_generated_at:
+        required: false
+        type: string
+        default: ''
+      gpu_build:
+        required: false
+        type: string
+        default: not_run
+      gpu_smoke:
+        required: false
+        type: string
+        default: not_run
+      gpu_generated_at:
+        required: false
+        type: string
+        default: ''
+      arm64_build:
+        required: false
+        type: string
+        default: not_run
+      arm64_smoke:
+        required: false
+        type: string
+        default: not_run
+      arm64_generated_at:
+        required: false
+        type: string
+        default: ''
+      multi_manifest:
+        required: false
+        type: string
+        default: not_run
+      amd64_manifest:
+        required: false
+        type: string
+        default: not_run
+      arm64_manifest:
+        required: false
+        type: string
+        default: not_run
+
+permissions:
+  contents: write
+
+# Many notebooks can finish building at the same time during a matrix run.
+# Serialize only the tiny report-writing job so concurrent builds never race
+# while editing the shared JSON/Markdown files.
+concurrency:
+  group: notebook-image-status-${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  update_status:
+    name: Record image build and smoke-test results
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the branch receiving the status update
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Select status target branch
+        id: target
+        shell: bash
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "branch" ]; then
+            target_branch="${GITHUB_REF_NAME}"
+          else
+            target_branch='${{ github.event.repository.default_branch }}'
+          fi
+          echo "branch=$target_branch" >> "$GITHUB_OUTPUT"
+          git fetch origin "$target_branch"
+          git checkout -B "$target_branch" "origin/$target_branch"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install report generator dependency
+        run: python -m pip install 'pyyaml==6.0.1'
+
+      - name: Record this publishing run
+        shell: bash
+        run: |
+          python .tools/python_tools/notebook_status.py --repo-root . record \
+            --config '${{ inputs.config_file }}' \
+            --docker-tag '${{ inputs.docker_tag }}' \
+            --amd64-build '${{ inputs.amd64_build }}' \
+            --amd64-smoke '${{ inputs.amd64_smoke }}' \
+            --amd64-generated-at '${{ inputs.amd64_generated_at }}' \
+            --gpu-build '${{ inputs.gpu_build }}' \
+            --gpu-smoke '${{ inputs.gpu_smoke }}' \
+            --gpu-generated-at '${{ inputs.gpu_generated_at }}' \
+            --arm64-build '${{ inputs.arm64_build }}' \
+            --arm64-smoke '${{ inputs.arm64_smoke }}' \
+            --arm64-generated-at '${{ inputs.arm64_generated_at }}' \
+            --multi-manifest '${{ inputs.multi_manifest }}' \
+            --amd64-manifest '${{ inputs.amd64_manifest }}' \
+            --arm64-manifest '${{ inputs.arm64_manifest }}' \
+            --attempted-at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+            --run-url '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}' \
+            --commit-sha '${{ github.sha }}'
+          python .tools/python_tools/notebook_status.py --repo-root . render
+
+      - name: Commit automated status report
+        shell: bash
+        env:
+          TARGET_BRANCH: ${{ steps.target.outputs.branch }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .tools/notebook-build-status.json .tools/test-notebooks.md
+          if git diff --cached --quiet; then
+            echo "Notebook image status is already up to date."
+            exit 0
+          fi
+          git commit -m "GitHub Action - Update notebook image status"
+
+          # Status writers are serialized, but another maintenance workflow may
+          # have committed unrelated files while the images were building.
+          # Rebase once before retrying rather than dropping the test evidence.
+          if git push origin "HEAD:$TARGET_BRANCH"; then
+            exit 0
+          fi
+          git pull --rebase origin "$TARGET_BRANCH"
+          git push origin "HEAD:$TARGET_BRANCH"

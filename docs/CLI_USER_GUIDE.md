@@ -17,7 +17,7 @@ Note that if you wish to use the graphical user interface (without providing any
 
   `-n NOTEBOOK_PATH`: `NOTEBOOK_PATH` is the path to the local ZeroCostDL4Mic style notebook that you want to use, instead of the one referred to in the `configuration.yaml` file. 
 
-  `-r REQUIREMENTS_PATH`: `REQUIREMENTS_PATH` is the path to the local `requirements.txt` file that you want to use, instead of the one referred to in the `configuration.yaml` file. 
+  `-r REQUIREMENTS_PATH`: `REQUIREMENTS_PATH` is the path to the local dependency input (`requirements.txt`) that you want to use, instead of the one referred to in the `configuration.yaml` file. 
 
   `-t TAG`: `TAG` is the tag that will be assigned to the created Docker image. If it is not provided, the default tag from the configuration file will be taken and if that configuration file does not have a tag a custom one will be generated with name and version of the notebook.
 
@@ -46,14 +46,14 @@ wsl bash Linux_launch.sh -c ./notebooks/CARE_2D_DL4Mic/configuration.yaml -d ./d
 
 ### More complex usage
 
-In this complex usage case, you can use your own `configuration.yaml` file, your ZeroCost4Mic style notebook, and your `requirements.txt` file. You can also allow the container to use GPUs and assign the tag `MyNewContainer` to the Docker image that will be created.
+In this complex usage case, you can use your own `configuration.yaml` file, your ZeroCost4Mic style notebook, and your `requirements.txt` dependency input. You can also allow the container to use GPUs and assign the tag `MyNewContainer` to the Docker image that will be created.
 
 **On MacOS/Linux:**
 ```
-bash Linux_launch.sh -c ./my_notebooks/CARE_2D_DL4Mic/configuration.yaml -d /home/user/Documents/data_folder -o /home/user/Documents/results_folder -g -n /home/user/Desktop/MyFancyZeroCostDL4MicNotebook.ipynb -r ./modified_requirements.txt -t MyNewContainer
+bash Linux_launch.sh -c ./my_notebooks/CARE_2D_DL4Mic/configuration.yaml -d /home/user/Documents/data_folder -o /home/user/Documents/results_folder -g -n /home/user/Desktop/MyFancyZeroCostDL4MicNotebook.ipynb -r ./requirements.txt -t MyNewContainer
 ```
 **On Windows:**
 ```
-wsl bash Linux_launch.sh -c ./my_notebooks/CARE_2D_DL4Mic/configuration.yaml -d /home/user/Documents/data_folder -o /home/user/Documents/results_folder -g -n /home/user/Desktop/MyFancyZeroCostDL4MicNotebook.ipynb -r ./modified_requirements.txt -t MyNewContainer
+wsl bash Linux_launch.sh -c ./my_notebooks/CARE_2D_DL4Mic/configuration.yaml -d /home/user/Documents/data_folder -o /home/user/Documents/results_folder -g -n /home/user/Desktop/MyFancyZeroCostDL4MicNotebook.ipynb -r ./requirements.txt -t MyNewContainer
 ```
 

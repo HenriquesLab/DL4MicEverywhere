@@ -1,3 +1,6 @@
+# check=skip=InvalidDefaultArgInFrom
+ARG CONVERTER_BASE_IMAGE
+ARG FINAL_BASE_IMAGE
 ARG UBUNTU_VERSION=22.04
 ARG CUDA_VERSION=12.3.2
 ARG CUDNN_VERSION=""
@@ -5,19 +8,26 @@ ARG CUDNN_VERSION=""
 ####
 ## Stage 1 - Download and convert the notebook
 ####
-FROM python:3.9-alpine3.19 AS notebook_autoconversion
+FROM ${CONVERTER_BASE_IMAGE} AS notebook_autoconversion
 
-RUN apk update && \
-    apk add --no-cache git
+# PyPI downloads can briefly stall on Docker Desktop/WSL networks.
+# Keep deterministic installs resilient without changing package resolution.
+ENV PIP_DEFAULT_TIMEOUT=120
+ENV PIP_RETRIES=10
 
 WORKDIR /home
 
-RUN python -m pip install --upgrade pip && \
-    python -m pip install nbformat==5.9.2
+COPY docker/converter-requirements.lock.txt /tmp/converter-requirements.lock.txt
+RUN python -m pip install --disable-pip-version-check --require-hashes \
+        -r /tmp/converter-requirements.lock.txt && \
+    rm /tmp/converter-requirements.lock.txt
 
 # Read all the arguments
+ARG CONVERTER_BASE_IMAGE
+ARG FINAL_BASE_IMAGE
 ARG PATH_TO_NOTEBOOK
 ARG PATH_TO_REQUIREMENTS
+ARG PATH_TO_REQUIREMENTS_LOCK
 ARG SECTIONS_TO_REMOVE
 ARG NOTEBOOK_NAME
 ARG GPU_FLAG
@@ -26,18 +36,18 @@ ARG UBUNTU_VERSION
 ARG CUDA_VERSION
 ARG CUDNN_VERSION
 
-# Custom cache invalidation
-ARG CACHEBUST=1
-
-# All the layers below this will not be cached
-RUN echo "${CACHEBUST}"
-
 # Download the notebook
 ADD ${PATH_TO_NOTEBOOK} ./${NOTEBOOK_NAME}
 
+# Use the converter from the exact local DL4MicEverywhere build context.
+# Docker fingerprints COPY inputs, so no self-referential Git commit pin is needed.
+COPY .tools/notebook_autoconversion/ /home/DL4MicEverywhere/.tools/notebook_autoconversion/
+COPY .tools/python_tools/create_docker_info.py /home/DL4MicEverywhere/.tools/python_tools/create_docker_info.py
+
+COPY ${PATH_TO_REQUIREMENTS_LOCK} /tmp/notebook-requirements.lock.txt
+
 # Autoconvert the notebook
-RUN git clone --depth 1 https://github.com/HenriquesLab/DL4MicEverywhere.git && \
-    python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py \
+RUN python DL4MicEverywhere/.tools/notebook_autoconversion/transform.py \
         -p . \
         -n "${NOTEBOOK_NAME}" \
         -s "${SECTIONS_TO_REMOVE}" && \
@@ -49,18 +59,25 @@ RUN git clone --depth 1 https://github.com/HenriquesLab/DL4MicEverywhere.git && 
         "${CUDNN_VERSION}" \
         "${PATH_TO_NOTEBOOK}" \
         "${PATH_TO_REQUIREMENTS}" \
+        "${PATH_TO_REQUIREMENTS_LOCK}" \
+        "$(sha256sum /tmp/notebook-requirements.lock.txt | awk '{print $1}')" \
         "${SECTIONS_TO_REMOVE}" \
         "${NOTEBOOK_NAME}" \
         "${GPU_FLAG}" \
-        "${PYTHON_VERSION}"
+        "${PYTHON_VERSION}" \
+        "${CONVERTER_BASE_IMAGE}" \
+        "${FINAL_BASE_IMAGE}"
 
 ####
 ## Stage 2 - Final GPU image
 ## Supported Python versions in this file: 3.7, 3.8, 3.9, 3.10, 3.11, 3.12, 3.13
 ## Interface build args accepted by all Dockerfiles:
-##   UBUNTU_VERSION, CUDA_VERSION, CUDNN_VERSION
+##   CONVERTER_BASE_IMAGE, FINAL_BASE_IMAGE, UBUNTU_VERSION, CUDA_VERSION, CUDNN_VERSION
 ####
-FROM nvidia/cuda:${CUDA_VERSION}-devel-ubuntu${UBUNTU_VERSION} AS final
+FROM ${FINAL_BASE_IMAGE} AS final
+
+# Ownership label used by scoped DL4MicEverywhere Docker cleanup.
+LABEL org.dl4miceverywhere.managed="true"
 ARG UBUNTU_VERSION
 ARG CUDA_VERSION
 ARG CUDNN_VERSION
@@ -70,17 +87,22 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Read all the arguments
 ARG PATH_TO_NOTEBOOK=""
 ARG PATH_TO_REQUIREMENTS=""
+ARG PATH_TO_REQUIREMENTS_LOCK=""
 ARG SECTIONS_TO_REMOVE=""
 ARG NOTEBOOK_NAME=""
 ARG GPU_FLAG=""
 ARG PYTHON_VERSION=""
-ARG CACHEBUST=1
 
 # Environment
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV TZ=Europe/Lisbon
 ENV DEBIAN_FRONTEND=noninteractive
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV PIP_NO_CACHE_DIR=1
+# Allow large hashed wheels to survive short network stalls during Docker builds.
+ENV PIP_DEFAULT_TIMEOUT=120
+ENV PIP_RETRIES=10
 
 # GPU environment
 ENV NVIDIA_VISIBLE_DEVICES=all
@@ -120,25 +142,35 @@ RUN ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Node.js with NVM
-RUN curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && \
+RUN curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/bab86d5de571015b63fd8fc30b47bbe072a1290e/install.sh | bash && \
     source "${NVM_DIR}/nvm.sh" && \
     nvm install "${NODE_VERSION}" && \
     nvm use "${NODE_VERSION}" && \
     nvm alias default "${NODE_VERSION}"
 
-# Optional cuDNN install
+# cuDNN install, pinned to the cudnn_version from configuration.yaml.
 # The nvidia/cuda base image already provides the CUDA apt repository.
 # Do not add it again, or apt may fail with conflicting Signed-By settings.
+# NVIDIA's package names changed with cuDNN 9:
+#   cuDNN <= 8: libcudnn8=<cudnn>-1+cuda<major.minor>
+#   cuDNN >= 9: libcudnn9-cuda-<major>=<cudnn>-1
 RUN set -eux; \
-    apt-get update; \
-    if [ -n "${CUDNN_VERSION}" ]; then \
-        apt-get install -y --no-install-recommends \
-            "libcudnn8=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*}" \
-            "libcudnn8-dev=${CUDNN_VERSION}-1+cuda${CUDA_VERSION%.*}"; \
+    if [ -z "${CUDNN_VERSION}" ]; then \
+        echo "cudnn_version is empty in configuration.yaml; GPU images need an exact cuDNN version." >&2; \
+        exit 1; \
+    fi; \
+    cudnn_major="${CUDNN_VERSION%%.*}"; \
+    cuda_major="${CUDA_VERSION%%.*}"; \
+    cuda_major_minor="${CUDA_VERSION%.*}"; \
+    if [ "${cudnn_major}" -ge 9 ]; then \
+        cudnn_packages="libcudnn${cudnn_major}-cuda-${cuda_major}=${CUDNN_VERSION}-1 libcudnn${cudnn_major}-dev-cuda-${cuda_major}=${CUDNN_VERSION}-1"; \
     else \
-        apt-get install -y --no-install-recommends \
-            libcudnn8 \
-            libcudnn8-dev; \
+        cudnn_packages="libcudnn${cudnn_major}=${CUDNN_VERSION}-1+cuda${cuda_major_minor} libcudnn${cudnn_major}-dev=${CUDNN_VERSION}-1+cuda${cuda_major_minor}"; \
+    fi; \
+    apt-get update; \
+    if ! apt-get install -y --no-install-recommends ${cudnn_packages}; then \
+        echo "cuDNN ${CUDNN_VERSION} is not published for CUDA ${CUDA_VERSION} on Ubuntu ${UBUNTU_VERSION}. Check cuda_version and cudnn_version in configuration.yaml." >&2; \
+        exit 1; \
     fi; \
     rm -rf /var/lib/apt/lists/*
 
@@ -165,39 +197,48 @@ RUN set -eux; \
             ;; \
     esac; \
     "python${PYTHON_VERSION}" -m venv "${VIRTUAL_ENV}"; \
-    "${VIRTUAL_ENV}/bin/python" -m ensurepip --upgrade; \
-    "${VIRTUAL_ENV}/bin/python" -m pip install --upgrade pip setuptools wheel; \
+    case "${PYTHON_VERSION}" in \
+        3.7) \
+            PIP_VERSION=24.0; SETUPTOOLS_VERSION=67.8.0; WHEEL_VERSION=0.41.3 ;; \
+        3.8|3.9|3.10|3.11|3.12|3.13) \
+            PIP_VERSION=24.3.1; SETUPTOOLS_VERSION=75.3.2; WHEEL_VERSION=0.45.1 ;; \
+    esac; \
+    "${VIRTUAL_ENV}/bin/python" -m pip install \
+        "pip==${PIP_VERSION}" \
+        "setuptools==${SETUPTOOLS_VERSION}" \
+        "wheel==${WHEEL_VERSION}"; \
     ln -sf "${VIRTUAL_ENV}/bin/python" /usr/local/bin/python; \
     ln -sf "${VIRTUAL_ENV}/bin/python" /usr/local/bin/python3; \
     ln -sf "${VIRTUAL_ENV}/bin/pip" /usr/local/bin/pip; \
     ln -sf "${VIRTUAL_ENV}/bin/pip" /usr/local/bin/pip3; \
+    # Same setuptools for the isolated environments in which pip compiles
+    # packages without wheels; otherwise each build fetches the newest one.
+    printf 'setuptools==%s\n' "${SETUPTOOLS_VERSION}" > /opt/dl4me-build-constraints.txt; \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /home
 
-# Install notebook runtime packages
-RUN set -eux; \
-    python -m pip install --upgrade pip; \
-    if [ "$(printf '%s\n' "3.8" "${PYTHON_VERSION}" | sort -V | head -n1)" = "3.8" ]; then \
-        python -m pip install nbformat==5.9.2; \
-        python -m pip install matplotlib==3.6.3; \
-    else \
-        python -m pip install nbformat==5.0.2; \
-        python -m pip install matplotlib==3.5.3; \
-    fi; \
-    python -m pip install ipywidgets==8.1.0; \
-    python -m pip install jupyterlab==3.6.0
-
-# Custom cache invalidation
-RUN echo "${CACHEBUST}"
-
-# Download requirements
-ADD ${PATH_TO_REQUIREMENTS} ./requirements.txt
-
-# Install requirements
-RUN python -m pip install --upgrade pip && \
-    python -m pip install -r requirements.txt && \
-    rm requirements.txt
+# Install the complete, pre-resolved notebook environment.
+# The lock includes transitive dependencies, hashes, and DL4MicEverywhere's
+# runtime defaults for packages not explicitly supplied by the notebook input.
+COPY ${PATH_TO_REQUIREMENTS_LOCK} /tmp/requirements.lock.txt
+# PIP_CONSTRAINT also reaches the isolated build environments of packages
+# compiled from source, so their setuptools stays pinned too.
+# pip cannot resume an interrupted download, and PIP_RETRIES does not cover a
+# download that stalls halfway, so the install is retried up to three times.
+# Downloads are kept in a BuildKit cache mount, which is not part of the image,
+# so a retry or a later build only fetches what is missing. The hashes in the
+# lock are still checked for every file taken from the cache.
+RUN --mount=type=cache,id=dl4me-pip,target=/root/.cache/pip \
+    for attempt in 1 2 3; do \
+        env -u PIP_NO_CACHE_DIR PIP_CONSTRAINT=/opt/dl4me-build-constraints.txt \
+            python -m pip install --cache-dir /root/.cache/pip \
+                --require-hashes -r /tmp/requirements.lock.txt && break; \
+        if [ "$attempt" -eq 3 ]; then exit 1; fi; \
+        echo "Installing the Python packages failed (attempt $attempt of 3). Retrying in 20 seconds ..."; \
+        sleep 20; \
+    done && \
+    rm /tmp/requirements.lock.txt
 
 # Copy the converted notebook from stage 1
 COPY --from=notebook_autoconversion /home/${NOTEBOOK_NAME} /home/docker_info.txt /home/

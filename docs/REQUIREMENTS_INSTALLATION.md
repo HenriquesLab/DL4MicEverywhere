@@ -1,10 +1,11 @@
 # DL4MicEverywhere Requirements Installation Guidelines
 
-You can double-click the launcher in the DL4MicEverywhere folder (which has the same name as your system, e.g., Windows_launch for Windows operating systems) to launch the GUI, but it also does some requirements checking. At the beginning of the process, the launcher checks if the requirements listed below are installed; otherwise, they are installed automatically. It can happen that the installation is not successfully done; in that case, please follow the guidelines provided on this page.
+You can double-click the launcher in the DL4MicEverywhere folder (which has the same name as your system, e.g., Windows_launch for Windows operating systems) to launch the GUI, but it also does some requirements checking. At the beginning of the process, the launcher checks if the requirements listed below are installed; otherwise, they are installed automatically. On Debian/Ubuntu systems, DL4MicEverywhere installs only the missing packages it needs; it does not perform a full operating-system upgrade as part of application setup. It can happen that the installation is not successfully done; in that case, please follow the guidelines provided on this page.
 
 ### Requirements
 
 - Docker installed on your system.
+- Python 3 with `venv` support when a missing/stale dependency lock must be generated for a local image build. DL4MicEverywhere installs this host-side helper automatically when needed.
 - For GPU usage - NVIDIA GPU + CUDA drivers.
 - If you want to run the graphical user interface (GUI), [Tcl/Tk](https://www.tcl.tk/) must be installed on your computer. 
 
@@ -15,71 +16,66 @@ The installation guidelines will be different depending on your operative system
 
 ## Intro
 Windows operating systems require a slightly more complicated installation process. Also, beware there might be differences between Windows 10 and 11.
-- Install Docker Desktop.
-- Install Ubuntu inside WSL. 
-- Install TCL/TK in WSL's Ubuntu.
+
+Before running any bundled PowerShell helper, `Windows_launch.bat` automatically checks the helper files for Windows Mark-of-the-Web (`Zone.Identifier`) metadata that can be propagated from a downloaded ZIP. On systems using `RemoteSigned`, the launcher removes those marks recursively and verifies that they are gone before executing the first `.ps1` file. This does not change the computer's PowerShell execution policy. If an organization enforces `AllSigned`/`Restricted`, or endpoint security prevents the marks from being removed, DL4MicEverywhere stops with a specific diagnostic instead of trying to bypass the managed policy.
+- WSL 2 is checked first. If WSL is missing or outdated, DL4MicEverywhere can install/update it automatically using Microsoft's official WSL commands, requesting Administrator permission only for the machine-level WSL step when needed. If no Ubuntu distribution is present afterwards, DL4MicEverywhere can install Ubuntu 24.04 LTS automatically.
+- Docker Desktop can then be installed automatically by DL4MicEverywhere in per-user mode, or installed manually if preferred.
+- DL4MicEverywhere installs missing Linux-side runtime utilities such as Tcl/Tk inside the selected Ubuntu distribution.
 
 ## Requirements
 - WSL (Windows Subsystem for Linux) - Pre-installed on most Windows 10/11 systems, otherwise it is available on the Microsoft store.
 - Install and/or update all the GPU [NVIDIA drivers](https://www.nvidia.com/download/index.aspx), [cudatoolkit](https://developer.nvidia.com/cuda-toolkit), and [cuDNN](https://developer.nvidia.com/cudnn) necessary for your GPU.  
 
-## 1. Docker Desktop installation
-Firstly, Docker Desktop needs to be installed on your computer. Follow the official guidelines: https://docs.docker.com/desktop/install/windows-install/:
- - During installation tick the recommended **WLS2** option.
- - To finalize the installation **Restart** the computer.
+## 1. WSL 2 prerequisite and automatic Ubuntu installation
 
-## 2. Setup the WSL (Windows Subsystem for Linux)
+DL4MicEverywhere requires a current WSL 2 installation on Windows. Docker Desktop currently requires WSL 2.1.5 or later. `Windows_launch.bat` now distinguishes a missing WSL runtime from a legacy/outdated installation instead of reporting both states as a version error.
 
-### 2.1. Install Ubuntu inside WSL
-Open a Command Line (cmd.exe) or PowerShell window and run:
- 
+If WSL is missing, the launcher offers to run Microsoft's official `wsl --install --no-distribution` command. Because first-time WSL 2 enablement can activate machine-level Windows virtualization components, Windows may show a UAC prompt. The launcher itself stays non-elevated; only Microsoft's `wsl.exe` prerequisite command is launched with Administrator permission. If the normal Store-backed path fails, the helper offers WSL's `--web-download` fallback. If Windows must restart to finish enabling WSL, DL4MicEverywhere offers to restart automatically or lets the user restart later.
+
+If WSL is installed but older than the required version, the launcher first attempts Microsoft's `wsl --update` as the normal Windows user. Only if that update cannot complete without elevation does it retry the WSL command with UAC. The `--web-download` fallback and restart handling are available for updates as well.
+
+Once WSL is current, `Windows_launch.bat` searches for an installed Ubuntu distribution. It prefers **Ubuntu-24.04** when several Ubuntu distributions are present, while continuing to support an existing Ubuntu installation rather than forcing a duplicate install.
+
+If no Ubuntu distribution is found, the launcher offers to install **Ubuntu-24.04** automatically. The installation flow:
+
+1. Confirms that `Ubuntu-24.04` is present in the WSL online distribution catalog.
+2. Asks for explicit user consent before installing anything.
+3. Uses Microsoft's supported `wsl --install --distribution Ubuntu-24.04 --no-launch` command.
+4. If the normal installation fails, offers a retry using WSL's `--web-download` mode.
+5. Returns to the Windows preflight, which checks whether Ubuntu already has a regular Linux user.
+6. If no regular user exists, asks the user to choose their own Ubuntu username, creates that normal `/home` account, lets Ubuntu's `passwd` command collect the password interactively, grants `sudo` access, and configures the account as the WSL default when possible. DL4MicEverywhere itself is never launched as `root`.
+7. Verifies the created account and continues with Docker setup.
+
+DL4MicEverywhere creates the Ubuntu account only after the user chooses the username; the password is entered directly into Ubuntu and is never stored by DL4MicEverywhere. The launcher does not change the user's global default WSL distribution.
+
+If automatic installation fails, the equivalent manual command is:
+
 ```
-wsl --install -d Ubuntu
-```
-
-This will install Ubuntu inside WSL.
-
-Once the installation ends it will ask for a username and a password. This is not necessary, exit the installation by using **Ctrl+C** or by closing the window.
-
-Re-open the Command Line or PowerShell window and run the command **again**, if the installation was sucessfull you should see the following message:
-
-![Ubuntu is sucessfully installed](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/WSL_UBUNTU_IS_INSTALLED.png)
-
-### 2.2. Make Ubuntu the default configuration
-
-Run the following command in the Command Line or PowerShell window to check what is the current default configuration.
-```
-wsl --list --verbose
-```
-
-The one with * is the default configuration. 
-
-![Ubuntu is the default configuration](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/WSL_UBUNTU.png)
-
-If it is not Ubuntu, it can be changed by using the command: 
-```
-wsl --set-default Ubuntu
+wsl --install -d Ubuntu-24.04
 ```
 
-### 2.3. TCL/TK installation 
+If an interrupted setup leaves Ubuntu installed with no regular Linux account, rerunning `Windows_launch.bat` will detect that state and offer the same guarded account-creation flow again.
 
-TCL/TK is required for the graphical user interface (GUI) of DL4MicEverywhere, and it must be installed inside WSL's Ubuntu.
+## 2. Docker Desktop installation
 
-This requires running the following commands in the Command Line or PowerShell window:
-```
-wsl sudo apt-get -y update
-```
-```
-wsl sudo apt-get -y install tk
-```
+DL4MicEverywhere uses Docker Desktop's WSL 2 backend on Windows. Current Docker Desktop versions support a **per-user installation** to `%LOCALAPPDATA%\Programs\DockerDesktop`, which does not require Windows Administrator privileges. The `Windows_launch.bat` launcher offers this installation automatically when Docker Desktop is missing.
 
-Now TCL/TK should be installed inside WSL's Ubuntu.
+After the distribution-level integration check succeeds, the Windows launcher also verifies Docker access as the actual non-root Ubuntu account that will run DL4MicEverywhere. If `/var/run/docker.sock` uses the standard `root:docker` group permissions and that account is not a member of `docker`, DL4MicEverywhere can add the account to the Linux `docker` group after explicit consent. The launcher never makes the socket world-writable and never adds the account to an unrelated privileged group.
 
-To check if TCL/TK is correctly installed run:
-```
-wsl wish
-```
-This should open a new window named Wish. If it fails repeat the previous steps again or create a [Issue](https://github.com/HenriquesLab/DL4MicEverywhere/issues/new/choose) letting us know your problem. 
+Once WSL 2 and Ubuntu are available, the automatic Docker path is:
+
+1. Ask for explicit acceptance of Docker's Subscription Service Agreement.
+2. Download Docker Desktop from Docker's official HTTPS endpoint.
+3. Validate the downloaded installer's Windows Authenticode signature and Docker signer identity.
+4. Install Docker Desktop with Docker's `--user --backend=wsl-2 --no-windows-containers` options.
+5. Start Docker Desktop and wait for the Docker engine.
+6. Verify Docker directly from the selected Ubuntu WSL 2 distribution.
+
+If you prefer to install Docker Desktop manually, follow Docker's official Windows instructions: https://docs.docker.com/desktop/setup/install/windows-install/ and choose the WSL 2 backend.
+
+## 3. Linux-side runtime requirements
+
+After the Windows preflight succeeds, DL4MicEverywhere launches its normal Linux-side requirements checks inside the selected Ubuntu distribution. Missing utilities required by the GUI and launcher, including Tcl/Tk and `net-tools`, are installed there by the existing requirements installation flow.
 
 </details>
 
@@ -88,7 +84,22 @@ This should open a new window named Wish. If it fails repeat the previous steps 
 
 ## 1. Docker Installation
 
-Firstly, Docker Desktop needs to be installed on your computer. Follow the official guideline: https://docs.docker.com/desktop/install/linux-install/
+DL4MicEverywhere uses **Docker Engine** on Linux (not Docker Desktop, whose virtual machine cannot use NVIDIA GPUs). If the `docker` command is missing, the launcher installs it automatically on Ubuntu/Debian from Docker's official apt repository, starts it at boot, and adds your user to the `docker` group (log out and back in afterwards). To install it manually, follow https://docs.docker.com/engine/install/ubuntu/ and https://docs.docker.com/engine/install/linux-postinstall/.
+
+DL4MicEverywhere never modifies an existing installation: if `docker` is already available it is used as it is, and if Ubuntu's own `docker.io`, `containerd`, `runc` or `podman-docker` packages are present, the automatic installation stops instead of replacing them.
+
+> ℹ️ Members of the `docker` group can control Docker with root-equivalent rights. On shared computers, an administrator may prefer [rootless Docker](https://docs.docker.com/engine/security/rootless/); DL4MicEverywhere does not set it up automatically.
+
+## 1b. GPU support (NVIDIA Container Toolkit)
+
+To use an NVIDIA GPU inside containers, Docker needs the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html). It works with any installed NVIDIA driver version (DL4MicEverywhere never installs drivers).
+
+- When DL4MicEverywhere installs Docker Engine itself and `nvidia-smi` works, the toolkit is installed and configured in the same step.
+- On an existing Docker installation, configuring the toolkit restarts Docker, which stops every running container, so DL4MicEverywhere only shows the commands. Run them yourself (or ask the administrator) when convenient:
+
+  ```bash
+  bash .tools/bash_tools/requirements_installation/nvidia_container_toolkit.sh --print-instructions
+  ```
 
 ## 2. Install Tcl/Tk for the DL4MicEverywhere graphical user interface
 
@@ -97,9 +108,8 @@ The only requirement to use the graphical user interface (GUI) is to have [Tcl/T
 Most Unix / Linux operating system distributions include Tcl and Tk. If not already installed, use your system's package manager to install the appropriate packages. For Ubuntu, use the following commands:
 
 ```
-sudo apt-get -y update
-sudo apt-get -y install tcl
-sudo apt-get -y install tk
+sudo apt-get update
+sudo apt-get install -y tcl tk
 ```
 
 </details>
@@ -107,114 +117,36 @@ sudo apt-get -y install tk
 <details>
 <summary>On Mac:</summary>
 
-## 1. Docker Installation
+## Automatic setup
 
-Firstly, Docker Desktop needs to be installed on your computer. Follow the official guideline: https://docs.docker.com/desktop/install/mac-install/
+The recommended path is to launch `MacOS_launch.command`. DL4MicEverywhere checks the following components and installs supported missing prerequisites:
 
-## 2. Install Tcl/Tk for the DL4MicEverywhere graphical user interface
+1. **Homebrew** — installed with Homebrew's official installer when missing. Apple Silicon and Intel default prefixes are discovered automatically; DL4MicEverywhere does not require `brew shellenv` or modify your shell startup files.
+2. **Tcl/Tk** — `brew install tcl-tk` is used when no current `wish` GUI executable is available. The Tcl/Tk 8.5 bundled with macOS (`/usr/bin/wish`) does not count, because macOS 15 and later refuse to launch it.
+3. **Docker Desktop** — DL4MicEverywhere downloads the current stable `Docker.dmg` directly from Docker's architecture-specific official endpoint (`arm64` for Apple Silicon, `amd64` for Intel), verifies the disk image with `hdiutil verify`, and invokes Docker's supported command-line installer. The Docker license is not accepted automatically.
 
-The only requirement to use the graphical user interface (GUI) is to have [Tcl/Tk](https://www.tcl.tk/) installed on your computer.
+After installation, DL4MicEverywhere refreshes its own PATH and continues. A full Mac restart is not required for these components. If Docker Desktop is starting for the first time, complete Docker's onboarding/license dialog and wait for the engine to become ready.
 
-Most Mac OS X operating system distributions include Tcl/Tk. If not already installed, you will receive an error similar to the following:
+## Manual setup
 
-```
-DEPRECATION WARNING: The system version of Tk is deprecated and may be removed in a future release. Please don't rely on it. Set TK_SILENCE_DEPRECATION=1 to suppress this warning.
-```
-you can install or update the appropriate packages in two different ways:
+If you prefer to install the prerequisites yourself:
 
- * Option 1: Using Homebrew:
-   Reinstall your tcl-tk packages
-   ```
-   brew uninstall tcl-tk
-   brew install tcl-tk
-   ```
+- Follow Docker's current macOS installation guide: https://docs.docker.com/desktop/setup/install/mac-install/
+- Install Homebrew from https://brew.sh/ if required.
+- Install Tcl/Tk with:
 
-   **Note**: If you don't have the `brew` command, install [Homebrew](https://brew.sh/) by running the following command in your terminal:
-   ```
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
+  ```bash
+  brew install tcl-tk
+  ```
 
- * Option 2: Using a package installation:
-   
-   Go to https://www.tcl.tk/software/tcltk/ and click on the Active Tcl [link](https://www.activestate.com/products/tcl/): 
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_01.png" 
-     alt="Main window"
-     width="80%" 
-     height="80%" />
-
-   In this case, as you are using macOS, click on the macOS option:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_02_Mac.png" 
-     alt="Main window"
-     width="80%" 
-     height="80%" />
-
-   Then, you can create an account, or continue to download without an account, to be able to download the installation file:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_03.png" 
-     alt="Main window"
-     width="80%" 
-     height="80%" />
-
-   Afterwards this window will be shown. Don't worry. Click on **View all Available Builds**:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_04_Mac.png" 
-     alt="Main window"
-     width="80%" 
-     height="80%" />
-
-   and then click on the **Download** button to get the `.pkg` file:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_05_Mac.png" 
-     alt="Main window"
-     width="80%" 
-     height="80%" />
-
-   Then, find the package that you have downloaded:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_06_Mac.png" 
-     alt="Main window"
-     width="60%" 
-     height="60%" />
-
-   and after double-clicking, an installation window will pop up. Click on **Continue** to start the installation:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_07_Mac.png" 
-     alt="Main window"
-     width="60%" 
-     height="60%" />
-
-   Click on **Continue** to go to the **License** step:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_08_Mac.png" 
-     alt="Main window"
-     width="60%" 
-     height="60%" />
-
-   Click on **Agree**:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_09_Mac.png" 
-     alt="Main window"
-     width="60%" 
-     height="60%" />
-
-   Click on **Install** to start the installation:
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_10_Mac.png" 
-     alt="Main window"
-     width="60%" 
-     height="60%" />
-
-   The installation has been completed, click on **Close** and everything should be ready.
-
-   <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/TCL_11_Mac.png" 
-     alt="Main window"
-     width="60%" 
-     height="60%" />
+Then launch `MacOS_launch.command` again. DL4MicEverywhere detects both `/opt/homebrew` (Apple Silicon) and `/usr/local` (Intel) automatically.
 
 </details>
 
 &nbsp;
 
 Once you have followed all these steps, you are ready to run DL4MicEverywhere - the last step to continue is [downloading the DL4MicEverywhere repository](USER_GUIDE.md#download-dl4miceverywhere-repository) on the **User Guide**.
+
+### Restart after prerequisite installation
+
+When DL4MicEverywhere installs missing host prerequisites, it may recommend a restart before continuing. On Windows/WSL, **Restart Now** requests a restart of the Windows host (not only the WSL distribution), while **Restart Later** exits the launcher cleanly so Windows can be restarted manually. Neither choice is treated as an installation failure.

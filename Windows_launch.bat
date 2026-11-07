@@ -1,116 +1,1224 @@
-@echo off 
-@setlocal
+@echo off
+setlocal EnableExtensions
 
-rem Get the full path of the script
+rem =============================================================================
+rem DL4MicEverywhere - Windows launcher
+rem WSL-first preflight with optional Ubuntu and per-user Docker Desktop installation.
+rem
+rem   1. Check WSL and discover/install a usable WSL 2 Ubuntu distribution.
+rem   2. Discover Docker Desktop. If missing, offer Docker's supported per-user
+rem      installation mode (no Windows Administrator privileges required).
+rem   3. Check that Ubuntu can directly use Docker Desktop.
+rem   4. Launch Linux_launch.sh / the GUI.
+rem
+rem The launcher itself stays non-elevated. If WSL must be installed or updated,
+rem it asks for consent and elevates only Microsoft's WSL command through UAC.
+rem Docker Desktop settings are never changed silently and Docker's license is
+rem never accepted without explicit user consent.
+rem =============================================================================
+
 set "SCRIPT_PATH=%~dp0"
-
-rem Remove the trailing backslash (if any)
 if "%SCRIPT_PATH:~-1%"=="\" set "SCRIPT_PATH=%SCRIPT_PATH:~0,-1%"
-
-rem Set the BASEDIR variable
 set "BASEDIR=%SCRIPT_PATH%"
+set "DL4ME_WINDOWS_TOOLS=%BASEDIR%\.tools\windows_tools"
+set "WSL_UTF8=1"
+set "DOCKER_DESKTOP_EXE="
+set "DOCKER_EXE="
+set "UBUNTU_DISTRO="
+set "UBUNTU_USER="
+set "PREFERRED_UBUNTU_DISTRO=Ubuntu-24.04"
 
-rem Temporary disable echo for cleaner output
-@REM echo BASEDIR is %BASEDIR%
-
-set WSL_UTF8=1
-setlocal enabledelayedexpansion
-
-set defaultdist=none
-set /A isubuntu=0
-set /A defaultubuntu=0
-
-if not exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" (
-  :: Download Docker Desktop
-  bitsadmin.exe /transfer "DownloadDocker" "https://desktop.docker.com/win/main/amd64/136059/Docker Desktop Installer.exe" "%temp%\DockerDesktopInstaller.exe"
-  :: Install it
-  powershell -Command Start-Process "%temp%\DockerDesktopInstaller.exe" -Wait install
-
-  :: Ask the user to restart its computer
-  echo 
-  echo ------------------------------------------------------------------------------------
-  echo Docker Desktop installation completed!
-  echo To ensure that all the changes are properly applied, please restart your computer.
-  echo Then click the Windows_launcher.
-  echo ------------------------------------------------------------------------------------
-  pause
-  exit
-)
-
-:: Check if WSL is installed
-for /f "tokens=* USEBACKQ skip=1" %%g in (`wsl --status`) do (set wslworking=%%g)
-
-:: In case is not installed, install it
-if ["%wslworking%"]==[""] (
-  wsl --install Ubuntu
-  
-  :: Ask the user to restart its computer
-  echo 
-  echo ------------------------------------------------------------------------------------
-  echo Ubuntu in WSL installation completed!
-  echo To ensure that all the changes are properly applied, please restart your computer. 
-  echo Then click the Windows_launcher.
-  echo ------------------------------------------------------------------------------------
-  pause
-  exit
-)
-
-:: Go trough all the WSL distributions in your computer
-for /f "tokens=* USEBACKQ skip=1" %%F in (`wsl --list`) do (
-
-  :: Get distribution name
-  set "dist=%%F"
-
-  :: Remove the word last parentheses in that name (that will be the default distribution)
-  set "withoutparentheses=!dist:)=!"
-  :: Check if the distrubution name contained paretheses (if so it is the default distribuition)
-  if not !dist!==!withoutparentheses! set defaultdist=!dist!
-
-  :: Remove the word Ubuntu in default distribution
-  set "defaultubuntuless=!defaultdist:Ubuntu=!"
-  :: Check if the default distrubution name contained Ubuntu
-  if not !defaultdist!==!defaultubuntuless! set /A defaultubuntu=1
-  
-  :: Remove the word Ubuntu in the distribution name
-  set "ubuntuless=!dist:Ubuntu=!"
-  :: Check if the distrubution name contained Ubuntu
-  if not !dist!==!ubuntuless! set /A isubuntu=1
-)
-
-:: First check if Ubuntu is installed
-if %isubuntu%==0 (
-  :: If it is not installed, install Ubuntu
-  wsl --install Ubuntu
-  wsl --set-default Ubuntu
-
-  :: Ask the user to restart its computer
-  echo 
-  echo ------------------------------------------------------------------------------------
-  echo Ubuntu in WSL installation completed!
-  echo To ensure that all the changes are properly applied, please restart your computer. 
-  echo Then click the Windows_launcher.
-  echo ------------------------------------------------------------------------------------
-  pause
-  exit
-) else (
-  :: If it is intalled, check if it is the default distribution
-  if %defaultubuntu%==0 (  
-    :: If not, set as the default one
-    wsl --set-default Ubuntu
-  )
-)
-
-
-rem At this point Ubuntu is installed and set as the default distribution, run the Linux_launch.sh inside the WSL
 cd /d "%BASEDIR%"
 
-:: It might happen that by downloading it through 'git clone', the format of the files is on DOS/Windows.
-:: We need it in a Unix/Linux format, that is why we need to install dos2unix if needed and use it.
-wsl -d Ubuntu if command -v dos2unix -h 2>nul; then echo "dos2unix already installed."; else echo "Installing dos2unix..."; apt-get -y update; apt-get -y install dos2unix; fi
+call :print_header
 
-:: Check if for example Linux_launch.sh is on DOS format, and if so use dos2unix to convert it
-wsl -d Ubuntu if [[ -n $(dos2unix --info=c "Linux_launch.sh") ]] ; then echo "Converting your files to Linux format..."; find . -type f -exec dos2unix -q '{}' '+'; fi
+rem Prepare every bundled PowerShell helper before executing any .ps1 file.
+rem ZIP downloads can propagate Mark-of-the-Web (Zone.Identifier) to extracted
+rem scripts. Under RemoteSigned that blocks unsigned helpers even when this
+rem launcher requests -ExecutionPolicy Bypass, because managed policy wins.
+rem The bootstrap itself is an inline PowerShell command, so it can safely
+rem remove and verify those marks before the first script-file invocation.
+call :prepare_powershell_helpers
+set "POWERSHELL_HELPER_RESULT=%ERRORLEVEL%"
+if "%POWERSHELL_HELPER_RESULT%"=="0" goto :check_wsl
+if "%POWERSHELL_HELPER_RESULT%"=="2" goto :powershell_policy_unsupported
+if "%POWERSHELL_HELPER_RESULT%"=="3" goto :powershell_helpers_still_blocked
+goto :powershell_helpers_unavailable
 
-:: At this point Ubuntu is installed and as the default distribution, run the launch.sh inside the WSL
+rem =============================================================================
+rem 1. WSL and Ubuntu discovery. The launcher itself remains non-elevated. If
+rem    WSL is missing or outdated, a dedicated helper asks for consent and uses
+rem    UAC only for Microsoft's official install/update command.
+rem =============================================================================
 
-wsl -d Ubuntu bash -E Linux_launch.sh
+:check_wsl
+echo [1/4] Checking Windows Subsystem for Linux and Ubuntu...
+
+rem Current Docker Desktop requires WSL 2.1.5 or later for its WSL backend.
+rem The helper distinguishes three important states:
+rem   0 = modern WSL is ready, 2 = legacy/outdated WSL, 3 = WSL not installed.
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\check_wsl_version.ps1"
+set "WSL_VERSION_RESULT=%ERRORLEVEL%"
+if "%WSL_VERSION_RESULT%"=="0" goto :query_wsl_distributions
+if "%WSL_VERSION_RESULT%"=="2" goto :wsl_update_required
+if "%WSL_VERSION_RESULT%"=="3" goto :wsl_not_installed
+goto :wsl_detection_failed
+
+:query_wsl_distributions
+wsl.exe --list --quiet >nul 2>&1
+if not "%ERRORLEVEL%"=="0" goto :wsl_not_ready
+
+call :discover_ubuntu
+if not defined UBUNTU_DISTRO goto :ubuntu_not_found
+
+goto :verify_ubuntu
+
+:verify_ubuntu
+echo       Ubuntu distribution found: %UBUNTU_DISTRO%
+
+rem Root is used only for this tiny readiness probe so it does not depend on
+rem the normal user's shell, profile, or systemd user session.  Run the probe
+rem from Linux / rather than inheriting the Windows launcher's current directory.
+rem The PowerShell helper preserves WSL stderr so failures are diagnosable.
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\wsl_readiness.ps1" -Action direct -Distro %UBUNTU_DISTRO%
+set "UBUNTU_READINESS_RESULT=%ERRORLEVEL%"
+if not "%UBUNTU_READINESS_RESULT%"=="0" goto :ubuntu_not_ready
+
+rem Docker Desktop integration requires this exact distribution to use WSL 2.
+rem Query WSL itself instead of inferring the generation from the Linux kernel
+rem release string.  The helper normalizes WSL's Unicode/NUL output and returns:
+rem   0 = WSL 2, 2 = WSL 1, 3 = distro not found, 4/10 = query/parse failure.
+if not exist "%BASEDIR%\.tools\windows_tools\check_wsl_distribution_version.ps1" goto :wsl_version_helper_missing
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\check_wsl_distribution_version.ps1" -Distribution %UBUNTU_DISTRO%
+set "UBUNTU_WSL_VERSION_RESULT=%ERRORLEVEL%"
+if "%UBUNTU_WSL_VERSION_RESULT%"=="2" goto :ubuntu_convert_to_wsl2
+if not "%UBUNTU_WSL_VERSION_RESULT%"=="0" goto :ubuntu_wsl_version_unknown
+
+rem Resolve the configured non-root Linux account explicitly. Some WSL states
+rem can retain a stale UID-1000 default even when the valid Ubuntu user has a
+rem different UID (for example 1001), which can produce stale default-user relay errors.
+rem If discovery cannot find a usable account, hand off to the guarded account
+rem setup helper. That helper independently refuses to create a new account when
+rem Ubuntu already contains regular /home users, so ambiguous existing installs
+rem are never modified or guessed.
+if not exist "%BASEDIR%\.tools\windows_tools\discover_ubuntu_user.ps1" goto :ubuntu_user_helper_missing
+call :discover_ubuntu_user
+set "UBUNTU_USER_DISCOVERY_RESULT=%ERRORLEVEL%"
+if not "%UBUNTU_USER_DISCOVERY_RESULT%"=="0" goto :ubuntu_user_setup_required
+
+echo       Ubuntu user: %UBUNTU_USER%
+echo       Ubuntu: ready (WSL 2).
+goto :check_docker
+
+rem =============================================================================
+rem 2. Docker Desktop discovery / optional per-user installation
+rem =============================================================================
+
+:check_docker
+echo.
+echo [2/4] Checking Docker Desktop...
+
+call :discover_docker
+if not defined DOCKER_DESKTOP_EXE goto :docker_not_installed
+if not defined DOCKER_EXE goto :docker_not_installed
+
+"%DOCKER_EXE%" info >nul 2>&1
+if "%ERRORLEVEL%"=="0" (
+    echo       Docker Desktop: ready.
+    goto :check_docker_integration
+)
+
+echo       Docker Desktop is installed but is not running yet.
+echo       Starting Docker Desktop...
+start "" "%DOCKER_DESKTOP_EXE%"
+
+call :wait_for_docker
+if not "%ERRORLEVEL%"=="0" goto :docker_not_ready
+
+echo       Docker Desktop: ready.
+goto :check_docker_integration
+
+:prepare_powershell_helpers
+echo Checking bundled Windows helpers...
+if not exist "%DL4ME_WINDOWS_TOOLS%\" exit /b 4
+
+powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $effectivePolicy = Get-ExecutionPolicy; if ($effectivePolicy -in @('AllSigned', 'Restricted')) { Write-Host ('Windows PowerShell policy ' + $effectivePolicy + ' requires signed scripts or forbids script files.'); exit 2 }; $files = @(Get-ChildItem -LiteralPath $env:DL4ME_WINDOWS_TOOLS -Recurse -Filter '*.ps1' -File -ErrorAction Stop); if ($files.Count -eq 0) { Write-Host 'No bundled PowerShell helpers were found.'; exit 4 }; $blocked = New-Object System.Collections.Generic.List[string]; foreach ($file in $files) { $zone = Get-Item -LiteralPath $file.FullName -Stream Zone.Identifier -ErrorAction SilentlyContinue; if ($null -eq $zone) { continue }; try { Unblock-File -LiteralPath $file.FullName -ErrorAction Stop } catch { }; $zone = Get-Item -LiteralPath $file.FullName -Stream Zone.Identifier -ErrorAction SilentlyContinue; if ($null -ne $zone) { try { Remove-Item -LiteralPath $file.FullName -Stream Zone.Identifier -Force -ErrorAction Stop } catch { }; $zone = Get-Item -LiteralPath $file.FullName -Stream Zone.Identifier -ErrorAction SilentlyContinue }; if ($null -ne $zone) { [void]$blocked.Add($file.FullName) } }; if ($blocked.Count -gt 0) { Write-Host 'ERROR: Windows still marks these bundled PowerShell helpers as downloaded from the Internet:' -ForegroundColor Red; foreach ($path in $blocked) { Write-Host ('  ' + $path) -ForegroundColor Red }; exit 3 }; Write-Host ('      PowerShell helpers: ready (' + $files.Count + ' checked).'); exit 0"
+exit /b %ERRORLEVEL%
+
+:discover_ubuntu
+set "UBUNTU_DISTRO="
+
+rem Do not parse `wsl --list --quiet` directly in cmd.exe.  Some WSL/Windows
+rem combinations expose embedded NUL/BOM characters when that output is piped,
+rem producing a visually correct but invalid distribution name.  Normalize it
+rem in PowerShell before returning a single ASCII-safe name to this launcher.
+if not exist "%BASEDIR%\.tools\windows_tools\discover_ubuntu_wsl.ps1" exit /b 1
+for /f "usebackq delims=" %%D in (`powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\discover_ubuntu_wsl.ps1" -PreferredDistribution %PREFERRED_UBUNTU_DISTRO%`) do if not defined UBUNTU_DISTRO set "UBUNTU_DISTRO=%%D"
+exit /b 0
+
+:discover_ubuntu_user
+set "UBUNTU_USER="
+set "UBUNTU_USER_DISCOVERY_RESULT=10"
+set "UBUNTU_USER_OUTPUT=%TEMP%\dl4me_ubuntu_user.txt"
+if exist "%UBUNTU_USER_OUTPUT%" del /q "%UBUNTU_USER_OUTPUT%" >nul 2>&1
+
+rem Resolve the Linux username in PowerShell while probing the distribution as
+rem root. The helper validates /etc/wsl.conf first and deliberately does not
+rem assume that the normal account has UID 1000. Preserve its exit code so the
+rem caller can distinguish a never-initialized distro from an ambiguous account.
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\discover_ubuntu_user.ps1" -Distribution %UBUNTU_DISTRO% > "%UBUNTU_USER_OUTPUT%"
+set "UBUNTU_USER_DISCOVERY_RESULT=%ERRORLEVEL%"
+if not "%UBUNTU_USER_DISCOVERY_RESULT%"=="0" goto :discover_ubuntu_user_cleanup
+for /f "usebackq delims=" %%U in ("%UBUNTU_USER_OUTPUT%") do if not defined UBUNTU_USER set "UBUNTU_USER=%%U"
+if defined UBUNTU_USER goto :discover_ubuntu_user_cleanup
+set "UBUNTU_USER_DISCOVERY_RESULT=10"
+
+:discover_ubuntu_user_cleanup
+if exist "%UBUNTU_USER_OUTPUT%" del /q "%UBUNTU_USER_OUTPUT%" >nul 2>&1
+exit /b %UBUNTU_USER_DISCOVERY_RESULT%
+
+:discover_docker
+set "DOCKER_DESKTOP_EXE="
+set "DOCKER_EXE="
+
+rem Docker Desktop per-user installation (recommended by Docker).
+if exist "%LOCALAPPDATA%\Programs\DockerDesktop\Docker Desktop.exe" set "DOCKER_DESKTOP_EXE=%LOCALAPPDATA%\Programs\DockerDesktop\Docker Desktop.exe"
+if exist "%LOCALAPPDATA%\Programs\DockerDesktop\resources\bin\docker.exe" set "DOCKER_EXE=%LOCALAPPDATA%\Programs\DockerDesktop\resources\bin\docker.exe"
+
+rem Traditional all-users installation.
+if not defined DOCKER_DESKTOP_EXE if exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" set "DOCKER_DESKTOP_EXE=C:\Program Files\Docker\Docker\Docker Desktop.exe"
+if not defined DOCKER_EXE if exist "C:\Program Files\Docker\Docker\resources\bin\docker.exe" set "DOCKER_EXE=C:\Program Files\Docker\Docker\resources\bin\docker.exe"
+
+rem Last-resort CLI discovery. A Desktop executable is still required because
+rem DL4MicEverywhere needs Docker Desktop's WSL 2 backend on Windows.
+if not defined DOCKER_EXE (
+    for /f "delims=" %%D in ('where docker.exe 2^>nul') do if not defined DOCKER_EXE set "DOCKER_EXE=%%D"
+)
+exit /b 0
+
+rem =============================================================================
+rem Install Docker Desktop per-user if it is not present.
+rem =============================================================================
+
+:docker_not_installed
+echo.
+echo Docker Desktop was not found.
+echo.
+echo DL4MicEverywhere can install Docker Desktop for this Windows user only,
+echo using Docker's WSL 2 backend. This per-user installation does not require
+echo Administrator privileges. You will be asked to review and explicitly agree
+echo to Docker's Subscription Service Agreement before anything is downloaded.
+echo.
+
+if not exist "%BASEDIR%\.tools\windows_tools\install_docker_desktop_per_user.ps1" goto :docker_install_helper_missing
+
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\install_docker_desktop_per_user.ps1"
+set "DOCKER_INSTALL_RESULT=%ERRORLEVEL%"
+
+if "%DOCKER_INSTALL_RESULT%"=="0" goto :docker_install_completed
+if "%DOCKER_INSTALL_RESULT%"=="2" goto :docker_install_cancelled
+if "%DOCKER_INSTALL_RESULT%"=="10" goto :docker_download_failed
+if "%DOCKER_INSTALL_RESULT%"=="11" goto :docker_signature_invalid
+if "%DOCKER_INSTALL_RESULT%"=="12" goto :docker_install_failed
+if "%DOCKER_INSTALL_RESULT%"=="13" goto :docker_architecture_unsupported
+goto :docker_install_failed
+
+:docker_install_completed
+echo.
+echo       Docker Desktop installation completed. Rediscovering Docker...
+call :discover_docker
+if not defined DOCKER_DESKTOP_EXE goto :docker_installed_not_found
+if not defined DOCKER_EXE goto :docker_installed_not_found
+
+echo       Starting Docker Desktop...
+start "" "%DOCKER_DESKTOP_EXE%"
+call :wait_for_docker
+if not "%ERRORLEVEL%"=="0" goto :docker_not_ready
+
+echo       Docker Desktop: ready.
+goto :check_docker_integration
+
+rem =============================================================================
+rem 3. Docker Desktop WSL integration
+rem =============================================================================
+
+:check_docker_integration
+rem Advisory only: warn when an old Docker Desktop may break GPU passthrough.
+rem Docker Desktop is never updated automatically.
+if not exist "%BASEDIR%\.tools\windows_tools\check_docker_desktop_version.ps1" goto :check_docker_integration_probe
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\check_docker_desktop_version.ps1" -DockerExe "%DOCKER_EXE%"
+if "%ERRORLEVEL%"=="2" goto :docker_update_requested
+
+:check_docker_integration_probe
+echo.
+echo [3/4] Checking Docker Desktop integration with %UBUNTU_DISTRO%...
+
+rem Docker Desktop WSL integration is installed at the distribution level. Probe
+rem it as root first so this check is independent of the distro's normal-user UID
+rem and avoids WSL's stale implicit-UID relay path. Then verify that the resolved
+rem non-root account can also use Docker; the application itself runs as that user.
+wsl.exe -d %UBUNTU_DISTRO% -u root --cd / --exec /usr/bin/env docker info >nul 2>&1
+if not "%ERRORLEVEL%"=="0" goto :docker_wsl_integration_missing
+
+if not exist "%BASEDIR%\.tools\windows_tools\ensure_ubuntu_docker_user_access.ps1" goto :docker_user_access_helper_missing
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\ensure_ubuntu_docker_user_access.ps1" -Distribution %UBUNTU_DISTRO% -User %UBUNTU_USER%
+set "DOCKER_USER_ACCESS_RESULT=%ERRORLEVEL%"
+if "%DOCKER_USER_ACCESS_RESULT%"=="0" goto :docker_integration_ready
+if "%DOCKER_USER_ACCESS_RESULT%"=="2" goto :docker_user_access_cancelled
+if "%DOCKER_USER_ACCESS_RESULT%"=="3" goto :docker_wsl_integration_missing
+goto :docker_user_access_failed
+
+:docker_integration_ready
+echo       Docker integration: ready for %UBUNTU_USER%.
+
+rem =============================================================================
+rem 4. Launch DL4MicEverywhere
+rem =============================================================================
+
+:launch_application
+echo.
+echo [4/4] Starting DL4MicEverywhere using %UBUNTU_DISTRO%...
+echo.
+
+wsl.exe -d %UBUNTU_DISTRO% -u %UBUNTU_USER% --exec /usr/bin/env DL4ME_WINDOWS_WRAPPER=1 /bin/bash -E Linux_launch.sh
+set "LAUNCH_RESULT=%ERRORLEVEL%"
+
+if "%LAUNCH_RESULT%"=="0" exit /b 0
+if "%LAUNCH_RESULT%"=="42" goto :complete_uninstall
+if "%LAUNCH_RESULT%"=="90" goto :restart_later
+if "%LAUNCH_RESULT%"=="91" goto :restart_scheduled
+if "%LAUNCH_RESULT%"=="92" goto :gui_closed
+if "%LAUNCH_RESULT%"=="93" goto :update_complete
+if "%LAUNCH_RESULT%"=="94" goto :operation_cancelled
+if "%LAUNCH_RESULT%"=="95" goto :historical_image_unavailable
+if "%LAUNCH_RESULT%"=="96" goto :input_invalid
+if "%LAUNCH_RESULT%"=="97" goto :dependency_failed
+if "%LAUNCH_RESULT%"=="98" goto :docker_image_failed
+if "%LAUNCH_RESULT%"=="99" goto :post_build_failed
+if "%LAUNCH_RESULT%"=="100" goto :container_runtime_failed
+if "%LAUNCH_RESULT%"=="101" goto :update_failed
+if "%LAUNCH_RESULT%"=="102" goto :uninstall_failed
+if "%LAUNCH_RESULT%"=="103" goto :linux_prerequisite_failed
+if "%LAUNCH_RESULT%"=="104" goto :port_unavailable
+
+goto :launch_failed
+
+rem =============================================================================
+rem Wait only when Docker Desktop was just started. Fresh first launch can take
+rem longer than a normal restart, so allow up to two minutes.
+rem =============================================================================
+
+:wait_for_docker
+set /a DOCKER_WAIT_ATTEMPT=0
+
+:wait_for_docker_loop
+"%DOCKER_EXE%" info >nul 2>&1
+if "%ERRORLEVEL%"=="0" exit /b 0
+
+set /a DOCKER_WAIT_ATTEMPT+=1
+if %DOCKER_WAIT_ATTEMPT% GEQ 60 exit /b 1
+
+timeout /t 2 /nobreak >nul
+goto :wait_for_docker_loop
+
+rem =============================================================================
+rem Normal uninstall handoff from Linux_launch.sh
+rem =============================================================================
+
+:complete_uninstall
+echo.
+echo DL4MicEverywhere is ready to be removed.
+echo The DL4MicEverywhere application folder will now be deleted.
+
+set "DL4ME_UNINSTALL_DIR=%BASEDIR%"
+cd /d "%TEMP%"
+start "" /b powershell -NoProfile -WindowStyle Hidden -Command "Start-Sleep -Milliseconds 750; Remove-Item -LiteralPath $env:DL4ME_UNINSTALL_DIR -Recurse -Force" >nul 2>&1
+exit /b 0
+
+rem =============================================================================
+rem Clear prerequisite / installation messages
+rem =============================================================================
+
+:powershell_policy_unsupported
+echo.
+echo DL4MicEverywhere cannot run its bundled Windows PowerShell helpers because
+echo this computer enforces an execution policy that requires signed scripts or
+echo forbids script files.
+echo.
+echo DL4MicEverywhere does not weaken or override managed Windows security policy.
+echo If this computer is managed by your organization, ask IT whether the bundled
+echo helpers can be allowed or signed for this computer.
+echo.
+pause
+exit /b 1
+
+:powershell_helpers_still_blocked
+echo.
+echo DL4MicEverywhere found Windows Internet security marks on one or more bundled
+echo PowerShell helpers and could not remove them automatically.
+echo.
+echo No PowerShell helper was executed. File permissions or endpoint security
+echo software may be preventing removal of the Zone.Identifier stream.
+echo Review the specific file paths printed above and try DL4MicEverywhere again
+echo after the Windows security restriction has been resolved.
+echo.
+pause
+exit /b 1
+
+:powershell_helpers_unavailable
+echo.
+echo DL4MicEverywhere could not prepare its bundled Windows PowerShell helpers.
+echo The helper folder may be missing, unreadable, or blocked by Windows security.
+echo Please use a complete DL4MicEverywhere download and try again.
+echo.
+pause
+exit /b 1
+
+:wsl_not_installed
+echo.
+echo Windows Subsystem for Linux is not installed or its Windows components are not
+echo enabled yet.
+echo.
+echo DL4MicEverywhere can install WSL automatically using Microsoft's official
+echo installer. Windows will request Administrator permission because enabling WSL 2
+echo can require machine-level virtualization components. Only Microsoft's WSL
+echo command is elevated; DL4MicEverywhere itself remains a normal user process.
+echo.
+
+if not exist "%BASEDIR%\.tools\windows_tools\install_or_update_wsl.ps1" goto :wsl_install_helper_missing
+
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\install_or_update_wsl.ps1" -Operation Install
+set "WSL_PREREQUISITE_RESULT=%ERRORLEVEL%"
+if "%WSL_PREREQUISITE_RESULT%"=="0" goto :check_wsl
+if "%WSL_PREREQUISITE_RESULT%"=="2" goto :wsl_install_cancelled
+if "%WSL_PREREQUISITE_RESULT%"=="10" goto :wsl_install_failed
+if "%WSL_PREREQUISITE_RESULT%"=="11" goto :wsl_install_unsupported
+if "%WSL_PREREQUISITE_RESULT%"=="12" goto :wsl_restart_required
+if "%WSL_PREREQUISITE_RESULT%"=="13" goto :wsl_version_still_too_old
+if "%WSL_PREREQUISITE_RESULT%"=="20" goto :wsl_restart_scheduled
+goto :wsl_install_failed
+
+:wsl_update_required
+echo.
+echo The installed Windows Subsystem for Linux is older than the version required by
+echo Docker Desktop.
+echo.
+echo DL4MicEverywhere can update WSL automatically using Microsoft's official
+echo updater. Windows may request Administrator permission; only the WSL update
+echo command is elevated.
+echo.
+
+if not exist "%BASEDIR%\.tools\windows_tools\install_or_update_wsl.ps1" goto :wsl_install_helper_missing
+
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\install_or_update_wsl.ps1" -Operation Update
+set "WSL_PREREQUISITE_RESULT=%ERRORLEVEL%"
+if "%WSL_PREREQUISITE_RESULT%"=="0" goto :check_wsl
+if "%WSL_PREREQUISITE_RESULT%"=="2" goto :wsl_update_cancelled
+if "%WSL_PREREQUISITE_RESULT%"=="10" goto :wsl_update_failed
+if "%WSL_PREREQUISITE_RESULT%"=="11" goto :wsl_install_unsupported
+if "%WSL_PREREQUISITE_RESULT%"=="12" goto :wsl_restart_required
+if "%WSL_PREREQUISITE_RESULT%"=="13" goto :wsl_version_still_too_old
+if "%WSL_PREREQUISITE_RESULT%"=="20" goto :wsl_restart_scheduled
+goto :wsl_update_failed
+
+:wsl_detection_failed
+echo.
+echo DL4MicEverywhere could not determine the Windows Subsystem for Linux state.
+echo.
+echo Please run "wsl --version" and "wsl --status" in PowerShell or Command Prompt
+echo to inspect the WSL installation, then run Windows_launch.bat again.
+echo.
+pause
+exit /b 1
+
+:wsl_install_cancelled
+echo.
+echo WSL installation was cancelled. No Windows WSL installation was started.
+echo You can run Windows_launch.bat again whenever you are ready.
+echo.
+pause
+exit /b 0
+
+:wsl_update_cancelled
+echo.
+echo WSL update was cancelled. DL4MicEverywhere requires WSL 2.1.5 or later.
+echo You can run Windows_launch.bat again whenever you are ready.
+echo.
+pause
+exit /b 0
+
+:wsl_install_failed
+echo.
+echo The automatic Windows Subsystem for Linux installation did not complete.
+echo DL4MicEverywhere used Microsoft's official "wsl --install --no-distribution"
+echo path and also offered the --web-download fallback when appropriate.
+echo.
+echo Review any message shown by Windows, then run Windows_launch.bat again.
+echo.
+pause
+exit /b 1
+
+:wsl_update_failed
+echo.
+echo The automatic Windows Subsystem for Linux update did not complete.
+echo DL4MicEverywhere used Microsoft's official "wsl --update" command and also
+echo offered the --web-download fallback when appropriate.
+echo.
+echo Review any message shown by Windows, then run Windows_launch.bat again.
+echo.
+pause
+exit /b 1
+
+:wsl_install_unsupported
+echo.
+echo This Windows installation does not provide a usable wsl.exe installer command.
+echo Automatic WSL installation is therefore not available on this Windows version.
+echo.
+echo Please install all current Windows updates and try Windows_launch.bat again.
+echo.
+pause
+exit /b 1
+
+:wsl_restart_required
+echo.
+echo The WSL installation/update completed, but Windows must restart before WSL 2 is
+echo ready. You chose not to restart automatically, or Windows could not schedule
+echo the restart.
+echo.
+echo Please restart Windows, then run Windows_launch.bat again.
+echo.
+pause
+exit /b 0
+
+:wsl_restart_scheduled
+echo.
+echo WSL installation/update completed and a Windows restart was requested.
+echo After Windows restarts, run Windows_launch.bat again to continue setup.
+echo.
+exit /b 0
+
+:wsl_version_still_too_old
+echo.
+echo WSL was installed/updated successfully, but the detected version is still older
+echo than the Docker Desktop requirement of WSL 2.1.5.
+echo.
+echo Install all pending Windows updates and run Windows_launch.bat again.
+echo.
+pause
+exit /b 1
+
+:wsl_install_helper_missing
+echo.
+echo The DL4MicEverywhere WSL installation/update helper is missing from this copy
+echo of the repository. Please download a complete DL4MicEverywhere release and try again.
+echo.
+pause
+exit /b 1
+
+:wsl_not_ready
+echo.
+echo Windows Subsystem for Linux is installed, but Windows could not query its
+echo distributions successfully.
+echo.
+echo Please open WSL or Ubuntu once from the Windows Start menu and complete any
+echo pending Windows/Ubuntu setup, then run Windows_launch.bat again.
+echo.
+pause
+exit /b 1
+
+:ubuntu_not_found
+echo.
+echo Windows Subsystem for Linux is available, but no Ubuntu distribution was found.
+echo.
+echo DL4MicEverywhere can install %PREFERRED_UBUNTU_DISTRO% automatically using
+echo Microsoft's official WSL installation mechanism.
+echo.
+
+if not exist "%BASEDIR%\.tools\windows_tools\install_ubuntu_wsl.ps1" goto :ubuntu_install_helper_missing
+
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\install_ubuntu_wsl.ps1" -Distribution %PREFERRED_UBUNTU_DISTRO%
+set "UBUNTU_INSTALL_RESULT=%ERRORLEVEL%"
+
+if "%UBUNTU_INSTALL_RESULT%"=="0" goto :ubuntu_install_completed
+if "%UBUNTU_INSTALL_RESULT%"=="2" goto :ubuntu_install_cancelled
+if "%UBUNTU_INSTALL_RESULT%"=="10" goto :ubuntu_distribution_unavailable
+if "%UBUNTU_INSTALL_RESULT%"=="11" goto :ubuntu_install_failed
+if "%UBUNTU_INSTALL_RESULT%"=="12" goto :ubuntu_restart_required
+if "%UBUNTU_INSTALL_RESULT%"=="13" goto :ubuntu_initial_setup_failed
+if "%UBUNTU_INSTALL_RESULT%"=="14" goto :ubuntu_wsl2_configuration_failed
+if "%UBUNTU_INSTALL_RESULT%"=="15" goto :ubuntu_install_failed
+if "%UBUNTU_INSTALL_RESULT%"=="20" goto :wsl_restart_scheduled
+goto :ubuntu_install_failed
+
+:ubuntu_install_completed
+echo.
+echo       Ubuntu installation completed. Verifying %PREFERRED_UBUNTU_DISTRO%...
+rem The installer just registered this exact distribution name, so avoid an
+rem unnecessary list/parse round-trip before the first verification.  Normal
+rem subsequent launches still use the normalized discovery helper above.
+set "UBUNTU_DISTRO=%PREFERRED_UBUNTU_DISTRO%"
+goto :verify_ubuntu
+
+:ubuntu_install_cancelled
+echo.
+echo Ubuntu installation was cancelled. No Ubuntu distribution was installed.
+echo You can run Windows_launch.bat again whenever you are ready.
+echo.
+pause
+exit /b 0
+
+:ubuntu_distribution_unavailable
+echo.
+echo %PREFERRED_UBUNTU_DISTRO% could not be found in the WSL online distribution catalog.
+echo Check your internet connection and confirm that WSL can list online distributions:
+echo.
+echo     wsl --list --online
+echo.
+echo Then run Windows_launch.bat again.
+echo.
+pause
+exit /b 1
+
+:ubuntu_install_failed
+echo.
+echo The automatic %PREFERRED_UBUNTU_DISTRO% installation did not complete successfully.
+echo.
+echo You can retry Windows_launch.bat or install it manually with:
+echo.
+echo     wsl --install -d %PREFERRED_UBUNTU_DISTRO%
+echo.
+pause
+exit /b 1
+
+:docker_update_requested
+echo.
+echo Open Docker Desktop and choose "Check for updates" to install the latest
+echo version, then run Windows_launch.bat again.
+echo.
+pause
+exit /b 0
+
+:ubuntu_restart_required
+echo.
+echo WSL enabled the Windows components it needs, so Windows must restart before
+echo %PREFERRED_UBUNTU_DISTRO% can be installed.
+echo.
+echo Please restart Windows, then run Windows_launch.bat again. The Ubuntu
+echo installation will continue automatically.
+echo.
+echo If this message appears again after restarting, run "wsl --list --verbose" to
+echo inspect the registered distributions.
+echo.
+pause
+exit /b 0
+
+:ubuntu_initial_setup_failed
+echo.
+echo %PREFERRED_UBUNTU_DISTRO% was installed, but its first-run Linux user setup did
+echo not complete successfully.
+echo.
+echo If Windows or WSL requested a restart, restart Windows and run Windows_launch.bat
+echo again. DL4MicEverywhere will detect the installed-but-uninitialized Ubuntu distro
+echo and automatically resume the username/password setup.
+echo.
+pause
+exit /b 1
+
+:ubuntu_wsl2_configuration_failed
+echo.
+echo %PREFERRED_UBUNTU_DISTRO% was installed, but Windows could not configure it
+echo as WSL 2 automatically.
+echo.
+echo Inspect the registered version with:
+echo.
+echo     wsl --list --verbose
+echo.
+echo If it shows VERSION 1, convert it with:
+echo.
+echo     wsl --set-version %PREFERRED_UBUNTU_DISTRO% 2
+echo.
+pause
+exit /b 1
+
+:ubuntu_install_helper_missing
+echo.
+echo The DL4MicEverywhere Ubuntu installation helper is missing from this copy of
+echo the repository. Please download a complete DL4MicEverywhere release and try again.
+echo.
+pause
+exit /b 1
+
+:ubuntu_not_ready
+echo.
+echo The Ubuntu distribution %UBUNTU_DISTRO% is installed, but the WSL readiness
+echo probe did not complete successfully.
+echo.
+if exist "%TEMP%\dl4me_wsl_probe_stderr.txt" (
+    echo WSL reported:
+    echo ------------------------------------
+    type "%TEMP%\dl4me_wsl_probe_stderr.txt"
+    echo ------------------------------------
+    echo.
+)
+echo Confirm that %UBUNTU_DISTRO% opens normally and that its one-time Linux user
+echo setup has completed. The diagnostic above should identify the underlying WSL
+echo error if the distribution itself is already usable.
+echo.
+pause
+exit /b 1
+
+:ubuntu_user_setup_required
+echo.
+echo Ubuntu does not currently have a usable non-root account for DL4MicEverywhere.
+echo.
+echo If this is a fresh Ubuntu installation, DL4MicEverywhere can create the normal
+echo Linux account now. You will choose the username yourself and Ubuntu will ask
+echo you to enter the password directly. The password is not stored by DL4MicEverywhere.
+echo.
+echo The account will receive its own /home directory and sudo access, and it will
+echo be configured as Ubuntu's default WSL user when possible.
+echo.
+if not exist "%BASEDIR%\.tools\windows_tools\create_ubuntu_user.ps1" goto :ubuntu_user_setup_helper_missing
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\create_ubuntu_user.ps1" -Distribution %UBUNTU_DISTRO%
+set "UBUNTU_USER_SETUP_RESULT=%ERRORLEVEL%"
+if "%UBUNTU_USER_SETUP_RESULT%"=="0" goto :ubuntu_user_setup_validate
+if "%UBUNTU_USER_SETUP_RESULT%"=="2" goto :ubuntu_user_setup_cancelled
+if "%UBUNTU_USER_SETUP_RESULT%"=="3" goto :ubuntu_user_not_ready
+goto :ubuntu_user_setup_failed
+
+:ubuntu_user_setup_validate
+call :discover_ubuntu_user
+set "UBUNTU_USER_DISCOVERY_RESULT=%ERRORLEVEL%"
+if not "%UBUNTU_USER_DISCOVERY_RESULT%"=="0" goto :ubuntu_user_setup_still_incomplete
+
+echo.
+echo       Ubuntu user: %UBUNTU_USER%
+echo       Ubuntu: ready (WSL 2).
+goto :check_docker
+
+:ubuntu_user_setup_failed
+echo.
+echo Ubuntu user creation did not complete successfully.
+echo.
+echo DL4MicEverywhere did not fall back to running the application as root. Review
+echo the specific account-creation message shown above and run Windows_launch.bat
+echo again when ready.
+echo.
+pause
+exit /b 1
+
+:ubuntu_user_setup_cancelled
+echo.
+echo Ubuntu user creation was cancelled.
+echo No Linux account was created or selected by DL4MicEverywhere.
+echo Run Windows_launch.bat again whenever you are ready to finish Ubuntu setup.
+echo.
+pause
+exit /b 0
+
+:ubuntu_user_setup_helper_missing
+echo.
+echo The DL4MicEverywhere Ubuntu account-creation helper is missing from this copy
+echo of the repository. Please download a complete DL4MicEverywhere release and try again.
+echo.
+pause
+exit /b 1
+
+:ubuntu_user_setup_still_incomplete
+echo.
+echo Ubuntu returned from account creation, but DL4MicEverywhere still could not
+echo validate the new non-root Linux account.
+echo.
+echo The application will not run as root. Use the diagnostics below to inspect the
+echo account that Ubuntu created.
+echo.
+goto :ubuntu_user_not_ready
+
+:ubuntu_user_not_ready
+echo.
+echo The Ubuntu distribution %UBUNTU_DISTRO% is installed, but DL4MicEverywhere
+echo could not resolve a usable non-root Linux account for it.
+echo.
+echo DL4MicEverywhere does not assume that the account must have UID 1000. It checks
+echo the [user] default entry in /etc/wsl.conf and regular /home accounts. If no
+echo normal account exists, the launcher offers to create one; it never runs the app
+echo as root.
+echo.
+echo Inspect the configured account with:
+echo.
+echo     wsl -d %UBUNTU_DISTRO% -u root -- cat /etc/wsl.conf
+echo     wsl -d %UBUNTU_DISTRO% -u root -- cat /etc/passwd
+echo.
+echo If /etc/wsl.conf names a valid user, confirm it can start with:
+echo.
+echo     wsl -d %UBUNTU_DISTRO% -u YOUR_USERNAME -- id
+echo.
+pause
+exit /b 1
+
+:ubuntu_user_helper_missing
+echo.
+echo The DL4MicEverywhere Ubuntu user-discovery helper is missing from this copy of
+echo the repository. Please download a complete DL4MicEverywhere release and try again.
+echo.
+pause
+exit /b 1
+
+:ubuntu_convert_to_wsl2
+echo.
+echo The Ubuntu distribution %UBUNTU_DISTRO% is registered as WSL 1.
+echo DL4MicEverywhere requires WSL 2 for Docker Desktop integration.
+echo.
+if not exist "%BASEDIR%\.tools\windows_tools\convert_wsl_distribution_to_v2.ps1" goto :wsl_conversion_helper_missing
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%BASEDIR%\.tools\windows_tools\convert_wsl_distribution_to_v2.ps1" -Distribution %UBUNTU_DISTRO%
+set "UBUNTU_WSL_CONVERSION_RESULT=%ERRORLEVEL%"
+if "%UBUNTU_WSL_CONVERSION_RESULT%"=="0" goto :verify_ubuntu
+if "%UBUNTU_WSL_CONVERSION_RESULT%"=="2" goto :ubuntu_wsl2_conversion_cancelled
+goto :ubuntu_wsl2_conversion_failed
+
+:ubuntu_wsl2_conversion_cancelled
+echo.
+echo WSL 2 conversion was cancelled. DL4MicEverywhere cannot use Docker Desktop
+echo with %UBUNTU_DISTRO% while it remains on WSL 1.
+echo.
+pause
+exit /b 0
+
+:ubuntu_wsl2_conversion_failed
+echo.
+echo Windows could not convert %UBUNTU_DISTRO% to WSL 2 automatically.
+echo.
+echo You can inspect the distribution state with:
+echo.
+echo     wsl --list --verbose
+echo.
+echo and retry the conversion manually with:
+echo.
+echo     wsl --set-version %UBUNTU_DISTRO% 2
+echo.
+pause
+exit /b 1
+
+:wsl_conversion_helper_missing
+echo.
+echo The DL4MicEverywhere WSL conversion helper is missing from this copy of
+echo the repository. Please download a complete DL4MicEverywhere release and try again.
+echo.
+pause
+exit /b 1
+
+:ubuntu_wsl_version_unknown
+echo.
+echo DL4MicEverywhere could start %UBUNTU_DISTRO%, but could not determine whether
+echo that distribution is WSL 1 or WSL 2 using "wsl --list --verbose".
+echo.
+echo Please run the following command in PowerShell or Command Prompt to inspect it:
+echo.
+echo     wsl --list --verbose
+echo.
+echo If %UBUNTU_DISTRO% shows VERSION 2, this is a launcher detection error.
+echo.
+pause
+exit /b 1
+
+:wsl_version_helper_missing
+echo.
+echo The DL4MicEverywhere WSL version-check helper is missing from this copy of
+echo the repository. Please download a complete DL4MicEverywhere release and try again.
+echo.
+pause
+exit /b 1
+
+:docker_install_cancelled
+echo.
+echo Docker Desktop installation was cancelled. No Docker software was installed.
+echo You can run Windows_launch.bat again whenever you are ready.
+echo.
+pause
+exit /b 0
+
+:docker_download_failed
+echo.
+echo Docker Desktop could not be downloaded from Docker's official HTTPS server.
+echo Check your internet connection, VPN/proxy settings, and security software,
+echo then run Windows_launch.bat again.
+echo.
+pause
+exit /b 1
+
+:docker_signature_invalid
+echo.
+echo The downloaded Docker Desktop installer did not pass Windows Authenticode
+echo signature validation. For safety, DL4MicEverywhere did not run it.
+echo.
+echo Please download Docker Desktop manually from Docker's official website or try
+echo again later. Do not bypass this validation.
+echo.
+pause
+exit /b 1
+
+:docker_install_failed
+echo.
+echo Docker Desktop per-user installation did not complete successfully.
+echo.
+echo If Docker created an installer log, it is normally located at:
+echo     %LOCALAPPDATA%\Docker\install-log.txt
+echo.
+echo You can inspect that log or install Docker Desktop manually, then run this
+echo launcher again.
+echo.
+pause
+exit /b 1
+
+:docker_installed_not_found
+echo.
+echo Docker Desktop reported a successful installation, but DL4MicEverywhere could
+echo not find the installed application or Docker CLI afterwards.
+echo.
+echo Expected per-user location:
+echo     %LOCALAPPDATA%\Programs\DockerDesktop
+echo.
+echo Please start Docker Desktop once from the Windows Start menu and rerun this
+echo launcher. If it is not present, reinstall Docker Desktop manually.
+echo.
+pause
+exit /b 1
+
+:docker_architecture_unsupported
+echo.
+echo DL4MicEverywhere cannot automatically select a Docker Desktop installer for
+echo this Windows processor architecture.
+echo.
+echo Please install the appropriate Docker Desktop build manually and then rerun
+echo Windows_launch.bat.
+echo.
+pause
+exit /b 1
+
+:docker_install_helper_missing
+echo.
+echo The DL4MicEverywhere Docker installation helper is missing from this copy of
+echo the repository. Please download a complete DL4MicEverywhere release and try again.
+echo.
+pause
+exit /b 1
+
+:docker_not_ready
+echo.
+echo Docker Desktop was found, but its Docker engine did not become ready within
+echo two minutes.
+echo.
+echo Please open Docker Desktop and review any message it displays. Once Docker
+echo reports that the engine is running, run Windows_launch.bat again.
+echo.
+pause
+exit /b 1
+
+:docker_user_access_cancelled
+echo.
+echo Docker Desktop and WSL integration are running, but the Ubuntu account
+echo %UBUNTU_USER% does not currently have permission to use the Docker socket.
+echo.
+echo No Linux group membership was changed. Run Windows_launch.bat again if you
+echo want DL4MicEverywhere to offer the Docker access repair again.
+echo.
+pause
+exit /b 0
+
+:docker_user_access_failed
+echo.
+echo Docker Desktop is running and works inside %UBUNTU_DISTRO% as root, but
+echo DL4MicEverywhere could not safely make Docker available to Ubuntu user:
+echo.
+echo     %UBUNTU_USER%
+echo.
+echo The automatic repair only handles the standard Docker socket configuration
+echo where /var/run/docker.sock is owned by group "docker". It does not broaden
+echo socket permissions or add your account to unrelated privileged groups.
+echo.
+echo From PowerShell, these commands can help diagnose the current state:
+echo.
+echo     wsl -d %UBUNTU_DISTRO% -u root -- ls -l /var/run/docker.sock
+echo     wsl -d %UBUNTU_DISTRO% -u root -- getent group docker
+echo     wsl -d %UBUNTU_DISTRO% -u %UBUNTU_USER% -- id
+echo     wsl -d %UBUNTU_DISTRO% -u %UBUNTU_USER% -- docker info
+echo.
+pause
+exit /b 1
+
+:docker_user_access_helper_missing
+echo.
+echo The DL4MicEverywhere Docker user-access helper is missing from this copy of
+echo the repository. Please download a complete DL4MicEverywhere release and try again.
+echo.
+pause
+exit /b 1
+
+:docker_wsl_integration_missing
+echo.
+echo Docker Desktop is running, but Docker cannot be used from:
+echo.
+echo     %UBUNTU_DISTRO%
+echo.
+echo Enable this distribution in Docker Desktop:
+echo.
+echo   1. Open Docker Desktop.
+echo   2. Open Settings ^(gear icon^).
+echo   3. Select Resources ^> WSL Integration.
+echo   4. Under "Enable integration with additional distros", enable:
+echo.
+echo          %UBUNTU_DISTRO%
+echo.
+echo   5. Select Apply / Apply ^& Restart if shown.
+echo   6. Wait until Docker Desktop reports that the engine is running.
+echo   7. Run Windows_launch.bat again.
+echo.
+echo No Docker Desktop settings were changed automatically by DL4MicEverywhere.
+echo.
+pause
+exit /b 1
+
+:gui_closed
+echo.
+echo ============================================================
+echo DL4MicEverywhere closed normally
+echo ============================================================
+echo.
+echo You closed the DL4MicEverywhere graphical interface.
+echo No error occurred, and the Windows, WSL, and Docker preflight checks
+echo completed successfully.
+echo.
+echo Docker Desktop is left running intentionally. Closing DL4MicEverywhere
+echo does not stop Docker Desktop or remove Docker images, containers, volumes,
+echo or other Docker data.
+echo.
+echo You can start DL4MicEverywhere again at any time by launching it normally.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 0
+
+:update_complete
+echo.
+echo ============================================================
+echo DL4MicEverywhere updated successfully
+echo ============================================================
+echo.
+echo The application files were updated successfully.
+echo DL4MicEverywhere stopped intentionally so the new version can start from
+echo a clean process on the next launch.
+echo.
+echo No Windows, WSL, or Docker error occurred.
+echo Please launch DL4MicEverywhere again when you are ready.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 0
+
+:operation_cancelled
+echo.
+echo ============================================================
+echo DL4MicEverywhere operation cancelled
+echo ============================================================
+echo.
+echo You cancelled the current launch or closed one of its choice dialogs.
+echo No error occurred and no further action is required.
+echo.
+echo Docker Desktop is left running intentionally, and existing Docker images,
+echo containers, volumes, and your data were not removed by this cancellation.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 0
+
+:historical_image_unavailable
+echo.
+echo ============================================================
+echo Selected Docker image is not available
+echo ============================================================
+echo.
+echo DL4MicEverywhere could not use the older image version you selected for
+echo this computer. The detailed reason was shown above by the Linux launcher.
+echo.
+echo Choose another published version or return to the current notebook version.
+echo The Windows, WSL, and Docker Desktop preflight checks completed normally.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:input_invalid
+echo.
+echo ============================================================
+echo DL4MicEverywhere needs an input or configuration change
+echo ============================================================
+echo.
+echo The launch stopped because a selected path, configuration value, notebook,
+echo requirements file, or reproducibility input was missing or invalid.
+echo.
+echo Review the specific message shown above, correct that item, and launch again.
+echo This is a handled input problem, not a Windows/WSL/Docker preflight failure.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:dependency_failed
+echo.
+echo ============================================================
+echo Dependency preparation failed
+echo ============================================================
+echo.
+echo DL4MicEverywhere could not prepare or validate the deterministic Python or
+echo base-image locks required for this local build.
+echo.
+echo Review the resolver/lock details shown above. Your existing Docker images
+echo were not reported as successfully replaced by this failed build attempt.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:docker_image_failed
+echo.
+echo ============================================================
+echo Docker image preparation failed
+echo ============================================================
+echo.
+echo DL4MicEverywhere could not validate, download, or build the selected Docker
+echo image. Review the Docker output shown above for the specific cause.
+echo.
+echo Docker Desktop itself passed the Windows preflight; this message refers to
+echo the notebook image operation inside the Linux launcher.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:post_build_failed
+echo.
+echo ============================================================
+echo Docker image validation failed
+echo ============================================================
+echo.
+echo The Docker image exists, but one or more post-build checks failed.
+echo This can include Python startup, package consistency, Jupyter, or GPU checks.
+echo.
+echo Review the detailed post-build check output shown above before using the image.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:container_runtime_failed
+echo.
+echo ============================================================
+echo Notebook container stopped with an error
+echo ============================================================
+echo.
+echo The Docker image passed preparation, but the interactive notebook container
+echo returned an unexpected non-zero runtime status.
+echo.
+echo Review the container/Jupyter output shown above. A normal Ctrl+C/SIGTERM
+echo shutdown is handled separately and is not reported through this message.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:update_failed
+echo.
+echo ============================================================
+echo DL4MicEverywhere update did not complete
+echo ============================================================
+echo.
+echo The update operation stopped safely. Review the Git/update details above.
+echo The current installation remains the version to use until an update succeeds.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:uninstall_failed
+echo.
+echo ============================================================
+echo DL4MicEverywhere was not uninstalled
+echo ============================================================
+echo.
+echo The uninstall operation could not complete safely, so the application folder
+echo was kept in place. Review the specific uninstall message shown above and retry.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:linux_prerequisite_failed
+echo.
+echo ============================================================
+echo Linux-side prerequisite check failed
+echo ============================================================
+echo.
+echo Windows, WSL, and Docker Desktop reached the Linux launcher, but a required
+echo Linux-side tool or Docker access check could not be completed.
+echo.
+echo Review the detailed message shown above. This is a known prerequisite state,
+echo not an unclassified launcher crash.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:restart_later
+echo.
+echo DL4MicEverywhere dependencies were installed successfully.
+echo You chose to restart later. Please restart Windows before running
+echo DL4MicEverywhere again.
+echo.
+pause
+exit /b 0
+
+:restart_scheduled
+echo.
+echo DL4MicEverywhere dependencies were installed successfully.
+echo A Windows restart was requested successfully.
+echo.
+exit /b 0
+
+
+:port_unavailable
+echo.
+echo ============================================================
+echo DL4MicEverywhere could not find a usable notebook port
+echo ============================================================
+echo.
+echo The launcher could not safely reserve a TCP port for the notebook.
+echo On Windows, DL4MicEverywhere checks both Ubuntu/WSL and the Windows host
+echo so an existing Windows application using localhost is not overlooked.
+echo.
+echo Close an unused service if appropriate, or launch again after the port is free.
+echo If you use the CLI, you can also request a specific port with -p.
+echo.
+echo No notebook container was started. Existing Docker containers and data were
+echo not changed by this port-selection failure.
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b 1
+
+:launch_failed
+echo.
+echo DL4MicEverywhere ended unexpectedly inside %UBUNTU_DISTRO%.
+echo The Linux launcher returned exit code %LAUNCH_RESULT%.
+echo.
+echo The Windows preflight checks all passed, so this error came from the Linux
+echo launcher rather than Docker Desktop / WSL detection.
+echo.
+pause
+exit /b %LAUNCH_RESULT%
+
+:print_header
+echo ============================================================
+echo DL4MicEverywhere
+echo Windows launcher: WSL-first Ubuntu and Docker Desktop preflight
+echo ============================================================
+exit /b 0

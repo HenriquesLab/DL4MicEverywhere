@@ -27,54 +27,60 @@ DL4MicEverywhere is a user-friendly platform that allows you to run deep learnin
 
 ## Run DL4MicEverywhere for the first time:
 
-To run DL4MicEverywhere for the first time you need to have root/admin permissions as the program will check for the presence of the requirements and will attempt to install any that are missing. 
+On the first run, DL4MicEverywhere checks the required host software and installs supported missing components when possible. Administrator privileges are not always required. In particular, current Docker Desktop versions support a per-user Windows installation without elevation. Enabling WSL 2 for the first time remains a Windows machine-level operation and may require Administrator privileges.
 
 DL4MicEverywhere comes packaged with an executable for each operating system. Double-click on the one that has the same name as your system (e.g., `Windows_launch` for Windows operating systems). This automatic requirements installation will be different on each operative system:
 
 <details>
 <summary>On MacOs:</summary>
     
-The automatic installation on MacOs guides you through these steps:
+> ⚠️ **First launch: "Apple could not verify MacOS_launch.command"**
+> A ZIP download marks every extracted file as downloaded from the Internet, and macOS blocks the first double-click of the unsigned launcher. Approve it once:
+> 1. Click **Done** in the warning (not *Move to Bin*).
+> 2. Open **System Settings > Privacy & Security**, scroll to the message about `MacOS_launch.command` and click **Open Anyway**, then confirm.
+>
+> Alternatively, remove the download mark from the whole folder in Terminal: `xattr -dr com.apple.quarantine /path/to/DL4MicEverywhere`. Copies downloaded with `git clone` are not marked and open directly. Only the first launch is affected.
 
-1. **Homebrew installation:**
+The macOS launcher performs a native prerequisite check before starting the shared DL4MicEverywhere application:
 
-    1.1. You need to enter the password when asked.
-    1.2. Click **RETURN/ENTER** when asked to start the installation.
+1. **Homebrew:** if Homebrew is missing, DL4MicEverywhere runs Homebrew's official installer. Both Apple Silicon (`/opt/homebrew`) and Intel (`/usr/local`) default prefixes are supported without editing your shell profiles.
+2. **Tcl/Tk:** if no current `wish` is available, the launcher installs Homebrew's `tcl-tk` package and adds its executable directory only to the current DL4MicEverywhere process environment. The outdated Tcl/Tk 8.5 bundled with macOS (`/usr/bin/wish`) is not used: recent macOS versions refuse to launch it.
+3. **Docker Desktop:** if `/Applications/Docker.app` is missing, DL4MicEverywhere downloads the current architecture-specific installer from Docker's official stable endpoint, verifies the DMG with macOS, and runs Docker's installer. macOS may request an administrator password for this installation step. DL4MicEverywhere does **not** accept Docker's license on your behalf; Docker Desktop presents its terms on first launch.
+4. **Docker readiness:** if Docker Desktop is installed but not running, DL4MicEverywhere offers to open it and waits for the engine. On a first launch, complete Docker Desktop's onboarding/license window if it appears.
+5. **No unnecessary reboot:** Homebrew, Tcl/Tk, and Docker Desktop setup do not force a Mac restart. The GUI opens as soon as the prerequisites are ready.
 
-2. **TCL/TK and Docker Desktop are automatically installed (do not need interaction).**
-
-3. **The GUI will pop up, and you can start using DL4MicEverywhere.**
+The macOS wrapper also preserves DL4MicEverywhere's controlled outcomes, so normal close/update/cancel operations and known failures are shown with specific messages instead of immediately closing Terminal.
 
 </details>
 
 <details>
 <summary>On Windows:</summary>
 
-The automatic installation on Windows guides you through the following steps. You can also [watch a video tutorial](https://youtu.be/aUoZ4b3B9qU).
+The Windows launcher now performs the checks in a safe order: WSL/Ubuntu first, Docker Desktop second, Docker-to-WSL integration third, then DL4MicEverywhere.
 
-1. **Docker Desktop installation:**
+1. **WSL 2 and Ubuntu:**
 
-   1.1. During installation, ensure that the **"Use WSL 2 instead of Hyper-V"** option is selected ☑️.
+   DL4MicEverywhere checks WSL before Ubuntu and Docker Desktop. Docker Desktop currently requires WSL 2.1.5 or later. If WSL is missing, the launcher offers Microsoft's official `wsl --install --no-distribution` flow; if WSL is outdated, it offers `wsl --update`. The launcher itself stays non-elevated. A UAC prompt is requested only when the Windows-level WSL command actually needs Administrator permission, and WSL updates are attempted as the normal user first. If a restart is required, the launcher offers to schedule it. After WSL is ready, the existing Ubuntu-24.04 automatic installation flow continues.
 
-   1.2. After succesfull installation, the terminal will close. Please restart your computer.
+2. **Docker Desktop:**
 
-2. **Windows Subsystem for Linux (WSL) installation:**
+   If Docker Desktop is already installed, both Docker's current per-user path and the traditional all-users path are detected automatically. If Docker Desktop is missing, DL4MicEverywhere offers to install it in Docker's supported **per-user** mode using the WSL 2 backend.
 
-   2.1. Go to your DL4MicEverywhere folder and click again on the `Windows_launch` file.
+   - The per-user installation is stored under `%LOCALAPPDATA%\Programs\DockerDesktop`.
+   - It does not require Windows Administrator privileges.
+   - Before the download, DL4MicEverywhere displays Docker's Subscription Service Agreement and requires explicit consent.
+   - The installer is downloaded from Docker's official HTTPS endpoint and its Windows Authenticode signature is checked before execution.
+   - Windows containers are disabled because DL4MicEverywhere uses Linux containers only.
 
-   2.2 You need to enter a username and a password, these can be different from the credentials on your computer (**IMPORTANT:** remember the password for the future) (when entering the password, it will not be displayed).
+3. **Docker Desktop WSL integration and Ubuntu-user access:**
 
-   2.3. After installation, you will need to type `logout` and press **ENTER**.
+   Once Docker Desktop is running, DL4MicEverywhere first checks the selected Ubuntu distribution at the distribution level. It then verifies that the resolved non-root Ubuntu account can execute `docker info`, because that is the account used to run DL4MicEverywhere. If the Docker socket uses the standard `root:docker` group permissions and the Ubuntu account is not yet a member of that group, the launcher explains the privilege and asks for consent before adding the account to the Linux `docker` group. No Windows Administrator permission is required for this WSL-local change. If Docker Desktop has not enabled the distribution at all, the launcher instead provides the short manual **Settings > Resources > WSL Integration** instructions. DL4MicEverywhere does not modify Docker Desktop's settings file automatically and does not broaden Docker socket permissions.
 
-   2.4. Then press **ENTER** to clsoe the terminal. Please restart your computer.
+4. **Ubuntu-side requirements:**
 
-3. **Ubuntu libraries installation and starting DL4MicEverywhere:**
+   After the Windows preflight succeeds, the Linux launcher installs only missing Ubuntu-side packages needed by DL4MicEverywhere (for example Tcl/Tk). It does not perform a full Ubuntu system upgrade. If those host packages require a restart, DL4MicEverywhere offers **Restart Now** or **Restart Later** and treats either choice as a normal completion state.
 
-   3.1. Go to your DL4MicEverywhere folder and click again on the `Windows_launch` file.
-
-   3.2. If Docker Desktop is not already running, it will ask you to start it. If in 10 seconds Docker Desktop is not opened, you will need to open it manually and click again on the `Windows_launch` file.
-
-6. **The GUI will pop up, and you can start using DL4MicEverywhere** (if the GUI is not displayed correctly, please restart your computer once more to fix the issue).
+5. **The GUI opens and DL4MicEverywhere is ready to use.**
 
 </details>
 
@@ -89,9 +95,18 @@ bash .tools/create_desktop.sh
 ```
 This will create a `DL4MicEverywhere.desktop` file in your Desktop. You will need to right-click the file and ´Allow Launching´, after that launch DL4MicEverywhere by double-clicking it. The automatic installation guides you through these steps:
 
-1. **You need to enter the password when asked.**
-2. **TCL/TK and Docker Desktop are automatically installed (do not need interaction).**
+1. **You need to enter the password when asked.** It is only needed the first time, to install missing system packages. Later launches, including building Docker images, do not ask for it.
+2. **Tcl/Tk and Docker Engine are installed automatically if they are missing.** If an NVIDIA driver is present, the NVIDIA Container Toolkit is also installed so Docker can use the GPU. Your user is added to the `docker` group; log out and back in (or restart) when asked so this takes effect.
 3. **The GUI will pop up, and you can start using DL4MicEverywhere**
+
+> ℹ️ **Docker Engine instead of Docker Desktop on Linux**
+> On Linux, DL4MicEverywhere uses Docker Engine, not Docker Desktop: Docker Desktop for Linux runs containers inside a virtual machine that cannot use NVIDIA GPUs. Compared with the Docker Desktop steps shown elsewhere in this guide:
+> - There is no "start Docker Desktop" step: Docker Engine starts automatically with the computer.
+> - Remove old images, and the Docker build cache left by image builds, with DL4MicEverywhere's own **File > Reclaim Docker Space...** menu option.
+> - Container output is shown in the launcher terminal.
+> - Docker Desktop's CPU/memory limits do not apply: Docker Engine can use the whole computer.
+>
+> **Existing Docker installations are never changed.** If Docker is already installed (for example on a shared server), DL4MicEverywhere uses it as it is. It does not reinstall it, change its configuration, or restart it. If something is missing (for example GPU support or your access to Docker), the launcher explains what to ask the computer's administrator for. You can install Docker Desktop for Linux yourself, but GPU acceleration is not available while it is the active Docker engine.
 
 </details>
 
@@ -323,7 +338,7 @@ Clicking on the **Advanced options** button at the bottom will display a new sec
      width="40%" 
      height="40%" />
 
-When you choose this option, the **default notebooks** section will be disabled and will not consider the information you provide there. The rest of the arguments you provided will remain intact. In the advanced options, you can provide paths to local files of the `configuration.yaml`, `notebook.ipynb`, and `requirements.txt`.
+When you choose this option, the **default notebooks** section will be disabled and will not consider the information you provide there. The rest of the arguments you provided will remain intact. In the advanced options, you can provide paths to local files of the `configuration.yaml`, `notebook.ipynb`, and a dependency input such as `requirements.txt`.
 
 ### Select a local `configuration.yaml`:
 
@@ -362,7 +377,7 @@ After selecting the file, the window should look like this:
 
 ### Select a local requirements file:
 
-You can also select a `requirements.txt` file instead of the one provided in the `configuration.yaml`. This file should contain the Python libraries that you want to be installed in the container:
+You can also select a local dependency input instead of the one provided in `configuration.yaml`. Use `requirements.txt` as the human-edited dependency file. List the direct Python dependencies and constraints you want; DL4MicEverywhere automatically generates or reuses a sibling `requirements.lock.txt` and installs the lock rather than the input directly:
 
 <img src="https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/GUI_USER_GUIDE/gui_requ_select.png" 
      alt="Select the local requirements"
@@ -385,3 +400,13 @@ You can enter the tag you want in the **Tag** textbox. In the following example,
      width="40%" 
      height="40%" />
  
+
+### Using older Docker image versions
+
+When a specific older version is selected from the **Version** list, DL4MicEverywhere treats that version as a published artifact. It will never rebuild an older tag from the current `configuration.yaml`.
+
+- If the exact image already exists locally, you can **Use Existing Image**, **Download from Docker Hub** to refresh/replace it, or **Cancel**.
+- If the image is not local, the only available action is **Download from Docker Hub** (or **Cancel**).
+- If Docker Hub does not provide that historical image for the current architecture, DL4MicEverywhere reports that the selected version is unavailable instead of attempting a local build.
+
+The normal **Build Locally** option remains available only for the current/default notebook version.

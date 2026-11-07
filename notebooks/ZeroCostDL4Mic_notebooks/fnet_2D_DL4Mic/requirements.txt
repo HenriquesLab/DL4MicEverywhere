@@ -1,0 +1,14 @@
+# Migrated from immutable upstream dependency input:
+
+
+numpy==1.19.5
+pandas==1.2.3
+scikit-image==0.18.0
+matplotlib
+astropy==3.2.3
+fpdf==1.7.2
+ipywidgets
+numexpr==2.8.4
+
+torch==1.11.0
+torchvision==0.12.0

@@ -16,8 +16,8 @@ config:
     cuda_version: 12.2.2
     cudnn_version: 8.9.7.29
     description: CAREamics_Noise2Noise_2D is a CAREamics-powered Noise2Noise 2D notebook, using a PyTorch/Lightning implementation.
-    dl4miceverywhere_version: 2.2.0
-    docker_hub_image: careamics_noise2noise_2d_zerocostdl4mic-b1.0.0-d2.2.0
+    dl4miceverywhere_version: 2.3.0
+    docker_hub_image: careamics_noise2noise_2d_zerocostdl4mic-b1.0.0-d2.3.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/CAREamics_Noise2Noise_2D/CAREamics_Noise2Noise_2D_ZeroCostDL4Mic.ipynb
     notebook_version: 1.0.0
     python_version: '3.11'

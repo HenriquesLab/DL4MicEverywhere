@@ -1,0 +1,69 @@
+name: Sync notebook image status from Docker Hub
+
+on:
+  workflow_dispatch:
+  # Reconcile the report weekly in case an image was published or removed
+  # outside the normal DL4MicEverywhere workflows.
+  schedule:
+    - cron: "20 3 * * 0"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: notebook-image-status-${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sync_status:
+    name: Import published image timestamps and render report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Select status target branch
+        id: target
+        shell: bash
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "branch" ]; then
+            target_branch="${GITHUB_REF_NAME}"
+          else
+            target_branch='${{ github.event.repository.default_branch }}'
+          fi
+          echo "branch=$target_branch" >> "$GITHUB_OUTPUT"
+          git fetch origin "$target_branch"
+          git checkout -B "$target_branch" "origin/$target_branch"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install report generator dependency
+        run: python -m pip install 'pyyaml==6.0.1'
+
+      - name: Sync current configured tags from Docker Hub
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          python .tools/python_tools/notebook_status.py --repo-root . sync-dockerhub
+          python .tools/python_tools/notebook_status.py --repo-root . render
+
+      - name: Commit synchronized status report
+        shell: bash
+        env:
+          TARGET_BRANCH: ${{ steps.target.outputs.branch }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .tools/notebook-build-status.json .tools/test-notebooks.md
+          if git diff --cached --quiet; then
+            echo "Notebook image status is already up to date."
+            exit 0
+          fi
+          git commit -m "GitHub Action - Sync notebook image status"
+          git push origin "HEAD:$TARGET_BRANCH"

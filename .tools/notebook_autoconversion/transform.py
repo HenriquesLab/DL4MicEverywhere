@@ -3,8 +3,6 @@ from code_utils_one_cell import code_to_cell
 from markdown_utils import markdown_to_cell
 from sections import remove_section_list
 
-import nbformat
-
 def transform_nb(path_original_nb, path_new_nb, remove_sections=[]):
     """
     Transforms a Jupyter notebook by converting code cells and markdown cells

@@ -6,9 +6,13 @@ This guide provides solutions to common issues encountered when using DL4MicEver
 
 ### **Docker daemon fails to start**
 
-- Ensure your OS meets the requirements for Docker Desktop. Docker requires Windows 10 Pro/Enterprise x64 or macOS 10.13+ .
+- Ensure your OS meets the requirements for Docker Desktop. Check Docker Desktop's current system requirements for your Windows or macOS release; Docker supports a rolling set of operating-system versions.
 - On Linux, ensure Docker engine is installed and the service is running. Check status with: `systemctl status docker`
 - Confirm your user is in the `docker` group to avoid permission errors.
+
+### **"Docker is running, but your user is not allowed to use it" (Linux)**
+
+Docker answered with `permission denied` on its socket: your user is not (yet) in the `docker` group. If DL4MicEverywhere has just installed Docker, log out and back in (or restart). Otherwise ask the computer's administrator to run `sudo usermod -aG docker <your user>`. DL4MicEverywhere does not use `sudo` to work around this, because images built with `sudo` end up where later `docker run` commands cannot find them.
 
 ### **Cannot pull Docker images** 
 
@@ -26,9 +30,12 @@ This guide provides solutions to common issues encountered when using DL4MicEver
 - Increase Docker resources in Preferences > Resources. At least 2 CPUs and 4GB memory recommended.
 - On Linux, check other processes consuming resources. Docker may need more RAM/CPUs.
 
-### **Docker desktop does not start or crashes after running DL4MicEverywhere on Mac**
+### **Docker Desktop does not become ready after DL4MicEverywhere opens it on Mac**
 
-- Ensure you are not using any Docker container in the terminal. Then, open a terminal and force quit Docker by typing: `pkill -SIGHUP -f /Applications/Docker.app 'docker serve'`
+- Open Docker Desktop from `/Applications/Docker.app` and complete any first-run onboarding or license dialog.
+- Wait until Docker Desktop reports that the engine is running, then launch DL4MicEverywhere again.
+- If Docker Desktop reports that the application is damaged or cannot start, reinstall it using Docker's current macOS installation guide rather than force-killing internal Docker processes.
+- DL4MicEverywhere waits up to two minutes for `docker info` to become responsive and reports a prerequisite error if the engine is still unavailable.
 
 ### **Docker cannot build image**
 - Your docker client might be out of space. [Read here how to clear space](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/DOCKER_DESKTOP.md).
@@ -47,10 +54,24 @@ This process requires you to restart your computer, enter the BIOS and enabling 
 
 ## GPU Support
 
+### **GPU check failed: which layer?**
+
+After an image is ready, DL4MicEverywhere checks GPU access in three layers and names the one that failed:
+
+1. **Docker -> GPU passthrough.** Docker cannot give containers the GPU at all (`could not select device driver "" with capabilities: [[gpu]]`).
+   - *Linux with Docker Engine:* the NVIDIA Container Toolkit is missing. See [GPU support](REQUIREMENTS_INSTALLATION.md) or run `bash .tools/bash_tools/requirements_installation/nvidia_container_toolkit.sh --print-instructions`.
+   - *Linux with Docker Desktop:* Docker Desktop for Linux cannot use NVIDIA GPUs. Use Docker Engine (`docker context use default` if it is installed).
+   - *Windows:* update Docker Desktop (*Check for updates*) and the Windows NVIDIA driver; do not install a driver inside Ubuntu.
+   - *All:* `nvidia-smi` must work on the computer itself.
+2. **CUDA/cuDNN libraries in the image.** Docker reaches the GPU, but the CUDA/cuDNN versions in the image do not match what TensorFlow was built for, or are newer than the host driver supports. The report shows both versions. Update `cuda_version`/`cudnn_version` in the notebook's `configuration.yaml`, or update the NVIDIA driver.
+3. **Framework.** Docker and the libraries look fine, but TensorFlow or PyTorch still cannot use the GPU. The framework's own error is shown.
+
+GPU images install exactly the cuDNN version in `configuration.yaml` (`cudnn_version`); cuDNN 8 and cuDNN 9 (`libcudnn9-cuda-<major>`) are both supported.
+
 ### **Notebooks fail with CUDA errors**
 
 - Verify Nvidia drivers are properly installed for your GPU.
-- Ensure `nvidia-docker` is installed and runtime is enabled in Docker.
+- Ensure the NVIDIA Container Toolkit is installed and configured for Docker (Linux).
 - Consider updating Nvidia driver and CUDA to latest compatible versions.
 - Ensure that you have checked `Enable GPU-backend inference`:
 
@@ -171,6 +192,12 @@ This process requires you to restart your computer, enter the BIOS and enabling 
 ## Launchers
 
 ### **`MacOs_launcher` cannot be oppened**
+
+> ℹ️ **macOS 15 (Sequoia) and later:** the right-click > **Open** shortcut shown below no longer bypasses this warning. Instead, click **Done**, open **System Settings > Privacy & Security**, and click **Open Anyway** next to the `MacOS_launch.command` message (once). Alternatively run `xattr -dr com.apple.quarantine /path/to/DL4MicEverywhere` in Terminal. Copies downloaded with `git clone` are not affected.
+
+### **The GUI crashes on macOS with "Launch Constraint Violation" (Tk 8.5)**
+
+macOS 15 refuses to start the outdated Tcl/Tk 8.5 bundled with the system (`/usr/bin/wish`). The launcher installs and uses Homebrew's `tcl-tk` instead. If you still see this error, run `brew install tcl-tk` and launch DL4MicEverywhere again.
 
 MacOS computers will notify you that the file you want to launch cannot verified if it is free from malware and it will pop you the following message:
 

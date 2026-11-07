@@ -64,6 +64,7 @@ DL4MicEverywhere is designed to make deep learning more accessible, transparent,
 
 1. Download the ZIP file of the DL4MicEverywhere repository [here](https://github.com/HenriquesLab/DL4MicEverywhere/archive/refs/heads/main.zip) and unzip it.
 2. Double-click the launcher in the DL4MicEverywhere folder that has the same name as your system (e.g., `Windows_launch` for Windows operating systems). If this is the first time you run DL4MicEverywhere, we recommend you to follow [the provided steps](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/USER_GUIDE.md#run-dl4miceverywhere-for-the-first-time).
+   On macOS, the first double-click shows *"Apple could not verify MacOS_launch.command"*: click **Done**, then **System Settings > Privacy & Security > Open Anyway** (only once).
 3. A GUI will automatically pop up. Choose a notebook and run!
 
 With Docker, all dependencies are neatly bundled. Just launch and access deep learning workflows through an intuitive interface!
@@ -75,18 +76,21 @@ Reproduce the demo in the video with the `U-Net (2D) multilabel` notebook and [B
 [![alt text](https://github.com/HenriquesLab/DL4MicEverywhere/blob/documentation/Wiki%20images/STEP_BY_STEP.gif)](https://youtu.be/rUt1aG_AXh8?si=cz1j0rwVZbfDbCXG)
 
 #### Requirements
-DL4MicEverywhere rely on the following external software that is automatically installed when launching the tool.
-- Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop)).
-- For the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/).
+DL4MicEverywhere relies on the following external software. The launchers check these prerequisites and install supported missing components when possible.
+- Docker Desktop on Windows and macOS ([download](https://www.docker.com/products/docker-desktop)); Docker Engine on Linux ([install](https://docs.docker.com/engine/install/)). On Windows, if WSL 2 is already available, DL4MicEverywhere can install Docker Desktop automatically in Docker's per-user mode without Windows Administrator privileges, after explicit license consent. Existing Docker installations are used as they are and never modified.
+- For the graphical user interface (GUI), [Tcl/Tk](https://www.tcl.tk/).
 
 If GPU acceleration is desired, the following needs to be installed:
 - NVIDIA GPU + CUDA drivers ([setup](https://docs.nvidia.com/cuda/)).
+- On Linux, the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) (installed automatically together with a fresh Docker Engine installation).
 
 ## Contributing
 
 We welcome contributions! Please check out the [contributing guidelines](CONTRIBUTING.md) to get started.
 
 ## Documentation
+
+For deterministic Docker environments, see [Python dependency locks](docs/DEPENDENCY_LOCKS.md), [immutable base-image locks](docs/BASE_IMAGE_LOCKS.md), and [reproducible builds](docs/REPRODUCIBLE_BUILDS.md).
 - [Step-by-step "How to" guide](docs/USER_GUIDE.md)
   - [Manual Installation of the Requirements](docs/REQUIREMENTS_INSTALLATION.md)
   - [Contianerise your own pipeline](https://github.com/HenriquesLab/DL4MicEverywhere/blob/main/docs/USER_GUIDE.md#5-containerise-your-own-pipelines-advanced-options)

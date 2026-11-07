@@ -12,7 +12,7 @@ DL4MicEverywhere allows you to utilize the pre-packaged Jupyter notebooks for a 
 
 **What are the prerequisites to run DL4MicEverywhere?**
 
-- Docker Desktop installed ([download](https://www.docker.com/products/docker-desktop)).
+- Docker Desktop ([download](https://www.docker.com/products/docker-desktop)). On Windows, DL4MicEverywhere can offer Docker's non-elevated per-user installation automatically once WSL 2 and Ubuntu are available.
 - For GPU acceleration - NVIDIA GPU + CUDA drivers ([setup](https://docs.nvidia.com/cuda/)).
 - For the graphical user interface (GUI),  [Tcl/Tk](https://www.tcl.tk/).
 

@@ -1,40 +1,62 @@
 #!/bin/bash
 
-# verlte() {
-#     printf '%s\n' "$1" "$2" | sort -C -V
-# }
+# Lightweight checks performed immediately before looking for/building the image.
+# Usage: pre_build_test.sh <docker_tag>
 
-# desired_version=25
+docker_tag="${1:-}"
 
-# # Check if docker is installed
-# if [[ $(which docker) ]]; then
-#     # Check if docker daemon is running
-#     if ( docker stats --no-stream  &> /dev/null ); then
+print_error() {
+    echo ""
+    echo "------------------------------------"
+    echo "Pre-build check failed"
+    echo "$1"
+    if [ -n "${2:-}" ]; then
+        echo ""
+        echo "Details:"
+        echo "$2"
+    fi
+    echo "------------------------------------"
+}
 
-#         # Check if docker version is good
-#         # docker_version=$(docker version --format '{{.Server.Version}}')
-#         # verlte $desired_version $docker_version && good_version=1 || good_version=0
+echo "Pre-build checks:"
 
-#         # if [ "$good_version" -eq 1 ]; then
-#         #     echo "Docker version $docker_version is good."
-#         #     exit 0
-#         # else
-#         #     echo "Docker version $docker_version is not good. You need to update to $desired_version or higher."
-#         #     exit 1
-#         # fi
-#         exit 0
-#     else
-#         echo "Docker daemon is not running."
-#         exit 1
-#     fi
-# else
-#     echo "Docker is not installed."
-#     exit 1
-# fi
+# 1. Docker must be installed and the daemon must answer.
+if ! command -v docker >/dev/null 2>&1; then
+    print_error "Docker could not be found. Please make sure Docker is installed and try again."
+    exit 1
+fi
 
-# docker_owner=$(ls -ld ~/.docker | grep $(whoami))
+if ! docker info >/dev/null 2>&1; then
+    print_error "Docker is installed, but it is not responding. Please start or restart Docker Desktop/Docker and try again."
+    exit 1
+fi
 
-# if [ "$docker_owner" == "" ]; then
-#     echo "You are not owner of ~/.docker. Please enter the password to allow the access to ~/.docker and with this run Docker without root access."
-#     sudo chown -R $(whoami) ~/.docker
-# fi
+echo "  [OK] Docker is responding."
+
+# 2. Let Docker itself validate the image reference. A valid tag that does not
+#    exist locally returns 'No such image', which is fine at this stage.
+if [ -z "$docker_tag" ]; then
+    print_error "The Docker image tag is empty. Please check the selected notebook configuration."
+    exit 1
+fi
+
+# Docker references cannot contain whitespace or control characters. This also
+# catches accidental Windows carriage returns (\r) before they reach Docker.
+if [[ "$docker_tag" =~ [[:space:][:cntrl:]] ]]; then
+    print_error "The Docker image tag contains an invalid whitespace or hidden character. Please check the selected notebook configuration." "$docker_tag"
+    exit 1
+fi
+
+tag_check=$(docker image inspect "$docker_tag" 2>&1)
+tag_status=$?
+
+if [ "$tag_status" -ne 0 ] && printf '%s\n' "$tag_check" | grep -Eqi 'invalid (reference format|tag|repository name)'; then
+    print_error "The Docker image tag is not valid. Please check the selected notebook configuration." "$docker_tag"
+    exit 1
+fi
+
+echo "  [OK] Docker image tag is valid."
+echo "Pre-build checks: OK"
+echo ""
+
+exit 0

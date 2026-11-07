@@ -16,8 +16,8 @@ config:
     cuda_version: 12.2.2
     cudnn_version: 8.9.7.29
     description: CAREamics_CARE_2D is a CAREamics-powered CARE 2D notebook, using a PyTorch/Lightning implementation. It is an alternative to the existing CSBDeep-based CARE_2D_DL4Mic notebook.
-    dl4miceverywhere_version: 2.2.0
-    docker_hub_image: careamics_care_2d_zerocostdl4mic-b1.0.0-d2.2.0
+    dl4miceverywhere_version: 2.3.0
+    docker_hub_image: careamics_care_2d_zerocostdl4mic-b1.0.0-d2.3.0
     notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/main/notebooks/Bespoke_notebooks/CAREamics_CARE_2D/CAREamics_CARE_2D_ZeroCostDL4Mic.ipynb
     notebook_version: 1.0.0
     python_version: '3.11'
