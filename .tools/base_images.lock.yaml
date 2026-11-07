@@ -2,6 +2,41 @@
 # Existing digests are immutable pins. Use refresh-all intentionally to update them.
 schema_version: 1
 images:
+  "nvidia/cuda:11.2.2-devel-ubuntu20.04":
+    digest: "sha256:65879f7299f35cd232f3b54e24081d569db2be1f31820728aef8a44240a305a8"
+    platforms:
+      "linux/amd64": "sha256:f7f504aafbc25b2ef888c4594f1902807643bfd1048b9838d2b62cb2c6d37bb9"
+      "linux/arm64": "sha256:4a349ba5b6534e706d46391c795aa588f474d187b0786e0628134e596072eb6b"
+  "nvidia/cuda:11.7.1-devel-ubuntu22.04":
+    digest: "sha256:18aade8cf02eede9d4db5d8a8a73d4505bb2322e91cd54e4c601e5ae100ed691"
+    platforms:
+      "linux/amd64": "sha256:a3184e4dc6f968da5bba86df3081ff3013f8e3674a9bfce544af8be905d2f17a"
+      "linux/arm64": "sha256:b22e45ba3de3b62e181930d34740e4b8a63e0d6b400562b1210aec5367736a6b"
+  "nvidia/cuda:11.8.0-devel-ubuntu22.04":
+    digest: "sha256:94fd755736cb58979173d491504f0b573247b1745250249415b07fefc738e41f"
+    platforms:
+      "linux/amd64": "sha256:60eda04ab6790aa76d73bf0df245b361eabc6d8f7b6f6cf9846c70f399b9a1eb"
+      "linux/arm64": "sha256:53ee1674b6bb23591439709ee61a5dd2566c010f10d75f6b33210050100213a1"
+  "nvidia/cuda:12.2.2-devel-ubuntu20.04":
+    digest: "sha256:b7074ef6f9aa30c27fe747f3a7e10402ec442f001290718c73e0972d1ee61342"
+    platforms:
+      "linux/amd64": "sha256:1014b3265691259e8df40b6326abebc5adecee17e372404569dee837ac9cec08"
+      "linux/arm64": "sha256:93c060832c99ac03b212306c0ebe48ac6b9fadc1b41307c19eacf0db177d2b40"
+  "nvidia/cuda:12.2.2-devel-ubuntu22.04":
+    digest: "sha256:ae8a022c02aec945c4f8c52f65deaf535de7abb58e840350d19391ec683f4980"
+    platforms:
+      "linux/amd64": "sha256:5f603101462baa721ff6ddc44af82f6e9ba7cbd92a424c9f9f348e6e9d6d64c3"
+      "linux/arm64": "sha256:a64a5a4a0638034aef2194276b8306e161a5a020dee5a13849ff5320c9ac0992"
+  "nvidia/cuda:12.5.0-devel-ubuntu22.04":
+    digest: "sha256:4b46c69e223d971f0fb279fd6381a0f3a057e09ba6de08bfbf7db751b1ad6db1"
+    platforms:
+      "linux/amd64": "sha256:e4d4c396586df35ec6aadc890f0c4da41085c4678083b2d987b2408fe076f426"
+      "linux/arm64": "sha256:ade7063ecf82cda183089652c4dbe3b351303f0353a3f4443e337709121468e6"
+  "nvidia/cuda:12.5.1-devel-ubuntu22.04":
+    digest: "sha256:732f76ff134bfa50b9a86e2fe7d07fecd3730beb98f3bcef616c6ae9d9f33f4c"
+    platforms:
+      "linux/amd64": "sha256:75be475d2cd39bdfd1a79e62b2a2f7ef2753e78b249c60eac0a82bd99bddd2e0"
+      "linux/arm64": "sha256:13381961419ea62f4417059d5e196f39f5f4965c22adae753c5eb3b53b417995"
   "python:3.9.20-alpine3.19":
     digest: "sha256:ce3ad85aaccd151968e3e939615e8ea3e0df9a268ed9fe6d0cdec070f8cb795b"
     platforms:
