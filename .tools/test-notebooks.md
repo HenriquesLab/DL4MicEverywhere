@@ -32,7 +32,7 @@ Legend: ✅ success · ❌ failure · ⚠️ cancelled · ⏭️ skipped · ⬜ 
 | Cellpose (2D and 3D) - ZeroCostDL4Mic | `cellpose_2d_zerocostdl4mic-z1.16.3-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
 | CycleGAN (2D) - ZeroCostDL4Mic | `cyclegan_zerocostdl4mic-z1.13.5-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
 | DFCAN - ZeroCostDL4Mic | `dfcan_zerocostdl4mic-z1.14.1-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
-| DRMIME - ZeroCostDL4Mic | `drmime_2d_zerocostdl4mic-z1.14.2-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| DRMIME - ZeroCostDL4Mic | `drmime_2d_zerocostdl4mic-z1.14.2-d2.3.0`<br><sub>[CI run](https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568)</sub> | ⬜ Not run | ⬜ Not run | ⬜ Not run | ⬜ Not run | ❌ Failed<br><sub>2026-11-08 01:11 UTC</sub> | ⏭️ Skipped | ⏭️ Skipped | — |
 | DecoNoising (2D) - ZeroCostDL4Mic | `deconoising_2d_zerocostdl4mic-z1.14.1-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
 | Deep-STORM (2D) - ZeroCostDL4Mic | `deep-storm_2d_zerocostdl4mic-z1.14.2-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
 | DenoiSeg (2D) - ZeroCostDL4Mic | `denoiseg_zerocostdl4mic-z1.14.1-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
