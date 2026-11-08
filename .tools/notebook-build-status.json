@@ -36,6 +36,41 @@
         }
       }
     },
+    "notebooks/ZeroCostDL4Mic_notebooks/StarDist_3D_DL4Mic/configuration.yaml": {
+      "category": "ZeroCostDL4Mic_notebooks",
+      "latest_recorded_tag": "stardist_3d_zerocostdl4mic-z1.15.4-d2.3.0",
+      "name": "StarDist (3D) - ZeroCostDL4Mic",
+      "notebook_version": "1.15.4",
+      "releases": {
+        "stardist_3d_zerocostdl4mic-z1.15.4-d2.3.0": {
+          "architectures": {
+            "amd64": {
+              "build_status": "not_run",
+              "image_tag": "stardist_3d_zerocostdl4mic-z1.15.4-d2.3.0-amd64",
+              "last_attempted_at": "2026-11-08T01:10:18Z",
+              "smoke_status": "not_run"
+            },
+            "arm64": {
+              "build_status": "failure",
+              "image_tag": "stardist_3d_zerocostdl4mic-z1.15.4-d2.3.0-arm64",
+              "last_attempted_at": "2026-11-08T01:10:18Z",
+              "smoke_status": "skipped"
+            },
+            "gpu": {
+              "build_status": "not_run",
+              "image_tag": "stardist_3d_zerocostdl4mic-z1.15.4-d2.3.0-gpu",
+              "last_attempted_at": "2026-11-08T01:10:18Z",
+              "smoke_status": "not_run"
+            }
+          },
+          "commit_sha": "f08fe7dc6c60dac43772bfc46617e32da6e8e483",
+          "docker_tag": "stardist_3d_zerocostdl4mic-z1.15.4-d2.3.0",
+          "last_attempted_at": "2026-11-08T01:10:18Z",
+          "manifest_status": "skipped",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568"
+        }
+      }
+    },
     "notebooks/ZeroCostDL4Mic_notebooks/YOLOv2_DL4Mic/configuration.yaml": {
       "category": "ZeroCostDL4Mic_notebooks",
       "latest_recorded_tag": "yolov2_zerocostdl4mic-z1.13-d2.3.0",
