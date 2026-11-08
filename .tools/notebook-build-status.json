@@ -249,6 +249,41 @@
         }
       }
     },
+    "notebooks/External_notebooks/SISR_Metric_Calculation/configuration.yaml": {
+      "category": "External_notebooks",
+      "latest_recorded_tag": "sisr_metrics_calculation-e0.0.1-d2.3.0",
+      "name": "SISR_Metric_Calculation",
+      "notebook_version": "0.0.1",
+      "releases": {
+        "sisr_metrics_calculation-e0.0.1-d2.3.0": {
+          "architectures": {
+            "amd64": {
+              "build_status": "not_run",
+              "image_tag": "sisr_metrics_calculation-e0.0.1-d2.3.0-amd64",
+              "last_attempted_at": "2026-11-08T01:19:46Z",
+              "smoke_status": "not_run"
+            },
+            "arm64": {
+              "build_status": "failure",
+              "image_tag": "sisr_metrics_calculation-e0.0.1-d2.3.0-arm64",
+              "last_attempted_at": "2026-11-08T01:19:46Z",
+              "smoke_status": "skipped"
+            },
+            "gpu": {
+              "build_status": "not_run",
+              "image_tag": "sisr_metrics_calculation-e0.0.1-d2.3.0-gpu",
+              "last_attempted_at": "2026-11-08T01:19:46Z",
+              "smoke_status": "not_run"
+            }
+          },
+          "commit_sha": "f08fe7dc6c60dac43772bfc46617e32da6e8e483",
+          "docker_tag": "sisr_metrics_calculation-e0.0.1-d2.3.0",
+          "last_attempted_at": "2026-11-08T01:19:46Z",
+          "manifest_status": "skipped",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568"
+        }
+      }
+    },
     "notebooks/ZeroCostDL4Mic_notebooks/3D-RCAN_DL4Mic/configuration.yaml": {
       "category": "ZeroCostDL4Mic_notebooks",
       "latest_recorded_tag": "3d_rcan_zerocostdl4mic-z1.14.2-d2.3.0",
