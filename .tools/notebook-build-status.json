@@ -387,6 +387,41 @@
           "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568"
         }
       }
+    },
+    "notebooks/ZeroCostDL4Mic_notebooks/pix2pix_DL4Mic/configuration.yaml": {
+      "category": "ZeroCostDL4Mic_notebooks",
+      "latest_recorded_tag": "pix2pix_zerocostdl4mic-z1.17.7-d2.3.0",
+      "name": "pix2pix (2D) - ZeroCostDL4Mic",
+      "notebook_version": "1.17.7",
+      "releases": {
+        "pix2pix_zerocostdl4mic-z1.17.7-d2.3.0": {
+          "architectures": {
+            "amd64": {
+              "build_status": "not_run",
+              "image_tag": "pix2pix_zerocostdl4mic-z1.17.7-d2.3.0-amd64",
+              "last_attempted_at": "2026-11-08T01:13:45Z",
+              "smoke_status": "not_run"
+            },
+            "arm64": {
+              "build_status": "failure",
+              "image_tag": "pix2pix_zerocostdl4mic-z1.17.7-d2.3.0-arm64",
+              "last_attempted_at": "2026-11-08T01:13:45Z",
+              "smoke_status": "skipped"
+            },
+            "gpu": {
+              "build_status": "not_run",
+              "image_tag": "pix2pix_zerocostdl4mic-z1.17.7-d2.3.0-gpu",
+              "last_attempted_at": "2026-11-08T01:13:45Z",
+              "smoke_status": "not_run"
+            }
+          },
+          "commit_sha": "f08fe7dc6c60dac43772bfc46617e32da6e8e483",
+          "docker_tag": "pix2pix_zerocostdl4mic-z1.17.7-d2.3.0",
+          "last_attempted_at": "2026-11-08T01:13:45Z",
+          "manifest_status": "skipped",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568"
+        }
+      }
     }
   },
   "schema_version": 1
