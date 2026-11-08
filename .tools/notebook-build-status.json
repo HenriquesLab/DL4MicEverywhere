@@ -1023,6 +1023,42 @@
         }
       }
     },
+    "notebooks/ZeroCostDL4Mic_notebooks/U-Net_2D_Multilabel_DL4Mic/configuration.yaml": {
+      "category": "ZeroCostDL4Mic_notebooks",
+      "latest_recorded_tag": "u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.3.0",
+      "name": "U-Net (2D) multilabel segmentation - ZeroCostDL4Mic",
+      "notebook_version": "2.2.0",
+      "releases": {
+        "u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.3.0": {
+          "architectures": {
+            "amd64": {
+              "build_status": "not_run",
+              "image_tag": "u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.3.0-amd64",
+              "last_attempted_at": "2026-11-08T01:39:06Z",
+              "smoke_status": "not_run"
+            },
+            "arm64": {
+              "build_status": "success",
+              "generated_at": "2026-11-07T01:25:30Z",
+              "image_tag": "u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.3.0-arm64",
+              "last_attempted_at": "2026-11-08T01:39:06Z",
+              "smoke_status": "success"
+            },
+            "gpu": {
+              "build_status": "not_run",
+              "image_tag": "u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.3.0-gpu",
+              "last_attempted_at": "2026-11-08T01:39:06Z",
+              "smoke_status": "not_run"
+            }
+          },
+          "commit_sha": "f08fe7dc6c60dac43772bfc46617e32da6e8e483",
+          "docker_tag": "u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.3.0",
+          "last_attempted_at": "2026-11-08T01:39:06Z",
+          "manifest_status": "cancelled",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568"
+        }
+      }
+    },
     "notebooks/ZeroCostDL4Mic_notebooks/U-Net_3D_DL4Mic/configuration.yaml": {
       "category": "ZeroCostDL4Mic_notebooks",
       "latest_recorded_tag": "u-net_3d_zerocostdl4mic-z3.1.2-d2.3.0",
