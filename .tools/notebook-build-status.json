@@ -141,6 +141,41 @@
         }
       }
     },
+    "notebooks/ZeroCostDL4Mic_notebooks/DenoiSeg_DL4Mic/configuration.yaml": {
+      "category": "ZeroCostDL4Mic_notebooks",
+      "latest_recorded_tag": "denoiseg_zerocostdl4mic-z1.14.1-d2.3.0",
+      "name": "DenoiSeg (2D) - ZeroCostDL4Mic",
+      "notebook_version": "1.14.1",
+      "releases": {
+        "denoiseg_zerocostdl4mic-z1.14.1-d2.3.0": {
+          "architectures": {
+            "amd64": {
+              "build_status": "not_run",
+              "image_tag": "denoiseg_zerocostdl4mic-z1.14.1-d2.3.0-amd64",
+              "last_attempted_at": "2026-11-08T01:12:41Z",
+              "smoke_status": "not_run"
+            },
+            "arm64": {
+              "build_status": "failure",
+              "image_tag": "denoiseg_zerocostdl4mic-z1.14.1-d2.3.0-arm64",
+              "last_attempted_at": "2026-11-08T01:12:41Z",
+              "smoke_status": "skipped"
+            },
+            "gpu": {
+              "build_status": "not_run",
+              "image_tag": "denoiseg_zerocostdl4mic-z1.14.1-d2.3.0-gpu",
+              "last_attempted_at": "2026-11-08T01:12:41Z",
+              "smoke_status": "not_run"
+            }
+          },
+          "commit_sha": "f08fe7dc6c60dac43772bfc46617e32da6e8e483",
+          "docker_tag": "denoiseg_zerocostdl4mic-z1.14.1-d2.3.0",
+          "last_attempted_at": "2026-11-08T01:12:41Z",
+          "manifest_status": "skipped",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568"
+        }
+      }
+    },
     "notebooks/ZeroCostDL4Mic_notebooks/StarDist_2D_DL4Mic/configuration.yaml": {
       "category": "ZeroCostDL4Mic_notebooks",
       "latest_recorded_tag": "stardist_2d_zerocostdl4mic-z1.20.5-d2.3.0",
