@@ -1,5 +1,41 @@
 {
   "notebooks": {
+    "notebooks/Bespoke_notebooks/CAREamics_CARE_2D/configuration.yaml": {
+      "category": "Bespoke_notebooks",
+      "latest_recorded_tag": "careamics_care_2d_zerocostdl4mic-b1.0.0-d2.3.0",
+      "name": "CARE (2D) - CAREamics",
+      "notebook_version": "1.0.0",
+      "releases": {
+        "careamics_care_2d_zerocostdl4mic-b1.0.0-d2.3.0": {
+          "architectures": {
+            "amd64": {
+              "build_status": "not_run",
+              "image_tag": "careamics_care_2d_zerocostdl4mic-b1.0.0-d2.3.0-amd64",
+              "last_attempted_at": "2026-11-08T01:20:10Z",
+              "smoke_status": "not_run"
+            },
+            "arm64": {
+              "build_status": "success",
+              "generated_at": "2026-11-07T08:06:23Z",
+              "image_tag": "careamics_care_2d_zerocostdl4mic-b1.0.0-d2.3.0-arm64",
+              "last_attempted_at": "2026-11-08T01:20:10Z",
+              "smoke_status": "failure"
+            },
+            "gpu": {
+              "build_status": "not_run",
+              "image_tag": "careamics_care_2d_zerocostdl4mic-b1.0.0-d2.3.0-gpu",
+              "last_attempted_at": "2026-11-08T01:20:10Z",
+              "smoke_status": "not_run"
+            }
+          },
+          "commit_sha": "f08fe7dc6c60dac43772bfc46617e32da6e8e483",
+          "docker_tag": "careamics_care_2d_zerocostdl4mic-b1.0.0-d2.3.0",
+          "last_attempted_at": "2026-11-08T01:20:10Z",
+          "manifest_status": "skipped",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568"
+        }
+      }
+    },
     "notebooks/Bespoke_notebooks/CAREamics_CARE_3D/configuration.yaml": {
       "category": "Bespoke_notebooks",
       "latest_recorded_tag": "careamics_care_3d_zerocostdl4mic-b1.0.0-d2.3.0",

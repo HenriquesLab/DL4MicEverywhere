@@ -17,7 +17,7 @@ Legend: ✅ success · ❌ failure · ⚠️ cancelled · ⏭️ skipped · ⬜ 
 
 | Notebook | Release tag | AMD64 build | AMD64 smoke | GPU build | GPU-image smoke | ARM64 build | ARM64 smoke | Final tag | Latest generated |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CARE (2D) - CAREamics | `careamics_care_2d_zerocostdl4mic-b1.0.0-d2.3.0` | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | ⬜ Not recorded | — |
+| CARE (2D) - CAREamics | `careamics_care_2d_zerocostdl4mic-b1.0.0-d2.3.0`<br><sub>[CI run](https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568)</sub> | ⬜ Not run | ⬜ Not run | ⬜ Not run | ⬜ Not run | ✅ Built<br><sub>2026-11-07 08:06 UTC</sub> | ❌ Failed | ⏭️ Skipped | 2026-11-07 08:06 UTC |
 | CARE (3D) - CAREamics | `careamics_care_3d_zerocostdl4mic-b1.0.0-d2.3.0`<br><sub>[CI run](https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568)</sub> | ⬜ Not run | ⬜ Not run | ⬜ Not run | ⬜ Not run | ✅ Built<br><sub>2026-11-07 07:35 UTC</sub> | ❌ Failed | ⏭️ Skipped | 2026-11-07 07:35 UTC |
 | Noise2Noise (2D) - CAREamics | `careamics_noise2noise_2d_zerocostdl4mic-b1.0.0-d2.3.0`<br><sub>[CI run](https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568)</sub> | ⬜ Not run | ⬜ Not run | ⬜ Not run | ⬜ Not run | ✅ Built<br><sub>2026-11-07 06:10 UTC</sub> | ❌ Failed | ⏭️ Skipped | 2026-11-07 06:10 UTC |
 | Noise2Void (2D) - CAREamics | `careamics_noise2void_2d_zerocostdl4mic-b1.0.0-d2.3.0`<br><sub>[CI run](https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568)</sub> | ⬜ Not run | ⬜ Not run | ⬜ Not run | ⬜ Not run | ✅ Built<br><sub>2026-11-07 07:07 UTC</sub> | ❌ Failed | ⏭️ Skipped | 2026-11-07 07:07 UTC |
