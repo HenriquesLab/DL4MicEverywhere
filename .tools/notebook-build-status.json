@@ -282,6 +282,41 @@
         }
       }
     },
+    "notebooks/ZeroCostDL4Mic_notebooks/Cellpose_2D_DL4Mic/configuration.yaml": {
+      "category": "ZeroCostDL4Mic_notebooks",
+      "latest_recorded_tag": "cellpose_2d_zerocostdl4mic-z1.16.3-d2.3.0",
+      "name": "Cellpose (2D and 3D) - ZeroCostDL4Mic",
+      "notebook_version": "1.16.3",
+      "releases": {
+        "cellpose_2d_zerocostdl4mic-z1.16.3-d2.3.0": {
+          "architectures": {
+            "amd64": {
+              "build_status": "not_run",
+              "image_tag": "cellpose_2d_zerocostdl4mic-z1.16.3-d2.3.0-amd64",
+              "last_attempted_at": "2026-11-08T01:17:43Z",
+              "smoke_status": "not_run"
+            },
+            "arm64": {
+              "build_status": "failure",
+              "image_tag": "cellpose_2d_zerocostdl4mic-z1.16.3-d2.3.0-arm64",
+              "last_attempted_at": "2026-11-08T01:17:43Z",
+              "smoke_status": "skipped"
+            },
+            "gpu": {
+              "build_status": "not_run",
+              "image_tag": "cellpose_2d_zerocostdl4mic-z1.16.3-d2.3.0-gpu",
+              "last_attempted_at": "2026-11-08T01:17:43Z",
+              "smoke_status": "not_run"
+            }
+          },
+          "commit_sha": "f08fe7dc6c60dac43772bfc46617e32da6e8e483",
+          "docker_tag": "cellpose_2d_zerocostdl4mic-z1.16.3-d2.3.0",
+          "last_attempted_at": "2026-11-08T01:17:43Z",
+          "manifest_status": "skipped",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568"
+        }
+      }
+    },
     "notebooks/ZeroCostDL4Mic_notebooks/CycleGAN_DL4Mic/configuration.yaml": {
       "category": "ZeroCostDL4Mic_notebooks",
       "latest_recorded_tag": "cyclegan_zerocostdl4mic-z1.13.5-d2.3.0",
