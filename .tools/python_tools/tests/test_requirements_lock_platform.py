@@ -132,5 +132,44 @@ class RequirementsLockPlatformTests(unittest.TestCase):
         self.assertIn('--platform "$lock_platform"', text)
 
 
+BUILD_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "build_docker_images_aux.yml"
+
+
+def workflow_job(name):
+    """Return the text of one job in the image build workflow."""
+    text = BUILD_WORKFLOW.read_text(encoding="utf-8")
+    start = text.index(f"\n  {name}:\n")
+    following = text.find("\n  build_", start + 1)
+    return text[start:following if following != -1 else len(text)]
+
+
+class BuildWorkflowLockPlatformTests(unittest.TestCase):
+    def test_arm64_job_builds_with_the_arm64_lock(self):
+        # Run 42322341568 built ARM64 images with the x86_64 lock: TensorFlow
+        # lacked tensorflow-cpu-aws hashes and PyTorch asked for x86-only wheels.
+        job = workflow_job("build_arm64")
+        self.assertIn("--platform arm64", job)
+        self.assertIn("/requirements.arm64.lock.txt", job)
+        self.assertNotIn("/requirements.lock.txt", job)
+
+    def test_amd64_job_keeps_the_default_lock(self):
+        job = workflow_job("build_amd64")
+        self.assertNotIn("--platform arm64", job)
+        self.assertIn("/requirements.lock.txt", job)
+
+
+class BuildWorkflowCleanupTests(unittest.TestCase):
+    def test_images_pulled_for_smoke_tests_are_always_removed(self):
+        # The same run filled the self-hosted runner's disk with pulled images.
+        for job_name, suffixes in (("build_amd64", ["-amd64", "-gpu"]), ("build_arm64", ["-arm64"])):
+            with self.subTest(job=job_name):
+                job = workflow_job(job_name)
+                cleanup = job[job.index("- name: Remove image"):]
+                self.assertIn("if: ${{ always() }}", cleanup)
+                self.assertIn("docker image rm -f", cleanup)
+                for suffix in suffixes:
+                    self.assertIn(suffix, cleanup)
+
+
 if __name__ == "__main__":
     unittest.main()

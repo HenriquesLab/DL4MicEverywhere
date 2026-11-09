@@ -265,6 +265,17 @@ jobs:
           # expose an NVIDIA device to Docker.
           bash .tools/bash_tools/post_build_test.sh "$image" 0
 
+      - name: Remove images pulled for the smoke tests
+        # The smoke tests pull several GB per image onto the self-hosted
+        # runner. Without this the disk fills after a few notebooks.
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          tag="henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}"
+          docker image rm -f "$tag-amd64" "$tag-gpu" 2>/dev/null || true
+          docker image prune -f
+          df -h "$(docker info --format '{{.DockerRootDir}}')" || true
+
   build_arm64:
     name: Build Docker image on ARM64
     runs-on: [self-hosted, macOS, ARM64]
@@ -286,14 +297,18 @@ jobs:
         id: dependency_lock
         shell: bash
         run: |
-          python3 .tools/python_tools/requirements_lock.py ensure --config '${{ inputs.config_file }}' --repo-root .
+          # ARM64 needs its own lock: some packages pull different dependencies
+          # on aarch64 (TensorFlow adds tensorflow-cpu-aws, PyTorch drops the
+          # x86-only nvidia-* wheels). Notebooks with no ARM build stop here
+          # with a clear message and are published for AMD64 only.
+          python3 .tools/python_tools/requirements_lock.py ensure --config '${{ inputs.config_file }}' --platform arm64 --repo-root .
           python3 .tools/python_tools/requirements_lock.py ensure \
             --source docker/converter-requirements.txt \
             --python-version 3.9 \
             --lock docker/converter-requirements.lock.txt \
             --profile none \
             --repo-root .
-          echo "path=$(dirname '${{ inputs.config_file }}')/requirements.lock.txt" >> "$GITHUB_OUTPUT"
+          echo "path=$(dirname '${{ inputs.config_file }}')/requirements.arm64.lock.txt" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -308,7 +323,7 @@ jobs:
           echo "CONVERTER_BASE_IMAGE=$CONVERTER_BASE_IMAGE" >> "$GITHUB_ENV"
           echo "CPU_BASE_IMAGE=$CPU_BASE_IMAGE" >> "$GITHUB_ENV"
           echo "GPU_BASE_IMAGE=$GPU_BASE_IMAGE" >> "$GITHUB_ENV"
-            
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -351,6 +366,13 @@ jobs:
           image="henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64"
           docker pull "$image"
           bash .tools/bash_tools/post_build_test.sh "$image" 0
+
+      - name: Remove image pulled for the smoke test
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          docker image rm -f "henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64" 2>/dev/null || true
+          docker image prune -f
 
   build_only_arm64:
     name: Only push ARM64 to Docker Hub
