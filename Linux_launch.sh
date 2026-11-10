@@ -1161,16 +1161,21 @@ if [ "$DOCKER_OUT" -eq 0 ]; then
     # container/runtime failure.
     docker_command="jupyter lab --ip='0.0.0.0' --port=$port --no-browser --allow-root --NotebookApp.token=$notebook_token; JUPYTER_OUT=\$?; cp /home/docker_info.txt /home/results/docker_info.txt || echo 'WARNING: Could not copy docker_info.txt into the results directory.' >&2; cp \"/home/$notebook_name\" \"/home/results/$notebook_name\" || echo 'WARNING: Could not copy the notebook into the results directory.' >&2; exit \"\$JUPYTER_OUT\""
 
+    # Publish the notebook port on 127.0.0.1 only. Without an address Docker
+    # listens on every network interface, which exposes the Jupyter session to
+    # the local network and makes Windows Firewall ask to allow Docker Desktop
+    # Backend. The browser and SSH tunnels (docs/REMOTE_CONNECTION.md) both
+    # connect through localhost, so they are unaffected.
     if [ "$flag_gpu" -eq 1 ]; then
-        # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data 
-        docker run -it --label org.dl4miceverywhere.managed=true --gpus all -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
+        # Run the docker image activating the GPU, allowing the port connection for the notebook and the volume with the data
+        docker run -it --label org.dl4miceverywhere.managed=true --gpus all -p 127.0.0.1:$port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
         CONTAINER_OUT=$?
-        echo -e "The command used to run this container has been:\n\tdocker run -it --label org.dl4miceverywhere.managed=true --gpus all -p $port:$port -v \"$data_path:/home/data\" -v \"$result_path:/home/results\" --shm-size=256m \"$docker_tag\"  /bin/bash -c \"$docker_command\"" >> "$result_path/docker_info.txt"
+        echo -e "The command used to run this container has been:\n\tdocker run -it --label org.dl4miceverywhere.managed=true --gpus all -p 127.0.0.1:$port:$port -v \"$data_path:/home/data\" -v \"$result_path:/home/results\" --shm-size=256m \"$docker_tag\"  /bin/bash -c \"$docker_command\"" >> "$result_path/docker_info.txt"
     else
         # Run the docker image without activating the GPU
-        docker run -it --label org.dl4miceverywhere.managed=true -p $port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
+        docker run -it --label org.dl4miceverywhere.managed=true -p 127.0.0.1:$port:$port -v "$data_path:/home/data" -v "$result_path:/home/results" --shm-size=256m "$docker_tag"  /bin/bash -c "$docker_command"
         CONTAINER_OUT=$?
-        echo -e "The command used to run this container has been:\n\tdocker run -it --label org.dl4miceverywhere.managed=true -p $port:$port -v \"$data_path:/home/data\" -v \"$result_path:/home/results\" --shm-size=256m \"$docker_tag\"  /bin/bash -c \"$docker_command\"" >> "$result_path/docker_info.txt"
+        echo -e "The command used to run this container has been:\n\tdocker run -it --label org.dl4miceverywhere.managed=true -p 127.0.0.1:$port:$port -v \"$data_path:/home/data\" -v \"$result_path:/home/results\" --shm-size=256m \"$docker_tag\"  /bin/bash -c \"$docker_command\"" >> "$result_path/docker_info.txt"
     fi
 
 

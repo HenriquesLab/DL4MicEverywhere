@@ -135,6 +135,17 @@ class PortSelectionContractTests(unittest.TestCase):
         self.assertIn('while [ "$attempt" -lt "$PORT_RANGE_SIZE" ]', selector)
         self.assertIn("windows_port_status", selector)
 
+    def test_notebook_port_is_published_on_localhost_only(self):
+        # Publishing on every interface exposes Jupyter to the local network and
+        # makes Windows Firewall ask to allow Docker Desktop Backend.
+        text = LINUX.read_text(encoding="utf-8")
+        run_lines = [line for line in text.splitlines() if "docker run -it" in line]
+        self.assertEqual(len(run_lines), 4, run_lines)
+        for line in run_lines:
+            with self.subTest(line=line.strip()[:60]):
+                self.assertIn("-p 127.0.0.1:$port:$port", line)
+                self.assertNotIn("-p $port:$port", line)
+
     def test_windows_probe_uses_active_tcp_listener_table(self):
         text = WINDOWS_HELPER.read_text(encoding="utf-8")
         self.assertIn("GetActiveTcpListeners", text)

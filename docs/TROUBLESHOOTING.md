@@ -52,6 +52,12 @@ This issue happens on Windows computers because the virtualization is not enable
 
 This process requires you to restart your computer, enter the BIOS and enabling this option. For more detailed instructions, we recommend following the step described on the following videos [Enable Virtualization on Windows 10](https://www.youtube.com/watch?v=LQIyowZMiY8) or [Enable Virtualization on Windows 11](https://youtu.be/t8f-zw_wcWM?si=pG2FlhXMImwrWfg7).
 
+### **Windows Firewall asks whether Docker Desktop Backend may access public and private networks**
+
+Choose **Cancel** (do not allow). DL4MicEverywhere opens the notebook through `localhost`, which Windows Firewall does not block, so the notebook keeps working. Allowing access would only let other computers on your network reach the Jupyter session, and it needs administrator rights.
+
+Current DL4MicEverywhere versions publish the notebook port on `127.0.0.1` only, so this prompt should no longer appear because of DL4MicEverywhere. If it still does, another container or application is publishing a port on all network interfaces.
+
 ## GPU Support
 
 ### **GPU check failed: which layer?**
