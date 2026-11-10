@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 import unittest
 
 
@@ -33,8 +34,10 @@ class PipNetworkResilienceTests(unittest.TestCase):
         for dockerfile in DOCKERFILES:
             with self.subTest(dockerfile=dockerfile.name):
                 text = dockerfile.read_text(encoding="utf-8")
-                self.assertIn("RUN --mount=type=cache,id=dl4me-pip,target=/root/.cache/pip \\\n"
-                              "    for attempt in 1 2 3; do \\\n", text)
+                install_run = re.search(r"^RUN --mount=type=cache,id=dl4me-pip,target=/root/\.cache/pip \\\n"
+                                        r"(?:    [^\n]*\\\n)*?"
+                                        r"    for attempt in 1 2 3; do \\\n", text, re.MULTILINE)
+                self.assertIsNotNone(install_run)
                 self.assertIn("python -m pip install --cache-dir /root/.cache/pip", text)
                 self.assertIn('if [ "$attempt" -eq 3 ]; then exit 1; fi', text)
 

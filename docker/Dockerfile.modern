@@ -164,11 +164,20 @@ RUN set -eux; \
             ;; \
     esac; \
     "python${PYTHON_VERSION}" -m venv "${VIRTUAL_ENV}"; \
+    # BUILD_SETUPTOOLS_SPEC is the upper limit for setuptools in the isolated
+    # environments in which pip compiles packages without wheels. Python 3.9+
+    # uses pip 25.3, whose build constraints do not affect the installed
+    # setuptools, so the limit can stay below 74 (setuptools 74 removed
+    # distutils.msvccompiler, needed by numpy.distutils builds such as stardist
+    # 0.8.3). Older pips apply the same file to the whole install, so their
+    # limit must still admit the setuptools pinned here and in the lock.
     case "${PYTHON_VERSION}" in \
         3.7) \
-            PIP_VERSION=24.0; SETUPTOOLS_VERSION=67.8.0; WHEEL_VERSION=0.41.3 ;; \
-        3.8|3.9|3.10|3.11|3.12|3.13) \
-            PIP_VERSION=24.3.1; SETUPTOOLS_VERSION=75.3.2; WHEEL_VERSION=0.45.1 ;; \
+            PIP_VERSION=24.0; SETUPTOOLS_VERSION=67.8.0; WHEEL_VERSION=0.41.3; BUILD_SETUPTOOLS_SPEC="<=67.8.0" ;; \
+        3.8) \
+            PIP_VERSION=24.3.1; SETUPTOOLS_VERSION=75.3.2; WHEEL_VERSION=0.45.1; BUILD_SETUPTOOLS_SPEC="<=75.3.2" ;; \
+        3.9|3.10|3.11|3.12|3.13) \
+            PIP_VERSION=25.3; SETUPTOOLS_VERSION=75.3.2; WHEEL_VERSION=0.45.1; BUILD_SETUPTOOLS_SPEC="<74" ;; \
     esac; \
     "${VIRTUAL_ENV}/bin/python" -m pip install \
         "pip==${PIP_VERSION}" \
@@ -178,9 +187,10 @@ RUN set -eux; \
     ln -sf "${VIRTUAL_ENV}/bin/python" /usr/local/bin/python3; \
     ln -sf "${VIRTUAL_ENV}/bin/pip" /usr/local/bin/pip; \
     ln -sf "${VIRTUAL_ENV}/bin/pip" /usr/local/bin/pip3; \
-    # Same setuptools for the isolated environments in which pip compiles
-    # packages without wheels; otherwise each build fetches the newest one.
-    printf 'setuptools==%s\n' "${SETUPTOOLS_VERSION}" > /opt/dl4me-build-constraints.txt; \
+    # Without an upper limit each source build fetches the newest setuptools
+    # (mpi4py 3.1.5 fails with 80+). A limit, unlike an exact pin, still lets a
+    # package ask for an older setuptools (scikit-image 0.18 needs <=51).
+    printf 'setuptools%s\n' "${BUILD_SETUPTOOLS_SPEC}" > /opt/dl4me-build-constraints.txt; \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /home
@@ -189,16 +199,23 @@ WORKDIR /home
 # The lock includes transitive dependencies, hashes, and DL4MicEverywhere's
 # runtime defaults for packages not explicitly supplied by the notebook input.
 COPY ${PATH_TO_REQUIREMENTS_LOCK} /tmp/requirements.lock.txt
-# PIP_CONSTRAINT also reaches the isolated build environments of packages
-# compiled from source, so their setuptools stays pinned too.
+# The setuptools limit reaches the isolated build environments of packages
+# compiled from source through PIP_BUILD_CONSTRAINT (pip 25.3+), or through
+# PIP_CONSTRAINT with older pips. pip 25.3+ refuses to run when both are set,
+# so exactly one is chosen, based on what this pip supports.
 # pip cannot resume an interrupted download, and PIP_RETRIES does not cover a
 # download that stalls halfway, so the install is retried up to three times.
 # Downloads are kept in a BuildKit cache mount, which is not part of the image,
 # so a retry or a later build only fetches what is missing. The hashes in the
 # lock are still checked for every file taken from the cache.
 RUN --mount=type=cache,id=dl4me-pip,target=/root/.cache/pip \
+    pip_install_help=$(python -m pip install --help) && \
+    case "$pip_install_help" in \
+        *--build-constraint*) constraint_var=PIP_BUILD_CONSTRAINT ;; \
+        *) constraint_var=PIP_CONSTRAINT ;; \
+    esac && \
     for attempt in 1 2 3; do \
-        env -u PIP_NO_CACHE_DIR PIP_CONSTRAINT=/opt/dl4me-build-constraints.txt \
+        env -u PIP_NO_CACHE_DIR "${constraint_var}=/opt/dl4me-build-constraints.txt" \
             python -m pip install --cache-dir /root/.cache/pip \
                 --require-hashes -r /tmp/requirements.lock.txt && break; \
         if [ "$attempt" -eq 3 ]; then exit 1; fi; \
