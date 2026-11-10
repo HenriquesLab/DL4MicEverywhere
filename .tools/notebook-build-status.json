@@ -402,29 +402,29 @@
         "care_3d_zerocostdl4mic-z1.15.3-d2.3.0": {
           "architectures": {
             "amd64": {
-              "build_status": "not_run",
+              "build_status": "failure",
               "image_tag": "care_3d_zerocostdl4mic-z1.15.3-d2.3.0-amd64",
-              "last_attempted_at": "2026-11-08T01:11:30Z",
-              "smoke_status": "not_run"
+              "last_attempted_at": "2026-11-10T05:19:11Z",
+              "smoke_status": "skipped"
             },
             "arm64": {
-              "build_status": "failure",
+              "build_status": "skipped",
               "image_tag": "care_3d_zerocostdl4mic-z1.15.3-d2.3.0-arm64",
-              "last_attempted_at": "2026-11-08T01:11:30Z",
+              "last_attempted_at": "2026-11-10T05:19:11Z",
               "smoke_status": "skipped"
             },
             "gpu": {
-              "build_status": "not_run",
+              "build_status": "skipped",
               "image_tag": "care_3d_zerocostdl4mic-z1.15.3-d2.3.0-gpu",
-              "last_attempted_at": "2026-11-08T01:11:30Z",
-              "smoke_status": "not_run"
+              "last_attempted_at": "2026-11-10T05:19:11Z",
+              "smoke_status": "skipped"
             }
           },
-          "commit_sha": "f08fe7dc6c60dac43772bfc46617e32da6e8e483",
+          "commit_sha": "a459e2a01ea67fe8d2f2f21c9035bacc7a5c0e1f",
           "docker_tag": "care_3d_zerocostdl4mic-z1.15.3-d2.3.0",
-          "last_attempted_at": "2026-11-08T01:11:30Z",
+          "last_attempted_at": "2026-11-10T05:19:11Z",
           "manifest_status": "skipped",
-          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568"
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42623744029"
         }
       }
     },
