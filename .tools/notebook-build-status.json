@@ -790,35 +790,37 @@
       "category": "ZeroCostDL4Mic_notebooks",
       "latest_recorded_tag": "embedseg_2d_zerocostdl4mic-z1.15.1-d2.3.0",
       "name": "EmbedSeg (2D) - ZeroCostDL4Mic",
-      "notebook_version": "1.15.1",
+      "notebook_version": "1.15.0",
       "releases": {
         "embedseg_2d_zerocostdl4mic-z1.15.1-d2.3.0": {
           "architectures": {
             "amd64": {
-              "build_status": "not_run",
+              "build_status": "success",
+              "generated_at": "2026-11-10T07:12:20Z",
               "image_tag": "embedseg_2d_zerocostdl4mic-z1.15.1-d2.3.0-amd64",
-              "last_attempted_at": "2026-11-08T01:18:26Z",
-              "smoke_status": "not_run"
+              "last_attempted_at": "2026-11-10T12:37:20Z",
+              "smoke_status": "success"
             },
             "arm64": {
               "build_status": "success",
-              "generated_at": "2026-11-07T06:40:06.218862Z",
+              "generated_at": "2026-11-09T19:26:23Z",
               "image_tag": "embedseg_2d_zerocostdl4mic-z1.15.1-d2.3.0-arm64",
-              "last_attempted_at": "2026-11-08T01:18:26Z",
+              "last_attempted_at": "2026-11-10T12:37:20Z",
               "smoke_status": "success"
             },
             "gpu": {
-              "build_status": "not_run",
+              "build_status": "success",
+              "generated_at": "2026-11-10T07:28:43Z",
               "image_tag": "embedseg_2d_zerocostdl4mic-z1.15.1-d2.3.0-gpu",
-              "last_attempted_at": "2026-11-08T01:18:26Z",
-              "smoke_status": "not_run"
+              "last_attempted_at": "2026-11-10T12:37:20Z",
+              "smoke_status": "success"
             }
           },
-          "commit_sha": "f08fe7dc6c60dac43772bfc46617e32da6e8e483",
+          "commit_sha": "a459e2a01ea67fe8d2f2f21c9035bacc7a5c0e1f",
           "docker_tag": "embedseg_2d_zerocostdl4mic-z1.15.1-d2.3.0",
-          "last_attempted_at": "2026-11-08T01:18:26Z",
-          "manifest_status": "skipped",
-          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568"
+          "last_attempted_at": "2026-11-10T12:37:20Z",
+          "manifest_status": "success",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42623744029"
         }
       }
     },
