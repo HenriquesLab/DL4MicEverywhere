@@ -305,9 +305,9 @@
     },
     "notebooks/External_notebooks/SISR_Metric_Calculation/configuration.yaml": {
       "category": "External_notebooks",
-      "latest_recorded_tag": "sisr_metrics_calculation-e0.0.1-d2.3.0",
+      "latest_recorded_tag": "sisr_metrics_calculation-e0.0.2-d2.3.0",
       "name": "SISR_Metric_Calculation",
-      "notebook_version": "0.0.1",
+      "notebook_version": "0.0.2",
       "releases": {
         "sisr_metrics_calculation-e0.0.1-d2.3.0": {
           "architectures": {
@@ -337,6 +337,36 @@
           "last_attempted_at": "2026-11-10T12:11:15Z",
           "manifest_status": "success",
           "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42623744029"
+        },
+        "sisr_metrics_calculation-e0.0.2-d2.3.0": {
+          "architectures": {
+            "amd64": {
+              "build_status": "success",
+              "generated_at": "2026-11-10T14:58:48Z",
+              "image_tag": "sisr_metrics_calculation-e0.0.2-d2.3.0-amd64",
+              "last_attempted_at": "2026-11-10T16:57:04Z",
+              "smoke_status": "success"
+            },
+            "arm64": {
+              "build_status": "success",
+              "generated_at": "2026-11-10T14:37:46Z",
+              "image_tag": "sisr_metrics_calculation-e0.0.2-d2.3.0-arm64",
+              "last_attempted_at": "2026-11-10T16:57:04Z",
+              "smoke_status": "success"
+            },
+            "gpu": {
+              "build_status": "success",
+              "generated_at": "2026-11-10T15:14:49Z",
+              "image_tag": "sisr_metrics_calculation-e0.0.2-d2.3.0-gpu",
+              "last_attempted_at": "2026-11-10T16:57:04Z",
+              "smoke_status": "success"
+            }
+          },
+          "commit_sha": "c1a8808d967848b905b6a56827c8f053c75f731d",
+          "docker_tag": "sisr_metrics_calculation-e0.0.2-d2.3.0",
+          "last_attempted_at": "2026-11-10T16:57:04Z",
+          "manifest_status": "success",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42832055205"
         }
       }
     },
