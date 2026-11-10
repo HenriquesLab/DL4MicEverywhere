@@ -912,29 +912,32 @@
         "retinanet_zerocostdl4mic-z1.14.1-d2.3.0": {
           "architectures": {
             "amd64": {
-              "build_status": "not_run",
+              "build_status": "success",
+              "generated_at": "2026-11-09T19:52:36Z",
               "image_tag": "retinanet_zerocostdl4mic-z1.14.1-d2.3.0-amd64",
-              "last_attempted_at": "2026-11-08T01:13:26Z",
-              "smoke_status": "not_run"
+              "last_attempted_at": "2026-11-10T12:19:40Z",
+              "smoke_status": "success"
             },
             "arm64": {
-              "build_status": "failure",
+              "build_status": "success",
+              "generated_at": "2026-11-09T16:25:33Z",
               "image_tag": "retinanet_zerocostdl4mic-z1.14.1-d2.3.0-arm64",
-              "last_attempted_at": "2026-11-08T01:13:26Z",
-              "smoke_status": "skipped"
+              "last_attempted_at": "2026-11-10T12:19:40Z",
+              "smoke_status": "success"
             },
             "gpu": {
-              "build_status": "not_run",
+              "build_status": "success",
+              "generated_at": "2026-11-09T20:07:11Z",
               "image_tag": "retinanet_zerocostdl4mic-z1.14.1-d2.3.0-gpu",
-              "last_attempted_at": "2026-11-08T01:13:26Z",
-              "smoke_status": "not_run"
+              "last_attempted_at": "2026-11-10T12:19:40Z",
+              "smoke_status": "success"
             }
           },
-          "commit_sha": "f08fe7dc6c60dac43772bfc46617e32da6e8e483",
+          "commit_sha": "a459e2a01ea67fe8d2f2f21c9035bacc7a5c0e1f",
           "docker_tag": "retinanet_zerocostdl4mic-z1.14.1-d2.3.0",
-          "last_attempted_at": "2026-11-08T01:13:26Z",
-          "manifest_status": "skipped",
-          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568"
+          "last_attempted_at": "2026-11-10T12:19:40Z",
+          "manifest_status": "success",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42623744029"
         }
       }
     },
