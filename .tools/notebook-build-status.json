@@ -1131,30 +1131,31 @@
           "architectures": {
             "amd64": {
               "build_status": "success",
-              "generated_at": "2026-11-07T01:37:37.471368Z",
+              "generated_at": "2026-11-10T07:38:43Z",
               "image_tag": "u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.3.0-amd64",
-              "last_attempted_at": "2026-11-08T01:39:06Z",
-              "smoke_status": "not_run"
+              "last_attempted_at": "2026-11-10T12:38:27Z",
+              "smoke_status": "success"
             },
             "arm64": {
               "build_status": "success",
-              "generated_at": "2026-11-07T01:25:29.388909Z",
+              "generated_at": "2026-11-09T19:34:47Z",
               "image_tag": "u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.3.0-arm64",
-              "last_attempted_at": "2026-11-08T01:39:06Z",
+              "last_attempted_at": "2026-11-10T12:38:27Z",
               "smoke_status": "success"
             },
             "gpu": {
-              "build_status": "not_run",
+              "build_status": "success",
+              "generated_at": "2026-11-10T07:53:00Z",
               "image_tag": "u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.3.0-gpu",
-              "last_attempted_at": "2026-11-08T01:39:06Z",
-              "smoke_status": "not_run"
+              "last_attempted_at": "2026-11-10T12:38:27Z",
+              "smoke_status": "success"
             }
           },
-          "commit_sha": "f08fe7dc6c60dac43772bfc46617e32da6e8e483",
+          "commit_sha": "a459e2a01ea67fe8d2f2f21c9035bacc7a5c0e1f",
           "docker_tag": "u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.3.0",
-          "last_attempted_at": "2026-11-08T01:39:06Z",
-          "manifest_status": "cancelled",
-          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568"
+          "last_attempted_at": "2026-11-10T12:38:27Z",
+          "manifest_status": "success",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42623744029"
         }
       }
     },
