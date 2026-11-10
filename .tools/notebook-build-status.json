@@ -982,7 +982,7 @@
     },
     "notebooks/ZeroCostDL4Mic_notebooks/SplineDist_2D_DL4Mic/configuration.yaml": {
       "category": "ZeroCostDL4Mic_notebooks",
-      "latest_recorded_tag": "splinedist_2d_zerocostdl4mic-z1.14.1-d2.3.0",
+      "latest_recorded_tag": "splinedist_2d_zerocostdl4mic-z1.14.2-d2.3.0",
       "name": "SplineDist (2D) - ZeroCostDL4Mic",
       "notebook_version": "1.14.1",
       "releases": {
@@ -1014,6 +1014,36 @@
           "last_attempted_at": "2026-11-10T12:16:16Z",
           "manifest_status": "success",
           "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42623744029"
+        },
+        "splinedist_2d_zerocostdl4mic-z1.14.2-d2.3.0": {
+          "architectures": {
+            "amd64": {
+              "build_status": "success",
+              "generated_at": "2026-11-10T14:25:46Z",
+              "image_tag": "splinedist_2d_zerocostdl4mic-z1.14.2-d2.3.0-amd64",
+              "last_attempted_at": "2026-11-10T16:55:35Z",
+              "smoke_status": "success"
+            },
+            "arm64": {
+              "build_status": "success",
+              "generated_at": "2026-11-10T14:25:30Z",
+              "image_tag": "splinedist_2d_zerocostdl4mic-z1.14.2-d2.3.0-arm64",
+              "last_attempted_at": "2026-11-10T16:55:35Z",
+              "smoke_status": "success"
+            },
+            "gpu": {
+              "build_status": "success",
+              "generated_at": "2026-11-10T14:42:58Z",
+              "image_tag": "splinedist_2d_zerocostdl4mic-z1.14.2-d2.3.0-gpu",
+              "last_attempted_at": "2026-11-10T16:55:35Z",
+              "smoke_status": "success"
+            }
+          },
+          "commit_sha": "c1a8808d967848b905b6a56827c8f053c75f731d",
+          "docker_tag": "splinedist_2d_zerocostdl4mic-z1.14.2-d2.3.0",
+          "last_attempted_at": "2026-11-10T16:55:35Z",
+          "manifest_status": "success",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42832055205"
         }
       }
     },
