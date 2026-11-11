@@ -1,0 +1,581 @@
+# GENERATED from build_docker_images_new_config.yml by .tools/python_tools/generate_hosted_workflows.py.
+# Do not edit by hand: change the original workflow and run the generator again.
+# Runs on GitHub-hosted runners instead of the self-hosted ones.
+name: "[GitHub-hosted] Build Docker images for a configuration from ZeroCostDL4Mic that has been updated"
+
+on:
+  workflow_call:
+    inputs:
+      config_file: # the variable you can use in place of a matrix
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  get_arguments:
+    name: Extract arguments from configuration
+    runs-on: ubuntu-latest
+    outputs:
+      notebook_url: ${{ steps.notebook_url.outputs.result }}
+      requirements_url: ${{ steps.requirements_url.outputs.result }}
+      cuda_version: ${{ steps.cuda_version.outputs.result }}
+      cudnn_version: ${{ steps.cudnn_version.outputs.result }}
+      ubuntu_version: ${{ steps.ubuntu_version.outputs.result }}
+      python_version: ${{ steps.python_version.outputs.result }}
+      sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}
+      docker_tag: ${{ steps.docker_tag.outputs.result }}
+      notebook_name: ${{ steps.notebook_name.outputs.value }}
+      latest_tag: ${{ steps.latest_tag.outputs.value }}
+      dockerfile_regular: ${{ steps.select_dockerfiles.outputs.dockerfile_regular }}
+      dockerfile_gpu: ${{ steps.select_dockerfiles.outputs.dockerfile_gpu }}
+    steps:
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+      # Set up Python for its use
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          cache: 'pip' # caching pip dependencies
+
+      # First udpate the configuration file
+      - name: Install requirements
+        run: pip install -r .tools/requirements.txt
+      - name: Update the version of the notebook on the configuration
+        run: python3 .tools/python_tools/update_zerocost_version.py '${{ inputs.config_file }}' 
+      - name: Update the docker_tag on the configuration
+        run: python3 .tools/python_tools/update_configuration.py '${{ inputs.config_file }}' 
+
+      # Now that the configuration is updated, we can extract the arguments
+      - name: Check notebook_url attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: notebook_url
+        with:
+          cmd: yq '.config.dl4miceverywhere.notebook_url' '${{ inputs.config_file }}' 
+      - name: Check requirements_url attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: requirements_url
+        with:
+          cmd: yq '.config.dl4miceverywhere.requirements_url' '${{ inputs.config_file }}' 
+      - name: Check cuda_version attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: cuda_version
+        with:
+          cmd: yq '.config.dl4miceverywhere.cuda_version' '${{ inputs.config_file }}' 
+      - name: Check cudnn_version attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: cudnn_version
+        with:
+          cmd: yq '.config.dl4miceverywhere.cudnn_version' '${{ inputs.config_file }}' 
+      - name: Check ubuntu_version attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: ubuntu_version
+        with:
+          cmd: yq '.config.dl4miceverywhere.ubuntu_version' '${{ inputs.config_file }}' 
+      - name: Check python_version attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: python_version
+        with:
+          cmd: yq '.config.dl4miceverywhere.python_version' '${{ inputs.config_file }}'
+      - name: Check sections_to_remove attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: sections_to_remove
+        with:
+          cmd: yq '.config.dl4miceverywhere.sections_to_remove' '${{ inputs.config_file }}'  
+      - name: Check docker_tag attribute on configuration.yaml
+        uses: mikefarah/yq@master
+        id: docker_tag
+        with:
+          cmd: yq '.config.dl4miceverywhere.docker_hub_image' '${{ inputs.config_file }}'  
+      - name: Refuse to overwrite an existing Docker Hub release tag
+        shell: bash
+        run: |
+          python3 .tools/python_tools/dockerhub_tag_guard.py \
+            --namespace henriqueslab \
+            --repository dl4miceverywhere \
+            --tag '${{ steps.docker_tag.outputs.result }}'
+      - name: Get notebook_name
+        id: notebook_name
+        run: |
+          notebook_name="$(basename ${{ steps.notebook_url.outputs.result }})"
+          echo "value=$notebook_name" >> "$GITHUB_OUTPUT"
+      - name: Create_latest_tag
+        id: latest_tag
+        run: |
+          IFS='-'
+          read -a strarr <<< "${{ steps.docker_tag.outputs.result }}"
+          IFS=''
+          latest_tag="${strarr[0]}"
+          for i in ${strarr[@]:1:${#strarr[@]}-3}; do
+            latest_tag+="-$i"
+          done
+          latest_tag+="-latest"
+          echo "$latest_tag"
+          echo "value=$latest_tag" >> "$GITHUB_OUTPUT"
+      - name: Select Dockerfiles
+        id: select_dockerfiles
+        shell: bash
+        run: |
+          python_version='${{ steps.python_version.outputs.result }}'
+          case "$python_version" in
+            3.5|3.6)
+              echo "dockerfile_regular=docker/Dockerfile.legacy" >> "$GITHUB_OUTPUT"
+              echo "dockerfile_gpu=docker/Dockerfile.gpu.legacy" >> "$GITHUB_OUTPUT"
+              ;;
+            3.7|3.8|3.9|3.10|3.11|3.12|3.13)
+              echo "dockerfile_regular=docker/Dockerfile.modern" >> "$GITHUB_OUTPUT"
+              echo "dockerfile_gpu=docker/Dockerfile.gpu.modern" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "Unsupported python_version: $python_version" >&2
+              exit 1
+              ;;
+          esac
+      - name: Print attributes
+        run: |
+          echo 'notebook_url: ${{ steps.notebook_url.outputs.result }}'
+          echo 'requirements_url: ${{ steps.requirements_url.outputs.result }}'
+          echo 'cuda_version: ${{ steps.cuda_version.outputs.result }}'
+          echo 'cudnn_version: ${{ steps.cudnn_version.outputs.result }}'
+          echo 'ubuntu version: ${{ steps.ubuntu_version.outputs.result }}'
+          echo 'python_version: ${{ steps.python_version.outputs.result }}'
+          echo 'sections_to_remove: ${{ steps.sections_to_remove.outputs.result }}'
+          echo 'docker_tag: ${{ steps.docker_tag.outputs.result }}'
+          echo 'notebook_name: ${{ steps.notebook_name.outputs.value }}'
+          echo 'latest_tag: ${{ steps.latest_tag.outputs.value }}'
+          echo 'dockerfile_regular: ${{ steps.select_dockerfiles.outputs.dockerfile_regular }}'
+          echo 'dockerfile_gpu: ${{ steps.select_dockerfiles.outputs.dockerfile_gpu }}'
+
+  build_amd64:
+    name: Build Docker image on AMD64
+    runs-on: ubuntu-latest
+    needs: get_arguments
+    outputs:
+      amd64_build: ${{ steps.build_amd64.outcome }}
+      amd64_smoke: ${{ steps.smoke_amd64.outcome }}
+      amd64_generated_at: ${{ steps.amd64_generated.outputs.timestamp }}
+      gpu_build: ${{ steps.build_gpu.outcome }}
+      gpu_smoke: ${{ steps.smoke_gpu.outcome }}
+      gpu_generated_at: ${{ steps.gpu_generated.outputs.timestamp }}
+    steps:
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+
+      - name: Free disk space on the GitHub-hosted runner
+        # GitHub-hosted runners start with about 14 GB free, less than a CUDA
+        # base image plus deep-learning wheels need. Remove preinstalled
+        # toolchains that DL4MicEverywhere does not use.
+        shell: bash
+        run: |
+          df -h /
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup \
+            /opt/hostedtoolcache/CodeQL /usr/local/share/boost /usr/share/swift \
+            /usr/local/share/powershell /usr/local/share/chromium /opt/az /opt/microsoft || true
+          docker image prune --all --force || true
+          df -h /
+
+      - name: Set up Python for dependency lock validation
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Ensure deterministic dependency locks
+        id: dependency_lock
+        shell: bash
+        run: |
+          python3 .tools/python_tools/requirements_lock.py ensure --config '${{ inputs.config_file }}' --repo-root .
+          python3 .tools/python_tools/requirements_lock.py ensure \
+            --source docker/converter-requirements.txt \
+            --python-version 3.9 \
+            --lock docker/converter-requirements.lock.txt \
+            --profile none \
+            --repo-root .
+          echo "path=$(dirname '${{ inputs.config_file }}')/requirements.lock.txt" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Resolve immutable Docker base images
+        shell: bash
+        run: |
+          eval "$(python3 .tools/python_tools/base_image_lock.py --repo-root . ensure-config --config '${{ inputs.config_file }}' --shell)"
+          echo "CONVERTER_BASE_IMAGE=$CONVERTER_BASE_IMAGE" >> "$GITHUB_ENV"
+          echo "CPU_BASE_IMAGE=$CPU_BASE_IMAGE" >> "$GITHUB_ENV"
+          echo "GPU_BASE_IMAGE=$GPU_BASE_IMAGE" >> "$GITHUB_ENV"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push AMD64 image
+        id: build_amd64
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ needs.get_arguments.outputs.dockerfile_regular }}
+          platforms: linux/amd64
+          push: true
+          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64
+          build-args: |
+            CONVERTER_BASE_IMAGE=${{ env.CONVERTER_BASE_IMAGE }}
+            FINAL_BASE_IMAGE=${{ env.CPU_BASE_IMAGE }}
+            UBUNTU_VERSION=${{ needs.get_arguments.outputs.ubuntu_version }}
+            CUDA_VERSION=${{ needs.get_arguments.outputs.cuda_version }}
+            CUDNN_VERSION=${{ needs.get_arguments.outputs.cudnn_version }}
+            GPU_FLAG=0
+            PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
+            PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
+            PATH_TO_REQUIREMENTS=${{ needs.get_arguments.outputs.requirements_url }}
+            PATH_TO_REQUIREMENTS_LOCK=${{ steps.dependency_lock.outputs.path }}
+            NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
+            SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
+      
+      - name: Record AMD64 generation time
+        id: amd64_generated
+        shell: bash
+        run: echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke-test generated AMD64 image
+        id: smoke_amd64
+        continue-on-error: true
+        shell: bash
+        run: |
+          image="henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64"
+          docker pull "$image"
+          bash .tools/bash_tools/post_build_test.sh "$image" 0
+
+      - name: Free disk space before the GPU image
+        # The CPU image and its build cache are no longer needed on this runner.
+        shell: bash
+        run: |
+          docker image rm -f "henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64" 2>/dev/null || true
+          docker buildx prune --all --force || true
+          df -h /
+
+      - name: Build and push GPU image
+        id: build_gpu
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ needs.get_arguments.outputs.dockerfile_gpu }}
+          platforms: linux/amd64
+          push: true
+          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu
+          build-args: |
+            CONVERTER_BASE_IMAGE=${{ env.CONVERTER_BASE_IMAGE }}
+            FINAL_BASE_IMAGE=${{ env.GPU_BASE_IMAGE }}
+            UBUNTU_VERSION=${{ needs.get_arguments.outputs.ubuntu_version }}
+            CUDA_VERSION=${{ needs.get_arguments.outputs.cuda_version }}
+            CUDNN_VERSION=${{ needs.get_arguments.outputs.cudnn_version }}
+            GPU_FLAG=1
+            PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
+            PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
+            PATH_TO_REQUIREMENTS=${{ needs.get_arguments.outputs.requirements_url }}
+            PATH_TO_REQUIREMENTS_LOCK=${{ steps.dependency_lock.outputs.path }}
+            NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
+            SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
+
+      - name: Record GPU-image generation time
+        id: gpu_generated
+        shell: bash
+        run: echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke-test generated GPU image
+        id: smoke_gpu
+        continue-on-error: true
+        shell: bash
+        run: |
+          image="henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-gpu"
+          docker pull "$image"
+          # This validates container integrity. GPU execution is intentionally
+          # not claimed here because this build runner is not guaranteed to
+          # expose an NVIDIA device to Docker.
+          bash .tools/bash_tools/post_build_test.sh "$image" 0
+
+      - name: Remove images pulled for the smoke tests
+        # The smoke tests pull several GB per image onto the self-hosted
+        # runner. Without this the disk fills after a few notebooks.
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          tag="henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}"
+          docker image rm -f "$tag-amd64" "$tag-gpu" 2>/dev/null || true
+          docker image prune -f
+          df -h "$(docker info --format '{{.DockerRootDir}}')" || true
+
+  build_arm64:
+    name: Build Docker image on ARM64
+    runs-on: ubuntu-24.04-arm
+    needs: get_arguments
+    outputs:
+      arm64_build: ${{ steps.build_arm64.outcome }}
+      arm64_smoke: ${{ steps.smoke_arm64.outcome }}
+      arm64_generated_at: ${{ steps.arm64_generated.outputs.timestamp }}
+    steps:
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+
+      - name: Free disk space on the GitHub-hosted runner
+        # GitHub-hosted runners start with about 14 GB free, less than a CUDA
+        # base image plus deep-learning wheels need. Remove preinstalled
+        # toolchains that DL4MicEverywhere does not use.
+        shell: bash
+        run: |
+          df -h /
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup \
+            /opt/hostedtoolcache/CodeQL /usr/local/share/boost /usr/share/swift \
+            /usr/local/share/powershell /usr/local/share/chromium /opt/az /opt/microsoft || true
+          docker image prune --all --force || true
+          df -h /
+
+      - name: Set up Python for dependency lock validation
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Ensure deterministic dependency locks
+        id: dependency_lock
+        shell: bash
+        run: |
+          # ARM64 needs its own lock: some packages pull different dependencies
+          # on aarch64 (TensorFlow adds tensorflow-cpu-aws, PyTorch drops the
+          # x86-only nvidia-* wheels). Notebooks with no ARM build stop here
+          # with a clear message and are published for AMD64 only.
+          python3 .tools/python_tools/requirements_lock.py ensure --config '${{ inputs.config_file }}' --platform arm64 --repo-root .
+          python3 .tools/python_tools/requirements_lock.py ensure \
+            --source docker/converter-requirements.txt \
+            --python-version 3.9 \
+            --lock docker/converter-requirements.lock.txt \
+            --profile none \
+            --repo-root .
+          echo "path=$(dirname '${{ inputs.config_file }}')/requirements.arm64.lock.txt" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Resolve immutable Docker base images
+        shell: bash
+        run: |
+          eval "$(python3 .tools/python_tools/base_image_lock.py --repo-root . ensure-config --config '${{ inputs.config_file }}' --shell)"
+          echo "CONVERTER_BASE_IMAGE=$CONVERTER_BASE_IMAGE" >> "$GITHUB_ENV"
+          echo "CPU_BASE_IMAGE=$CPU_BASE_IMAGE" >> "$GITHUB_ENV"
+          echo "GPU_BASE_IMAGE=$GPU_BASE_IMAGE" >> "$GITHUB_ENV"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push ARM64 image
+        id: build_arm64
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ needs.get_arguments.outputs.dockerfile_regular }}
+          platforms: linux/arm64
+          push: true
+          tags: henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
+          build-args: |
+              CONVERTER_BASE_IMAGE=${{ env.CONVERTER_BASE_IMAGE }}
+              FINAL_BASE_IMAGE=${{ env.CPU_BASE_IMAGE }}
+              UBUNTU_VERSION=${{ needs.get_arguments.outputs.ubuntu_version }}
+              CUDA_VERSION=${{ needs.get_arguments.outputs.cuda_version }}
+              CUDNN_VERSION=${{ needs.get_arguments.outputs.cudnn_version }}
+              GPU_FLAG=0
+              PYTHON_VERSION=${{ needs.get_arguments.outputs.python_version }}
+              PATH_TO_NOTEBOOK=${{ needs.get_arguments.outputs.notebook_url }}
+              PATH_TO_REQUIREMENTS=${{ needs.get_arguments.outputs.requirements_url }}
+              PATH_TO_REQUIREMENTS_LOCK=${{ steps.dependency_lock.outputs.path }}
+              NOTEBOOK_NAME=${{ needs.get_arguments.outputs.notebook_name }}
+              SECTIONS_TO_REMOVE=${{ needs.get_arguments.outputs.sections_to_remove }}
+
+      - name: Record ARM64 generation time
+        id: arm64_generated
+        shell: bash
+        run: echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke-test generated ARM64 image
+        id: smoke_arm64
+        continue-on-error: true
+        shell: bash
+        run: |
+          image="henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64"
+          docker pull "$image"
+          bash .tools/bash_tools/post_build_test.sh "$image" 0
+
+      - name: Remove image pulled for the smoke test
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          docker image rm -f "henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64" 2>/dev/null || true
+          docker image prune -f
+
+  build_only_arm64:
+    name: Only push ARM64 to Docker Hub 
+    if: ${{ always() && contains(needs.build_amd64.result, 'failure') }}
+    needs:
+      - get_arguments
+      - build_amd64
+      - build_arm64
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create and push manifest images
+        run: |
+          docker buildx imagetools create \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
+
+  build_only_amd64:
+    name: Only push AMD64 to Docker Hub
+    if: ${{ always() && contains(needs.build_arm64.result, 'failure') }}
+    needs:
+      - get_arguments
+      - build_amd64
+      - build_arm64
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create and push manifest images
+        run: |
+          docker buildx imagetools create \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64
+
+  build_multi_architecture:
+    name: Both push AMD64 and ARM64 to Docker Hub
+    needs:
+      - get_arguments
+      - build_amd64
+      - build_arm64
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create and push manifest images
+        run: |
+          docker buildx imagetools create \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }} \
+          -t henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.latest_tag }} \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-amd64 \
+          henriqueslab/dl4miceverywhere:${{ needs.get_arguments.outputs.docker_tag }}-arm64
+
+  update_config:
+    name: Update the versions on configurations
+    runs-on: [ubuntu-latest]
+    if: ${{ always() && ( contains(needs.build_multi_architecture.result, 'success')  || contains(needs.build_only_arm64.result, 'success') || contains(needs.build_only_amd64.result, 'success') ) }}
+    needs:
+      - build_multi_architecture
+      - build_only_arm64
+      - build_only_amd64
+    steps:
+      - name: Wait a minute
+        run: sleep 60
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+      - name: Update the repository with git pull
+        run: git pull origin main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          # cache: 'pip' # caching pip dependencies
+      - name: Install requirements
+        run: pip install -r .tools/requirements.txt
+      - name: Update the version of the notebook on the configuration
+        run: python3 .tools/python_tools/update_zerocost_version.py '${{ inputs.config_file }}' 
+      - name: Update the docker_tag on the configuration
+        run: python3 .tools/python_tools/update_configuration.py '${{ inputs.config_file }}' 
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: GitHub Action - Update the notebook version on the configuration
+
+  update_test_notebook_status:
+    name: Update automated notebook image status
+    if: ${{ always() && needs.get_arguments.result == 'success' }}
+    needs:
+      - get_arguments
+      - build_amd64
+      - build_arm64
+      - build_only_arm64
+      - build_only_amd64
+      - build_multi_architecture
+      - update_config
+    uses: ./.github/workflows/update_test_notebooks.yml
+    with:
+      config_file: ${{ inputs.config_file }}
+      docker_tag: ${{ needs.get_arguments.outputs.docker_tag }}
+      amd64_build: ${{ needs.build_amd64.outputs.amd64_build }}
+      amd64_smoke: ${{ needs.build_amd64.outputs.amd64_smoke }}
+      amd64_generated_at: ${{ needs.build_amd64.outputs.amd64_generated_at }}
+      gpu_build: ${{ needs.build_amd64.outputs.gpu_build }}
+      gpu_smoke: ${{ needs.build_amd64.outputs.gpu_smoke }}
+      gpu_generated_at: ${{ needs.build_amd64.outputs.gpu_generated_at }}
+      arm64_build: ${{ needs.build_arm64.outputs.arm64_build }}
+      arm64_smoke: ${{ needs.build_arm64.outputs.arm64_smoke }}
+      arm64_generated_at: ${{ needs.build_arm64.outputs.arm64_generated_at }}
+      multi_manifest: ${{ needs.build_multi_architecture.result }}
+      amd64_manifest: ${{ needs.build_only_amd64.result }}
+      arm64_manifest: ${{ needs.build_only_arm64.result }}
+

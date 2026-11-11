@@ -1,0 +1,38 @@
+# GENERATED from update_configs_manifest.yml by .tools/python_tools/generate_hosted_workflows.py.
+# Do not edit by hand: change the original workflow and run the generator again.
+# Runs on GitHub-hosted runners instead of the self-hosted ones.
+name: "[GitHub-hosted] Update configuration files with the manifest information from ZeroCostDL4Mic"
+on:
+  # GitHub-hosted copy: manual only, so it never runs alongside the self-hosted
+  # workflow on the same push, release or schedule.
+  workflow_dispatch:
+
+jobs:
+  update_configuration:
+    name: Update configuration files with the manifest information from ZeroCostDL4Mic
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone DL4MicEverywhere repository
+        uses: actions/checkout@v4
+        with:
+            path: DL4MicEverywhere 
+      - name: Clone ZeroCostDL4Mic repository
+        uses: actions/checkout@v4
+        with:
+            repository: HenriquesLab/ZeroCostDL4Mic
+            path: ZeroCostDL4Mic
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          # cache: 'pip' # caching pip dependencies
+      - name: Install requirements
+        working-directory: ./DL4MicEverywhere
+        run: pip install -r .tools/requirements.txt
+      - name: Update all the configurations
+        working-directory: ./DL4MicEverywhere
+        run: python3 .tools/python_tools/update_with_zc_manifest.py
+      - name: Commit the changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          repository: ./DL4MicEverywhere
+          commit_message: GitHub Action - Update configurations with manifest from ZeroCostDL4Mic
