@@ -1346,27 +1346,27 @@
               "build_status": "failure",
               "generated_at": "2026-11-07T01:26:27.954043Z",
               "image_tag": "yolov2_zerocostdl4mic-z1.13-d2.3.0-amd64",
-              "last_attempted_at": "2026-11-10T06:02:26Z",
+              "last_attempted_at": "2026-11-11T12:32:52Z",
               "smoke_status": "skipped"
             },
             "arm64": {
               "build_status": "skipped",
               "image_tag": "yolov2_zerocostdl4mic-z1.13-d2.3.0-arm64",
-              "last_attempted_at": "2026-11-10T06:02:26Z",
+              "last_attempted_at": "2026-11-11T12:32:52Z",
               "smoke_status": "skipped"
             },
             "gpu": {
               "build_status": "skipped",
               "image_tag": "yolov2_zerocostdl4mic-z1.13-d2.3.0-gpu",
-              "last_attempted_at": "2026-11-10T06:02:26Z",
+              "last_attempted_at": "2026-11-11T12:32:52Z",
               "smoke_status": "skipped"
             }
           },
-          "commit_sha": "a459e2a01ea67fe8d2f2f21c9035bacc7a5c0e1f",
+          "commit_sha": "f5fd343a18940b8c5817ed2891a737c070108da3",
           "docker_tag": "yolov2_zerocostdl4mic-z1.13-d2.3.0",
-          "last_attempted_at": "2026-11-10T06:02:26Z",
+          "last_attempted_at": "2026-11-11T12:32:52Z",
           "manifest_status": "skipped",
-          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42623744029"
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/43020362083"
         }
       }
     },
