@@ -1,43 +1,54 @@
 
 CAREamics_CARE_2D:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.0.0(latest)'
+	tag_list: 'careamics_care_2d_zerocostdl4mic-b1.0.0-d2.3.0'
+	1_0_0: careamics_care_2d_zerocostdl4mic-b1.0.0-d2.3.0
 
 CAREamics_CARE_3D:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.0.0(latest)'
+	tag_list: 'careamics_care_3d_zerocostdl4mic-b1.0.0-d2.3.0'
+	1_0_0: careamics_care_3d_zerocostdl4mic-b1.0.0-d2.3.0
 
 CAREamics_Noise2Noise_2D:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.0.0(latest)'
+	tag_list: 'careamics_noise2noise_2d_zerocostdl4mic-b1.0.0-d2.3.0'
+	1_0_0: careamics_noise2noise_2d_zerocostdl4mic-b1.0.0-d2.3.0
 
 CAREamics_Noise2Void_2D:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.0.0(latest)'
+	tag_list: 'careamics_noise2void_2d_zerocostdl4mic-b1.0.0-d2.3.0'
+	1_0_0: careamics_noise2void_2d_zerocostdl4mic-b1.0.0-d2.3.0
 
 CAREamics_Noise2Void_3D:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.0.0(latest)'
+	tag_list: 'careamics_noise2void_3d_zerocostdl4mic-b1.0.0-d2.3.0'
+	1_0_0: careamics_noise2void_3d_zerocostdl4mic-b1.0.0-d2.3.0
 
 bioimageio_pytorch:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.6.0(latest)'
+	tag_list: 'load_bioimageio_pytorch-b1.6.0-d2.3.0'
+	1_6_0: load_bioimageio_pytorch-b1.6.0-d2.3.0
 
 bioimageio_tensorflow:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.0.0(latest)'
+	tag_list: 'load_bioimageio_tensorflow-b1.0.0-d2.3.0'
+	1_0_0: load_bioimageio_tensorflow-b1.0.0-d2.3.0
 
 FRUNet_Exosomes:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.0.0(latest)'
+	tag_list: 'frunet_tem_exosomes_sev-e1.0.0-d2.3.0'
+	1_0_0: frunet_tem_exosomes_sev-e1.0.0-d2.3.0
 
 SISR_Metric_Calculation:
-	version_list: ''
-	tag_list: ''
+	version_list: '0.0.2(latest) 0.0.1'
+	tag_list: 'sisr_metrics_calculation-e0.0.2-d2.3.0 sisr_metrics_calculation-e0.0.1-d2.3.0'
+	0_0_2: sisr_metrics_calculation-e0.0.2-d2.3.0
+	0_0_1: sisr_metrics_calculation-e0.0.1-d2.3.0
 
 3D_RCAN_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.14.2(latest)'
+	tag_list: '3d_rcan_zerocostdl4mic-z1.14.2-d2.3.0'
+	1_14_2: 3d_rcan_zerocostdl4mic-z1.14.2-d2.3.0
 
 CARE_2D_DL4Mic:
 	version_list: '1.15.3(latest)'
@@ -49,102 +60,126 @@ CARE_3D_DL4Mic:
 	tag_list: ''
 
 Cellpose_2D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.16.3(latest)'
+	tag_list: 'cellpose_2d_zerocostdl4mic-z1.16.3-d2.3.0'
+	1_16_3: cellpose_2d_zerocostdl4mic-z1.16.3-d2.3.0
 
 CycleGAN_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.13.5(latest)'
+	tag_list: 'cyclegan_zerocostdl4mic-z1.13.5-d2.3.0'
+	1_13_5: cyclegan_zerocostdl4mic-z1.13.5-d2.3.0
 
 DFCAN_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.14.1(latest)'
+	tag_list: 'dfcan_zerocostdl4mic-z1.14.1-d2.3.0'
+	1_14_1: dfcan_zerocostdl4mic-z1.14.1-d2.3.0
 
 DRMIME_2D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.14.2(latest)'
+	tag_list: 'drmime_2d_zerocostdl4mic-z1.14.2-d2.3.0'
+	1_14_2: drmime_2d_zerocostdl4mic-z1.14.2-d2.3.0
 
 DecoNoising_2D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.14.1(latest)'
+	tag_list: 'deconoising_2d_zerocostdl4mic-z1.14.1-d2.3.0'
+	1_14_1: deconoising_2d_zerocostdl4mic-z1.14.1-d2.3.0
 
 Deep_STORM_2D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.14.2(latest)'
+	tag_list: 'deep-storm_2d_zerocostdl4mic-z1.14.2-d2.3.0'
+	1_14_2: deep-storm_2d_zerocostdl4mic-z1.14.2-d2.3.0
 
 DenoiSeg_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.14.1(latest)'
+	tag_list: 'denoiseg_zerocostdl4mic-z1.14.1-d2.3.0'
+	1_14_1: denoiseg_zerocostdl4mic-z1.14.1-d2.3.0
 
 Detectron2_2D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.15.2(latest)'
+	tag_list: 'detectron2_2d_zerocostdl4mic-z1.15.2-d2.3.0'
+	1_15_2: detectron2_2d_zerocostdl4mic-z1.15.2-d2.3.0
 
 Diffusion_SMLM_DL4Mic:
 	version_list: ''
 	tag_list: ''
 
 Embedseg_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.15.1(latest)'
+	tag_list: 'embedseg_2d_zerocostdl4mic-z1.15.1-d2.3.0'
+	1_15_1: embedseg_2d_zerocostdl4mic-z1.15.1-d2.3.0
 
 MaskRCNN_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.14.2(latest)'
+	tag_list: 'maskrcnn_zerocostdl4mic-z1.14.2-d2.3.0'
+	1_14_2: maskrcnn_zerocostdl4mic-z1.14.2-d2.3.0
 
 Noise2Void_2D_DL4Mic:
 	version_list: ''
 	tag_list: ''
 
 Noise2Void_3D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.16.2(latest)'
+	tag_list: 'noise2void_3d_zerocostdl4mic-z1.16.2-d2.3.0'
+	1_16_2: noise2void_3d_zerocostdl4mic-z1.16.2-d2.3.0
 
 RetinaNet_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.14.1(latest)'
+	tag_list: 'retinanet_zerocostdl4mic-z1.14.1-d2.3.0'
+	1_14_1: retinanet_zerocostdl4mic-z1.14.1-d2.3.0
 
 SplineDist_2D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.14.2(latest) 1.14.1'
+	tag_list: 'splinedist_2d_zerocostdl4mic-z1.14.2-d2.3.0 splinedist_2d_zerocostdl4mic-z1.14.1-d2.3.0'
+	1_14_2: splinedist_2d_zerocostdl4mic-z1.14.2-d2.3.0
+	1_14_1: splinedist_2d_zerocostdl4mic-z1.14.1-d2.3.0
 
 StarDist_2D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.20.5(latest)'
+	tag_list: 'stardist_2d_zerocostdl4mic-z1.20.5-d2.3.0'
+	1_20_5: stardist_2d_zerocostdl4mic-z1.20.5-d2.3.0
 
 StarDist_3D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.15.4(latest)'
+	tag_list: 'stardist_3d_zerocostdl4mic-z1.15.4-d2.3.0'
+	1_15_4: stardist_3d_zerocostdl4mic-z1.15.4-d2.3.0
 
 U_Net_2D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '2.2.2(latest)'
+	tag_list: 'u-net_2d_zerocostdl4mic-z2.2.2-d2.3.0'
+	2_2_2: u-net_2d_zerocostdl4mic-z2.2.2-d2.3.0
 
 U_Net_2D_Multilabel_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '2.2.0(latest)'
+	tag_list: 'u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.3.0'
+	2_2_0: u-net_2d_multilabel_zerocostdl4mic-z2.2.0-d2.3.0
 
 U_Net_3D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '3.1.2(latest)'
+	tag_list: 'u-net_3d_zerocostdl4mic-z3.1.2-d2.3.0'
+	3_1_2: u-net_3d_zerocostdl4mic-z3.1.2-d2.3.0
 
 WGAN_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.15.1(latest)'
+	tag_list: 'wgan_zerocostdl4mic-z1.15.1-d2.3.0'
+	1_15_1: wgan_zerocostdl4mic-z1.15.1-d2.3.0
 
 YOLOv2_DL4Mic:
 	version_list: ''
 	tag_list: ''
 
 fnet_2D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.14.3(latest) 1.14.2'
+	tag_list: 'fnet_2d_zerocostdl4mic-z1.14.3-d2.3.0 fnet_2d_zerocostdl4mic-z1.14.2-d2.3.0'
+	1_14_3: fnet_2d_zerocostdl4mic-z1.14.3-d2.3.0
+	1_14_2: fnet_2d_zerocostdl4mic-z1.14.2-d2.3.0
 
 fnet_3D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.13.2(latest)'
+	tag_list: 'fnet_3d_zerocostdl4mic-z1.13.2-d2.3.0'
+	1_13_2: fnet_3d_zerocostdl4mic-z1.13.2-d2.3.0
 
 pix2pix_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.17.7(latest)'
+	tag_list: 'pix2pix_zerocostdl4mic-z1.17.7-d2.3.0'
+	1_17_7: pix2pix_zerocostdl4mic-z1.17.7-d2.3.0
 
