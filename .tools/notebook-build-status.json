@@ -908,29 +908,29 @@
         "noise2void_2d_zerocostdl4mic-z1.16.2-d2.3.0": {
           "architectures": {
             "amd64": {
-              "build_status": "not_run",
+              "build_status": "failure",
               "image_tag": "noise2void_2d_zerocostdl4mic-z1.16.2-d2.3.0-amd64",
-              "last_attempted_at": "2026-11-08T01:15:38Z",
-              "smoke_status": "not_run"
+              "last_attempted_at": "2026-11-11T13:53:46Z",
+              "smoke_status": "skipped"
             },
             "arm64": {
               "build_status": "failure",
               "image_tag": "noise2void_2d_zerocostdl4mic-z1.16.2-d2.3.0-arm64",
-              "last_attempted_at": "2026-11-08T01:15:38Z",
+              "last_attempted_at": "2026-11-11T13:53:46Z",
               "smoke_status": "skipped"
             },
             "gpu": {
-              "build_status": "not_run",
+              "build_status": "skipped",
               "image_tag": "noise2void_2d_zerocostdl4mic-z1.16.2-d2.3.0-gpu",
-              "last_attempted_at": "2026-11-08T01:15:38Z",
-              "smoke_status": "not_run"
+              "last_attempted_at": "2026-11-11T13:53:46Z",
+              "smoke_status": "skipped"
             }
           },
-          "commit_sha": "f08fe7dc6c60dac43772bfc46617e32da6e8e483",
+          "commit_sha": "47c5da94d57bedbd0e32b74de24f3d636ad2c579",
           "docker_tag": "noise2void_2d_zerocostdl4mic-z1.16.2-d2.3.0",
-          "last_attempted_at": "2026-11-08T01:15:38Z",
+          "last_attempted_at": "2026-11-11T13:53:46Z",
           "manifest_status": "skipped",
-          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42322341568"
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/43032874429"
         }
       }
     },
