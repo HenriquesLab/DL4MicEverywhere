@@ -1342,7 +1342,7 @@
     },
     "notebooks/ZeroCostDL4Mic_notebooks/fnet_2D_DL4Mic/configuration.yaml": {
       "category": "ZeroCostDL4Mic_notebooks",
-      "latest_recorded_tag": "fnet_2d_zerocostdl4mic-z1.14.2-d2.3.0",
+      "latest_recorded_tag": "fnet_2d_zerocostdl4mic-z1.14.3-d2.3.0",
       "name": "Label-free Prediction - fnet - (2D) ZeroCostDL4Mic",
       "notebook_version": "1.14.1",
       "releases": {
@@ -1374,6 +1374,36 @@
           "last_attempted_at": "2026-11-10T12:36:13Z",
           "manifest_status": "success",
           "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42623744029"
+        },
+        "fnet_2d_zerocostdl4mic-z1.14.3-d2.3.0": {
+          "architectures": {
+            "amd64": {
+              "build_status": "success",
+              "generated_at": "2026-11-11T08:42:48Z",
+              "image_tag": "fnet_2d_zerocostdl4mic-z1.14.3-d2.3.0-amd64",
+              "last_attempted_at": "2026-11-11T09:02:32Z",
+              "smoke_status": "success"
+            },
+            "arm64": {
+              "build_status": "success",
+              "generated_at": "2026-11-11T08:59:31Z",
+              "image_tag": "fnet_2d_zerocostdl4mic-z1.14.3-d2.3.0-arm64",
+              "last_attempted_at": "2026-11-11T09:02:32Z",
+              "smoke_status": "success"
+            },
+            "gpu": {
+              "build_status": "success",
+              "generated_at": "2026-11-11T08:50:01Z",
+              "image_tag": "fnet_2d_zerocostdl4mic-z1.14.3-d2.3.0-gpu",
+              "last_attempted_at": "2026-11-11T09:02:32Z",
+              "smoke_status": "success"
+            }
+          },
+          "commit_sha": "713075a5c3e5258441ffdf30d7067a3900c4e48b",
+          "docker_tag": "fnet_2d_zerocostdl4mic-z1.14.3-d2.3.0",
+          "last_attempted_at": "2026-11-11T09:02:32Z",
+          "manifest_status": "success",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42988273839"
         }
       }
     },
