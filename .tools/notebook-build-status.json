@@ -1146,7 +1146,7 @@
       "category": "ZeroCostDL4Mic_notebooks",
       "latest_recorded_tag": "stardist_3d_zerocostdl4mic-z1.15.5-d2.3.0",
       "name": "StarDist (3D) - ZeroCostDL4Mic",
-      "notebook_version": "1.15.4",
+      "notebook_version": "1.15.5",
       "releases": {
         "stardist_3d_zerocostdl4mic-z1.15.4-d2.3.0": {
           "architectures": {
@@ -1181,31 +1181,31 @@
           "architectures": {
             "amd64": {
               "build_status": "success",
-              "generated_at": "2026-11-11T09:39:25Z",
+              "generated_at": "2026-11-10T15:39:19Z",
               "image_tag": "stardist_3d_zerocostdl4mic-z1.15.5-d2.3.0-amd64",
-              "last_attempted_at": "2026-11-11T09:51:38Z",
+              "last_attempted_at": "2026-11-11T17:02:27Z",
               "smoke_status": "success"
             },
             "arm64": {
               "build_status": "success",
-              "generated_at": "2026-11-11T09:37:27Z",
+              "generated_at": "2026-11-10T17:01:09Z",
               "image_tag": "stardist_3d_zerocostdl4mic-z1.15.5-d2.3.0-arm64",
-              "last_attempted_at": "2026-11-11T09:51:38Z",
+              "last_attempted_at": "2026-11-11T17:02:27Z",
               "smoke_status": "success"
             },
             "gpu": {
               "build_status": "success",
-              "generated_at": "2026-11-11T09:46:45Z",
+              "generated_at": "2026-11-10T15:51:57Z",
               "image_tag": "stardist_3d_zerocostdl4mic-z1.15.5-d2.3.0-gpu",
-              "last_attempted_at": "2026-11-11T09:51:38Z",
+              "last_attempted_at": "2026-11-11T17:02:27Z",
               "smoke_status": "success"
             }
           },
-          "commit_sha": "1de74e82607e55ecd1952a003f9fe11d480cae5b",
+          "commit_sha": "c1a8808d967848b905b6a56827c8f053c75f731d",
           "docker_tag": "stardist_3d_zerocostdl4mic-z1.15.5-d2.3.0",
-          "last_attempted_at": "2026-11-11T09:51:38Z",
-          "manifest_status": "success",
-          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42996128290"
+          "last_attempted_at": "2026-11-11T17:02:27Z",
+          "manifest_status": "cancelled",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42832055205"
         }
       }
     },
