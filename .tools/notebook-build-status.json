@@ -1117,7 +1117,7 @@
     },
     "notebooks/ZeroCostDL4Mic_notebooks/StarDist_3D_DL4Mic/configuration.yaml": {
       "category": "ZeroCostDL4Mic_notebooks",
-      "latest_recorded_tag": "stardist_3d_zerocostdl4mic-z1.15.4-d2.3.0",
+      "latest_recorded_tag": "stardist_3d_zerocostdl4mic-z1.15.5-d2.3.0",
       "name": "StarDist (3D) - ZeroCostDL4Mic",
       "notebook_version": "1.15.4",
       "releases": {
@@ -1149,6 +1149,36 @@
           "last_attempted_at": "2026-11-10T12:40:39Z",
           "manifest_status": "success",
           "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42623744029"
+        },
+        "stardist_3d_zerocostdl4mic-z1.15.5-d2.3.0": {
+          "architectures": {
+            "amd64": {
+              "build_status": "success",
+              "generated_at": "2026-11-11T09:39:25Z",
+              "image_tag": "stardist_3d_zerocostdl4mic-z1.15.5-d2.3.0-amd64",
+              "last_attempted_at": "2026-11-11T09:51:38Z",
+              "smoke_status": "success"
+            },
+            "arm64": {
+              "build_status": "success",
+              "generated_at": "2026-11-11T09:37:27Z",
+              "image_tag": "stardist_3d_zerocostdl4mic-z1.15.5-d2.3.0-arm64",
+              "last_attempted_at": "2026-11-11T09:51:38Z",
+              "smoke_status": "success"
+            },
+            "gpu": {
+              "build_status": "success",
+              "generated_at": "2026-11-11T09:46:45Z",
+              "image_tag": "stardist_3d_zerocostdl4mic-z1.15.5-d2.3.0-gpu",
+              "last_attempted_at": "2026-11-11T09:51:38Z",
+              "smoke_status": "success"
+            }
+          },
+          "commit_sha": "1de74e82607e55ecd1952a003f9fe11d480cae5b",
+          "docker_tag": "stardist_3d_zerocostdl4mic-z1.15.5-d2.3.0",
+          "last_attempted_at": "2026-11-11T09:51:38Z",
+          "manifest_status": "success",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42996128290"
         }
       }
     },
