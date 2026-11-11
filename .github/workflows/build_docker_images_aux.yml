@@ -498,8 +498,11 @@ jobs:
           # cache: 'pip' # caching pip dependencies
       - name: Install requirements
         run: pip install -r .tools/requirements.txt
-      - name: Update the version of the notebook on the configuration
-        run: python3 .tools/python_tools/update_zerocost_version.py '${{ inputs.config_file }}' 
+      # notebook_version is not copied from ZeroCostDL4Mic's version list here:
+      # the configurations point to pinned notebook copies in this repository,
+      # so the configured version is the one that was just built and published.
+      # Overwriting it would point the configuration at an image that does not
+      # exist. Adopting a new upstream version is check_zerocost_versions.yml's job.
       - name: Update the docker_tag on the configuration
         run: python3 .tools/python_tools/update_configuration.py '${{ inputs.config_file }}' 
       - uses: stefanzweifel/git-auto-commit-action@v5
