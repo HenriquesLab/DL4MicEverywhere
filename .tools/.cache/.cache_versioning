@@ -139,8 +139,9 @@ StarDist_2D_DL4Mic:
 	1_20_5: stardist_2d_zerocostdl4mic-z1.20.5-d2.3.0
 
 StarDist_3D_DL4Mic:
-	version_list: '1.15.4(latest)'
-	tag_list: 'stardist_3d_zerocostdl4mic-z1.15.4-d2.3.0'
+	version_list: '1.15.5(latest) 1.15.4'
+	tag_list: 'stardist_3d_zerocostdl4mic-z1.15.5-d2.3.0 stardist_3d_zerocostdl4mic-z1.15.4-d2.3.0'
+	1_15_5: stardist_3d_zerocostdl4mic-z1.15.5-d2.3.0
 	1_15_4: stardist_3d_zerocostdl4mic-z1.15.4-d2.3.0
 
 U_Net_2D_DL4Mic:
