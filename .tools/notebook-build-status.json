@@ -1079,7 +1079,7 @@
     },
     "notebooks/ZeroCostDL4Mic_notebooks/StarDist_2D_DL4Mic/configuration.yaml": {
       "category": "ZeroCostDL4Mic_notebooks",
-      "latest_recorded_tag": "stardist_2d_zerocostdl4mic-z1.20.5-d2.3.0",
+      "latest_recorded_tag": "stardist_2d_zerocostdl4mic-z1.20.8-d2.3.0",
       "name": "StarDist (2D) - ZeroCostDL4Mic",
       "notebook_version": "1.20.8",
       "releases": {
@@ -1112,6 +1112,33 @@
           "last_attempted_at": "2026-11-10T12:13:46Z",
           "manifest_status": "success",
           "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42623744029"
+        },
+        "stardist_2d_zerocostdl4mic-z1.20.8-d2.3.0": {
+          "architectures": {
+            "amd64": {
+              "build_status": "failure",
+              "image_tag": "stardist_2d_zerocostdl4mic-z1.20.8-d2.3.0-amd64",
+              "last_attempted_at": "2026-11-11T14:26:50Z",
+              "smoke_status": "skipped"
+            },
+            "arm64": {
+              "build_status": "failure",
+              "image_tag": "stardist_2d_zerocostdl4mic-z1.20.8-d2.3.0-arm64",
+              "last_attempted_at": "2026-11-11T14:26:50Z",
+              "smoke_status": "skipped"
+            },
+            "gpu": {
+              "build_status": "skipped",
+              "image_tag": "stardist_2d_zerocostdl4mic-z1.20.8-d2.3.0-gpu",
+              "last_attempted_at": "2026-11-11T14:26:50Z",
+              "smoke_status": "skipped"
+            }
+          },
+          "commit_sha": "72fb8d70b57d147e8ef3e8ee21a3f9e8a92106d6",
+          "docker_tag": "stardist_2d_zerocostdl4mic-z1.20.8-d2.3.0",
+          "last_attempted_at": "2026-11-11T14:26:50Z",
+          "manifest_status": "skipped",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/43038176469"
         }
       }
     },
