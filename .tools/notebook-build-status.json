@@ -1119,28 +1119,30 @@
         "stardist_2d_zerocostdl4mic-z1.20.8-d2.3.0": {
           "architectures": {
             "amd64": {
-              "build_status": "failure",
+              "build_status": "success",
+              "generated_at": "2026-11-12T11:46:27Z",
               "image_tag": "stardist_2d_zerocostdl4mic-z1.20.8-d2.3.0-amd64",
-              "last_attempted_at": "2026-11-11T14:26:50Z",
-              "smoke_status": "skipped"
+              "last_attempted_at": "2026-11-12T11:56:36Z",
+              "smoke_status": "success"
             },
             "arm64": {
-              "build_status": "failure",
+              "build_status": "success",
+              "generated_at": "2026-11-12T11:45:51Z",
               "image_tag": "stardist_2d_zerocostdl4mic-z1.20.8-d2.3.0-arm64",
-              "last_attempted_at": "2026-11-11T14:26:50Z",
-              "smoke_status": "skipped"
+              "last_attempted_at": "2026-11-12T11:56:36Z",
+              "smoke_status": "success"
             },
             "gpu": {
-              "build_status": "skipped",
+              "build_status": "failure",
               "image_tag": "stardist_2d_zerocostdl4mic-z1.20.8-d2.3.0-gpu",
-              "last_attempted_at": "2026-11-11T14:26:50Z",
+              "last_attempted_at": "2026-11-12T11:56:36Z",
               "smoke_status": "skipped"
             }
           },
           "commit_sha": "72fb8d70b57d147e8ef3e8ee21a3f9e8a92106d6",
           "docker_tag": "stardist_2d_zerocostdl4mic-z1.20.8-d2.3.0",
-          "last_attempted_at": "2026-11-11T14:26:50Z",
-          "manifest_status": "skipped",
+          "last_attempted_at": "2026-11-12T11:56:36Z",
+          "manifest_status": "success",
           "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/43038176469"
         }
       }
