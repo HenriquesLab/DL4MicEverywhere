@@ -16,10 +16,10 @@ config:
     description: StarDist_2D_DL4Mic is the conversion of the 2D StarDist from ZeroCostDL4Mic.
     dl4miceverywhere_version: 2.3.0
     docker_hub_image: stardist_2d_zerocostdl4mic-z1.20.8-d2.3.0
-    notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/335211c4edc1d43fdce664267431109fec32f142/notebooks/ZeroCostDL4Mic_notebooks/StarDist_2D_DL4Mic/StarDist_2D_ZeroCostDL4Mic.ipynb
+    notebook_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/e554d621e71e51fe4f877d45f9cbccb91ad3e9e7/notebooks/ZeroCostDL4Mic_notebooks/StarDist_2D_DL4Mic/StarDist_2D_ZeroCostDL4Mic.ipynb
     notebook_version: 1.20.8
     python_version: '3.12'
-    requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/335211c4edc1d43fdce664267431109fec32f142/notebooks/ZeroCostDL4Mic_notebooks/StarDist_2D_DL4Mic/requirements.txt
+    requirements_url: https://raw.githubusercontent.com/HenriquesLab/DL4MicEverywhere/e554d621e71e51fe4f877d45f9cbccb91ad3e9e7/notebooks/ZeroCostDL4Mic_notebooks/StarDist_2D_DL4Mic/requirements.txt
     sections_to_remove: 1.1. 1.2. 2. 6.3.
     ubuntu_version: '22.04'
 covers:
@@ -29,7 +29,7 @@ covers:
 - https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/Wiki_files/StarDist_trainingfluo_trackmate.png
 description: 2D instance segmentation of oval objects (ie nuclei). StarDist is a deep-learning method that can be used to segment cell nuclei in 2D (xy) single images or in stacks (xyz). Note - visit the ZeroCostDL4Mic wiki to check the original publications this network is based on and make sure you cite these.
 documentation: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/BioimageModelZoo/README.md
-download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/481a3f3e2e1692dc27aa22f4ef3986f455ed3245/Colab_notebooks/StarDist_2D_ZeroCostDL4Mic.ipynb
+download_url: https://raw.githubusercontent.com/HenriquesLab/ZeroCostDL4Mic/20adf66c50ca884fa60f43c0d9e0d6cd5aec9b58/Colab_notebooks/StarDist_2D_ZeroCostDL4Mic.ipynb
 git_repo: https://github.com/HenriquesLab/ZeroCostDL4Mic
 id: Notebook_StarDist_2D_ZeroCostDL4Mic
 license: MIT
@@ -51,4 +51,4 @@ tags:
 - 2D
 - dl4miceverywhere
 type: application
-version: 1.20.5
+version: 1.20.8
