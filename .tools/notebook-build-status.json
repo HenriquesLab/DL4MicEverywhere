@@ -455,29 +455,31 @@
         "care_3d_zerocostdl4mic-z1.15.3-d2.3.0": {
           "architectures": {
             "amd64": {
-              "build_status": "failure",
+              "build_status": "success",
+              "generated_at": "2026-11-12T13:57:13Z",
               "image_tag": "care_3d_zerocostdl4mic-z1.15.3-d2.3.0-amd64",
-              "last_attempted_at": "2026-11-10T05:19:11Z",
-              "smoke_status": "skipped"
+              "last_attempted_at": "2026-11-12T14:09:43Z",
+              "smoke_status": "success"
             },
             "arm64": {
               "build_status": "skipped",
               "image_tag": "care_3d_zerocostdl4mic-z1.15.3-d2.3.0-arm64",
-              "last_attempted_at": "2026-11-10T05:19:11Z",
+              "last_attempted_at": "2026-11-12T14:09:43Z",
               "smoke_status": "skipped"
             },
             "gpu": {
-              "build_status": "skipped",
+              "build_status": "success",
+              "generated_at": "2026-11-12T14:04:31Z",
               "image_tag": "care_3d_zerocostdl4mic-z1.15.3-d2.3.0-gpu",
-              "last_attempted_at": "2026-11-10T05:19:11Z",
-              "smoke_status": "skipped"
+              "last_attempted_at": "2026-11-12T14:09:43Z",
+              "smoke_status": "success"
             }
           },
-          "commit_sha": "a459e2a01ea67fe8d2f2f21c9035bacc7a5c0e1f",
+          "commit_sha": "6eeaf229f3cce6701b65c415982409fe9f5d1e38",
           "docker_tag": "care_3d_zerocostdl4mic-z1.15.3-d2.3.0",
-          "last_attempted_at": "2026-11-10T05:19:11Z",
-          "manifest_status": "skipped",
-          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/42623744029"
+          "last_attempted_at": "2026-11-12T14:09:43Z",
+          "manifest_status": "success",
+          "run_url": "https://github.com/HenriquesLab/DL4MicEverywhere/actions/runs/43231036100"
         }
       }
     },
