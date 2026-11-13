@@ -56,8 +56,9 @@ CARE_2D_DL4Mic:
 	1_15_3: care_2d_zerocostdl4mic-z1.15.3-d2.3.0
 
 CARE_3D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.15.3(latest)'
+	tag_list: 'care_3d_zerocostdl4mic-z1.15.3-d2.3.0'
+	1_15_3: care_3d_zerocostdl4mic-z1.15.3-d2.3.0
 
 Cellpose_2D_DL4Mic:
 	version_list: '1.16.3(latest)'
@@ -114,8 +115,9 @@ MaskRCNN_DL4Mic:
 	1_14_2: maskrcnn_zerocostdl4mic-z1.14.2-d2.3.0
 
 Noise2Void_2D_DL4Mic:
-	version_list: ''
-	tag_list: ''
+	version_list: '1.16.2(latest)'
+	tag_list: 'noise2void_2d_zerocostdl4mic-z1.16.2-d2.3.0'
+	1_16_2: noise2void_2d_zerocostdl4mic-z1.16.2-d2.3.0
 
 Noise2Void_3D_DL4Mic:
 	version_list: '1.16.2(latest)'
@@ -134,8 +136,9 @@ SplineDist_2D_DL4Mic:
 	1_14_1: splinedist_2d_zerocostdl4mic-z1.14.1-d2.3.0
 
 StarDist_2D_DL4Mic:
-	version_list: '1.20.5(latest)'
-	tag_list: 'stardist_2d_zerocostdl4mic-z1.20.5-d2.3.0'
+	version_list: '1.20.8(latest) 1.20.5'
+	tag_list: 'stardist_2d_zerocostdl4mic-z1.20.8-d2.3.0 stardist_2d_zerocostdl4mic-z1.20.5-d2.3.0'
+	1_20_8: stardist_2d_zerocostdl4mic-z1.20.8-d2.3.0
 	1_20_5: stardist_2d_zerocostdl4mic-z1.20.5-d2.3.0
 
 StarDist_3D_DL4Mic:
